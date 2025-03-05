@@ -10,14 +10,14 @@ JodoTarot est une application web élégante et intuitive qui vous permet de ré
 
 - 🎴 **Tirage en croix** avec 5 cartes (influences positives, passé, situation actuelle, futur, influences négatives)
 - 🧠 **Interprétation par IA** de votre tirage en fonction de votre question
-- 👤 **Personnages variés** pour interpréter votre tirage (10 personas différents)
+- 👤 **Personnages variés** pour interpréter votre tirage (11 personas différents)
 - 🔄 **Flexibilité des modèles d'IA** (OpenAI et modèles locaux Ollama)
 - 📱 **Interface responsive** adaptée à tous les appareils
 - 🖼️ **Visualisation claire** des cartes et de leur signification dans le tirage
 
 ## 🎭 Les personas disponibles
 
-JodoTarot propose 10 personnages différents pour interpréter votre tirage:
+JodoTarot propose 11 personnages différents pour interpréter votre tirage:
 
 ### Univers mystique et ésotérique:
 - 🔮 **Tarologue** - L'expert traditionnel du tarot
@@ -32,6 +32,14 @@ JodoTarot propose 10 personnages différents pour interpréter votre tirage:
 - ☯️ **Carl Gustav Jung** - Explorateur de l'inconscient collectif
 - 🔄 **Jacques Lacan** - Théoricien du symbolisme
 - 👶 **Françoise Dolto** - Spécialiste de la psychanalyse de l'enfant
+
+### Traditions Spirituelles:
+- ✝️ **Prêtre Exégète** - Interprète des textes sacrés chrétiens
+- ✡️ **Rabbin Kabbaliste** - Érudit des mystères de la Kabbale
+- ☪️ **Imam Sage** - Guide spirituel dans la tradition islamique
+
+### Entités Surnaturelles:
+- 😈 **Démon des Pactes** - Être des ténèbres offrant des vérités cachées
 
 ## 🃏 Le jeu de tarot
 
@@ -123,7 +131,7 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 Développé avec ❤️ pour les amateurs de tarot et d'exploration intérieure.
 
-## �� Dépannage
+## 🔧 Dépannage
 
 ### Problèmes courants et solutions
 
