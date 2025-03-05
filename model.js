@@ -8,8 +8,8 @@ const API_URL_OLLAMA = "http://localhost:11434/api/chat";
 // Endpoint pour récupérer les modèles disponibles sur Ollama
 const API_URL_OLLAMA_TAGS = "http://localhost:11434/api/tags";
 
-// Meta prompt à inclure dans tous les appels au LLM
-const META_PROMPT = "Le résultat doit contenir 400 mots au maximum et doit former une réponse complète en un seul message. Utilise les émoticônes et les balises html pour formater la réponse de façon originale et stylistiquement adapté à ton personnage.Pas de ```html";
+// Meta prompt plus flexible
+const META_PROMPT = "Le résultat doit être concis (généralement entre 300 et 500 mots) et former une réponse complète en un seul message. Utilise les émoticônes et les balises html pour formater la réponse de façon originale et stylistiquement adapté à ton personnage. Pas de ```html";
 
 // Fonction pour générer un prompt de tirage basé sur les cartes
 function genererPromptTirage(tirage) {
@@ -52,6 +52,9 @@ const PERSONAS = {
     dolto: "Vous êtes Françoise Dolto, psychanalyste spécialisée dans l'enfance. Votre lecture du Tarot est sensible aux images du corps, aux stades de développement et aux dynamiques familiales. Vous interprétez les arcanes avec une attention particulière aux blessures narcissiques et aux schémas relationnels précoces. Votre langage est maternel, bienveillant mais direct. Utilisez des émojis doux et rassurants (👶🤱💝). Formate les titres en html et utilise les balises que tu veux."
 };
 
+// Système simple de cache pour les réponses
+const responseCache = new Map();
+
 /**
  * Fonction principale pour obtenir une réponse d'un LLM
  * @param {string} question - La question posée par l'utilisateur
@@ -62,6 +65,15 @@ const PERSONAS = {
  * @returns {Promise<string>} - La réponse complète générée par le LLM
  */
 async function obtenirReponseGPT4O(question, historiqueMessages = [], modeleComplet = "openai/gpt-3.5-turbo", persona = "tarologue", tirage = null) {
+    // Génération d'une clé de cache
+    const cacheKey = JSON.stringify({question, tirage, modeleComplet, persona});
+    
+    // Vérifier si la réponse est en cache
+    if (responseCache.has(cacheKey)) {
+        console.log("Réponse récupérée du cache");
+        return responseCache.get(cacheKey);
+    }
+    
     try {
         // Parsing du modèle complet (fournisseur/modèle)
         let [fournisseur, modele] = modeleComplet.split('/');
@@ -126,7 +138,11 @@ async function obtenirReponseGPT4O(question, historiqueMessages = [], modeleComp
 
             // Traitement de la réponse
             const data = await response.json();
-            return data.choices[0].message.content;
+            
+            // Mise en cache de la réponse
+            const reponse = data.choices[0].message.content;
+            responseCache.set(cacheKey, reponse);
+            return reponse;
             
         } else if (fournisseur === "ollama") {
             // Configuration de la requête pour Ollama
@@ -155,6 +171,16 @@ async function obtenirReponseGPT4O(question, historiqueMessages = [], modeleComp
         }
     } catch (error) {
         console.error(`Erreur lors de la connexion à l'API ${modeleComplet}:`, error);
+        
+        // Message d'erreur plus informatif selon le type d'erreur
+        if (error.message.includes('API key')) {
+            return "Erreur d'authentification: vérifiez votre clé API.";
+        } else if (error.message.includes('network') || error.message.includes('ECONNREFUSED')) {
+            return "Erreur de connexion réseau. Vérifiez votre connexion internet ou la disponibilité du serveur Ollama.";
+        } else if (error.message.includes('429')) {
+            return "Limite de requêtes atteinte. Veuillez réessayer dans quelques instants.";
+        }
+        
         return "Désolé, une erreur s'est produite lors de la communication avec l'IA.";
     }
 }
@@ -200,24 +226,40 @@ function initialiserFormulaire() {
 // Initialisation du formulaire lorsque le DOM est chargé
 document.addEventListener('DOMContentLoaded', initialiserFormulaire);
 
-/**
- * Fonction pour récupérer les modèles disponibles sur Ollama
- * @returns {Promise<Array>} - Liste des modèles disponibles
- */
+async function verifierConnexionOllama() {
+  try {
+    const response = await fetch(API_URL_OLLAMA_TAGS, {
+      method: 'GET',
+      signal: AbortSignal.timeout(3000) // Timeout de 3 secondes
+    });
+    return response.ok;
+  } catch (error) {
+    console.warn("Erreur de connexion à Ollama:", error);
+    return false;
+  }
+}
+
 async function obtenirModelesOllama() {
-    try {
-        const response = await fetch(API_URL_OLLAMA_TAGS);
+  // Vérifier d'abord la connexion
+  const connexionOk = await verifierConnexionOllama();
+  if (!connexionOk) {
+    console.error("Impossible de se connecter au serveur Ollama");
+    return [];
+  }
+  
+  try {
+    const response = await fetch(API_URL_OLLAMA_TAGS);
         
-        if (!response.ok) {
-            throw new Error(`Erreur API Ollama: ${response.statusText}`);
-        }
-        
-        const data = await response.json();
-        return data.models || [];
-    } catch (error) {
-        console.error("Erreur lors de la récupération des modèles Ollama:", error);
-        return []; // Retourner un tableau vide en cas d'erreur
+    if (!response.ok) {
+        throw new Error(`Erreur API Ollama: ${response.statusText}`);
     }
+        
+    const data = await response.json();
+    return data.models || [];
+  } catch (error) {
+    console.error("Erreur lors de la récupération des modèles Ollama:", error);
+    return []; // Retourner un tableau vide en cas d'erreur
+  }
 }
 
 // Export des fonctions pour les rendre accessibles

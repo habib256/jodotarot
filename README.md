@@ -122,3 +122,47 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 ---
 
 Développé avec ❤️ pour les amateurs de tarot et d'exploration intérieure.
+
+## �� Dépannage
+
+### Problèmes courants et solutions
+
+1. **"Erreur de connexion à l'API OpenAI"**
+   - Vérifiez que votre clé API est correcte et possède des crédits suffisants
+   - Assurez-vous que votre connexion internet fonctionne correctement
+
+2. **"Impossible de se connecter à Ollama"**
+   - Vérifiez que le serveur Ollama est bien lancé: `ollama serve`
+   - Assurez-vous qu'Ollama écoute sur le port 11434
+   - Vérifiez que vous avez au moins un modèle installé: `ollama list`
+
+3. **"Le tirage ne s'affiche pas correctement"**
+   - Essayez de rafraîchir la page
+   - Vérifiez que JavaScript est activé dans votre navigateur
+   - Assurez-vous que le chemin vers les images est correct
+
+4. **"L'interprétation est toujours la même"**
+   - Essayez de poser des questions plus variées
+   - Utilisez un modèle d'IA plus avancé (comme GPT-4o)
+   - Alternez entre différents personas
+
+## 📦 Configuration d'Ollama (pour les modèles locaux)
+
+Pour utiliser les modèles d'IA locaux avec JodoTarot:
+
+1. **Installez Ollama** - Suivez les instructions sur [ollama.ai](https://ollama.ai)
+2. **Démarrez le serveur**: 
+   ```bash
+   ollama serve
+   ```
+3. **Installez au moins un modèle compatible**:
+   ```bash
+   # Modèles recommandés pour JodoTarot
+   ollama pull llama3
+   ollama pull mistral
+   ```
+4. **Vérifiez que les modèles sont disponibles**:
+   ```bash
+   ollama list
+   ```
+5. **Lancez JodoTarot** et sélectionnez un de vos modèles Ollama dans le menu déroulant
