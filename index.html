@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tirage de Tarot en Croix</title>
+  <style>
+    body { 
+      font-family: sans-serif; 
+      text-align: center; 
+      margin: 0;
+      padding: 0;
+    }
+    /* Entête avec logo et question */
+    .header {
+      display: flex;
+      align-items: center;
+      padding: 10px 20px;
+      margin-bottom: 20px;
+      position: relative; /* Pour permettre le positionnement absolu des menus */
+    }
+    .logo-container {
+      margin-right: 30px;
+    }
+    .logo-container img {
+      height: 240px; /* Augmenté de 160px × 1,5 = 240px */
+      width: auto;
+    }
+    .header-question {
+      flex: 1;
+      text-align: left;
+      max-width: 45%; /* Réduit de 60% à 45% pour éviter tout chevauchement */
+    }
+    /* Conteneur principal en deux colonnes */
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 20px;
+      margin: 10px;
+    }
+    .left-panel {
+      flex: 1;
+      min-width: 300px;
+      text-align: left;
+      padding: 10px;
+      border-right: 1px solid #ccc;
+    }
+    .right-panel {
+      width: 550px; /* Réduit par rapport à la version précédente (650px) */
+      flex: 0 0 auto; /* Ne pas rétrécir ni agrandir */
+      padding: 10px;
+      position: relative;
+      min-height: 550px; /* Légèrement réduit */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    /* Grille de la croix */
+    .spread {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      grid-template-rows: auto auto auto;
+      grid-template-areas: 
+        ". top ."
+        "left center right"
+        ". bottom .";
+      column-gap: 8px; /* Légèrement réduit */
+      row-gap: 8px; /* Légèrement réduit */
+      width: 100%;
+      max-width: 500px; /* Réduit par rapport à la version précédente (600px) */
+      margin: 5px auto;
+      position: relative;
+    }
+    .top { grid-area: top; }
+    .left { grid-area: left; }
+    .center { grid-area: center; }
+    .right { grid-area: right; }
+    .bottom { grid-area: bottom; }
+    .card { 
+      width: 100%; 
+      max-width: 130px; /* Réduit de 150px à 130px */
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      transform-origin: center center;
+      position: relative;
+      z-index: 1;
+    }
+    .card.enlarged {
+      position: fixed;
+      top: 0;
+      right: 0; /* Changé de left: 0 à right: 0 */
+      width: 40%; /* Changé de 100% à 60% pour n'occuper que la partie droite */
+      height: 100%;
+      max-width: none;
+      max-height: none;
+      z-index: 1000;
+      object-fit: contain;
+      padding: 20px;
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+    button { padding: 10px 20px; font-size: 16px; margin-top: 20px; }
+    .input-group {
+      margin-bottom: 15px;
+    }
+    .question-input {
+      width: 100%; /* Changé de 90% à 100% pour utiliser tout l'espace disponible dans header-question */
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      min-height: 50px;
+      resize: vertical;
+      font-family: inherit;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    #interpretations {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f8f8f8;
+      border-radius: 5px;
+      border-left: 3px solid #6b5b95;
+    }
+    .loading {
+      text-align: center;
+      color: #666;
+      font-style: italic;
+    }
+    /* Styles pour les nouveaux éléments */
+    .controls-container {
+      display: flex;
+      align-items: center;
+      margin-top: 10px;
+    }
+    .selection-controls {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 10; /* Pour s'assurer que les menus apparaissent au-dessus des autres éléments */
+      text-align: left;
+    }
+    .select-group {
+      position: relative;
+    }
+    .select-dropdown {
+      padding: 9px 15px;
+      font-size: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: white;
+      appearance: none;
+      cursor: pointer;
+      min-width: 180px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Ajoute une légère ombre pour plus de profondeur */
+      transition: border-color 0.3s, box-shadow 0.3s; /* Animation de transition */
+    }
+    
+    .select-dropdown:hover {
+      border-color: #6b5b95; /* Couleur violette assortie à la bordure du panneau d'interprétation */
+      box-shadow: 0 2px 6px rgba(107, 91, 149, 0.2); /* Ombre violette légère */
+    }
+    
+    .select-dropdown:focus {
+      outline: none;
+      border-color: #6b5b95;
+      box-shadow: 0 0 0 3px rgba(107, 91, 149, 0.25); /* Contour de focus */
+    }
+    .select-group::after {
+      content: '▼';
+      font-size: 10px;
+      color: #666;
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+    /* Étiquettes pour les menus déroulants */
+    .select-label {
+      display: block;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 3px;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo-container">
+      <img id="persona-logo" src="personas/tarologue.png" alt="Logo Persona" />
+    </div>
+    <div class="header-question">
+      <div class="input-group">
+        <label for="question">Votre question :</label>
+        <textarea id="question" placeholder="Entrez votre question pour ce tirage..." class="question-input" rows="2"></textarea>
+      </div>
+      <div class="controls-container">
+        <button id="tirer">Tirer les cartes</button>
+      </div>
+    </div>
+    
+    <!-- Menus déroulants à droite -->
+    <div class="selection-controls">
+      <div class="select-group">
+        <span class="select-label">Modèle d'IA :</span>
+        <select id="ia-model" class="select-dropdown">
+          <optgroup label="OpenAI">
+            <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
+            <option value="openai/gpt-3.5-turbo" selected>GPT-3.5 Turbo</option>
+            <option value="openai/gpt-4o">GPT-4o</option>
+          </optgroup>
+          <optgroup label="Ollama">
+            <!-- Les modèles Ollama seront chargés dynamiquement au démarrage -->
+            <option value="" disabled>Chargement des modèles...</option>
+          </optgroup>
+        </select>
+      </div>
+      
+      <div class="select-group">
+        <span class="select-label">Personnage occulte :</span>
+        <select id="persona" class="select-dropdown">
+          <option value="tarologue">🔮 Tarologue</option>
+          <option value="oracle">✨ Oracle Mystique</option>
+          <option value="sorciere">🌙 Sorcière Ancestrale</option>
+          <option value="alchimiste">⚗️ Alchimiste Ésotérique</option>
+          <option value="voyante">🎯 Voyante Gitane</option>
+          <option value="mage">🌟 Mage Élémentaliste</option>
+          <option value="freud">🛋️ Sigmund Freud</option>
+          <option value="jung">☯️ Carl Gustav Jung</option>
+          <option value="lacan">🔄 Jacques Lacan</option>
+          <option value="dolto">👶 Françoise Dolto</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  
+  <div class="container">
+    <div class="left-panel">
+      <div id="interpretations">
+        <p>Les interprétations s'afficheront ici après le tirage.</p>
+      </div>
+    </div>
+    <div class="right-panel">
+      <div id="spread" class="spread">
+        <div class="top"></div>
+        <div class="left"></div>
+        <div class="center"></div>
+        <div class="right"></div>
+        <div class="bottom"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import du module model.js -->
+  <script type="module">
+    import { obtenirReponseGPT4O, obtenirModelesOllama } from './model.js';
+
+    // Tableau des cartes du tarot avec les chemins vers les images
+    const cards = [
+      { id: "00", name: "Le fou", image: "set01/00 Le fou.png" },
+      { id: "01", name: "Bateleur", image: "set01/01 Bateleur.png" },
+      { id: "02", name: "Papesse", image: "set01/02 Papesse.png" },
+      { id: "03", name: "Imperatrice", image: "set01/03 Imperatrice.png" },
+      { id: "04", name: "Empereur", image: "set01/04 Empereur.png" },
+      { id: "05", name: "Pape", image: "set01/05 Pape.png" },
+      { id: "06", name: "Les amoureux", image: "set01/06 Les amoureux.png" },
+      { id: "07", name: "Chariot", image: "set01/07 Chariot.png" },
+      { id: "08", name: "Justice", image: "set01/08 Justice.png" },
+      { id: "09", name: "Ermite", image: "set01/09 Ermite.png" },
+      { id: "10", name: "La roue", image: "set01/10 La roue.png" },
+      { id: "11", name: "Force", image: "set01/11 Force.png" },
+      { id: "12", name: "Le pendu", image: "set01/12 Le pendu.png" },
+      { id: "13", name: "La mort", image: "set01/13 La mort.png" },
+      { id: "14", name: "Temperance", image: "set01/14 Temperance.png" },
+      { id: "15", name: "Diable", image: "set01/15 Diable.png" },
+      { id: "16", name: "La Tour", image: "set01/16 La Tour.png" },
+      { id: "17", name: "Etoile", image: "set01/17 Etoile.png" },
+      { id: "18", name: "La lune", image: "set01/18 La lune.png" },
+      { id: "19", name: "Le soleil", image: "set01/19 Le soleil.png" },
+      { id: "20", name: "Le jugement", image: "set01/20 Le jugement.png" },
+      { id: "21", name: "Le monde", image: "set01/21 Le monde.png" },
+      { id: "22", name: "Dos de carte", image: "set01/22 Dos de carte.png" }
+    ];
+
+    // Variables pour stocker le tirage actuel
+    let tirageActuel = [];
+    let questionActuelle = "";
+
+    // Fonction pour mélanger un tableau
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    // Fonction pour générer le HTML d'une carte (uniquement l'image)
+    function renderCard(card) {
+      return `<img src="${card.image}" alt="${card.name}" class="card" onclick="toggleEnlarge(this)">`;
+    }
+
+    // Fonction pour initialiser le tirage en affichant le dos des cartes dans la croix
+    function initSpread() {
+      const backHTML = `<img src="set01/22 Dos de carte.png" alt="Dos de carte" class="card">`;
+      const cells = document.querySelectorAll('.top, .left, .center, .right, .bottom');
+      cells.forEach(cell => cell.innerHTML = backHTML);
+    }
+
+    // Fonction pour obtenir l'interprétation du tirage via GPT-4o
+    async function obtenirInterpretation(tirage, question) {
+      const interpretationsDiv = document.getElementById('interpretations');
+      interpretationsDiv.innerHTML = '<p class="loading">Analyse du tirage en cours...</p>';
+      
+      // Récupération des options sélectionnées
+      const modeleIA = document.getElementById('ia-model').value;
+      const persona = document.getElementById('persona').value;
+      
+      // Préparation de la question pour l'interprétation
+      const prompt = `Interprétez ce tirage de tarot en croix en relation avec ma question: "${question}"`;
+      
+      try {
+        // Affichage d'un message indiquant le modèle et le personnage utilisés
+        interpretationsDiv.innerHTML = `<p class="loading">Analyse du tirage en cours avec ${modeleIA} interprété par un(e) ${getPersonaLabel(persona)}...</p>`;
+        
+        // Appel à l'API GPT-4o via notre fonction avec les options sélectionnées
+        const reponse = await obtenirReponseGPT4O(prompt, [], modeleIA, persona, tirage);
+        
+        // Mise en forme de la réponse
+        const formattedResponse = reponse.split('\n').map(paragraph => 
+          paragraph ? `<p>${paragraph}</p>` : ''
+        ).join('');
+        
+        interpretationsDiv.innerHTML = formattedResponse;
+      } catch (error) {
+        console.error("Erreur lors de l'interprétation:", error);
+        interpretationsDiv.innerHTML = '<p>Une erreur est survenue lors de l\'interprétation. Veuillez réessayer.</p>';
+      }
+    }
+    
+    // Fonction pour obtenir le libellé d'un persona à partir de sa valeur
+    function getPersonaLabel(personaValue) {
+      const personaSelect = document.getElementById('persona');
+      for (let i = 0; i < personaSelect.options.length; i++) {
+        if (personaSelect.options[i].value === personaValue) {
+          return personaSelect.options[i].text;
+        }
+      }
+      return "Tarologue";
+    }
+
+    // Fonction pour effectuer un tirage de 5 cartes
+    function faireUnTirage() {
+      // Récupérer la question
+      const question = document.getElementById('question').value.trim();
+      
+      // Vérifier si une question a été posée
+      if (!question) {
+        alert("Veuillez entrer une question avant de tirer les cartes.");
+        return;
+      }
+      
+      // Mémoriser la question
+      questionActuelle = question;
+      
+      // Mélanger les cartes (exclure la dernière qui est le dos de carte)
+      const jeuMelange = shuffle([...cards.slice(0, -1)]);
+      
+      // Sélectionner les 5 premières cartes pour le tirage
+      tirageActuel = jeuMelange.slice(0, 5);
+      
+      // Afficher les cartes dans la croix (en haut, en bas, à droite, à gauche, au centre)
+      const positions = document.querySelectorAll('.top, .bottom, .right, .left, .center');
+      positions.forEach((position, index) => {
+        if (index < tirageActuel.length) {
+          position.innerHTML = renderCard(tirageActuel[index]);
+        }
+      });
+      
+      // Obtenir l'interprétation
+      obtenirInterpretation(tirageActuel, questionActuelle);
+    }
+
+    // Fonction pour agrandir/réduire une carte
+    window.toggleEnlarge = function(img) {
+      img.classList.toggle('enlarged');
+    };
+
+    // Fonction pour mettre à jour l'image du logo en fonction du persona sélectionné
+    function updatePersonaLogo(persona) {
+      const logoImg = document.getElementById('persona-logo');
+      // Gestion du cas spécial pour le Mage Élémentaliste
+      const imageName = persona === "mage" ? "elementaliste" : persona;
+      logoImg.src = `personas/${imageName}.png`;
+      logoImg.alt = `${getPersonaLabel(persona)}`;
+    }
+
+    // Fonction pour charger les modèles Ollama disponibles
+    async function chargerModelesOllama() {
+      try {
+        const selectModele = document.getElementById('ia-model');
+        const groupeOllama = selectModele.querySelector('optgroup[label="Ollama"]');
+        
+        // Afficher un message de chargement
+        const optionChargement = document.createElement('option');
+        optionChargement.textContent = "Chargement des modèles...";
+        optionChargement.disabled = true;
+        groupeOllama.appendChild(optionChargement);
+        
+        // Récupérer les modèles disponibles
+        const modeles = await obtenirModelesOllama();
+        
+        // Supprimer le message de chargement
+        groupeOllama.removeChild(optionChargement);
+        
+        // Supprimer les options existantes du groupe Ollama
+        while (groupeOllama.firstChild) {
+          groupeOllama.removeChild(groupeOllama.firstChild);
+        }
+        
+        if (modeles.length === 0) {
+          // Si aucun modèle n'est disponible
+          const optionErreur = document.createElement('option');
+          optionErreur.textContent = "Aucun modèle disponible";
+          optionErreur.disabled = true;
+          groupeOllama.appendChild(optionErreur);
+        } else {
+          // Ajouter les modèles disponibles
+          modeles.forEach(modele => {
+            const option = document.createElement('option');
+            option.value = `ollama/${modele.name}`;
+            option.textContent = modele.name;
+            groupeOllama.appendChild(option);
+          });
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement des modèles Ollama:", error);
+        
+        // Mettre à jour le groupe avec un message d'erreur
+        const selectModele = document.getElementById('ia-model');
+        const groupeOllama = selectModele.querySelector('optgroup[label="Ollama"]');
+        
+        // Supprimer les options existantes
+        while (groupeOllama.firstChild) {
+          groupeOllama.removeChild(groupeOllama.firstChild);
+        }
+        
+        // Ajouter un message d'erreur
+        const optionErreur = document.createElement('option');
+        optionErreur.textContent = "Erreur de connexion à Ollama";
+        optionErreur.disabled = true;
+        groupeOllama.appendChild(optionErreur);
+      }
+    }
+
+    // Initialisation au chargement de la page
+    document.addEventListener('DOMContentLoaded', () => {
+      // Afficher le dos des cartes
+      initSpread();
+      
+      // Ajouter un gestionnaire d'événements au bouton de tirage
+      document.getElementById('tirer').addEventListener('click', faireUnTirage);
+      
+      // Ajouter un gestionnaire d'événements au menu déroulant des personas
+      document.getElementById('persona').addEventListener('change', function() {
+        updatePersonaLogo(this.value);
+      });
+      
+      // Initialiser le logo avec le persona par défaut
+      updatePersonaLogo(document.getElementById('persona').value);
+      
+      // Charger les modèles Ollama disponibles
+      chargerModelesOllama();
+    });
+  </script>
+</body>
+</html> 
