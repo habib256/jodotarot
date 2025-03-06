@@ -45,28 +45,28 @@ JodoTarot propose 11 personnages différents pour interpréter votre tirage:
 
 L'application utilise un jeu complet des 22 arcanes majeurs du tarot de Marseille:
 
-- 00 Le Fou
-- 01 Le Bateleur
-- 02 La Papesse
-- 03 L'Impératrice
-- 04 L'Empereur
-- 05 Le Pape
-- 06 Les Amoureux
-- 07 Le Chariot
-- 08 La Justice
-- 09 L'Ermite
-- 10 La Roue de Fortune
-- 11 La Force
-- 12 Le Pendu
-- 13 La Mort
-- 14 La Tempérance
-- 15 Le Diable
-- 16 La Tour
-- 17 L'Étoile
-- 18 La Lune
-- 19 Le Soleil
-- 20 Le Jugement
-- 21 Le Monde
+- 0 Le Fou
+- I Le Bateleur
+- II La Papesse
+- III L'Impératrice
+- IV L'Empereur
+- V Le Pape
+- VI Les Amoureux
+- VII Le Chariot
+- VIII La Justice
+- IX L'Ermite
+- X La Roue de Fortune
+- XI La Force
+- XII Le Pendu
+- XIII La Mort
+- XIV La Tempérance
+- XV Le Diable
+- XVI La Tour
+- XVII L'Étoile
+- XVIII La Lune
+- XIX Le Soleil
+- XX Le Jugement
+- XXI Le Monde
 
 ## 🤖 Modèles d'IA supportés
 

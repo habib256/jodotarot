@@ -15,21 +15,44 @@
     .header {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       padding: 10px 20px;
       margin-bottom: 20px;
-      position: relative; /* Pour permettre le positionnement absolu des menus */
+      position: relative;
+    }
+    .left-side-container {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex: 0 0 auto;
     }
     .logo-container {
-      margin-right: 30px;
+      display: flex;
+      justify-content: center;
+      flex: 0 0 auto;
+      margin-left: 10px;
+      margin-right: 20px;
     }
     .logo-container img {
-      height: 240px; /* Augmenté de 160px × 1,5 = 240px */
+      height: 305px;
       width: auto;
+    }
+    .selection-controls {
+      position: static;
+      transform: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 10;
+      text-align: left;
+      flex: 0 0 auto;
+      min-width: 220px;
     }
     .header-question {
       flex: 1;
       text-align: left;
-      max-width: 45%; /* Réduit de 60% à 45% pour éviter tout chevauchement */
+      margin-left: 20px;
+      margin-right: 15px;
     }
     /* Conteneur principal en deux colonnes */
     .container {
@@ -72,11 +95,11 @@
       margin: 5px auto;
       position: relative;
     }
-    .top { grid-area: top; }
+    .top { grid-area: top; justify-self: center; }
     .left { grid-area: left; }
     .center { grid-area: center; }
     .right { grid-area: right; }
-    .bottom { grid-area: bottom; }
+    .bottom { grid-area: bottom; justify-self: center; }
     .card { 
       width: 100%; 
       max-width: 130px; /* Réduit de 150px à 130px */
@@ -89,8 +112,8 @@
     .card.enlarged {
       position: fixed;
       top: 0;
-      right: 0;
-      width: 550px; /* Exactement la même largeur que le right-panel */
+      left: 0;
+      width: 580px; /* Augmenté de 550px à 580px (+ 30px) */
       height: 100%;
       max-width: none;
       max-height: none;
@@ -138,19 +161,10 @@
       align-items: center;
       margin-top: 10px;
     }
-    .selection-controls {
-      position: absolute;
-      right: 20px;
-      top: 50%;
-      transform: translateY(-50%);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      z-index: 10; /* Pour s'assurer que les menus apparaissent au-dessus des autres éléments */
-      text-align: left;
-    }
     .select-group {
       position: relative;
+      width: 100%;
+      max-width: 220px;
     }
     .select-dropdown {
       padding: 9px 15px;
@@ -160,20 +174,20 @@
       background-color: white;
       appearance: none;
       cursor: pointer;
-      min-width: 180px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Ajoute une légère ombre pour plus de profondeur */
-      transition: border-color 0.3s, box-shadow 0.3s; /* Animation de transition */
+      width: 100%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: border-color 0.3s, box-shadow 0.3s;
     }
     
     .select-dropdown:hover {
-      border-color: #6b5b95; /* Couleur violette assortie à la bordure du panneau d'interprétation */
-      box-shadow: 0 2px 6px rgba(107, 91, 149, 0.2); /* Ombre violette légère */
+      border-color: #6b5b95;
+      box-shadow: 0 2px 6px rgba(107, 91, 149, 0.2);
     }
     
     .select-dropdown:focus {
       outline: none;
       border-color: #6b5b95;
-      box-shadow: 0 0 0 3px rgba(107, 91, 149, 0.25); /* Contour de focus */
+      box-shadow: 0 0 0 3px rgba(107, 91, 149, 0.25);
     }
     .select-group::after {
       content: '▼';
@@ -197,9 +211,70 @@
 </head>
 <body>
   <div class="header">
-    <div class="logo-container">
-      <img id="persona-logo" src="personas/tarologue.png" alt="Logo Persona" />
+    <div class="left-side-container">
+      <!-- Menus déroulants à gauche -->
+      <div class="selection-controls">
+        <div class="select-group">
+          <span class="select-label">Personnage :</span>
+          <select id="persona" class="select-dropdown">
+            <optgroup label="Arts Divinatoires">
+              <option value="tarologue">🔮 Tarologue</option>
+              <option value="oracle">✨ Oracle Mystique</option>
+              <option value="voyante">🎯 Voyante Gitane</option>
+            </optgroup>
+            <optgroup label="Traditions Spirituelles">
+              <option value="pretre">✝️ Prêtre Exégète</option>
+              <option value="rabbin">✡️ Rabbin Kabbaliste</option>
+              <option value="imam">☪️ Imam Soufis</option>
+            </optgroup>
+            <optgroup label="Traditions Ésotériques">
+              <option value="sorciere">🌙 Sorcière Ancestrale</option>
+              <option value="alchimiste">⚗️ Alchimiste Ésotérique</option>
+              <option value="mage">🌟 Mage Élémentaliste</option>
+            </optgroup>
+            <optgroup label="Psychanalystes">
+              <option value="freud">🛋️ Sigmund Freud</option>
+              <option value="jung">☯️ Carl Gustav Jung</option>
+              <option value="lacan">🔄 Jacques Lacan</option>
+              <option value="dolto">👶 Françoise Dolto</option>
+            </optgroup>
+            <optgroup label="Entités Surnaturelles">
+              <option value="demon">😈 Démon des Pactes</option>
+            </optgroup>
+          </select>
+        </div>
+        
+        <div class="select-group">
+          <span class="select-label">Jeu de cartes :</span>
+          <select id="card-set" class="select-dropdown">
+            <option value="set01" selected>Tarot de Marseille</option>
+            <option value="set02">Tarot Thiago Lehmann</option>
+          </select>
+        </div>
+        
+        <div class="select-group">
+          <span class="select-label">Modèle d'IA :</span>
+          <select id="ia-model" class="select-dropdown">
+            <optgroup label="OpenAI">
+              <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
+              <option value="openai/gpt-3.5-turbo" selected>GPT-3.5 Turbo</option>
+              <option value="openai/gpt-4o">GPT-4o</option>
+            </optgroup>
+            <optgroup label="Ollama">
+              <!-- Les modèles Ollama seront chargés dynamiquement au démarrage -->
+              <option value="" disabled>Chargement des modèles...</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+      
+      <!-- Logo persona juste à côté des menus -->
+      <div class="logo-container">
+        <img id="persona-logo" src="personas/tarologue.png" style="width: 210%;" alt="Persona Tarologue" />
+      </div>
     </div>
+    
+    <!-- Question et bouton à droite -->
     <div class="header-question">
       <div class="input-group">
         <label for="question">Votre question :</label>
@@ -209,62 +284,12 @@
         <button id="tirer">Tirer les cartes</button>
       </div>
     </div>
-    
-    <!-- Menus déroulants à droite -->
-    <div class="selection-controls">
-      <div class="select-group">
-        <span class="select-label">Modèle d'IA :</span>
-        <select id="ia-model" class="select-dropdown">
-          <optgroup label="OpenAI">
-            <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
-            <option value="openai/gpt-3.5-turbo" selected>GPT-3.5 Turbo</option>
-            <option value="openai/gpt-4o">GPT-4o</option>
-          </optgroup>
-          <optgroup label="Ollama">
-            <!-- Les modèles Ollama seront chargés dynamiquement au démarrage -->
-            <option value="" disabled>Chargement des modèles...</option>
-          </optgroup>
-        </select>
-      </div>
-      
-      <div class="select-group">
-        <span class="select-label">Personnage occulte :</span>
-        <select id="persona" class="select-dropdown">
-          <optgroup label="Arts Divinatoires">
-            <option value="tarologue">🔮 Tarologue</option>
-            <option value="oracle">✨ Oracle Mystique</option>
-            <option value="voyante">🎯 Voyante Gitane</option>
-          </optgroup>
-          <optgroup label="Traditions Ésotériques">
-            <option value="sorciere">🌙 Sorcière Ancestrale</option>
-            <option value="alchimiste">⚗️ Alchimiste Ésotérique</option>
-            <option value="mage">🌟 Mage Élémentaliste</option>
-          </optgroup>
-          <optgroup label="Psychanalystes">
-            <option value="freud">🛋️ Sigmund Freud</option>
-            <option value="jung">☯️ Carl Gustav Jung</option>
-            <option value="lacan">🔄 Jacques Lacan</option>
-            <option value="dolto">👶 Françoise Dolto</option>
-          </optgroup>
-          <optgroup label="Traditions Spirituelles">
-            <option value="pretre">✝️ Prêtre Exégète</option>
-            <option value="rabbin">✡️ Rabbin Kabbaliste</option>
-            <option value="imam">☪️ Imam Sage</option>
-          </optgroup>
-          <optgroup label="Entités Surnaturelles">
-            <option value="demon">😈 Démon des Pactes</option>
-          </optgroup>
-        </select>
-      </div>
-    </div>
   </div>
   
+  <!-- Ligne de séparation entre le haut et le bas de la page -->
+  <hr style="width: 95%; margin: 0 auto 20px auto; border: 0; height: 1px; background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(107, 91, 149, 0.75), rgba(0, 0, 0, 0));">
+  
   <div class="container">
-    <div class="left-panel">
-      <div id="interpretations">
-        <p>Les interprétations s'afficheront ici après le tirage.</p>
-      </div>
-    </div>
     <div class="right-panel">
       <div id="spread" class="spread">
         <div class="top"></div>
@@ -274,6 +299,11 @@
         <div class="bottom"></div>
       </div>
     </div>
+    <div class="left-panel">
+      <div id="interpretations">
+        <p>Les interprétations s'afficheront ici après le tirage.</p>
+      </div>
+    </div>
   </div>
 
   <!-- Import du module model.js -->
@@ -281,31 +311,58 @@
     import { obtenirReponseGPT4O, obtenirModelesOllama } from './model.js';
 
     // Tableau des cartes du tarot avec les chemins vers les images
-    const cards = [
-      { id: "00", name: "Le fou", image: "set01/00 Le fou.png" },
-      { id: "01", name: "Bateleur", image: "set01/01 Bateleur.png" },
-      { id: "02", name: "Papesse", image: "set01/02 Papesse.png" },
-      { id: "03", name: "Imperatrice", image: "set01/03 Imperatrice.png" },
-      { id: "04", name: "Empereur", image: "set01/04 Empereur.png" },
-      { id: "05", name: "Pape", image: "set01/05 Pape.png" },
-      { id: "06", name: "Les amoureux", image: "set01/06 Les amoureux.png" },
-      { id: "07", name: "Chariot", image: "set01/07 Chariot.png" },
-      { id: "08", name: "Justice", image: "set01/08 Justice.png" },
-      { id: "09", name: "Ermite", image: "set01/09 Ermite.png" },
-      { id: "10", name: "La roue", image: "set01/10 La roue.png" },
-      { id: "11", name: "Force", image: "set01/11 Force.png" },
-      { id: "12", name: "Le pendu", image: "set01/12 Le pendu.png" },
-      { id: "13", name: "La mort", image: "set01/13 La mort.png" },
-      { id: "14", name: "Temperance", image: "set01/14 Temperance.png" },
-      { id: "15", name: "Diable", image: "set01/15 Diable.png" },
-      { id: "16", name: "La Tour", image: "set01/16 La Tour.png" },
-      { id: "17", name: "Etoile", image: "set01/17 Etoile.png" },
-      { id: "18", name: "La lune", image: "set01/18 La lune.png" },
-      { id: "19", name: "Le soleil", image: "set01/19 Le soleil.png" },
-      { id: "20", name: "Le jugement", image: "set01/20 Le jugement.png" },
-      { id: "21", name: "Le monde", image: "set01/21 Le monde.png" },
-      { id: "22", name: "Dos de carte", image: "set01/22 Dos de carte.png" }
-    ];
+    const cardsData = {
+      set01: [
+        { id: "00", name: "Le fou", image: "set01/00 Le fou.png" },
+        { id: "01", name: "Bateleur", image: "set01/01 Bateleur.png" },
+        { id: "02", name: "Papesse", image: "set01/02 Papesse.png" },
+        { id: "03", name: "Imperatrice", image: "set01/03 Imperatrice.png" },
+        { id: "04", name: "Empereur", image: "set01/04 Empereur.png" },
+        { id: "05", name: "Pape", image: "set01/05 Pape.png" },
+        { id: "06", name: "Les amoureux", image: "set01/06 Les amoureux.png" },
+        { id: "07", name: "Chariot", image: "set01/07 Chariot.png" },
+        { id: "08", name: "Justice", image: "set01/08 Justice.png" },
+        { id: "09", name: "Ermite", image: "set01/09 Ermite.png" },
+        { id: "10", name: "La roue", image: "set01/10 La roue.png" },
+        { id: "11", name: "Force", image: "set01/11 Force.png" },
+        { id: "12", name: "Le pendu", image: "set01/12 Le pendu.png" },
+        { id: "13", name: "La mort", image: "set01/13 La mort.png" },
+        { id: "14", name: "Temperance", image: "set01/14 Temperance.png" },
+        { id: "15", name: "Diable", image: "set01/15 Diable.png" },
+        { id: "16", name: "La Tour", image: "set01/16 La Tour.png" },
+        { id: "17", name: "Etoile", image: "set01/17 Etoile.png" },
+        { id: "18", name: "La lune", image: "set01/18 La lune.png" },
+        { id: "19", name: "Le soleil", image: "set01/19 Le soleil.png" },
+        { id: "20", name: "Le jugement", image: "set01/20 Le jugement.png" },
+        { id: "21", name: "Le monde", image: "set01/21 Le monde.png" },
+        { id: "22", name: "Dos de carte", image: "set01/22 Dos de carte.png" }
+      ],
+      set02: [
+        { id: "00", name: "Le fou", image: "set02/00 Le fou.jpg" },
+        { id: "01", name: "Bateleur", image: "set02/01 Bateleur.jpg" },
+        { id: "02", name: "Papesse", image: "set02/02 Papesse.jpg" },
+        { id: "03", name: "Imperatrice", image: "set02/03 Imperatrice.jpg" },
+        { id: "04", name: "Empereur", image: "set02/04 Empereur.jpg" },
+        { id: "05", name: "Pape", image: "set02/05 Pape.jpg" },
+        { id: "06", name: "Les amoureux", image: "set02/06 Les amoureux.jpg" },
+        { id: "07", name: "Chariot", image: "set02/07 Chariot.jpg" },
+        { id: "08", name: "Justice", image: "set02/08 Justice.jpg" },
+        { id: "09", name: "Ermite", image: "set02/09 Ermite.jpg" },
+        { id: "10", name: "La roue", image: "set02/10 La roue.jpg" },
+        { id: "11", name: "Force", image: "set02/11 Force.jpg" },
+        { id: "12", name: "Le pendu", image: "set02/12 Le pendu.jpg" },
+        { id: "13", name: "La mort", image: "set02/13 La mort.jpg" },
+        { id: "14", name: "Temperance", image: "set02/14 Temperance.jpg" },
+        { id: "15", name: "Diable", image: "set02/15 Diable.jpg" },
+        { id: "16", name: "La Tour", image: "set02/16 La Tour.jpg" },
+        { id: "17", name: "Etoile", image: "set02/17 Etoile.jpg" },
+        { id: "18", name: "La lune", image: "set02/18 La lune.jpg" },
+        { id: "19", name: "Le soleil", image: "set02/19 Le soleil.jpg" },
+        { id: "20", name: "Le jugement", image: "set02/20 Le jugement.jpg" },
+        { id: "21", name: "Le monde", image: "set02/21 Le monde.jpg" },
+        { id: "22", name: "Dos de carte", image: "set02/22 Dos de carte.png" }
+      ]
+    };
 
     // Variables pour stocker le tirage actuel
     let tirageActuel = [];
@@ -327,9 +384,13 @@
 
     // Fonction pour initialiser le tirage en affichant le dos des cartes dans la croix
     function initSpread() {
-      const backHTML = `<img src="set01/22 Dos de carte.png" alt="Dos de carte" class="card">`;
+      const jeuSelectionne = document.getElementById('card-set').value;
+      const backHTML = `<img src="${cardsData[jeuSelectionne][22].image}" alt="Dos de carte" class="card">`;
       const cells = document.querySelectorAll('.top, .left, .center, .right, .bottom');
       cells.forEach(cell => cell.innerHTML = backHTML);
+      
+      // Réinitialiser tirageActuel
+      tirageActuel = [];
     }
 
     // Fonction pour obtenir l'interprétation du tirage via GPT-4o
@@ -388,22 +449,53 @@
       // Mémoriser la question
       questionActuelle = question;
       
+      // Récupérer le jeu de cartes sélectionné
+      const jeuSelectionne = document.getElementById('card-set').value;
+      
       // Mélanger les cartes (exclure la dernière qui est le dos de carte)
-      const jeuMelange = shuffle([...cards.slice(0, -1)]);
+      const jeuMelange = shuffle([...cardsData[jeuSelectionne].slice(0, -1)]);
       
       // Sélectionner les 5 premières cartes pour le tirage
       tirageActuel = jeuMelange.slice(0, 5);
       
-      // Afficher les cartes dans la croix (en haut, en bas, à droite, à gauche, au centre)
-      const positions = document.querySelectorAll('.top, .bottom, .right, .left, .center');
-      positions.forEach((position, index) => {
-        if (index < tirageActuel.length) {
-          position.innerHTML = renderCard(tirageActuel[index]);
-        }
-      });
+      // Afficher les cartes dans la croix
+      afficherTirage();
       
       // Obtenir l'interprétation
       obtenirInterpretation(tirageActuel, questionActuelle);
+    }
+
+    // Nouvelle fonction pour afficher le tirage actuel
+    function afficherTirage() {
+      if (tirageActuel.length !== 5) return;
+      
+      const positions = document.querySelectorAll('.top, .bottom, .right, .left, .center');
+      positions.forEach((position, index) => {
+        position.innerHTML = renderCard(tirageActuel[index]);
+      });
+    }
+
+    // Fonction pour mettre à jour l'affichage des cartes lors du changement de jeu
+    function mettreAJourAffichageCartes() {
+      const jeuSelectionne = document.getElementById('card-set').value;
+      
+      // Si un tirage est en cours, on met à jour les images avec le nouveau jeu
+      if (tirageActuel.length === 5) {
+        // Récupérer les cartes correspondantes dans le nouveau jeu
+        const nouvelleCartes = tirageActuel.map(carte => {
+          const id = carte.id;
+          return cardsData[jeuSelectionne].find(c => c.id === id);
+        });
+        
+        // Mettre à jour le tirage actuel
+        tirageActuel = nouvelleCartes;
+        
+        // Afficher le tirage avec les nouvelles images
+        afficherTirage();
+      } else {
+        // Sinon, on initialise juste l'affichage avec le dos des cartes
+        initSpread();
+      }
     }
 
     // Fonction pour agrandir/réduire une carte
@@ -411,17 +503,17 @@
       if (img.classList.contains('enlarged')) {
         // Si la carte est déjà agrandie, la réduire
         img.classList.remove('enlarged');
-        img.style.right = '';
+        img.style.left = '';
       } else {
-        // Agrandir la carte et l'aligner précisément avec le panneau droit
+        // Agrandir la carte et l'aligner précisément avec le panneau gauche
         img.classList.add('enlarged');
         
-        // Obtenir la position et les dimensions du panneau droit
-        const rightPanel = document.querySelector('.right-panel');
-        const rightPanelRect = rightPanel.getBoundingClientRect();
+        // Obtenir la position et les dimensions du panneau gauche (qui est maintenant le right-panel)
+        const leftPanel = document.querySelector('.right-panel');
+        const leftPanelRect = leftPanel.getBoundingClientRect();
         
-        // Positionner la carte agrandie exactement au-dessus du panneau droit
-        img.style.right = (window.innerWidth - rightPanelRect.right) + 'px';
+        // Positionner la carte agrandie exactement au-dessus du panneau gauche
+        img.style.left = leftPanelRect.left + 'px';
       }
     };
 
@@ -503,6 +595,11 @@
       // Ajouter un gestionnaire d'événements au menu déroulant des personas
       document.getElementById('persona').addEventListener('change', function() {
         updatePersonaLogo(this.value);
+      });
+      
+      // Ajouter un gestionnaire d'événements au menu déroulant du jeu de cartes
+      document.getElementById('card-set').addEventListener('change', function() {
+        mettreAJourAffichageCartes();
       });
       
       // Initialiser le logo avec le persona par défaut

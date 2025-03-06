@@ -1,15 +1,74 @@
-// Fichier pour gérer les connexions à l'API OpenAI
-
+// Fichier pour gérer les connexions aux llms et construire 
 // Configuration pour l'API OpenAI
-const API_KEY = "Your OpenAI KEY";
+const API_KEY = "your API KEY";
 const API_URL_OPENAI = "https://api.openai.com/v1/chat/completions";
 // Configuration pour l'API Ollama (local)
 const API_URL_OLLAMA = "http://localhost:11434/api/chat";
 // Endpoint pour récupérer les modèles disponibles sur Ollama
 const API_URL_OLLAMA_TAGS = "http://localhost:11434/api/tags";
 
-// Meta prompt plus flexible
-const META_PROMPT = "Ta réponse doit respecter ces critères STRICTS: \n1) Être concise (entre 300 et 500 mots)\n2) Former une interprétation complète en un seul message\n3) Organiser ta réponse avec une introduction, une analyse de chaque carte dans sa position et une conclusion\n4) Utiliser des émoticônes appropriées à ton personnage pour enrichir visuellement le texte\n5) UTILISER EXCLUSIVEMENT des balises HTML pour tout formatage (pas de syntaxe Markdown)\n6) IMPORTANT: TOUS les titres et sous-titres (comme 'Introduction', 'Analyse', 'Conclusion', etc.) doivent OBLIGATOIREMENT être formatés avec des balises HTML (<h1>, <h2>, <h3>) et JAMAIS avec des symboles Markdown (# ou ##) ou laissés en texte brut\n7) Exemples de formatage correct: <h2>Introduction</h2>, <h3>La carte du Bateleur</h3>, <em>concept important</em>\n8) Exemples de formatage INCORRECT à ÉVITER ABSOLUMENT: '# Introduction', '### La carte du Bateleur', 'Introduction:', '*concept important*'\n9) Créer une présentation visuellement attrayante et stylistiquement cohérente avec ton personnage en utilisant des émoticones";
+// Meta prompt
+const META_PROMPT = `Ta réponse doit respecter ces critères STRICTS: 
+1) Être concise (entre 400 et 450 mots)
+2) Former une interprétation complète en un seul message
+3) Utiliser des émoticônes appropriées à ton personnage pour enrichir visuellement le texte
+4) UTILISER EXCLUSIVEMENT des balises HTML pour tout formatage
+5) IMPORTANT: TOUS les titres et sous-titres doivent OBLIGATOIREMENT être formatés avec des balises HTML (<h1>, <h2>, <h3>) et JAMAIS avec des symboles Markdown (# ou ##) ou laissés en texte brut
+7) Exemples de formatage correct: <h2>Introduction</h2>, <h3>La carte du Bateleur</h3>, <em>concept important</em>`;
+
+// Tableau des cartes du tarot avec les chemins vers les images
+const cardsData = {
+  set01: [
+    { id: "00", name: "Le fou", image: "set01/00 Le fou.png" },
+    { id: "01", name: "Bateleur", image: "set01/01 Bateleur.png" },
+    { id: "02", name: "Papesse", image: "set01/02 Papesse.png" },
+    { id: "03", name: "Imperatrice", image: "set01/03 Imperatrice.png" },
+    { id: "04", name: "Empereur", image: "set01/04 Empereur.png" },
+    { id: "05", name: "Pape", image: "set01/05 Pape.png" },
+    { id: "06", name: "Les amoureux", image: "set01/06 Les amoureux.png" },
+    { id: "07", name: "Chariot", image: "set01/07 Chariot.png" },
+    { id: "08", name: "Justice", image: "set01/08 Justice.png" },
+    { id: "09", name: "Ermite", image: "set01/09 Ermite.png" },
+    { id: "10", name: "La roue", image: "set01/10 La roue.png" },
+    { id: "11", name: "Force", image: "set01/11 Force.png" },
+    { id: "12", name: "Le pendu", image: "set01/12 Le pendu.png" },
+    { id: "13", name: "La mort", image: "set01/13 La mort.png" },
+    { id: "14", name: "Temperance", image: "set01/14 Temperance.png" },
+    { id: "15", name: "Diable", image: "set01/15 Diable.png" },
+    { id: "16", name: "La Tour", image: "set01/16 La Tour.png" },
+    { id: "17", name: "Etoile", image: "set01/17 Etoile.png" },
+    { id: "18", name: "La lune", image: "set01/18 La lune.png" },
+    { id: "19", name: "Le soleil", image: "set01/19 Le soleil.png" },
+    { id: "20", name: "Le jugement", image: "set01/20 Le jugement.png" },
+    { id: "21", name: "Le monde", image: "set01/21 Le monde.png" },
+    { id: "22", name: "Dos de carte", image: "set01/22 Dos de carte.png" }
+  ],
+  set02: [
+    { id: "00", name: "Le fou", image: "set02/00 Le fou.jpg" },
+    { id: "01", name: "Bateleur", image: "set02/01 Bateleur.jpg" },
+    { id: "02", name: "Papesse", image: "set02/02 Papesse.jpg" },
+    { id: "03", name: "Imperatrice", image: "set02/03 Imperatrice.jpg" },
+    { id: "04", name: "Empereur", image: "set02/04 Empereur.jpg" },
+    { id: "05", name: "Pape", image: "set02/05 Pape.jpg" },
+    { id: "06", name: "Les amoureux", image: "set02/06 Les amoureux.jpg" },
+    { id: "07", name: "Chariot", image: "set02/07 Chariot.jpg" },
+    { id: "08", name: "Justice", image: "set02/08 Justice.jpg" },
+    { id: "09", name: "Ermite", image: "set02/09 Ermite.jpg" },
+    { id: "10", name: "La roue", image: "set02/10 La roue.jpg" },
+    { id: "11", name: "Force", image: "set02/11 Force.jpg" },
+    { id: "12", name: "Le pendu", image: "set02/12 Le pendu.jpg" },
+    { id: "13", name: "La mort", image: "set02/13 La mort.jpg" },
+    { id: "14", name: "Temperance", image: "set02/14 Temperance.jpg" },
+    { id: "15", name: "Diable", image: "set02/15 Diable.jpg" },
+    { id: "16", name: "La Tour", image: "set02/16 La Tour.jpg" },
+    { id: "17", name: "Etoile", image: "set02/17 Etoile.jpg" },
+    { id: "18", name: "La lune", image: "set02/18 La lune.jpg" },
+    { id: "19", name: "Le soleil", image: "set02/19 Le soleil.jpg" },
+    { id: "20", name: "Le jugement", image: "set02/20 Le jugement.jpg" },
+    { id: "21", name: "Le monde", image: "set02/21 Le monde.jpg" },
+    { id: "22", name: "Dos de carte", image: "set02/22 Dos de carte.png" }
+  ]
+};
 
 // Fonction pour générer un prompt de tirage détaillé basé sur les cartes
 function genererPromptTirage(tirage) {

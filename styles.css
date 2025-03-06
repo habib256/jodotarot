@@ -1,0 +1,4 @@
+.persona-image {
+    width: calc(100% * 1.5);  /* ou une valeur fixe comme 300px → 450px */
+    height: auto;  /* maintient le ratio d'aspect */
+} 
