@@ -73,6 +73,14 @@ Une interprétation artistique moderne des arcanes.
 5. **Lisez l'interprétation** générée par l'IA dans le style du persona choisi
 6. **Cliquez sur une carte** pour l'agrandir et mieux l'observer
 
+## 📸 Exemple de tirage
+
+Voici un exemple de tirage en croix avec son interprétation complète:
+
+![Exemple de tirage en croix JodoTarot](assets/images/jodotarot_screenshot.png)
+
+*L'image montre un tirage complet avec l'interprétation de chaque carte et leur signification dans les différentes positions: influences positives (La Force), passé (Le Chariot), situation actuelle (La Papesse), futur (La Roue) et influences négatives (L'Étoile).*
+
 ## ⚙️ Installation et configuration
 
 1. Clonez ce dépôt sur votre serveur
