@@ -13,7 +13,7 @@ const API_URL_OLLAMA_TAGS = "http://localhost:11434/api/tags";
 // Meta prompt de base pour formater les réponses
 const META_PROMPT_BASE = {
   fr: `Ta réponse doit respecter ces critères STRICTS:
-1) Être concise (400-450 mots)
+1) Être concise et compacte (400-450 mots)
 2) Former une interprétation complète en un seul message
 3) Utiliser des émoticônes adaptées à ton personnage
 4) Utiliser UNIQUEMENT des balises HTML pour le formatage:
@@ -28,7 +28,7 @@ const META_PROMPT_BASE = {
 6) TOUJOURS utiliser la langue française pour ta réponse complète`,
 
   en: `Your response MUST follow these STRICT criteria:
-1) Be concise (400-450 words)
+1) Be concise and compact (400-450 words)
 2) Form a complete interpretation in a single message
 3) Use emojis that match your character
 4) Use ONLY HTML tags for formatting:
@@ -43,7 +43,7 @@ const META_PROMPT_BASE = {
 6) ALWAYS use the English language for your complete response`,
 
   es: `Tu respuesta DEBE seguir estos criterios ESTRICTOS:
-1) Ser concisa (400-450 palabras)
+1) Ser concisa y compacta (400-450 palabras)
 2) Formar una interpretación completa en un solo mensaje
 3) Usar emojis que coincidan con tu personaje
 4) Usar SOLO etiquetas HTML para el formato:
@@ -58,7 +58,7 @@ const META_PROMPT_BASE = {
 6) SIEMPRE utiliza el idioma español para tu respuesta completa`,
 
   de: `Deine Antwort MUSS diese STRENGEN Kriterien erfüllen:
-1) Sei präzise (400-450 Wörter)
+1) Sei präzise und kompakt (400-450 Wörter)
 2) Bilde eine vollständige Interpretation in einer einzigen Nachricht
 3) Verwende Emojis, die zu deinem Charakter passen
 4) Verwende NUR HTML-Tags zur Formatierung:
@@ -73,7 +73,7 @@ const META_PROMPT_BASE = {
 6) Verwende IMMER die deutsche Sprache für deine vollständige Antwort`,
 
   it: `La tua risposta DEVE seguire questi criteri RIGOROSI:
-1) Essere concisa (400-450 parole)
+1) Essere concisa e compatta (400-450 parole)
 2) Formare un'interpretazione completa in un unico messaggio
 3) Utilizzare emoji che corrispondano al tuo personaggio
 4) Utilizzare SOLO tag HTML per la formattazione:

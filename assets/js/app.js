@@ -213,12 +213,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Charger les modèles Ollama disponibles
   chargerModelesOllama();
   
-  // Charger la langue préférée de l'utilisateur (si disponible)
-  const savedLanguage = localStorage.getItem('jodotarot_language');
-  if (savedLanguage) {
-    document.getElementById('language').value = savedLanguage;
-    // Déclencher l'événement de changement pour appliquer les traductions
-    const event = new Event('change');
-    document.getElementById('language').dispatchEvent(event);
-  }
+  // Toujours définir la langue française au démarrage
+  document.getElementById('language').value = 'fr';
+  // Déclencher l'événement de changement pour appliquer les traductions
+  const event = new Event('change');
+  document.getElementById('language').dispatchEvent(event);
+  // Stocker la préférence de langue en français dans le localStorage
+  localStorage.setItem('jodotarot_language', 'fr');
 }); 
