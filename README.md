@@ -203,18 +203,15 @@ Développé avec ❤️ pour les amateurs de tarot et d'exploration intérieure.
 Pour utiliser les modèles d'IA locaux avec JodoTarot:
 
 1. **Installez Ollama** - Suivez les instructions sur [ollama.ai](https://ollama.ai)
-2. **Démarrez le serveur**: 
-   ```bash
-   ollama serve
-   ```
-3. **Installez au moins un modèle compatible**:
+
+2. **Installez au moins un modèle compatible**:
    ```bash
    # Modèles recommandés pour JodoTarot
    ollama pull llama3
    ollama pull mistral
    ```
-4. **Vérifiez que les modèles sont disponibles**:
+3. **Vérifiez que les modèles sont disponibles**:
    ```bash
    ollama list
    ```
-5. **Lancez JodoTarot** et sélectionnez un de vos modèles Ollama dans le menu déroulant
+4. **Lancez JodoTarot** et sélectionnez un de vos modèles Ollama dans le menu déroulant
