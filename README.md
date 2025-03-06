@@ -81,13 +81,6 @@ Voici un exemple de tirage en croix avec son interprétation complète:
 
 *L'image montre un tirage complet avec l'interprétation de chaque carte et leur signification dans les différentes positions: influences positives (La Force), passé (Le Chariot), situation actuelle (La Papesse), futur (La Roue) et influences négatives (L'Étoile).*
 
-## ⚙️ Installation et configuration
-
-1. Clonez ce dépôt sur votre serveur
-2. Ouvrez le fichier `assets/js/config.js` et configurez votre clé API OpenAI: `const API_KEY = "Your OpenAI KEY";`
-3. Pour utiliser les modèles Ollama, assurez-vous que le serveur Ollama est en cours d'exécution sur `http://localhost:11434`
-4. Ouvrez `index.html` dans votre navigateur ou déployez l'application sur un serveur web
-
 ## 💡 Conseils d'utilisation
 
 - Formulez des questions ouvertes et personnelles pour obtenir des interprétations plus pertinentes
@@ -95,6 +88,13 @@ Voici un exemple de tirage en croix avec son interprétation complète:
 - Les modèles plus avancés comme GPT-4o offrent généralement des interprétations plus nuancées
 - Essayez les deux jeux de cartes pour voir lequel résonne le plus avec vous
 - Prenez le temps de méditer sur chaque carte avant de lire l'interprétation complète
+
+## ⚙️ Installation et configuration
+
+1. Clonez ce dépôt sur votre serveur
+2. Ouvrez le fichier `assets/js/config.js` et configurez votre clé API OpenAI: `const API_KEY = "Your OpenAI KEY";`
+3. Pour utiliser les modèles Ollama, assurez-vous que le serveur Ollama est en cours d'exécution sur `http://localhost:11434`
+4. Ouvrez `index.html` dans votre navigateur ou déployez l'application sur un serveur web
 
 ## 🔧 Caractéristiques techniques
 
