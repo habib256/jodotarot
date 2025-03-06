@@ -75,7 +75,9 @@ Une interprétation artistique moderne des arcanes.
 
 ## 📸 Exemple de tirage
 
-**Exemple de tirage en croix JodoTarot** (L'image illustre un tirage complet avec 5 cartes)
+Voici un exemple de tirage en croix avec son interprétation complète:
+
+<img src="assets/images/jodotarot_screenshot.png" alt="Exemple de tirage en croix JodoTarot" width="600" />
 
 *L'image montre un tirage complet avec l'interprétation de chaque carte et leur signification dans les différentes positions: influences positives (La Force), passé (Le Chariot), situation actuelle (La Papesse), futur (La Roue) et influences négatives (L'Étoile).*
 
