@@ -10,8 +10,9 @@ const API_URL_OPENAI = "https://api.openai.com/v1/chat/completions";
 const API_URL_OLLAMA = "http://localhost:11434/api/chat";
 const API_URL_OLLAMA_TAGS = "http://localhost:11434/api/tags";
 
-// Meta prompt pour formater les réponses
-const META_PROMPT = `Ta réponse doit respecter ces critères STRICTS:
+// Meta prompt de base pour formater les réponses
+const META_PROMPT_BASE = {
+  fr: `Ta réponse doit respecter ces critères STRICTS:
 1) Être concise (400-450 mots)
 2) Former une interprétation complète en un seul message
 3) Utiliser des émoticônes adaptées à ton personnage
@@ -23,12 +24,92 @@ const META_PROMPT = `Ta réponse doit respecter ces critères STRICTS:
    - <blockquote> pour les citations ou références
    - <ul>/<li> pour les listes
    - <span> avec styles CSS pour les mises en forme spéciales
-5) JAMAIS utiliser de symboles Markdown (# ou ##) ou laisser des titres en texte brut comme "Introduction:" ou "ANALYSE:"`;
+5) JAMAIS utiliser de symboles Markdown (# ou ##) ou laisser des titres en texte brut comme "Introduction:" ou "ANALYSE:"`,
+
+  en: `Your response MUST follow these STRICT criteria:
+1) Be concise (400-450 words)
+2) Form a complete interpretation in a single message
+3) Use emojis that match your character
+4) Use ONLY HTML tags for formatting:
+   - <h2> for main titles (sections, themes)
+   - <h3> for subsections
+   - <em> for important concepts
+   - <strong> for key advice or important points
+   - <blockquote> for quotes or references
+   - <ul>/<li> for lists
+   - <span> with CSS styles for special formatting
+5) NEVER use Markdown symbols (# or ##) or leave titles in plain text like "Introduction:" or "ANALYSIS:"`,
+
+  es: `Tu respuesta DEBE seguir estos criterios ESTRICTOS:
+1) Ser concisa (400-450 palabras)
+2) Formar una interpretación completa en un solo mensaje
+3) Usar emojis que coincidan con tu personaje
+4) Usar SOLO etiquetas HTML para el formato:
+   - <h2> para títulos principales (secciones, temas)
+   - <h3> para subsecciones
+   - <em> para conceptos importantes
+   - <strong> para consejos clave o puntos importantes
+   - <blockquote> para citas o referencias
+   - <ul>/<li> para listas
+   - <span> con estilos CSS para formato especial
+5) NUNCA uses símbolos de Markdown (# o ##) o dejes títulos en texto plano como "Introducción:" o "ANÁLISIS:"`,
+
+  de: `Deine Antwort MUSS diese STRENGEN Kriterien erfüllen:
+1) Sei präzise (400-450 Wörter)
+2) Bilde eine vollständige Interpretation in einer einzigen Nachricht
+3) Verwende Emojis, die zu deinem Charakter passen
+4) Verwende NUR HTML-Tags zur Formatierung:
+   - <h2> für Haupttitel (Abschnitte, Themen)
+   - <h3> für Unterabschnitte
+   - <em> für wichtige Konzepte
+   - <strong> für wichtige Ratschläge oder wichtige Punkte
+   - <blockquote> für Zitate oder Referenzen
+   - <ul>/<li> für Listen
+   - <span> mit CSS-Stilen für spezielle Formatierungen
+5) Verwende NIEMALS Markdown-Symbole (# oder ##) oder belasse Titel in Klartext wie "Einleitung:" oder "ANALYSE:"`,
+
+  it: `La tua risposta DEVE seguire questi criteri RIGOROSI:
+1) Essere concisa (400-450 parole)
+2) Formare un'interpretazione completa in un unico messaggio
+3) Utilizzare emoji che corrispondano al tuo personaggio
+4) Utilizzare SOLO tag HTML per la formattazione:
+   - <h2> per i titoli principali (sezioni, temi)
+   - <h3> per le sottosezioni
+   - <em> per concetti importanti
+   - <strong> per consigli chiave o punti importanti
+   - <blockquote> per citazioni o riferimenti
+   - <ul>/<li> per gli elenchi
+   - <span> con stili CSS per formattazioni speciali
+5) NON utilizzare MAI simboli Markdown (# o ##) o lasciare titoli in testo semplice come "Introduzione:" o "ANALISI:"`
+};
+
+/**
+ * Fonction pour obtenir le META_PROMPT adapté à la langue sélectionnée
+ * @param {string} langue - Code de la langue (fr, en, es, de, it)
+ * @returns {string} - Le META_PROMPT dans la langue appropriée
+ */
+function getMetaPrompt(langue = 'fr') {
+  // Récupérer le prompt de base dans la langue demandée ou en français par défaut
+  const basePrompt = META_PROMPT_BASE[langue] || META_PROMPT_BASE.fr;
+  
+  // Ajouter la règle spécifique pour utiliser la langue sélectionnée
+  let langueName;
+  switch(langue) {
+    case 'en': langueName = 'English'; break;
+    case 'es': langueName = 'Spanish'; break;
+    case 'de': langueName = 'German'; break;
+    case 'it': langueName = 'Italian'; break;
+    case 'fr': default: langueName = 'French'; break;
+  }
+  
+  return `${basePrompt}
+6) TOUJOURS utiliser la langue ${langueName} pour ta réponse complète`;
+}
 
 export {
   API_KEY,
   API_URL_OPENAI,
   API_URL_OLLAMA,
   API_URL_OLLAMA_TAGS,
-  META_PROMPT
+  getMetaPrompt
 }; 

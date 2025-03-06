@@ -12,6 +12,17 @@
       <!-- Menus déroulants à gauche -->
       <div class="selection-controls">
         <div class="select-group">
+          <span class="select-label">Langue :</span>
+          <select id="language" class="select-dropdown">
+            <option value="fr" selected>🇫🇷 Français</option>
+            <option value="en">🇬🇧 English</option>
+            <option value="es">🇪🇸 Español</option>
+            <option value="de">🇩🇪 Deutsch</option>
+            <option value="it">🇮🇹 Italiano</option>
+          </select>
+        </div>
+        
+        <div class="select-group">
           <span class="select-label">Personnage :</span>
           <select id="persona" class="select-dropdown">
             <optgroup label="Arts Divinatoires">
@@ -46,6 +57,13 @@
           <select id="card-set" class="select-dropdown">
             <option value="set01" selected>Tarot de Marseille</option>
             <option value="set02">Tarot Thiago Lehmann</option>
+          </select>
+        </div>
+        
+        <div class="select-group">
+          <span class="select-label">Mode de tirage :</span>
+          <select id="spread-type" class="select-dropdown">
+            <option value="cross" selected>Tirage en Croix</option>
           </select>
         </div>
         

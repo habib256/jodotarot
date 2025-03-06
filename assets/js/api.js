@@ -2,7 +2,7 @@
  * Module de gestion des appels API aux modèles d'IA
  */
 
-import { API_KEY, API_URL_OPENAI, API_URL_OLLAMA, API_URL_OLLAMA_TAGS, META_PROMPT } from './config.js';
+import { API_KEY, API_URL_OPENAI, API_URL_OLLAMA, API_URL_OLLAMA_TAGS, getMetaPrompt } from './config.js';
 import { genererPromptTirage } from './tarot.js';
 import PERSONAS from './personas.js';
 
@@ -36,17 +36,18 @@ function enrichirPromptContextuel(question, systemPrompt) {
 }
 
 /**
- * Fonction principale pour obtenir une réponse d'un LLM
+ * Obtient une réponse d'un modèle d'IA (OpenAI ou Ollama)
  * @param {string} question - La question posée par l'utilisateur
  * @param {Array} historiqueMessages - Historique des messages pour continuer une conversation
  * @param {string} modeleComplet - Le modèle complet au format "fournisseur/modèle" (ex: "openai/gpt-4o")
  * @param {string} persona - Le type de personnage occulte (par défaut: tarologue)
  * @param {Array} tirage - Les cartes tirées (optionnel)
+ * @param {string} langue - La langue à utiliser pour la réponse (par défaut: fr)
  * @returns {Promise<string>} - La réponse complète générée par le LLM
  */
-async function obtenirReponseGPT4O(question, historiqueMessages = [], modeleComplet = "openai/gpt-3.5-turbo", persona = "tarologue", tirage = null) {
+async function obtenirReponseGPT4O(question, historiqueMessages = [], modeleComplet = "openai/gpt-3.5-turbo", persona = "tarologue", tirage = null, langue = "fr") {
   // Génération d'une clé de cache
-  const cacheKey = JSON.stringify({question, tirage, modeleComplet, persona});
+  const cacheKey = JSON.stringify({question, tirage, modeleComplet, persona, langue});
   
   // Vérifier si la réponse est en cache
   if (responseCache.has(cacheKey)) {
@@ -58,20 +59,32 @@ async function obtenirReponseGPT4O(question, historiqueMessages = [], modeleComp
     // Parsing du modèle complet (fournisseur/modèle)
     let [fournisseur, modele] = modeleComplet.split('/');
     
-    // Récupérer le prompt système pour le persona sélectionné
-    let systemPrompt = PERSONAS[persona] || PERSONAS.tarologue;
+    // Si le fournisseur est non spécifié, on considère que c'est OpenAI
+    if (!modele) {
+      modele = fournisseur;
+      fournisseur = "openai";
+    }
     
-    // Générer le prompt de tirage si des cartes sont fournies
-    const tiragePrompt = genererPromptTirage(tirage);
+    // Récupération des infos du persona (ou utilisation du personnage par défaut)
+    const personaInfo = PERSONAS[persona] || PERSONAS.tarologue;
+    
+    // Préparation du prompt système
+    let systemPrompt = personaInfo.systemPrompt;
     
     // Enrichir le prompt avec le contexte de la question
     systemPrompt = enrichirPromptContextuel(question, systemPrompt);
     
+    // Préparer le prompt spécifique au tirage si des cartes sont fournies
+    let tiragePrompt = null;
+    if (tirage && tirage.length) {
+      tiragePrompt = genererPromptTirage(tirage);
+    }
+    
     // Ajouter le meta prompt et le prompt de tirage
     if (tiragePrompt) {
-      systemPrompt = `${systemPrompt} ${tiragePrompt} ${META_PROMPT}`;
+      systemPrompt = `${systemPrompt} ${tiragePrompt} ${getMetaPrompt(langue)}`;
     } else {
-      systemPrompt = `${systemPrompt} ${META_PROMPT}`;
+      systemPrompt = `${systemPrompt} ${getMetaPrompt(langue)}`;
     }
     
     // Log pour le développement (à retirer en production)

@@ -51,8 +51,9 @@ function faireUnTirage() {
   // Mémoriser la question
   questionActuelle = question;
   
-  // Récupérer le jeu de cartes sélectionné
+  // Récupérer le jeu de cartes et le mode de tirage sélectionnés
   const jeuSelectionne = document.getElementById('card-set').value;
+  const modeTirage = document.getElementById('spread-type').value;
   
   // Effectuer le tirage
   tirageActuel = drawCards(jeuSelectionne);
@@ -61,31 +62,39 @@ function faireUnTirage() {
   afficherTirage(tirageActuel);
   
   // Obtenir l'interprétation
-  obtenirInterpretation(tirageActuel, questionActuelle);
+  obtenirInterpretation(tirageActuel, questionActuelle, modeTirage);
 }
 
 /**
  * Fonction pour obtenir l'interprétation du tirage via le modèle d'IA
  * @param {Array} tirage - Tableau des cartes tirées
  * @param {string} question - Question posée par l'utilisateur
+ * @param {string} modeTirage - Mode de tirage sélectionné (ex: "cross" pour tirage en croix)
  */
-async function obtenirInterpretation(tirage, question) {
+async function obtenirInterpretation(tirage, question, modeTirage) {
   const interpretationsDiv = document.getElementById('interpretations');
   interpretationsDiv.innerHTML = '<p class="loading">Analyse du tirage en cours...</p>';
   
   // Récupération des options sélectionnées
   const modeleIA = document.getElementById('ia-model').value;
   const persona = document.getElementById('persona').value;
+  const langue = document.getElementById('language').value;
   
   // Préparation de la question pour l'interprétation
-  const prompt = `Interprétez ce tirage de tarot en croix en relation avec ma question: "${question}"`;
+  let typeDeSpread = "en croix";
+  if (modeTirage === "cross") {
+    typeDeSpread = "en croix";
+  }
+  // D'autres modes pourront être ajoutés ici à l'avenir
+  
+  const prompt = `Interprétez ce tirage de tarot ${typeDeSpread} en relation avec ma question: "${question}"`;
   
   try {
     // Affichage d'un message indiquant le modèle et le personnage utilisés
-    interpretationsDiv.innerHTML = `<p class="loading">Analyse du tirage en cours avec ${modeleIA} interprété par un(e) ${getPersonaLabel(persona)}...</p>`;
+    interpretationsDiv.innerHTML = `<p class="loading">Analyse du tirage ${typeDeSpread} en cours avec ${modeleIA} interprété par un(e) ${getPersonaLabel(persona)}...</p>`;
     
     // Appel à l'API via notre fonction avec les options sélectionnées
-    const reponse = await obtenirReponseGPT4O(prompt, [], modeleIA, persona, tirage);
+    const reponse = await obtenirReponseGPT4O(prompt, [], modeleIA, persona, tirage, langue);
     
     // Mise en forme de la réponse
     const formattedResponse = reponse.split('\n').map(paragraph => 
@@ -169,6 +178,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Ajouter un gestionnaire d'événements au bouton de tirage
   document.getElementById('tirer').addEventListener('click', faireUnTirage);
   
+  // Ajouter un gestionnaire d'événements au menu déroulant de langue
+  document.getElementById('language').addEventListener('change', function() {
+    console.log(`Langue sélectionnée : ${this.value}`);
+    // Ici, dans une future mise à jour, on pourrait ajouter une fonction pour traduire l'interface
+  });
+  
   // Ajouter un gestionnaire d'événements au menu déroulant des personas
   document.getElementById('persona').addEventListener('change', function() {
     updatePersonaLogo(this.value);
@@ -177,6 +192,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Ajouter un gestionnaire d'événements au menu déroulant du jeu de cartes
   document.getElementById('card-set').addEventListener('change', function() {
     tirageActuel = mettreAJourAffichageCartes(tirageActuel, this.value);
+  });
+  
+  // Ajouter un gestionnaire d'événements au menu déroulant du mode de tirage
+  document.getElementById('spread-type').addEventListener('change', function() {
+    // Pour l'instant, nous n'avons qu'un seul mode de tirage
+    // À l'avenir, on pourra ajouter une logique pour changer l'affichage en fonction du mode
+    console.log(`Mode de tirage sélectionné : ${this.value}`);
   });
   
   // Initialiser le logo avec le persona par défaut
