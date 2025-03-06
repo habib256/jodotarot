@@ -120,7 +120,7 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ## 🔮 Capture d'écran
 
-![Capture d'écran de JodoTarot](assets/images/personas/tarologue.png)
+![Carte de La Mort - Tarot Thiago Lehmann](assets/images/set02/13 La mort.jpg)
 
 ---
 
