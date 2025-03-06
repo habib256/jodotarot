@@ -118,10 +118,21 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ---
 
-## 🔮 Exemple d'arcane de tarot
+## 🔮 Exemples d'arcanes de tarot
 
-<div align="center">
-  <img src="assets/images/set02/13%20La%20mort.jpg" alt="Carte de La Mort - Tarot Thiago Lehmann" width="300" />
+<div align="center" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+  <div style="text-align: center; margin: 10px;">
+    <img src="assets/images/set01/13 La mort.png" alt="Carte de La Mort - Tarot de Marseille" width="250" />
+    <p><strong>XIII - La Mort</strong><br>Tarot de Marseille</p>
+  </div>
+  <div style="text-align: center; margin: 10px;">
+    <img src="assets/images/set02/17 Etoile.jpg" alt="Carte de L'Étoile - Tarot Thiago Lehmann" width="250" />
+    <p><strong>XVII - L'Étoile</strong><br>Tarot Thiago Lehmann</p>
+  </div>
+  <div style="text-align: center; margin: 10px;">
+    <img src="assets/images/set02/00 Le fou.jpg" alt="Carte du Fou - Tarot Thiago Lehmann" width="250" />
+    <p><strong>0 - Le Fou</strong><br>Tarot Thiago Lehmann</p>
+  </div>
 </div>
 
 Développé avec ❤️ pour les amateurs de tarot et d'exploration intérieure.
