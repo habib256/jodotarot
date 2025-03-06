@@ -15,6 +15,8 @@ JodoTarot est une application web élégante et intuitive qui vous permet de ré
 - 📱 **Interface responsive** adaptée à tous les appareils
 - 🖼️ **Visualisation claire** des cartes et de leur signification dans le tirage
 - 🎨 **Choix de jeux de cartes** (Tarot de Marseille et Tarot Thiago Lehmann)
+- 🌍 **Support multilingue** (Français, Anglais, Espagnol, Allemand, Italien)
+- 🔄 **Cache intégré** pour les réponses d'IA afin d'optimiser les performances
 
 ## 🎭 Les personas disponibles
 
@@ -54,6 +56,18 @@ Le jeu traditionnel avec ses illustrations classiques.
 ### Tarot Thiago Lehmann (set02)
 Une interprétation artistique moderne des arcanes.
 
+## 🌍 Langues disponibles
+
+JodoTarot prend désormais en charge 5 langues différentes:
+
+- 🇫🇷 **Français** (langue par défaut)
+- 🇬🇧 **Anglais**
+- 🇪🇸 **Espagnol**
+- 🇩🇪 **Allemand**
+- 🇮🇹 **Italien**
+
+L'interface utilisateur complète ainsi que les interprétations générées par l'IA sont adaptées à la langue sélectionnée.
+
 ## 🤖 Modèles d'IA supportés
 
 ### OpenAI (nécessite une clé API):
@@ -66,12 +80,13 @@ Une interprétation artistique moderne des arcanes.
 
 ## 🚀 Comment utiliser JodoTarot
 
-1. **Posez votre question** dans le champ dédié
-2. **Choisissez votre persona**, le **jeu de cartes** et le **modèle d'IA** souhaités
-3. **Cliquez sur "Tirer les cartes"**
-4. **Contemplez** le tirage qui s'affiche
-5. **Lisez l'interprétation** générée par l'IA dans le style du persona choisi
-6. **Cliquez sur une carte** pour l'agrandir et mieux l'observer
+1. **Choisissez votre langue** dans le menu déroulant en haut à gauche
+2. **Posez votre question** dans le champ dédié
+3. **Choisissez votre persona**, le **jeu de cartes** et le **modèle d'IA** souhaités
+4. **Cliquez sur "Tirer les cartes"**
+5. **Contemplez** le tirage qui s'affiche
+6. **Lisez l'interprétation** générée par l'IA dans le style du persona choisi
+7. **Cliquez sur une carte** pour l'agrandir et mieux l'observer
 
 ## 📸 Exemple de tirage
 
@@ -103,6 +118,7 @@ Voici un exemple de tirage en croix avec son interprétation complète:
 - Interface utilisateur intuitive et réactive
 - Système de cache pour les réponses d'IA afin d'optimiser les performances
 - Support complet pour les modèles d'IA locaux (Ollama) et distants (OpenAI)
+- Internationalisation complète avec support de 5 langues
 
 ## 📝 Licence
 
@@ -156,3 +172,9 @@ Développé avec ❤️ pour les amateurs de tarot et d'exploration intérieure.
    - Essayez de poser des questions plus variées
    - Utilisez un modèle d'IA plus avancé (comme GPT-4o)
    - Alternez entre différents personas
+
+5. **"Problèmes avec le changement de langue"**
+   - Assurez-vous que la page est entièrement chargée avant de changer de langue
+   - Si certains textes ne sont pas traduits, rafraîchissez la page
+   - Vérifiez que le modèle d'IA que vous utilisez est compatible avec la langue sélectionnée
+   - Pour les modèles locaux Ollama, assurez-vous qu'ils peuvent générer du contenu dans la langue choisie
