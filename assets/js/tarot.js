@@ -2,6 +2,8 @@
  * Module de gestion des cartes de tarot et des tirages
  */
 
+import { getTranslation } from './translations.js';
+
 // Tableau des cartes du tarot avec les chemins vers les images
 const cardsData = {
   set01: [
@@ -101,43 +103,28 @@ function drawCards(deckName = 'set01') {
 /**
  * Fonction pour générer un prompt de tirage détaillé basé sur les cartes
  * @param {Array} tirage - Tableau des cartes tirées
+ * @param {string} lang - Langue pour les traductions (fr par défaut)
  * @returns {string} - Prompt détaillé pour l'IA
  */
-function genererPromptTirage(tirage) {
+function genererPromptTirage(tirage, lang = 'fr') {
   if (!tirage || tirage.length === 0) {
     return "";
   }
   
-  const positions = [
-    "en haut (influences positives/spirituelles)", 
-    "à gauche (passé/origines de la situation)", 
-    "au centre (situation actuelle/enjeu principal)", 
-    "à droite (futur/évolution probable)",
-    "en bas (influences négatives/défis à surmonter)"
-  ];
+  const positionKeys = ['top', 'left', 'center', 'right', 'bottom'];
   
-  let tiragePrompt = "\nVoici le tirage en croix à interpréter:\n";
+  let tiragePrompt = "\n" + getTranslation('tarotReading.intro', lang) + "\n";
   
   tirage.forEach((carte, index) => {
-    if (index < positions.length) {
-      tiragePrompt += `- La carte "${carte.name}" est positionnée ${positions[index]}`;
+    if (index < positionKeys.length) {
+      const position = getTranslation(`tarotReading.positions.${positionKeys[index]}`, lang);
+      const instruction = getTranslation(`tarotReading.instructions.${positionKeys[index]}`, lang);
       
-      // Ajouter des instructions spécifiques pour chaque position
-      if (index === 0) {
-        tiragePrompt += `. Analyse les forces spirituelles ou mentales qui soutiennent la personne.\n`;
-      } else if (index === 1) {
-        tiragePrompt += `. Explore comment les événements passés ont contribué à la situation actuelle.\n`;
-      } else if (index === 2) {
-        tiragePrompt += `. Décris précisément la situation actuelle et les enjeux centraux.\n`;
-      } else if (index === 3) {
-        tiragePrompt += `. Projette l'évolution probable si la personne suit le chemin actuel.\n`;
-      } else if (index === 4) {
-        tiragePrompt += `. Identifie les obstacles à surmonter et propose des moyens de les gérer.\n`;
-      }
+      tiragePrompt += `- "${carte.name}" : ${position}. ${instruction}\n`;
     }
   });
   
-  tiragePrompt += "\nPrends en compte l'interaction entre les cartes et leur position relative dans ton interprétation globale.";
+  tiragePrompt += "\n" + getTranslation('tarotReading.conclusion', lang);
   
   return tiragePrompt;
 }

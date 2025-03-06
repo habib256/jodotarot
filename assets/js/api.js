@@ -4,41 +4,45 @@
 
 import { API_KEY, API_URL_OPENAI, API_URL_OLLAMA, API_URL_OLLAMA_TAGS, getMetaPrompt } from './config.js';
 import { genererPromptTirage } from './tarot.js';
-import PERSONAS from './personas.js';
+import PERSONAS, { getPersonaPrompt } from './personas.js';
+import { getTranslation } from './translations.js';
 
 // Système simple de cache pour les réponses
 const responseCache = new Map();
+
+// Créer un fichier de configuration centrale
+const SETTINGS = {
+  DEFAULT_PERSONA: "tarologue",
+  DEFAULT_LANGUAGE: "fr",
+  MAX_TOKENS: 500,
+  // etc.
+};
 
 /**
  * Fonction pour enrichir le prompt système avec le contexte spécifique à la question
  * @param {string} question - La question posée par l'utilisateur
  * @param {string} systemPrompt - Le prompt système de base
- * @returns {string} - Le prompt système enrichi
+ * @param {string} langue - La langue à utiliser (fr par défaut)
+ * @returns {string} - Le prompt système enrichi avec la question
  */
-function enrichirPromptContextuel(question, systemPrompt) {
-  // Analyse simple de la question pour adapter le prompt
-  const questionLower = question.toLowerCase();
-  
-  // Détection de thèmes spécifiques pour adapter la réponse
-  if (questionLower.includes('amour') || questionLower.includes('relation') || questionLower.includes('couple')) {
-    systemPrompt += "\nLa question semble porter sur des relations amoureuses ou sentimentales. Concentre-toi particulièrement sur cet aspect dans ton interprétation.";
-  } else if (questionLower.includes('travail') || questionLower.includes('carrière') || questionLower.includes('emploi') || questionLower.includes('job')) {
-    systemPrompt += "\nLa question porte sur la carrière professionnelle. Oriente ton interprétation vers cet aspect de la vie.";
-  } else if (questionLower.includes('argent') || questionLower.includes('finance') || questionLower.includes('économie')) {
-    systemPrompt += "\nLa question concerne les finances ou l'argent. Focalise ton interprétation sur cet aspect.";
-  } else if (questionLower.includes('santé') || questionLower.includes('maladie') || questionLower.includes('guérison')) {
-    systemPrompt += "\nLa question est liée à la santé. Dirige ton interprétation vers cet aspect, tout en rappelant que tu ne remplaces pas un avis médical professionnel.";
-  } else if (questionLower.includes('décision') || questionLower.includes('choix') || questionLower.includes('dilemme')) {
-    systemPrompt += "\nLa personne semble face à un choix important. Propose des éclairages sur les différentes options sans décider à sa place.";
+function enrichirPromptContextuel(question, systemPrompt, langue = 'fr') {
+  // Ajouter la question de l'utilisateur au prompt système
+  if (question && question.trim()) {
+    // Obtenir la traduction de "La question posée par l'utilisateur est:"
+    const questionIntro = getTranslation('interpretation.userQuestion', langue);
+    
+    // Ajouter un paragraphe vide pour séparer le prompt système original de la question
+    return `${systemPrompt}\n\n${questionIntro} "${question.trim()}"`;
   }
-
+  
+  // Retourner le prompt système original si pas de question
   return systemPrompt;
 }
 
 /**
- * Obtient une réponse d'un modèle d'IA (OpenAI ou Ollama)
- * @param {string} question - La question posée par l'utilisateur
- * @param {Array} historiqueMessages - Historique des messages pour continuer une conversation
+ * Fonction pour obtenir une réponse du modèle GPT-4 Omni
+ * @param {string} question - La question à poser au modèle
+ * @param {Array} historiqueMessages - Messages d'historique optionnels
  * @param {string} modeleComplet - Le modèle complet au format "fournisseur/modèle" (ex: "openai/gpt-4o")
  * @param {string} persona - Le type de personnage occulte (par défaut: tarologue)
  * @param {Array} tirage - Les cartes tirées (optionnel)
@@ -65,19 +69,22 @@ async function obtenirReponseGPT4O(question, historiqueMessages = [], modeleComp
       fournisseur = "openai";
     }
     
-    // Récupération des infos du persona (ou utilisation du personnage par défaut)
-    const personaInfo = PERSONAS[persona] || PERSONAS.tarologue;
+    // Utilisation de getPersonaPrompt pour obtenir le prompt dans la langue demandée
+    let systemPrompt = getPersonaPrompt(persona, langue);
     
-    // Préparation du prompt système
-    let systemPrompt = personaInfo.systemPrompt;
+    // Si le persona n'existe pas, utiliser le tarologue comme fallback
+    if (!systemPrompt) {
+      console.error(`Persona "${persona}" non trouvé, utilisation du persona par défaut.`);
+      systemPrompt = getPersonaPrompt("tarologue", langue);
+    }
     
     // Enrichir le prompt avec le contexte de la question
-    systemPrompt = enrichirPromptContextuel(question, systemPrompt);
+    systemPrompt = enrichirPromptContextuel(question, systemPrompt, langue);
     
     // Préparer le prompt spécifique au tirage si des cartes sont fournies
     let tiragePrompt = null;
     if (tirage && tirage.length) {
-      tiragePrompt = genererPromptTirage(tirage);
+      tiragePrompt = genererPromptTirage(tirage, langue);
     }
     
     // Ajouter le meta prompt et le prompt de tirage
@@ -87,91 +94,97 @@ async function obtenirReponseGPT4O(question, historiqueMessages = [], modeleComp
       systemPrompt = `${systemPrompt} ${getMetaPrompt(langue)}`;
     }
     
-    // Log pour le développement (à retirer en production)
-    console.log("Prompt système utilisé:", systemPrompt);
+    // Ajoutez une vérification avant d'utiliser le prompt
+    if (systemPrompt) {
+      // Log du prompt système juste avant l'envoi
+      logPrompt(persona, question, systemPrompt);
+      
+      // Préparation des messages
+      let messages = [];
+      
+      if (historiqueMessages.length === 0) {
+        // Première requête
+        messages = [
+          {
+            role: "system",
+            content: systemPrompt
+          },
+          {
+            role: "user", 
+            content: getTranslation('interpretation.userMessage', langue)
+          }
+        ];
+      } else {
+        // Continuation d'une réponse précédente
+        messages = historiqueMessages;
+      }
 
-    // Préparation des messages
-    let messages = [];
-    
-    if (historiqueMessages.length === 0) {
-      // Première requête
-      messages = [
-        {
-          role: "system",
-          content: systemPrompt
-        },
-        {
-          role: "user", 
-          content: question
+      let response;
+      
+      // Sélectionner l'API en fonction du fournisseur
+      if (fournisseur === "openai") {
+        // Configuration de la requête pour OpenAI
+        response = await fetch(API_URL_OPENAI, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${API_KEY}`
+          },
+          body: JSON.stringify({
+            model: modele,
+            messages: messages,
+            temperature: 0.7,
+            max_tokens: 1000 // Augmentation du nombre de tokens pour garantir une réponse complète
+          })
+        });
+
+        // Vérification de la réponse
+        if (!response.ok) {
+          const erreur = await response.json();
+          throw new Error(`Erreur API OpenAI: ${erreur.error?.message || response.statusText}`);
         }
-      ];
-    } else {
-      // Continuation d'une réponse précédente
-      messages = historiqueMessages;
-    }
 
-    let response;
-    
-    // Sélectionner l'API en fonction du fournisseur
-    if (fournisseur === "openai") {
-      // Configuration de la requête pour OpenAI
-      response = await fetch(API_URL_OPENAI, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${API_KEY}`
-        },
-        body: JSON.stringify({
-          model: modele,
-          messages: messages,
-          temperature: 0.7,
-          max_tokens: 1000 // Augmentation du nombre de tokens pour garantir une réponse complète
-        })
-      });
+        // Traitement de la réponse
+        const data = await response.json();
+        
+        // Mise en cache de la réponse
+        const reponse = data.choices[0].message.content;
+        responseCache.set(cacheKey, reponse);
+        return reponse;
+        
+      } else if (fournisseur === "ollama") {
+        // Configuration de la requête pour Ollama
+        response = await fetch(API_URL_OLLAMA, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: modele,
+            messages: messages,
+            stream: false,
+            temperature: 0.7
+          })
+        });
 
-      // Vérification de la réponse
-      if (!response.ok) {
-        const erreur = await response.json();
-        throw new Error(`Erreur API OpenAI: ${erreur.error?.message || response.statusText}`);
+        // Vérification de la réponse
+        if (!response.ok) {
+          throw new Error(`Erreur API Ollama: ${response.statusText}`);
+        }
+
+        // Traitement de la réponse
+        const data = await response.json();
+        
+        // Mise en cache de la réponse
+        const reponse = data.message?.content || "Désolé, je n'ai pas pu générer de réponse.";
+        responseCache.set(cacheKey, reponse);
+        return reponse;
+      } else {
+        throw new Error(`Fournisseur non supporté: ${fournisseur}`);
       }
-
-      // Traitement de la réponse
-      const data = await response.json();
-      
-      // Mise en cache de la réponse
-      const reponse = data.choices[0].message.content;
-      responseCache.set(cacheKey, reponse);
-      return reponse;
-      
-    } else if (fournisseur === "ollama") {
-      // Configuration de la requête pour Ollama
-      response = await fetch(API_URL_OLLAMA, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: modele,
-          messages: messages,
-          stream: false,
-          temperature: 0.7
-        })
-      });
-
-      // Vérification de la réponse
-      if (!response.ok) {
-        throw new Error(`Erreur API Ollama: ${response.statusText}`);
-      }
-
-      // Traitement de la réponse
-      const data = await response.json();
-      
-      // Mise en cache de la réponse
-      const reponse = data.message?.content || "Désolé, je n'ai pas pu générer de réponse.";
-      responseCache.set(cacheKey, reponse);
-      return reponse;
     } else {
-      throw new Error(`Fournisseur non supporté: ${fournisseur}`);
+      console.error("Erreur: Prompt système non défini");
+      return `Une erreur est survenue lors de la communication avec le modèle: Prompt système non défini`;
     }
   } catch (error) {
     console.error("Erreur lors de l'obtention de la réponse:", error);
@@ -236,10 +249,20 @@ async function verifierConnexionOllama() {
   }
 }
 
+// Améliorer les logs
+function logPrompt(persona, question, systemPrompt) {
+  console.group("Génération de réponse");
+  console.log("Persona:", persona);
+  console.log("Question:", question);
+  console.log("Prompt système:", systemPrompt);
+  console.groupEnd();
+}
+
 // Exporter les fonctions
 export {
   obtenirReponseGPT4O,
   obtenirModelesOllama,
   verifierConnexionOllama,
-  enrichirPromptContextuel
+  enrichirPromptContextuel,
+  logPrompt
 };

@@ -9,8 +9,12 @@ import {
   afficherTirage, 
   mettreAJourAffichageCartes, 
   updatePersonaLogo, 
-  getPersonaLabel 
+  getPersonaLabel,
+  updateUILanguage
 } from './ui.js';
+
+// Import des fonctions de traduction
+import { getTranslation } from './translations.js';
 
 // Variables pour stocker le tirage actuel
 let tirageActuel = [];
@@ -73,25 +77,21 @@ function faireUnTirage() {
  */
 async function obtenirInterpretation(tirage, question, modeTirage) {
   const interpretationsDiv = document.getElementById('interpretations');
-  interpretationsDiv.innerHTML = '<p class="loading">Analyse du tirage en cours...</p>';
+  const langue = document.getElementById('language').value;
+  interpretationsDiv.innerHTML = `<p class="loading">${getTranslation('interpretation.loading', langue)}</p>`;
   
   // Récupération des options sélectionnées
   const modeleIA = document.getElementById('ia-model').value;
   const persona = document.getElementById('persona').value;
-  const langue = document.getElementById('language').value;
   
   // Préparation de la question pour l'interprétation
-  let typeDeSpread = "en croix";
-  if (modeTirage === "cross") {
-    typeDeSpread = "en croix";
-  }
-  // D'autres modes pourront être ajoutés ici à l'avenir
+  let typeDeSpread = getTranslation('misc.crossSpread', langue);
   
-  const prompt = `Interprétez ce tirage de tarot ${typeDeSpread} en relation avec ma question: "${question}"`;
+  const prompt = getTranslation('misc.tarotPrompt', langue, { spreadType: typeDeSpread, question: question });
   
   try {
     // Affichage d'un message indiquant le modèle et le personnage utilisés
-    interpretationsDiv.innerHTML = `<p class="loading">Analyse du tirage ${typeDeSpread} en cours avec ${modeleIA} interprété par un(e) ${getPersonaLabel(persona)}...</p>`;
+    interpretationsDiv.innerHTML = `<p class="loading">${getTranslation('interpretation.loadingWithModel', langue, { model: modeleIA, persona: getPersonaLabel(persona) })}</p>`;
     
     // Appel à l'API via notre fonction avec les options sélectionnées
     const reponse = await obtenirReponseGPT4O(prompt, [], modeleIA, persona, tirage, langue);
@@ -104,7 +104,7 @@ async function obtenirInterpretation(tirage, question, modeTirage) {
     interpretationsDiv.innerHTML = formattedResponse;
   } catch (error) {
     console.error("Erreur lors de l'interprétation:", error);
-    interpretationsDiv.innerHTML = '<p>Une erreur est survenue lors de l\'interprétation. Veuillez réessayer.</p>';
+    interpretationsDiv.innerHTML = `<p>${getTranslation('interpretation.error', langue)}</p>`;
   }
 }
 
@@ -180,8 +180,14 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Ajouter un gestionnaire d'événements au menu déroulant de langue
   document.getElementById('language').addEventListener('change', function() {
-    console.log(`Langue sélectionnée : ${this.value}`);
-    // Ici, dans une future mise à jour, on pourrait ajouter une fonction pour traduire l'interface
+    const selectedLanguage = this.value;
+    console.log(`Langue sélectionnée : ${selectedLanguage}`);
+    
+    // Mettre à jour l'interface avec les traductions
+    updateUILanguage(selectedLanguage);
+    
+    // Stocker la préférence de langue dans le localStorage
+    localStorage.setItem('jodotarot_language', selectedLanguage);
   });
   
   // Ajouter un gestionnaire d'événements au menu déroulant des personas
@@ -206,4 +212,13 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Charger les modèles Ollama disponibles
   chargerModelesOllama();
+  
+  // Charger la langue préférée de l'utilisateur (si disponible)
+  const savedLanguage = localStorage.getItem('jodotarot_language');
+  if (savedLanguage) {
+    document.getElementById('language').value = savedLanguage;
+    // Déclencher l'événement de changement pour appliquer les traductions
+    const event = new Event('change');
+    document.getElementById('language').dispatchEvent(event);
+  }
 }); 

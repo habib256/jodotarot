@@ -3,6 +3,7 @@
  */
 
 import { cardsData, renderCard } from './tarot.js';
+import { TRANSLATIONS, getTranslation } from './translations.js';
 
 /**
  * Initialise l'affichage du tirage en croix avec des dos de cartes
@@ -104,6 +105,157 @@ function toggleEnlarge(img) {
   }
 }
 
+/**
+ * Met à jour les libellés des options des personas selon la langue sélectionnée
+ * @param {string} langue - Le code de langue (fr, en, es, de, it)
+ */
+function updatePersonaOptions(langue) {
+  const personaSelect = document.getElementById('persona');
+  
+  // Parcourir toutes les options du select persona
+  for (let i = 0; i < personaSelect.options.length; i++) {
+    const option = personaSelect.options[i];
+    const personaValue = option.value;
+    
+    // Ne mettre à jour que les options qui ont une valeur (pas les optgroup)
+    if (personaValue && TRANSLATIONS[langue]?.personas?.[personaValue]) {
+      // Conserver l'emoji au début du texte s'il existe
+      const emojiMatch = option.text.match(/^([\p{Emoji}\s]+)/u);
+      const emoji = emojiMatch ? emojiMatch[1] : '';
+      
+      // Mettre à jour le texte avec l'emoji et la traduction
+      option.text = emoji + TRANSLATIONS[langue].personas[personaValue];
+    }
+  }
+}
+
+/**
+ * Met à jour les libellés des options des types de tirage selon la langue sélectionnée
+ * @param {string} langue - Le code de langue (fr, en, es, de, it)
+ */
+function updateSpreadTypeOptions(langue) {
+  const spreadTypeSelect = document.getElementById('spread-type');
+  
+  // Parcourir toutes les options du select spread-type
+  for (let i = 0; i < spreadTypeSelect.options.length; i++) {
+    const option = spreadTypeSelect.options[i];
+    const spreadTypeValue = option.value;
+    
+    // Ne mettre à jour que les options qui ont une valeur
+    if (spreadTypeValue && TRANSLATIONS[langue]?.spreadTypes?.[spreadTypeValue]) {
+      option.text = TRANSLATIONS[langue].spreadTypes[spreadTypeValue];
+    }
+  }
+}
+
+/**
+ * Met à jour l'interface utilisateur avec les traductions dans la langue spécifiée
+ * @param {string} langue - Le code de langue (fr, en, es, de, it)
+ */
+function updateUILanguage(langue) {
+  // Mettre à jour l'attribut lang de la balise HTML
+  document.documentElement.lang = langue;
+  
+  // Mettre à jour le titre de la page
+  document.getElementById('page-title').textContent = getTranslation('pageTitle', langue);
+  
+  // Mettre à jour les labels dans l'en-tête
+  document.querySelector('.select-group:nth-child(1) .select-label').textContent = getTranslation('header.language', langue);
+  document.querySelector('.select-group:nth-child(2) .select-label').textContent = getTranslation('header.persona', langue);
+  document.querySelector('.select-group:nth-child(3) .select-label').textContent = getTranslation('header.cardSet', langue);
+  document.querySelector('.select-group:nth-child(4) .select-label').textContent = getTranslation('header.spreadType', langue);
+  document.querySelector('.select-group:nth-child(5) .select-label').textContent = getTranslation('header.iaModel', langue);
+  
+  // Mettre à jour le label et le placeholder de la question
+  document.querySelector('.input-group label').textContent = getTranslation('header.question', langue);
+  document.getElementById('question').placeholder = getTranslation('header.questionPlaceholder', langue);
+  
+  // Mettre à jour le bouton de tirage
+  document.getElementById('tirer').textContent = getTranslation('header.drawButton', langue);
+  
+  // Mettre à jour les messages d'interprétation par défaut
+  const interpretationsDiv = document.getElementById('interpretations');
+  // Ne mettre à jour que si le contenu est le message par défaut
+  if (interpretationsDiv.textContent.trim() === TRANSLATIONS.fr.interpretation.default || 
+      interpretationsDiv.textContent.trim() === TRANSLATIONS.en.interpretation.default ||
+      interpretationsDiv.textContent.trim() === TRANSLATIONS.es.interpretation.default ||
+      interpretationsDiv.textContent.trim() === TRANSLATIONS.de.interpretation.default ||
+      interpretationsDiv.textContent.trim() === TRANSLATIONS.it.interpretation.default) {
+    interpretationsDiv.innerHTML = `<p>${getTranslation('interpretation.default', langue)}</p>`;
+  }
+  
+  // Mettre à jour les groupes d'options
+  updateOptGroupsLabels(langue);
+  
+  // Mettre à jour les noms des personas et types de tirage
+  updatePersonaOptions(langue);
+  updateSpreadTypeOptions(langue);
+}
+
+/**
+ * Met à jour les labels des groupes d'options dans les menus déroulants
+ * @param {string} langue - Le code de langue (fr, en, es, de, it)
+ */
+function updateOptGroupsLabels(langue) {
+  // Mettre à jour les optgroups du menu persona
+  const personaSelect = document.getElementById('persona');
+  for (let i = 0; i < personaSelect.children.length; i++) {
+    const child = personaSelect.children[i];
+    if (child.tagName === 'OPTGROUP') {
+      // Déterminer la clé de traduction en fonction du label actuel
+      let key = '';
+      switch (child.label) {
+        case 'Arts Divinatoires':
+        case 'Divination Arts':
+        case 'Artes Adivinatorias':
+        case 'Wahrsagekünste':
+        case 'Arti Divinatorie':
+          key = 'optgroups.divinationArts'; break;
+        case 'Traditions Spirituelles':
+        case 'Spiritual Traditions':
+        case 'Tradiciones Espirituales':
+        case 'Spirituelle Traditionen':
+        case 'Tradizioni Spirituali':
+          key = 'optgroups.spiritualTraditions'; break;
+        case 'Traditions Ésotériques':
+        case 'Esoteric Traditions':
+        case 'Tradiciones Esotéricas':
+        case 'Esoterische Traditionen':
+        case 'Tradizioni Esoteriche':
+          key = 'optgroups.esotericTraditions'; break;
+        case 'Psychanalystes':
+        case 'Psychoanalysts':
+        case 'Psicoanalistas':
+        case 'Psychoanalytiker':
+        case 'Psicoanalisti':
+          key = 'optgroups.psychoanalysts'; break;
+        case 'Entités Surnaturelles':
+        case 'Supernatural Entities':
+        case 'Entidades Sobrenaturales':
+        case 'Übernatürliche Wesenheiten':
+        case 'Entità Soprannaturali':
+          key = 'optgroups.supernaturalEntities'; break;
+      }
+      if (key) {
+        child.label = getTranslation(key, langue);
+      }
+    }
+  }
+  
+  // Mettre à jour les optgroups du menu IA
+  const iaSelect = document.getElementById('ia-model');
+  for (let i = 0; i < iaSelect.children.length; i++) {
+    const child = iaSelect.children[i];
+    if (child.tagName === 'OPTGROUP') {
+      if (child.label === 'OpenAI') {
+        child.label = getTranslation('optgroups.openai', langue);
+      } else if (child.label === 'Ollama') {
+        child.label = getTranslation('optgroups.ollama', langue);
+      }
+    }
+  }
+}
+
 // Exporter les fonctions
 export {
   initSpread,
@@ -111,5 +263,8 @@ export {
   mettreAJourAffichageCartes,
   updatePersonaLogo,
   getPersonaLabel,
-  toggleEnlarge
+  toggleEnlarge,
+  updateUILanguage,
+  updatePersonaOptions,
+  updateSpreadTypeOptions
 }; 
