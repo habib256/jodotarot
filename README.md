@@ -54,30 +54,6 @@ Le jeu traditionnel avec ses illustrations classiques.
 ### Tarot Thiago Lehmann (set02)
 Une interprétation artistique moderne des arcanes.
 
-Chaque jeu comprend les cartes suivantes:
-- 00 Le Fou
-- 01 Le Bateleur
-- 02 La Papesse
-- 03 L'Impératrice
-- 04 L'Empereur
-- 05 Le Pape
-- 06 Les Amoureux
-- 07 Le Chariot
-- 08 La Justice
-- 09 L'Ermite
-- 10 La Roue de Fortune
-- 11 La Force
-- 12 Le Pendu
-- 13 La Mort
-- 14 La Tempérance
-- 15 Le Diable
-- 16 La Tour
-- 17 L'Étoile
-- 18 La Lune
-- 19 Le Soleil
-- 20 Le Jugement
-- 21 Le Monde
-
 ## 🤖 Modèles d'IA supportés
 
 ### OpenAI (nécessite une clé API):
@@ -96,31 +72,6 @@ Chaque jeu comprend les cartes suivantes:
 4. **Contemplez** le tirage qui s'affiche
 5. **Lisez l'interprétation** générée par l'IA dans le style du persona choisi
 6. **Cliquez sur une carte** pour l'agrandir et mieux l'observer
-
-## 📂 Structure du projet
-
-L'application est organisée de manière modulaire :
-
-```
-/jodotarot
-  /assets
-    /css
-      - style.css (styles CSS de l'application)
-    /js
-      - app.js (point d'entrée principal)
-      - tarot.js (logique liée au tirage et cartes)
-      - ui.js (gestion de l'interface utilisateur)
-      - api.js (appels API aux modèles d'IA)
-      - personas.js (définitions des personas)
-      - config.js (configuration partagée)
-    /images
-      /personas (images des différents personas)
-      /set01 (jeu de tarot de Marseille)
-      /set02 (jeu de tarot Thiago Lehmann)
-  - index.html (structure HTML principale)
-  - README.md (documentation)
-  - LICENSE (licence du projet)
-```
 
 ## ⚙️ Installation et configuration
 
@@ -158,7 +109,7 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 ## 🙏 Remerciements
 
 - Inspiré par l'univers symbolique d'Alejandro Jodorowsky
-- Cartes de tarot et personas créés spécifiquement pour cette application
+- Personas créés spécifiquement pour cette application
 - Technologie propulsée par les API OpenAI et Ollama
 
 ---
