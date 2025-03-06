@@ -118,11 +118,11 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ---
 
-## 🔮 Capture d'écran
+## 🔮 Exemple d'arcane de tarot
 
-<img src="assets/images/set02/13%20La%20mort.jpg" alt="Carte de La Mort - Tarot Thiago Lehmann" width="300" />
-
----
+<div align="center">
+  <img src="assets/images/set02/13%20La%20mort.jpg" alt="Carte de La Mort - Tarot Thiago Lehmann" width="300" />
+</div>
 
 Développé avec ❤️ pour les amateurs de tarot et d'exploration intérieure.
 
