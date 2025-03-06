@@ -120,7 +120,7 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ## 🔮 Capture d'écran
 
-![Carte de La Mort - Tarot Thiago Lehmann](assets/images/set02/13 La mort.jpg)
+![Carte de La Mort - Tarot Thiago Lehmann](assets/images/set02/13%20La%20mort.jpg)
 
 ---
 
