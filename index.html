@@ -89,8 +89,8 @@
     .card.enlarged {
       position: fixed;
       top: 0;
-      right: 0; /* Changé de left: 0 à right: 0 */
-      width: 40%; /* Changé de 100% à 60% pour n'occuper que la partie droite */
+      right: 0;
+      width: 550px; /* Exactement la même largeur que le right-panel */
       height: 100%;
       max-width: none;
       max-height: none;
@@ -408,7 +408,21 @@
 
     // Fonction pour agrandir/réduire une carte
     window.toggleEnlarge = function(img) {
-      img.classList.toggle('enlarged');
+      if (img.classList.contains('enlarged')) {
+        // Si la carte est déjà agrandie, la réduire
+        img.classList.remove('enlarged');
+        img.style.right = '';
+      } else {
+        // Agrandir la carte et l'aligner précisément avec le panneau droit
+        img.classList.add('enlarged');
+        
+        // Obtenir la position et les dimensions du panneau droit
+        const rightPanel = document.querySelector('.right-panel');
+        const rightPanelRect = rightPanel.getBoundingClientRect();
+        
+        // Positionner la carte agrandie exactement au-dessus du panneau droit
+        img.style.right = (window.innerWidth - rightPanelRect.right) + 'px';
+      }
     };
 
     // Fonction pour mettre à jour l'image du logo en fonction du persona sélectionné
