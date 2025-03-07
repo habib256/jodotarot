@@ -6,6 +6,8 @@
 
 JodoTarot est une application web élégante et intuitive qui vous permet de réaliser des tirages de tarot en croix et d'obtenir des interprétations générées par intelligence artificielle. Inspirée par l'univers mystique du tarot, cette application combine l'art divinatoire traditionnel avec les technologies modernes d'IA pour vous offrir une expérience de consultation unique.
 
+[Lancer JodoTarot](https://habib256.github.io/jodotarot/index.html)  
+
 ## 🌟 Fonctionnalités principales
 
 - 🎴 **Tirage en croix** avec 5 cartes (influences positives, passé, situation actuelle, futur, influences négatives)
@@ -160,10 +162,7 @@ Développé avec ❤️ pour les amateurs de tarot et d'exploration intérieure.
 ## 📝 Licence
 
 JodoTarot est distribué sous licence GNU General Public License v3.0. Vous êtes libre de:
-- Utiliser le logiciel
-- Modifier le code source
-- Distribuer le logiciel
-- Distribuer vos modifications
+- Utiliser le logicielde chaque interprétation ds
 
 Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
