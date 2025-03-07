@@ -196,11 +196,12 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
    - Vérifiez que le modèle d'IA que vous utilisez est compatible avec la langue sélectionnée
    - Pour les modèles locaux Ollama, assurez-vous qu'ils peuvent générer du contenu dans la langue choisie
 
-## 🔄 Mises à jour futures prévues
+## 🔄 Mises à jour futures envisageables
 
 - Ajout de nouveaux types de tirages (tirage en fer à cheval, tirage celtique, etc.)
 - Support pour les arcanes mineurs (jeu complet de 78 cartes)
 - Possibilité de sauvegarder et partager vos tirages
-- Mode hors-ligne avec interprétations pré-générées
-- Thèmes visuels alternatifs pour l'interface
+- Thèmes visuels alternatifs pour l'interface comme un mode sombre
 - Intégration d'autres modèles d'IA locaux
+- Rajout de la gestion des Oracles et du Yi King
+- Permettre à l'IA de lire les images des cartes pour identifier les particularités symboliques spécifiques à chaque set. Ce sera très utile pour les oracles.
