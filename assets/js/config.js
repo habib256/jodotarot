@@ -3,7 +3,7 @@
  */
 
 // Configuration pour l'API OpenAI
-const API_KEY = "your API KEY";
+const API_KEY = "YOUR API KEY";
 const API_URL_OPENAI = "https://api.openai.com/v1/chat/completions";
 
 // Configuration pour l'API Ollama (local)

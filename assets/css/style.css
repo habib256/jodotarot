@@ -47,6 +47,22 @@ body {
   margin-left: 20px;
   margin-right: 15px;
 }
+
+.header-title {
+  font-size: 42px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
+  text-align: center;
+}
+
+.title-separator {
+  width: 80%;
+  margin: 10px auto 20px;
+  border: 0;
+  height: 1px;
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(107, 91, 149, 0.75), rgba(0, 0, 0, 0));
+}
 /* Conteneur principal en deux colonnes */
 .container {
   display: flex;
@@ -63,7 +79,7 @@ body {
   border-right: 1px solid #ccc;
 }
 .right-panel {
-  width: 550px; 
+  width: 600px; /* Augmentation pour accommoder la nouvelle taille de grille */
   flex: 0 0 auto; /* Ne pas rétrécir ni agrandir */
   padding: 10px;
   position: relative;
@@ -75,27 +91,57 @@ body {
 /* Grille de la croix */
 .spread {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: 179px 179px 179px; /* Trois colonnes de taille fixe */
   grid-template-rows: auto auto auto;
   grid-template-areas: 
     ". top ."
     "left center right"
     ". bottom .";
-  column-gap: 8px; 
-  row-gap: 8px; 
+  column-gap: 16px; /* Plus d'espace entre les colonnes */
+  row-gap: 16px; /* Plus d'espace entre les lignes */
   width: 100%;
-  max-width: 500px; 
+  max-width: 580px; /* Augmenté pour accueillir les cartes et les écarts */
   margin: 5px auto;
   position: relative;
+  justify-content: center; /* Centrer la grille */
 }
-.top { grid-area: top; justify-self: center; }
-.left { grid-area: left; }
-.center { grid-area: center; }
-.right { grid-area: right; }
-.bottom { grid-area: bottom; justify-self: center; }
+/* Styles communs pour tous les conteneurs de cartes */
+.top, .left, .center, .right, .bottom {
+  width: 179px;
+  height: 320px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.top { 
+  grid-area: top; 
+  justify-self: center; 
+}
+.left { 
+  grid-area: left; 
+  justify-self: end;
+}
+.center { 
+  grid-area: center;
+}
+.right { 
+  grid-area: right; 
+  justify-self: start;
+}
+.bottom { 
+  grid-area: bottom; 
+  justify-self: center; 
+}
+/* S'assurer que toutes les positions contiennent des cartes de la même taille */
+.top .card, .left .card, .center .card, .right .card, .bottom .card {
+  width: 179px;
+  height: auto;
+  max-width: 179px;
+}
 .card { 
-  width: 100%; 
-  max-width: 130px; 
+  width: 179px;
+  height: auto;
+  max-width: 179px;
   cursor: pointer;
   transition: transform 0.3s ease;
   transform-origin: center center;
@@ -106,7 +152,7 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  width: 580px; 
+  width: 624px; /* Réduction de 20% de 780px = 780 * 0.8 = 624px */
   height: 100%;
   max-width: none;
   max-height: none;

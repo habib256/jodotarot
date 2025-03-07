@@ -4,7 +4,7 @@
 
 import { API_KEY, API_URL_OPENAI, API_URL_OLLAMA, API_URL_OLLAMA_TAGS, getMetaPrompt } from './config.js';
 import { genererPromptTirage } from './tarot.js';
-import PERSONAS, { getPersonaPrompt } from './personas.js';
+import PERSONAS, { getPersonaPrompt } from './personas/index.js';
 import { getTranslation } from './translations.js';
 
 // Système simple de cache pour les réponses
@@ -28,11 +28,53 @@ const SETTINGS = {
 function enrichirPromptContextuel(question, systemPrompt, langue = 'fr') {
   // Ajouter la question de l'utilisateur au prompt système
   if (question && question.trim()) {
-    // Obtenir la traduction de "La question posée par l'utilisateur est:"
+    // Obtenir la traduction de l'introduction à la question
     const questionIntro = getTranslation('interpretation.userQuestion', langue);
     
-    // Ajouter un paragraphe vide pour séparer le prompt système original de la question
-    return `${systemPrompt}\n\n${questionIntro} "${question.trim()}"`;
+    // Textes d'emphase traduits pour chaque langue
+    const emphaseTextes = {
+      fr: `IMPORTANT: Ta réponse doit être DIRECTEMENT et SPÉCIFIQUEMENT liée à cette question.
+Concentre-toi sur ce que la question demande précisément et adapte ton interprétation 
+en fonction des éléments mentionnés dans la question. Ne donne pas une réponse générique.
+Chaque aspect de ton interprétation doit répondre à un aspect de cette question.`,
+      
+      en: `IMPORTANT: Your answer must be DIRECTLY and SPECIFICALLY related to this question.
+Focus on what the question precisely asks and adapt your interpretation
+based on the elements mentioned in the question. Do not give a generic answer.
+Each aspect of your interpretation must address an aspect of this question.`,
+      
+      es: `IMPORTANTE: Tu respuesta debe estar DIRECTA y ESPECÍFICAMENTE relacionada con esta pregunta.
+Concéntrate en lo que la pregunta pide con precisión y adapta tu interpretación
+según los elementos mencionados en la pregunta. No des una respuesta genérica.
+Cada aspecto de tu interpretación debe responder a un aspecto de esta pregunta.`,
+      
+      de: `WICHTIG: Deine Antwort muss DIREKT und SPEZIFISCH mit dieser Frage zusammenhängen.
+Konzentriere dich darauf, was die Frage genau fragt, und passe deine Interpretation
+an die in der Frage genannten Elemente an. Gib keine allgemeine Antwort.
+Jeder Aspekt deiner Interpretation muss auf einen Aspekt dieser Frage eingehen.`,
+      
+      it: `IMPORTANTE: La tua risposta deve essere DIRETTAMENTE e SPECIFICAMENTE legata a questa domanda.
+Concentrati su ciò che la domanda chiede precisamente e adatta la tua interpretazione
+in base agli elementi menzionati nella domanda. Non dare una risposta generica.
+Ogni aspetto della tua interpretazione deve rispondere a un aspetto di questa domanda.`
+    };
+    
+    // Sélectionner le texte d'emphase dans la langue appropriée ou utiliser le français par défaut
+    const emphaseTexte = emphaseTextes[langue] || emphaseTextes.fr;
+    
+    // Mettre beaucoup plus d'emphase sur la question pour améliorer sa prise en compte
+    const emphaseQuestion = `
+
+====================
+${questionIntro}:
+"${question.trim()}"
+====================
+
+${emphaseTexte}
+`;
+    
+    // Ajouter le prompt d'emphase sur la question au début du prompt système
+    return `${emphaseQuestion}\n\n${systemPrompt}`;
   }
   
   // Retourner le prompt système original si pas de question
@@ -78,21 +120,27 @@ async function obtenirReponseGPT4O(question, historiqueMessages = [], modeleComp
       systemPrompt = getPersonaPrompt("tarologue", langue);
     }
     
-    // Enrichir le prompt avec le contexte de la question
-    systemPrompt = enrichirPromptContextuel(question, systemPrompt, langue);
-    
     // Préparer le prompt spécifique au tirage si des cartes sont fournies
     let tiragePrompt = null;
     if (tirage && tirage.length) {
       tiragePrompt = genererPromptTirage(tirage, langue);
     }
     
-    // Ajouter le meta prompt et le prompt de tirage
+    // Réorganiser l'ordre des prompts pour augmenter l'impact de la question
+    // 1. D'abord le prompt du persona (déjà dans systemPrompt)
+    // 2. Ensuite le prompt du tirage si présent
+    // 3. Ajouter le meta prompt avant d'enrichir avec la question
+    // 4. Finalement, ajouter la question avec emphase (c'est le dernier élément vu par l'IA)
+    
     if (tiragePrompt) {
-      systemPrompt = `${systemPrompt} ${tiragePrompt} ${getMetaPrompt(langue)}`;
-    } else {
-      systemPrompt = `${systemPrompt} ${getMetaPrompt(langue)}`;
+      systemPrompt = `${systemPrompt} ${tiragePrompt}`;
     }
+    
+    // Ajouter le meta prompt avant d'enrichir avec la question
+    systemPrompt = `${systemPrompt} ${getMetaPrompt(langue)}`;
+    
+    // Enrichir le prompt avec le contexte de la question en dernier
+    systemPrompt = enrichirPromptContextuel(question, systemPrompt, langue);
     
     // Ajoutez une vérification avant d'utiliser le prompt
     if (systemPrompt) {

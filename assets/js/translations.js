@@ -71,7 +71,12 @@ const TRANSLATIONS = {
       jung: "Carl Gustav Jung",
       lacan: "Jacques Lacan",
       dolto: "Françoise Dolto",
-      demon: "Démon des Pactes"
+      demon: "Mortrarion",
+      noegoman: "No EGO man",
+      socrate: "Socrate",
+      salomon: "Roi Salomon",
+      quichotte: "Don Quichotte",
+      montaigne: "Michel de Montaigne"
     },
     // Types de tirage - Noms traduits
     spreadTypes: {
@@ -152,7 +157,12 @@ const TRANSLATIONS = {
       jung: "Carl Gustav Jung",
       lacan: "Jacques Lacan",
       dolto: "Françoise Dolto",
-      demon: "Pact Demon"
+      demon: "Mortrarion",
+      noegoman: "No EGO man",
+      socrate: "Socrates",
+      salomon: "King Solomon",
+      quichotte: "Don Quixote",
+      montaigne: "Michel de Montaigne"
     },
     // Types de tirage - Noms traduits
     spreadTypes: {
@@ -231,7 +241,12 @@ const TRANSLATIONS = {
       jung: "Carl Gustav Jung",
       lacan: "Jacques Lacan",
       dolto: "Françoise Dolto",
-      demon: "Demonio de Pactos"
+      demon: "Mortrarion",
+      noegoman: "No EGO man",
+      socrate: "Sócrates",
+      salomon: "Rey Salomón",
+      quichotte: "Don Quijote",
+      montaigne: "Michel de Montaigne"
     },
     // Types de tirage - Noms traduits
     spreadTypes: {
@@ -310,7 +325,12 @@ const TRANSLATIONS = {
       jung: "Carl Gustav Jung",
       lacan: "Jacques Lacan",
       dolto: "Françoise Dolto",
-      demon: "Paktdämon"
+      demon: "Mortrarion",
+      noegoman: "No EGO man",
+      socrate: "Sokrates",
+      salomon: "König Salomon",
+      quichotte: "Don Quijote",
+      montaigne: "Michel de Montaigne"
     },
     // Types de tirage - Noms traduits
     spreadTypes: {
@@ -389,7 +409,12 @@ const TRANSLATIONS = {
       jung: "Carl Gustav Jung",
       lacan: "Jacques Lacan",
       dolto: "Françoise Dolto",
-      demon: "Demone dei Patti"
+      demon: "Mortrarion",
+      noegoman: "No EGO man",
+      socrate: "Socrate",
+      salomon: "Re Salomone",
+      quichotte: "Don Chisciotte",
+      montaigne: "Michel de Montaigne"
     },
     // Types de tirage - Noms traduits
     spreadTypes: {
