@@ -157,7 +157,10 @@ function updateUILanguage(langue) {
   document.documentElement.lang = langue;
   
   // Mettre à jour le titre de la page
-  document.getElementById('page-title').textContent = getTranslation('pageTitle', langue);
+  document.getElementById('page-title').textContent = getTranslation('appTitle', langue);
+  
+  // Mettre à jour le titre de l'application
+  document.getElementById('app-title').textContent = getTranslation('appTitle', langue);
   
   // Mettre à jour les labels dans l'en-tête
   document.querySelector('.select-group:nth-child(1) .select-label').textContent = getTranslation('header.language', langue);

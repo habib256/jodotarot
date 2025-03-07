@@ -7,6 +7,7 @@ const TRANSLATIONS = {
   fr: {
     // Titre de la page
     pageTitle: "Tirage de Tarot en Croix",
+    appTitle: "JodoTarot: L'intelligence artificielle",
     // Éléments de l'en-tête
     header: {
       language: "Langue :",
@@ -26,7 +27,7 @@ const TRANSLATIONS = {
       error: "Une erreur est survenue lors de l'interprétation. Veuillez réessayer.",
       userQuestion: "La question posée par l'utilisateur est:",
       userMessage: "J'aimerais une interprétation détaillée de mon tirage de tarot en lien avec ma question.",
-      ollamaPromo: "Télécharge llama3.2:3b pour commencer à tirer les cartes avec <a href='https://ollama.com' target='_blank'>ollama</a> et recharge la page pour voir tes modèles."
+      ollamaPromo: "Télécharge <a href='https://ollama.com' target='_blank'>ollama</a> avec <a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a> pour commencer. Recharge la page et réalise ton tirage de cartes"
     },
     // Textes pour le prompt de tirage
     tarotReading: {
@@ -95,6 +96,7 @@ const TRANSLATIONS = {
   en: {
     // Titre de la page
     pageTitle: "Tarot Cross Spread",
+    appTitle: "JodoTarot: Artificial Intelligence",
     // Éléments de l'en-tête
     header: {
       language: "Language:",
@@ -113,7 +115,7 @@ const TRANSLATIONS = {
       error: "An error occurred during the interpretation. Please try again.",
       userQuestion: "The question posed by the user is:",
       userMessage: "I would like a detailed interpretation of my tarot spread in relation to my question.",
-      ollamaPromo: "Download llama3.2:3b to start drawing cards with <a href='https://ollama.com' target='_blank'>ollama</a> and reload the page to see your models."
+      ollamaPromo: "Download <a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a> to start drawing cards with <a href='https://ollama.com' target='_blank'>ollama</a> and reload the page to see your models."
     },
     // Tarot reading prompt texts
     tarotReading: {
@@ -181,6 +183,7 @@ const TRANSLATIONS = {
   es: {
     // Titre de la page
     pageTitle: "Tirada de Tarot en Cruz",
+    appTitle: "JodoTarot: La inteligencia artificial",
     // Éléments de l'en-tête
     header: {
       language: "Idioma:",
@@ -199,7 +202,7 @@ const TRANSLATIONS = {
       error: "Ha ocurrido un error durante la interpretación. Por favor, inténtelo de nuevo.",
       userQuestion: "La pregunta planteada por el usuario es:",
       userMessage: "Me gustaría una interpretación detallada de mi tirada de tarot en relación con mi pregunta.",
-      ollamaPromo: "Descarga llama3.2:3b para empezar a tirar cartas con <a href='https://ollama.com' target='_blank'>ollama</a> y recarga la página para ver tus modelos."
+      ollamaPromo: "Descarga <a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a> para empezar a tirar cartas con <a href='https://ollama.com' target='_blank'>ollama</a> y recarga la página para ver tus modelos."
     },
     // Textes pour le tirage de tarot en espagnol
     tarotReading: {
@@ -266,6 +269,7 @@ const TRANSLATIONS = {
   de: {
     // Titre de la page
     pageTitle: "Tarot Kreuzlegung",
+    appTitle: "JodoTarot: Künstliche Intelligenz",
     // Éléments de l'en-tête
     header: {
       language: "Sprache:",
@@ -284,7 +288,7 @@ const TRANSLATIONS = {
       error: "Bei der Interpretation ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
       userQuestion: "Die von dem Benutzer gestellte Frage ist:",
       userMessage: "Ich hätte gerne eine detaillierte Interpretation meiner Tarot-Legung in Bezug auf meine Frage.",
-      ollamaPromo: "Laden Sie llama3.2:3b herunter, um mit <a href='https://ollama.com' target='_blank'>ollama</a> Karten zu ziehen, und laden Sie die Seite neu, um Ihre Modelle zu sehen."
+      ollamaPromo: "Laden Sie <a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a> herunter, um mit <a href='https://ollama.com' target='_blank'>ollama</a> Karten zu ziehen, und laden Sie die Seite neu, um Ihre Modelle zu sehen."
     },
     // Textes pour le tirage de tarot en allemand
     tarotReading: {
@@ -351,6 +355,7 @@ const TRANSLATIONS = {
   it: {
     // Titre de la page
     pageTitle: "Stesa di Tarocchi a Croce",
+    appTitle: "JodoTarot: L'intelligenza artificiale",
     // Éléments de l'en-tête
     header: {
       language: "Lingua:",
@@ -369,7 +374,7 @@ const TRANSLATIONS = {
       error: "Si è verificato un errore durante l'interpretazione. Per favore riprova.",
       userQuestion: "La domanda posta dall'utente è:",
       userMessage: "Vorrei un'interpretazione dettagliata della mia stesa di tarocchi in relazione alla mia domanda.",
-      ollamaPromo: "Scarica llama3.2:3b per iniziare a pescare carte con <a href='https://ollama.com' target='_blank'>ollama</a> e ricarica la pagina per vedere i tuoi modelli."
+      ollamaPromo: "Scarica <a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a> per iniziare a pescare carte con <a href='https://ollama.com' target='_blank'>ollama</a> e ricarica la pagina per vedere i tuoi modelli."
     },
     // Textes pour le prompt de tirage en italien
     tarotReading: {
