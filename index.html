@@ -77,14 +77,14 @@
         <div class="select-group">
           <span class="select-label">Modèle d'IA :</span>
           <select id="ia-model" class="select-dropdown">
-            <optgroup label="OpenAI">
-              <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
-              <option value="openai/gpt-3.5-turbo" selected>GPT-3.5 Turbo</option>
-              <option value="openai/gpt-4o">GPT-4o</option>
-            </optgroup>
             <optgroup label="Ollama">
               <!-- Les modèles Ollama seront chargés dynamiquement au démarrage -->
               <option value="" disabled>Chargement des modèles...</option>
+            </optgroup>
+            <optgroup label="OpenAI">
+              <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
+              <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo</option>
+              <option value="openai/gpt-4o">GPT-4o</option>
             </optgroup>
           </select>
         </div>
@@ -125,7 +125,8 @@
     </div>
     <div class="left-panel">
       <div id="interpretations">
-        <p>Les interprétations s'afficheront ici après le tirage.</p>
+        <p id="default-interpretation">Les interprétations s'afficheront ici après le tirage.</p>
+        <p id="ollama-promo" class="promo-text"></p>
       </div>
     </div>
   </div>

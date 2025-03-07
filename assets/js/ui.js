@@ -175,13 +175,17 @@ function updateUILanguage(langue) {
   
   // Mettre à jour les messages d'interprétation par défaut
   const interpretationsDiv = document.getElementById('interpretations');
-  // Ne mettre à jour que si le contenu est le message par défaut
-  if (interpretationsDiv.textContent.trim() === TRANSLATIONS.fr.interpretation.default || 
-      interpretationsDiv.textContent.trim() === TRANSLATIONS.en.interpretation.default ||
-      interpretationsDiv.textContent.trim() === TRANSLATIONS.es.interpretation.default ||
-      interpretationsDiv.textContent.trim() === TRANSLATIONS.de.interpretation.default ||
-      interpretationsDiv.textContent.trim() === TRANSLATIONS.it.interpretation.default) {
-    interpretationsDiv.innerHTML = `<p>${getTranslation('interpretation.default', langue)}</p>`;
+  const defaultInterpretation = document.getElementById('default-interpretation');
+  const ollamaPromo = document.getElementById('ollama-promo');
+  
+  // Mettre à jour le texte d'interprétation par défaut
+  if (defaultInterpretation) {
+    defaultInterpretation.textContent = getTranslation('interpretation.default', langue);
+  }
+  
+  // Mettre à jour le texte promotionnel d'Ollama
+  if (ollamaPromo) {
+    ollamaPromo.innerHTML = getTranslation('interpretation.ollamaPromo', langue);
   }
   
   // Mettre à jour les groupes d'options

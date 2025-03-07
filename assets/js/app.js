@@ -110,6 +110,7 @@ async function obtenirInterpretation(tirage, question, modeTirage) {
 
 /**
  * Fonction pour charger les modèles Ollama disponibles
+ * @returns {Promise<boolean>} - true si un modèle Ollama a été sélectionné, false sinon
  */
 async function chargerModelesOllama() {
   try {
@@ -139,14 +140,21 @@ async function chargerModelesOllama() {
       optionErreur.textContent = "Aucun modèle disponible";
       optionErreur.disabled = true;
       groupeOllama.appendChild(optionErreur);
+      return false;
     } else {
       // Ajouter les modèles disponibles
-      modeles.forEach(modele => {
+      modeles.forEach((modele, index) => {
         const option = document.createElement('option');
         option.value = `ollama/${modele.name}`;
         option.textContent = modele.name;
         groupeOllama.appendChild(option);
+        
+        // Sélectionner le premier modèle par défaut
+        if (index === 0) {
+          selectModele.value = `ollama/${modele.name}`;
+        }
       });
+      return true;
     }
   } catch (error) {
     console.error("Erreur lors du chargement des modèles Ollama:", error);
@@ -165,6 +173,7 @@ async function chargerModelesOllama() {
     optionErreur.textContent = "Erreur de connexion à Ollama";
     optionErreur.disabled = true;
     groupeOllama.appendChild(optionErreur);
+    return false;
   }
 }
 
@@ -210,8 +219,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialiser le logo avec le persona par défaut
   updatePersonaLogo(document.getElementById('persona').value);
   
-  // Charger les modèles Ollama disponibles
-  chargerModelesOllama();
+  // Charger les modèles Ollama disponibles et sélectionner le premier comme modèle par défaut
+  // Si aucun modèle Ollama n'est disponible, utiliser GPT-3.5 Turbo comme modèle par défaut
+  chargerModelesOllama().then(modelleOllamaSelectionne => {
+    if (!modelleOllamaSelectionne) {
+      // Si aucun modèle Ollama n'a été sélectionné, utiliser GPT-3.5 Turbo
+      const selectModele = document.getElementById('ia-model');
+      selectModele.value = 'openai/gpt-3.5-turbo';
+    }
+  });
   
   // Toujours définir la langue française au démarrage
   document.getElementById('language').value = 'fr';
