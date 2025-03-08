@@ -208,49 +208,47 @@ function updateOptGroupsLabels(langue) {
   for (let i = 0; i < personaSelect.children.length; i++) {
     const child = personaSelect.children[i];
     if (child.tagName === 'OPTGROUP') {
-      // Déterminer la clé de traduction en fonction du label actuel
-      let key = '';
-      switch (child.label) {
-        case 'Arts Divinatoires':
-        case 'Divination Arts':
-        case 'Artes Adivinatorias':
-        case 'Wahrsagekünste':
-        case 'Arti Divinatorie':
-          key = 'optgroups.divinationArts'; break;
-        case 'Traditions Spirituelles':
-        case 'Spiritual Traditions':
-        case 'Tradiciones Espirituales':
-        case 'Spirituelle Traditionen':
-        case 'Tradizioni Spirituali':
-          key = 'optgroups.spiritualTraditions'; break;
-        case 'Traditions Ésotériques':
-        case 'Esoteric Traditions':
-        case 'Tradiciones Esotéricas':
-        case 'Esoterische Traditionen':
-        case 'Tradizioni Esoteriche':
-          key = 'optgroups.esotericTraditions'; break;
-        case 'Psychanalystes':
-        case 'Psychoanalysts':
-        case 'Psicoanalistas':
-        case 'Psychoanalytiker':
-        case 'Psicoanalisti':
-          key = 'optgroups.psychoanalysts'; break;
-        case 'Philosophes et Sages':
-        case 'Philosophers and Sages':
-        case 'Filósofos y Sabios':
-        case 'Philosophen und Weise':
-        case 'Filosofi e Saggi':
-        case '哲学家和智者':
-          key = 'optgroups.philosophers'; break;
-        case 'Entités Surnaturelles':
-        case 'Supernatural Entities':
-        case 'Entidades Sobrenaturales':
-        case 'Übernatürliche Wesenheiten':
-        case 'Entità Soprannaturali':
-          key = 'optgroups.supernaturalEntities'; break;
+      // Vérifier si l'élément a un attribut data-translation-key
+      let translationKey = child.getAttribute('data-translation-key');
+      
+      // Si l'attribut n'existe pas, l'affecter en fonction du texte d'origine
+      if (!translationKey) {
+        // Déterminer la clé de traduction en fonction du label actuel
+        if (child.label.includes('Arts Divinatoires') || child.label.includes('Divination Arts') || 
+            child.label.includes('Artes Adivinatorias') || child.label.includes('Wahrsagekünste') || 
+            child.label.includes('Arti Divinatorie') || child.label.includes('占卜艺术')) {
+          translationKey = 'optgroups.divinationArts';
+        } else if (child.label.includes('Traditions Spirituelles') || child.label.includes('Spiritual Traditions') || 
+                  child.label.includes('Tradiciones Espirituales') || child.label.includes('Spirituelle Traditionen') || 
+                  child.label.includes('Tradizioni Spirituali') || child.label.includes('精神传统')) {
+          translationKey = 'optgroups.spiritualTraditions';
+        } else if (child.label.includes('Traditions Ésotériques') || child.label.includes('Esoteric Traditions') || 
+                  child.label.includes('Tradiciones Esotéricas') || child.label.includes('Esoterische Traditionen') || 
+                  child.label.includes('Tradizioni Esoteriche') || child.label.includes('密传传统')) {
+          translationKey = 'optgroups.esotericTraditions';
+        } else if (child.label.includes('Psychanalystes') || child.label.includes('Psychoanalysts') || 
+                  child.label.includes('Psicoanalistas') || child.label.includes('Psychoanalytiker') || 
+                  child.label.includes('Psicoanalisti') || child.label.includes('精神分析学家')) {
+          translationKey = 'optgroups.psychoanalysts';
+        } else if (child.label.includes('Philosophes et Sages') || child.label.includes('Philosophers and Sages') || 
+                  child.label.includes('Filósofos y Sabios') || child.label.includes('Philosophen und Weise') || 
+                  child.label.includes('Filosofi e Saggi') || child.label.includes('哲学家和智者')) {
+          translationKey = 'optgroups.philosophers';
+        } else if (child.label.includes('Entités Surnaturelles') || child.label.includes('Supernatural Entities') || 
+                  child.label.includes('Entidades Sobrenaturales') || child.label.includes('Übernatürliche Wesenheiten') || 
+                  child.label.includes('Entità Soprannaturali') || child.label.includes('超自然实体')) {
+          translationKey = 'optgroups.supernaturalEntities';
+        }
+        
+        // Si une clé a été déterminée, la stocker dans un attribut data-
+        if (translationKey) {
+          child.setAttribute('data-translation-key', translationKey);
+        }
       }
-      if (key) {
-        child.label = getTranslation(key, langue);
+      
+      // Si une clé de traduction est disponible, mettre à jour le label
+      if (translationKey) {
+        child.label = getTranslation(translationKey, langue);
       }
     }
   }
@@ -260,10 +258,17 @@ function updateOptGroupsLabels(langue) {
   for (let i = 0; i < iaSelect.children.length; i++) {
     const child = iaSelect.children[i];
     if (child.tagName === 'OPTGROUP') {
-      if (child.label === 'OpenAI') {
-        child.label = getTranslation('optgroups.openai', langue);
-      } else if (child.label === 'Ollama') {
-        child.label = getTranslation('optgroups.ollama', langue);
+      let translationKey = '';
+      if (child.label.includes('OpenAI') || child.getAttribute('data-translation-key') === 'optgroups.openai') {
+        translationKey = 'optgroups.openai';
+        child.setAttribute('data-translation-key', translationKey);
+      } else if (child.label.includes('Ollama') || child.getAttribute('data-translation-key') === 'optgroups.ollama') {
+        translationKey = 'optgroups.ollama';
+        child.setAttribute('data-translation-key', translationKey);
+      }
+      
+      if (translationKey) {
+        child.label = getTranslation(translationKey, langue);
       }
     }
   }
@@ -304,7 +309,10 @@ function resetAllDisplays() {
   
   // Réinitialiser le texte d'interprétation
   const langue = document.getElementById('language').value;
-  document.getElementById('interpretations').innerHTML = `<p id="default-interpretation">${getTranslation('interpretation.default', langue) || "Les interprétations s'afficheront ici après le tirage."}</p>`;
+  document.getElementById('interpretations').innerHTML = `
+    <p id="default-interpretation">${getTranslation('interpretation.default', langue) || "Les interprétations s'afficheront ici après le tirage."}</p>
+    <p id="ollama-promo" class="promo-text">${getTranslation('interpretation.ollamaPromo', langue) || "Télécharge ollama avec llama3.2:3b pour commencer."}</p>
+  `;
   
   // Afficher le bon type de tirage selon la sélection
   const modeTirage = document.getElementById('spread-type').value;
