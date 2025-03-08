@@ -3,6 +3,7 @@
  */
 
 import { getTranslation } from './translations.js';
+import { genererPromptTirage, getNombreCartes } from './tirages/index.js';
 
 // Tableau des cartes du tarot avec les chemins vers les images
 const cardsData = {
@@ -78,15 +79,16 @@ function shuffle(array) {
  * @returns {string} - HTML de la carte
  */
 function renderCard(card) {
-  return `<img src="${card.image}" alt="${card.name}" class="card" onclick="toggleEnlarge(this)">`;
+  return `<img src="${card.image}" alt="${card.name}" class="card" onclick="toggleEnlarge(this, event)">`;
 }
 
 /**
- * Fonction pour tirer aléatoirement 5 cartes d'un jeu
+ * Fonction pour tirer aléatoirement des cartes d'un jeu
  * @param {string} deckName - Nom du jeu de cartes (set01 ou set02)
- * @returns {Array} - Tableau des 5 cartes tirées
+ * @param {string} spreadType - Type de tirage (cross ou horseshoe)
+ * @returns {Array} - Tableau des cartes tirées
  */
-function drawCards(deckName = 'set01') {
+function drawCards(deckName = 'set01', spreadType = 'cross') {
   // Vérifier si le jeu existe
   if (!cardsData[deckName]) {
     console.error(`Le jeu de cartes ${deckName} n'existe pas`);
@@ -96,37 +98,10 @@ function drawCards(deckName = 'set01') {
   // Mélanger les cartes (exclure la dernière qui est le dos de carte)
   const jeuMelange = shuffle(cardsData[deckName].slice(0, -1));
   
-  // Sélectionner les 5 premières cartes pour le tirage
-  return jeuMelange.slice(0, 5);
-}
-
-/**
- * Fonction pour générer un prompt de tirage détaillé basé sur les cartes
- * @param {Array} tirage - Tableau des cartes tirées
- * @param {string} lang - Langue pour les traductions (fr par défaut)
- * @returns {string} - Prompt détaillé pour l'IA
- */
-function genererPromptTirage(tirage, lang = 'fr') {
-  if (!tirage || tirage.length === 0) {
-    return "";
-  }
+  // Récupérer le nombre de cartes nécessaires pour ce type de tirage
+  const nombreCartes = getNombreCartes(spreadType);
   
-  const positionKeys = ['top', 'left', 'center', 'right', 'bottom'];
-  
-  let tiragePrompt = "\n" + getTranslation('tarotReading.intro', lang) + "\n";
-  
-  tirage.forEach((carte, index) => {
-    if (index < positionKeys.length) {
-      const position = getTranslation(`tarotReading.positions.${positionKeys[index]}`, lang);
-      const instruction = getTranslation(`tarotReading.instructions.${positionKeys[index]}`, lang);
-      
-      tiragePrompt += `- "${carte.name}" : ${position}. ${instruction}\n`;
-    }
-  });
-  
-  tiragePrompt += "\n" + getTranslation('tarotReading.conclusion', lang);
-  
-  return tiragePrompt;
+  return jeuMelange.slice(0, nombreCartes);
 }
 
 // Exporter les fonctions et données

@@ -99,11 +99,7 @@ body {
     ". bottom .";
   column-gap: 16px; /* Plus d'espace entre les colonnes */
   row-gap: 16px; /* Plus d'espace entre les lignes */
-  width: 100%;
-  max-width: 580px; /* Augmenté pour accueillir les cartes et les écarts */
-  margin: 5px auto;
-  position: relative;
-  justify-content: center; /* Centrer la grille */
+  margin: auto; /* Centrage dans le conteneur */
 }
 /* Styles communs pour tous les conteneurs de cartes */
 .top, .left, .center, .right, .bottom {
@@ -143,25 +139,46 @@ body {
   height: auto;
   max-width: 179px;
   cursor: pointer;
-  transition: transform 0.3s ease;
   transform-origin: center center;
   position: relative;
   z-index: 1;
+  border-radius: 6px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
 }
-.card.enlarged {
+/* Transition seulement pour le survol */
+.card:not(.enlarged):hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+/* Le style pour la classe .card.enlarged est maintenant géré directement en JavaScript */
+/* Nous désactivons cette règle car elle cause l'affichage d'une carte à droite */
+/*
+.card.enlarged, .horseshoe-spread .card.enlarged {
   position: fixed;
-  top: 0;
+  top: 50%;
   left: 0;
-  width: 624px; /* Réduction de 20% de 780px = 780 * 0.8 = 624px */
-  height: 100%;
+  width: 400px;
+  height: auto;
   max-width: none;
-  max-height: none;
-  z-index: 1000;
+  max-height: 80vh;
+  z-index: 9999;
+  transform: translateY(-50%);
+  isolation: isolate;
   object-fit: contain;
   padding: 20px;
   box-sizing: border-box;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
+*/
+
+/* Assombrir le fond quand une carte est agrandie */
+body:has(#enlarge-container) {
+  overflow: auto; /* Permettre le défilement tout en gardant l'overlay visible */
+}
+
 button { padding: 10px 20px; font-size: 16px; margin-top: 20px; }
 .input-group {
   margin-bottom: 15px;
@@ -296,4 +313,229 @@ label {
   font-weight: bold;
   margin-bottom: 3px;
   color: #444;
+}
+
+/* Style pour le tirage en fer à cheval */
+.horseshoe-spread {
+  position: relative;
+  width: 750px;
+  height: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  display: grid; /* Utiliser grid pour un meilleur contrôle */
+  grid-template-areas: 
+    "top-left . top-right"
+    "mid-left . mid-right"
+    "bottom-left bottom-center bottom-right";
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 300px 300px 300px;
+}
+
+.horseshoe-spread .card-position {
+  width: 140px;
+  height: 220px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative; /* Changer de absolute à relative */
+  background-color: transparent; /* Enlever le fond blanc */
+  box-shadow: none; /* Enlever l'ombre pour les positions */
+  margin: auto; /* Centrer dans la cellule de grille */
+}
+
+/* Disposition personnalisée des cartes de tarot */
+.horseshoe-spread .card-1 {
+  grid-area: top-left;
+  z-index: 1;
+}
+
+.horseshoe-spread .card-2 {
+  grid-area: mid-left;
+  z-index: 2;
+}
+
+.horseshoe-spread .card-3 {
+  grid-area: bottom-left;
+  z-index: 3;
+}
+
+.horseshoe-spread .card-4 {
+  grid-area: bottom-center;
+  z-index: 4;
+}
+
+.horseshoe-spread .card-5 {
+  grid-area: bottom-right;
+  z-index: 5;
+}
+
+.horseshoe-spread .card-6 {
+  grid-area: mid-right;
+  z-index: 6;
+}
+
+.horseshoe-spread .card-7 {
+  grid-area: top-right;
+  z-index: 7;
+}
+
+.horseshoe-spread .card {
+  max-width: 140px; /* Fixer une largeur maximale */
+  height: auto;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Transition seulement pour le survol des cartes du fer à cheval, pas pour l'agrandissement */
+.horseshoe-spread .card:not(.enlarged):hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Styles pour les avertissements et erreurs */
+.warning-container {
+  margin: 10px 0;
+  max-width: 100%;
+}
+
+.warning-box {
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-left: 4px solid #ffc107;
+  border-radius: 4px;
+  color: #856404;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  position: relative;
+}
+
+.warning-box h3 {
+  margin-top: 0;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.warning-box p {
+  margin-bottom: 0.5rem;
+}
+
+.warning-box ul {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.warning-box button {
+  background-color: #ffc107;
+  border: none;
+  border-radius: 3px;
+  color: #212529;
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 5px 10px;
+  margin-top: 10px;
+}
+
+.warning-box button:hover {
+  background-color: #e0a800;
+}
+
+.error {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-left: 4px solid #dc3545;
+  border-radius: 4px;
+  color: #721c24;
+  margin-bottom: 1rem;
+  padding: 1rem;
+}
+
+/* Styles pour les messages de chargement */
+.loading {
+  background-color: #e2e3e5;
+  border: 1px solid #d6d8db;
+  border-left: 4px solid #6c757d;
+  border-radius: 4px;
+  color: #383d41;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  position: relative;
+}
+
+/* Style pour la barre de progression */
+.progress-container {
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  height: 8px;
+  margin: 10px 0;
+  overflow: hidden;
+  width: 100%;
+}
+
+.progress-bar {
+  animation: progress-animation 1.5s infinite;
+  background: linear-gradient(to right, #6b5b95, #a393eb, #6b5b95);
+  background-size: 200% 100%;
+  height: 100%;
+  width: 100%;
+}
+
+@keyframes progress-animation {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+/* La classe spécifique pour les cartes agrandies - sans transition */
+.enlarged-card {
+  position: fixed;
+  top: 50%;
+  left: 325px; /* Ajusté pour tenir compte du décalage de 15px (15px + 310px) */
+  transform: translate(-50%, -50%);
+  width: 620px; /* Largeur fixe de 620px */
+  height: auto;
+  max-height: 100vh; /* Utilise toute la hauteur de l'écran */
+  object-fit: contain;
+  padding: 10px; /* Padding réduit pour maximiser l'espace */
+  box-sizing: border-box;
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  z-index: 100000;
+  cursor: pointer;
+}
+
+/* Pour empêcher l'affichage d'une carte agrandie à droite */
+.left-panel .enlarged-card, 
+#interpretations .enlarged-card {
+  display: none !important;
+}
+
+/* S'assurer que seule la carte dans l'overlay est visible */
+#enlarge-container .enlarged-card {
+  pointer-events: auto;
+}
+
+/* S'assurer que les cartes avec la classe enlarged ne sont pas zoomées automatiquement dans leur position d'origine */
+.card.enlarged {
+  /* Annuler tout comportement de zoom ou d'agrandissement qui pourrait être hérité */
+  transform: none !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: 179px !important; /* Même taille que les autres cartes */
+  position: relative !important;
+  z-index: auto !important;
+}
+
+#enlarge-container {
+  position: fixed;
+  top: 2.5%; /* Ajusté pour centrer verticalement avec la nouvelle hauteur de 95% */
+  left: 15px; /* Positionnement à exactement 15px du bord gauche */
+  width: 30%;
+  height: 95%; /* 95% de la hauteur de la page */
+  z-index: 99999;
+  pointer-events: none;
+}
+
+#enlarge-container .enlarged-card {
+  pointer-events: auto;
 } 

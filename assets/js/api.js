@@ -2,10 +2,14 @@
  * Module de gestion des appels API aux modèles d'IA
  */
 
-import { API_KEY, API_URL_OPENAI, API_URL_OLLAMA, API_URL_OLLAMA_TAGS, getMetaPrompt } from './config.js';
+import { API_KEY, API_URL_OPENAI, API_URL_OLLAMA, API_URL_OLLAMA_TAGS, getMetaPrompt, getOllamaModelFormat } from './config.js';
 import { genererPromptTirage } from './tarot.js';
 import PERSONAS, { getPersonaPrompt } from './personas/index.js';
 import { getTranslation } from './translations.js';
+
+// Configuration du niveau de déboggage
+// 0 = Erreurs seulement, 1 = Infos importantes, 2 = Détails, 3 = Verbeux
+const DEBUG_LEVEL = 1; 
 
 // Système simple de cache pour les réponses
 const responseCache = new Map();
@@ -59,338 +63,391 @@ in base agli elementi menzionati nella domanda. Non dare una risposta generica.
 Ogni aspetto della tua interpretazione deve rispondere a un aspetto di questa domanda.`
     };
     
-    // Sélectionner le texte d'emphase dans la langue appropriée ou utiliser le français par défaut
+    // Sélectionner le texte d'emphase dans la langue appropriée
     const emphaseTexte = emphaseTextes[langue] || emphaseTextes.fr;
     
-    // Mettre beaucoup plus d'emphase sur la question pour améliorer sa prise en compte
-    const emphaseQuestion = `
-
-====================
+    // Former le bloc d'emphase avec les délimiteurs et la question
+    const questionBlock = `====================
 ${questionIntro}:
 "${question.trim()}"
-====================
+====================`;
+    
+    // Vérifier si le prompt contient déjà ce bloc ou une partie significative
+    if (systemPrompt.includes(questionBlock) || 
+        (systemPrompt.includes(`"${question.trim()}"`) && 
+         systemPrompt.includes("====================") && 
+         systemPrompt.includes(emphaseTexte.substring(0, 50)))) {
+      return systemPrompt;
+    }
+    
+    return `
+${questionBlock}
 
 ${emphaseTexte}
-`;
-    
-    // Ajouter le prompt d'emphase sur la question au début du prompt système
-    return `${emphaseQuestion}\n\n${systemPrompt}`;
+
+${systemPrompt}`;
   }
   
-  // Retourner le prompt système original si pas de question
   return systemPrompt;
 }
 
 /**
- * Fonction pour obtenir une réponse du modèle GPT-4 Omni
- * @param {string} question - La question à poser au modèle
- * @param {Array} historiqueMessages - Messages d'historique optionnels
- * @param {string} modeleComplet - Le modèle complet au format "fournisseur/modèle" (ex: "openai/gpt-4o")
- * @param {string} persona - Le type de personnage occulte (par défaut: tarologue)
- * @param {Array} tirage - Les cartes tirées (optionnel)
- * @param {string} langue - La langue à utiliser pour la réponse (par défaut: fr)
- * @returns {Promise<string>} - La réponse complète générée par le LLM
+ * Fonction pour obtenir une réponse de l'API OpenAI avec GPT-4o
+ * @param {string} message - La question posée par l'utilisateur
+ * @param {Array} systemPrompts - Tableau de prompts système additionnels
+ * @param {string} modele - Modèle d'IA à utiliser
+ * @param {string} persona - Persona sélectionné pour l'interprétation
+ * @param {Array} tirage - Tableau des cartes tirées
+ * @param {string} langue - Langue sélectionnée (fr, en, es, de, it)
+ * @param {string} spreadType - Type de tirage (cross ou horseshoe)
+ * @returns {Promise<string>} - Réponse de l'API
  */
-async function obtenirReponseGPT4O(question, historiqueMessages = [], modeleComplet = "openai/gpt-3.5-turbo", persona = "tarologue", tirage = null, langue = "fr") {
-  // Génération d'une clé de cache
-  const cacheKey = JSON.stringify({question, tirage, modeleComplet, persona, langue});
+async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai/gpt-3.5-turbo', persona = 'tarologue', tirage = [], langue = 'fr', spreadType = 'cross') {
+  // Vérifier quel type d'API nous utilisons (OpenAI ou Ollama)
+  const isOllama = !modele.startsWith('openai/');
   
-  // Vérifier si la réponse est en cache
-  if (responseCache.has(cacheKey)) {
-    console.log("Réponse récupérée du cache");
-    return responseCache.get(cacheKey);
-  }
+  console.log("🔍 DEBUG - Démarrage appel API:", { 
+    modele, 
+    isOllama, 
+    persona,
+    nombreCartes: tirage.length,
+    langue,
+    spreadType
+  });
+  
+  // Récupérer l'élément pour afficher les erreurs et l'interprétation
+  const interpretationsDiv = document.getElementById('interpretations');
   
   try {
-    // Parsing du modèle complet (fournisseur/modèle)
-    let [fournisseur, modele] = modeleComplet.split('/');
+    // Préparer les données pour l'API
+    const modelName = isOllama ? modele.split('/')[1] : modele.split('/')[1];
+    const API_URL = isOllama ? API_URL_OLLAMA : API_URL_OPENAI;
     
-    // Si le fournisseur est non spécifié, on considère que c'est OpenAI
-    if (!modele) {
-      modele = fournisseur;
-      fournisseur = "openai";
-    }
+    console.log("🔍 DEBUG - Configuration API:", { 
+      modelName, 
+      API_URL,
+      headers: isOllama ? "Standard" : "Avec API_KEY" 
+    });
     
-    // Utilisation de getPersonaPrompt pour obtenir le prompt dans la langue demandée
-    let systemPrompt = getPersonaPrompt(persona, langue);
-    
-    // Si le persona n'existe pas, utiliser le tarologue comme fallback
-    if (!systemPrompt) {
-      console.error(`Persona "${persona}" non trouvé, utilisation du persona par défaut.`);
-      systemPrompt = getPersonaPrompt("tarologue", langue);
-    }
-    
-    // Préparer le prompt spécifique au tirage si des cartes sont fournies
-    let tiragePrompt = null;
-    if (tirage && tirage.length) {
-      tiragePrompt = genererPromptTirage(tirage, langue);
-    }
-    
-    // Réorganiser l'ordre des prompts pour augmenter l'impact de la question
-    // 1. D'abord le prompt du persona (déjà dans systemPrompt)
-    // 2. Ensuite le prompt du tirage si présent
-    // 3. Ajouter le meta prompt avant d'enrichir avec la question
-    // 4. Finalement, ajouter la question avec emphase (c'est le dernier élément vu par l'IA)
-    
-    if (tiragePrompt) {
-      systemPrompt = `${systemPrompt} ${tiragePrompt}`;
-    }
-    
-    // Ajouter le meta prompt avant d'enrichir avec la question
-    systemPrompt = `${systemPrompt} ${getMetaPrompt(langue)}`;
-    
-    // Enrichir le prompt avec le contexte de la question en dernier
-    systemPrompt = enrichirPromptContextuel(question, systemPrompt, langue);
-    
-    // Ajoutez une vérification avant d'utiliser le prompt
-    if (systemPrompt) {
-      // Log du prompt système juste avant l'envoi
-      logPrompt(persona, question, systemPrompt);
+    // Tester la connectivité d'Ollama si applicable
+    if (isOllama) {
+      interpretationsDiv.innerHTML = `<p class="loading">${getTranslation('interpretation.testingConnection', langue) || 'Test de connexion à Ollama...'}</p>`;
+      const connectivityTest = await testOllamaConnectivity(modelName);
       
-      // Préparation des messages
-      let messages = [];
-      
-      if (historiqueMessages.length === 0) {
-        // Première requête
-        messages = [
-          {
-            role: "system",
-            content: systemPrompt
-          },
-          {
-            role: "user", 
-            content: getTranslation('interpretation.userMessage', langue)
-          }
-        ];
-      } else {
-        // Continuation d'une réponse précédente
-        messages = historiqueMessages;
+      if (!connectivityTest.success) {
+        console.error("🔍 DEBUG - Échec du test de connectivité Ollama:", connectivityTest.message);
+        interpretationsDiv.innerHTML = `<p class="error">${getTranslation('interpretation.connectionError', langue) || 'Erreur de connexion à Ollama:'} ${connectivityTest.message}</p>`;
+        return `Erreur de connexion: ${connectivityTest.message}`;
       }
-
-      let response;
-      
-      // Sélectionner l'API en fonction du fournisseur
-      if (fournisseur === "openai") {
-        // Configuration de la requête pour OpenAI
-        const interpretationsDiv = document.getElementById('interpretations');
-        const progressElement = document.createElement('div');
-        progressElement.className = 'openai-progress';
-        progressElement.innerHTML = '<p>Génération en cours...</p><div class="progress-container"><div class="progress-bar"></div></div>';
-        interpretationsDiv.innerHTML = '';
-        interpretationsDiv.appendChild(progressElement);
-        
-        // Utiliser le streaming pour OpenAI
-        response = await fetch(API_URL_OPENAI, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${API_KEY}`
-          },
-          body: JSON.stringify({
-            model: modele,
-            messages: messages,
-            temperature: 0.7,
-            max_tokens: 1000,
-            stream: true // Activer le streaming pour OpenAI
-          })
+    }
+    
+    // Obtenir le prompt spécifique au persona
+    const personaPrompt = getPersonaPrompt(persona, langue);
+    
+    // Obtenir le prompt spécifique au tirage des cartes
+    const tiragePrompt = tirage.length > 0 ? genererPromptTirage(tirage, message, spreadType, langue) : "";
+    
+    // Fusionner les prompts système avec ceux du persona et du tirage
+    const mergedSystemPrompt = 
+      `${getMetaPrompt(langue)}\n\n${personaPrompt}\n\n${tiragePrompt}`;
+    
+    // Ajouter l'emphase sur la question au début du système prompt
+    const finalSystemPrompt = enrichirPromptContextuel(message, mergedSystemPrompt, langue);
+    
+    console.log("🔍 DEBUG - Prompts préparés:", { 
+      personaPromptLength: personaPrompt.length,
+      tiragePromptLength: tiragePrompt.length,
+      finalSystemPromptLength: finalSystemPrompt.length
+    });
+    
+    // Pour le débogage
+    logPrompt(persona, message, finalSystemPrompt);
+    
+    // Créer les messages pour l'API
+    const messages = [
+      {
+        role: "system",
+        content: finalSystemPrompt
+      },
+      {
+        role: "user",
+        content: message
+      }
+    ];
+    
+    // Ajouter les messages système supplémentaires s'il y en a
+    if (systemPrompts && systemPrompts.length > 0) {
+      for (const sysPrompt of systemPrompts) {
+        messages.push({
+          role: "system",
+          content: sysPrompt
         });
-
-        // Vérification de la réponse
-        if (!response.ok) {
-          const erreur = await response.json();
-          throw new Error(`Erreur API OpenAI: ${erreur.error?.message || response.statusText}`);
-        }
-
-        // Traitement du stream
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let reponseComplete = '';
+      }
+    }
+    
+    // Construire la clé de cache
+    const cacheKey = JSON.stringify({
+      persona,
+      message,
+      tirage: tirage.map(card => card.id),
+      spreadType,
+      langue
+    });
+    
+    // Vérifier si nous avons déjà cette réponse en cache
+    if (responseCache.has(cacheKey)) {
+      console.log("🔍 DEBUG - Réponse trouvée dans le cache");
+      return responseCache.get(cacheKey);
+    }
+    
+    // Préparer les données de la requête pour OpenAI ou Ollama
+    const requestData = isOllama ? {
+      model: modelName,
+      messages: messages,
+      stream: true
+    } : {
+      model: modelName,
+      messages: messages,
+      max_tokens: SETTINGS.MAX_TOKENS,
+      stream: true
+    };
+    
+    console.log("🔍 DEBUG - Données de la requête:", {
+      model: modelName,
+      messagesCount: messages.length,
+      stream: true,
+      max_tokens: isOllama ? "Non spécifié" : SETTINGS.MAX_TOKENS
+    });
+    
+    // En-têtes de la requête (API key pour OpenAI uniquement)
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(isOllama ? {} : {'Authorization': `Bearer ${API_KEY}`})
+    };
+    
+    console.log("🔍 DEBUG - Envoi de la requête API à:", API_URL);
+    
+    // Faire la requête à l'API avec streaming
+    const progressContainer = document.createElement('div');
+    progressContainer.className = 'ollama-progress';
+    progressContainer.innerHTML = `
+      <p>${getTranslation('interpretation.streamingResponse', langue)}</p>
+      <div class="progress-container">
+        <div class="progress-bar"></div>
+      </div>
+    `;
+    interpretationsDiv.innerHTML = '';
+    interpretationsDiv.appendChild(progressContainer);
+    
+    const partialResponse = document.createElement('div');
+    partialResponse.className = 'partial-response';
+    interpretationsDiv.appendChild(partialResponse);
+    
+    try {
+      console.log("🔍 DEBUG - Début fetch API");
+      
+      // Fonction pour créer un timeout pour le fetch
+      const fetchWithTimeout = async (url, options, timeoutMs = 30000) => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
         
         try {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            
-            const chunk = decoder.decode(value, { stream: true });
-            try {
-              // Format des chunks OpenAI: "data: {...}\n\n"
-              const lines = chunk.split('\n\n').filter(line => line.trim() && line.startsWith('data: '));
-              
-              for (const line of lines) {
-                // Extraire le JSON après "data: "
-                const jsonStr = line.replace(/^data: /, '').trim();
-                
-                // Ignorer le message "[DONE]"
-                if (jsonStr === '[DONE]') continue;
-                
-                const data = JSON.parse(jsonStr);
-                if (data.choices && data.choices[0] && data.choices[0].delta && data.choices[0].delta.content) {
-                  const content = data.choices[0].delta.content;
-                  reponseComplete += content;
-                  
-                  // Mettre à jour l'affichage avec le texte partiel
-                  const formattedPartial = reponseComplete.split('\n').map(paragraph => 
-                    paragraph ? `<p>${paragraph}</p>` : ''
-                  ).join('');
-                  
-                  // Mettre à jour la barre de progression
-                  const progressBar = progressElement.querySelector('.progress-bar');
-                  progressBar.style.width = Math.min(90, (reponseComplete.length / 500) * 100) + '%';
-                  
-                  // Afficher le texte partiel sous la barre de progression
-                  const responseContainer = document.createElement('div');
-                  responseContainer.className = 'partial-response';
-                  responseContainer.innerHTML = formattedPartial;
-                  
-                  // Remplacer le contenu existant
-                  const partialResponse = interpretationsDiv.querySelector('.partial-response');
-                  if (partialResponse && partialResponse.parentNode === interpretationsDiv) {
-                    interpretationsDiv.removeChild(partialResponse);
-                  }
-                  interpretationsDiv.appendChild(responseContainer);
-                }
-              }
-            } catch (e) {
-              console.warn("Erreur lors du parsing d'un chunk OpenAI:", e);
-            }
-          }
+          const response = await fetch(url, {
+            ...options,
+            signal: controller.signal
+          });
+          clearTimeout(timeoutId);
+          return response;
         } catch (error) {
-          console.error("Erreur lors de la lecture du stream OpenAI:", error);
-        } finally {
-          // Finaliser la barre de progression
-          const progressBar = progressElement.querySelector('.progress-bar');
-          progressBar.style.width = '100%';
-          
-          // Supprimer la barre de progression après un court délai
-          setTimeout(() => {
-            // Vérifier si progressElement est toujours un enfant de interpretationsDiv
-            if (progressElement.parentNode === interpretationsDiv) {
-              interpretationsDiv.removeChild(progressElement);
-            }
-            
-            // Formater la réponse finale
-            const formattedResponse = reponseComplete.split('\n').map(paragraph => 
-              paragraph ? `<p>${paragraph}</p>` : ''
-            ).join('');
-            
-            interpretationsDiv.innerHTML = formattedResponse;
-          }, 500);
+          clearTimeout(timeoutId);
+          if (error.name === 'AbortError') {
+            throw new Error(`La requête a expiré après ${timeoutMs / 1000} secondes`);
+          }
+          throw error;
         }
-        
-        // Mise en cache de la réponse
-        responseCache.set(cacheKey, reponseComplete);
-        return reponseComplete;
-      } else if (fournisseur === "ollama") {
-        // Configuration de la requête pour Ollama
-        const interpretationsDiv = document.getElementById('interpretations');
-        const progressElement = document.createElement('div');
-        progressElement.className = 'ollama-progress';
-        progressElement.innerHTML = '<p>Génération en cours...</p><div class="progress-container"><div class="progress-bar"></div></div>';
-        interpretationsDiv.innerHTML = '';
-        interpretationsDiv.appendChild(progressElement);
-        
-        // Utiliser le streaming pour Ollama
-        response = await fetch(API_URL_OLLAMA, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            model: modele,
-            messages: messages,
-            stream: true,
-            temperature: 0.7
-          })
-        });
-
-        // Vérification de la réponse
-        if (!response.ok) {
-          throw new Error(`Erreur API Ollama: ${response.statusText}`);
-        }
-
-        // Traitement du stream
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let reponseComplete = '';
-        let reponsePartielle = '';
+      };
+      
+      const response = await fetchWithTimeout(API_URL, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(requestData)
+      }, 60000); // 60 secondes de timeout
+      
+      console.log("🔍 DEBUG - Réponse fetch reçue:", { 
+        status: response.status, 
+        ok: response.ok,
+        statusText: response.statusText
+      });
+      
+      // Vérifier si la réponse est OK
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("🔍 DEBUG - Erreur API - Réponse texte:", errorText);
         
         try {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
+          const errorData = JSON.parse(errorText);
+          console.error("🔍 DEBUG - Erreur API - Détails:", errorData);
+          throw new Error(`Erreur API: ${errorData.error?.message || response.statusText}`);
+        } catch (parseError) {
+          throw new Error(`Erreur API (${response.status}): ${response.statusText} - ${errorText.substring(0, 100)}...`);
+        }
+      }
+      
+      // Traiter le stream de la réponse
+      console.log("🔍 DEBUG - Début traitement du stream");
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let fullResponse = '';
+      
+      // Timeout pour chaque chunk de réponse
+      let chunkPromise;
+      let lastChunkTime = Date.now();
+      const chunkTimeout = 30000; // 30 secondes entre chaque chunk
+      
+      const checkTimeout = () => {
+        const now = Date.now();
+        if (now - lastChunkTime > chunkTimeout) {
+          throw new Error(`Délai d'attente dépassé: aucune donnée reçue depuis ${chunkTimeout / 1000} secondes`);
+        }
+      };
+      
+      const timeoutInterval = setInterval(checkTimeout, 5000);
+      
+      try {
+        // Utiliser un tableau pour stocker les morceaux de réponse (optimisation)
+        const responseChunks = [];
+        let detectedFormat = null;
+        
+        while (true) {
+          // Logging simplifié
+          if (DEBUG_LEVEL > 1) console.log("🔍 DEBUG - Attente de chunk de données");
+          
+          // Check for timeout while waiting for chunks
+          chunkPromise = reader.read();
+          const { done, value } = await chunkPromise;
+          
+          lastChunkTime = Date.now(); // Reset timeout counter
+          
+          if (done) {
+            if (DEBUG_LEVEL > 0) console.log("🔍 DEBUG - Stream terminé");
+            break;
+          }
+          
+          const chunk = decoder.decode(value, { stream: true });
+          if (DEBUG_LEVEL > 1) console.log("🔍 DEBUG - Chunk reçu:", chunk.substring(0, 80) + (chunk.length > 80 ? "..." : ""));
+          
+          // Traiter le chunk en fonction du type d'API
+          if (isOllama) {
+            // Format Ollama: objets JSON séparés par des sauts de ligne
+            const lines = chunk.split('\n');
+            if (DEBUG_LEVEL > 1) console.log("🔍 DEBUG - Traitement chunk Ollama:", { nombreLignes: lines.length });
             
-            const chunk = decoder.decode(value, { stream: true });
-            try {
-              // Chaque chunk peut contenir plusieurs objets JSON
-              const lines = chunk.split('\n').filter(line => line.trim());
+            // Obtenir le format de réponse pour ce modèle (utilisé comme référence initiale)
+            const modelFormat = getOllamaModelFormat(modelName);
+            
+            for (const line of lines) {
+              if (!line.trim()) continue;
               
-              for (const line of lines) {
-                const data = JSON.parse(line);
-                if (data.message && data.message.content) {
-                  reponsePartielle += data.message.content;
-                  
-                  // Mettre à jour l'affichage avec le texte partiel
-                  const formattedPartial = reponsePartielle.split('\n').map(paragraph => 
-                    paragraph ? `<p>${paragraph}</p>` : ''
-                  ).join('');
-                  
-                  // Mettre à jour la barre de progression
-                  const progressBar = progressElement.querySelector('.progress-bar');
-                  progressBar.style.width = Math.min(90, (reponsePartielle.length / 500) * 100) + '%';
-                  
-                  // Afficher le texte partiel sous la barre de progression
-                  const responseContainer = document.createElement('div');
-                  responseContainer.className = 'partial-response';
-                  responseContainer.innerHTML = formattedPartial;
-                  
-                  // Remplacer le contenu existant
-                  const partialResponse = interpretationsDiv.querySelector('.partial-response');
-                  if (partialResponse && partialResponse.parentNode === interpretationsDiv) {
-                    interpretationsDiv.removeChild(partialResponse);
+              try {
+                const parsedChunk = JSON.parse(line);
+                
+                // Détection intelligente du format (si pas encore détecté)
+                if (!detectedFormat) {
+                  if (parsedChunk.message?.content !== undefined) {
+                    detectedFormat = 'message.content';
+                  } else if (parsedChunk.response !== undefined) {
+                    detectedFormat = 'response';
+                  } else if (modelFormat && modelFormat.responseKey) {
+                    detectedFormat = modelFormat.responseKey;
+                  } else {
+                    detectedFormat = 'unknown';
                   }
-                  interpretationsDiv.appendChild(responseContainer);
+                  
+                  if (DEBUG_LEVEL > 0) console.log(`🔍 DEBUG - Format détecté pour ${modelName}: ${detectedFormat}`);
                 }
+                
+                // Extraction du texte selon le format détecté (approche simplifiée)
+                let responseText;
+                if (detectedFormat === 'message.content' && parsedChunk.message?.content !== undefined) {
+                  responseText = parsedChunk.message.content;
+                } else if (detectedFormat === 'response' && parsedChunk.response !== undefined) {
+                  responseText = parsedChunk.response;
+                } else {
+                  // Fallback aux autres méthodes si le format détecté n'est pas disponible
+                  responseText = getValueByPath(parsedChunk, detectedFormat) || 
+                                 parsedChunk.response || 
+                                 parsedChunk.message?.content || 
+                                 '';
+                }
+                
+                // Logging minimal des informations importantes
+                if (DEBUG_LEVEL > 1) {
+                  console.log("🔍 DEBUG - Ligne Ollama:", { 
+                    format: detectedFormat,
+                    textFound: responseText !== undefined && responseText !== '',
+                    snippet: responseText ? (responseText.substring(0, 20) + "...") : null,
+                    done: parsedChunk.done
+                  });
+                }
+                
+                // Si on a trouvé du texte de réponse, l'ajouter à la réponse
+                if (responseText) {
+                  responseChunks.push(responseText);
+                  // Mise à jour de l'affichage avec la réponse cumulative
+                  fullResponse = responseChunks.join('');
+                  partialResponse.innerHTML = formatStreamingResponse(fullResponse);
+                }
+                
+                if (parsedChunk.done) {
+                  if (DEBUG_LEVEL > 0) console.log("🔍 DEBUG - Ollama a signalé la fin (done=true)");
+                }
+              } catch (e) {
+                console.error("🔍 DEBUG - Erreur parsing chunk Ollama:", { 
+                  error: e.message,
+                  snippet: line.substring(0, 50) + (line.length > 50 ? "..." : "") 
+                });
               }
-            } catch (e) {
-              console.warn("Erreur lors du parsing d'un chunk:", e);
+            }
+          } else {
+            // Format OpenAI: "data: {JSON}" séparés par des sauts de ligne
+            const lines = chunk.split('\n');
+            for (const line of lines) {
+              if (!line.trim() || !line.startsWith('data: ')) continue;
+              
+              const jsonStr = line.replace(/^data: /, '');
+              if (jsonStr === '[DONE]') continue;
+              
+              try {
+                const parsedChunk = JSON.parse(jsonStr);
+                const content = parsedChunk.choices[0]?.delta?.content || '';
+                if (content) {
+                  fullResponse += content;
+                  partialResponse.innerHTML = formatStreamingResponse(fullResponse);
+                }
+              } catch (e) {
+                console.error("Erreur lors du parsing du chunk OpenAI:", e);
+              }
             }
           }
-        } catch (error) {
-          console.error("Erreur lors de la lecture du stream:", error);
-        } finally {
-          // Finaliser la barre de progression
-          const progressBar = progressElement.querySelector('.progress-bar');
-          progressBar.style.width = '100%';
-          
-          // Supprimer la barre de progression après un court délai
-          setTimeout(() => {
-            // Vérifier si progressElement est toujours un enfant de interpretationsDiv
-            if (progressElement.parentNode === interpretationsDiv) {
-              interpretationsDiv.removeChild(progressElement);
-            }
-            
-            // Formater la réponse finale
-            const formattedResponse = reponsePartielle.split('\n').map(paragraph => 
-              paragraph ? `<p>${paragraph}</p>` : ''
-            ).join('');
-            
-            interpretationsDiv.innerHTML = formattedResponse;
-          }, 500);
         }
         
-        // Mise en cache de la réponse
-        responseCache.set(cacheKey, reponsePartielle);
-        return reponsePartielle;
-      } else {
-        throw new Error(`Fournisseur non supporté: ${fournisseur}`);
+        // Mettre en cache la réponse
+        responseCache.set(cacheKey, fullResponse);
+        
+        // Retourner la réponse complète
+        return fullResponse;
+      } finally {
+        clearInterval(timeoutInterval);
       }
-    } else {
-      console.error("Erreur: Prompt système non défini");
-      return `Une erreur est survenue lors de la communication avec le modèle: Prompt système non défini`;
+    } catch (fetchError) {
+      console.error("🔍 DEBUG - Erreur critique fetch:", fetchError);
+      interpretationsDiv.innerHTML = `<p class="error">${getTranslation('interpretation.apiError', langue) || 'Erreur API:'} ${fetchError.message}</p>`;
+      throw fetchError;
     }
   } catch (error) {
-    console.error("Erreur lors de l'obtention de la réponse:", error);
-    return `Une erreur est survenue lors de la communication avec le modèle: ${error.message}`;
+    console.error("🔍 DEBUG - Erreur globale:", error);
+    interpretationsDiv.innerHTML = `<p class="error">${getTranslation('interpretation.error', langue) || 'Erreur:'} ${error.message}</p>`;
+    throw error;
   }
 }
 
@@ -451,6 +508,83 @@ async function verifierConnexionOllama() {
   }
 }
 
+/**
+ * Fonction pour tester la connectivité avec Ollama
+ * @param {string} modelName - Nom du modèle à tester
+ * @returns {Promise<Object>} - Résultat du test avec statut et message
+ */
+async function testOllamaConnectivity(modelName) {
+  console.log("🔍 DEBUG - Test de connectivité Ollama pour le modèle:", modelName);
+  
+  try {
+    // 1. Test simple de ping sur le serveur Ollama
+    console.log("🔍 DEBUG - Test ping serveur Ollama");
+    const pingResponse = await fetch(`${API_URL_OLLAMA.replace('/api/chat', '')}/api/tags`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    
+    if (!pingResponse.ok) {
+      console.error("🔍 DEBUG - Serveur Ollama inaccessible:", pingResponse.status, pingResponse.statusText);
+      return { 
+        success: false, 
+        message: `Serveur Ollama inaccessible (${pingResponse.status}): ${pingResponse.statusText}` 
+      };
+    }
+    
+    // 2. Vérifier si le modèle est disponible
+    console.log("🔍 DEBUG - Vérification disponibilité du modèle:", modelName);
+    const modelsData = await pingResponse.json();
+    
+    if (!modelsData.models) {
+      console.error("🔍 DEBUG - Format de réponse Ollama inattendu:", modelsData);
+      return { 
+        success: false, 
+        message: "Format de réponse Ollama inattendu" 
+      };
+    }
+    
+    const modelExists = modelsData.models.some(m => m.name === modelName);
+    if (!modelExists) {
+      console.error("🔍 DEBUG - Modèle non trouvé:", modelName);
+      return { 
+        success: false, 
+        message: `Le modèle ${modelName} n'est pas disponible sur ce serveur Ollama` 
+      };
+    }
+    
+    // 3. Test rapide du modèle
+    console.log("🔍 DEBUG - Test rapide du modèle:", modelName);
+    const testResponse = await fetch(API_URL_OLLAMA, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: modelName,
+        messages: [{ role: "user", content: "Réponds simplement par 'OK' pour tester la connectivité." }],
+        stream: false
+      })
+    });
+    
+    if (!testResponse.ok) {
+      console.error("🔍 DEBUG - Test du modèle échoué:", testResponse.status, testResponse.statusText);
+      return { 
+        success: false, 
+        message: `Test du modèle échoué (${testResponse.status}): ${testResponse.statusText}` 
+      };
+    }
+    
+    console.log("🔍 DEBUG - Connectivité Ollama OK pour:", modelName);
+    return { success: true, message: "Connectivité Ollama OK" };
+    
+  } catch (error) {
+    console.error("🔍 DEBUG - Erreur lors du test de connectivité Ollama:", error);
+    return { 
+      success: false, 
+      message: `Erreur de connectivité: ${error.message}` 
+    };
+  }
+}
+
 // Améliorer les logs
 function logPrompt(persona, question, systemPrompt) {
   console.group("Génération de réponse");
@@ -460,11 +594,74 @@ function logPrompt(persona, question, systemPrompt) {
   console.groupEnd();
 }
 
+/**
+ * Formate le texte de réponse pour l'affichage en HTML
+ * @param {string} text - Texte à formater
+ * @returns {string} - HTML formaté
+ */
+function formatStreamingResponse(text) {
+  if (!text || typeof text !== 'string') {
+    console.error("Erreur: Texte invalide pour formatage", text);
+    return '<p>En attente de réponse...</p>';
+  }
+  
+  // Réduire les logs de débogage
+  if (DEBUG_LEVEL > 2) console.log("🔍 DEBUG - formatStreamingResponse:", text.substring(0, 30) + "...");
+  
+  // Cache statique pour optimiser les appels répétés
+  if (!formatStreamingResponse.containsHtmlCache) {
+    formatStreamingResponse.containsHtmlCache = new Map();
+  }
+  
+  // Vérifier si on a déjà analysé ce texte (optimisation)
+  const cacheKey = text.substring(0, 100); // Utiliser début du texte comme clé
+  
+  let containsHtml;
+  if (formatStreamingResponse.containsHtmlCache.has(cacheKey)) {
+    containsHtml = formatStreamingResponse.containsHtmlCache.get(cacheKey);
+  } else {
+    // Vérifie si le texte contient déjà des balises HTML
+    containsHtml = /<\/?[a-z][\s\S]*>/i.test(text);
+    formatStreamingResponse.containsHtmlCache.set(cacheKey, containsHtml);
+  }
+  
+  if (containsHtml) {
+    // Si le texte contient déjà du HTML, vérifier seulement qu'il est enveloppé dans un conteneur
+    return text.trim().startsWith('<') ? text : `<div>${text}</div>`;
+  } else {
+    // Pour le texte brut, diviser en paragraphes et formater
+    return text.split('\n').map(paragraph => 
+      paragraph.trim() ? `<p>${paragraph}</p>` : ''
+    ).join('');
+  }
+}
+
+/**
+ * Extrait une valeur depuis un objet en utilisant une notation par points
+ * @param {Object} obj - L'objet source
+ * @param {string} path - Chemin de la propriété (ex: "message.content")
+ * @returns {*} - La valeur ou undefined si non trouvée
+ */
+function getValueByPath(obj, path) {
+  if (!obj || !path) return undefined;
+  
+  const parts = path.split('.');
+  let value = obj;
+  
+  for (const part of parts) {
+    if (value === undefined || value === null) return undefined;
+    value = value[part];
+  }
+  
+  return value;
+}
+
 // Exporter les fonctions
 export {
   obtenirReponseGPT4O,
   obtenirModelesOllama,
   verifierConnexionOllama,
   enrichirPromptContextuel,
-  logPrompt
+  logPrompt,
+  testOllamaConnectivity
 };

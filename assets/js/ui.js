@@ -29,6 +29,19 @@ function afficherTirage(tirage) {
 }
 
 /**
+ * Affiche le tirage en fer à cheval
+ * @param {Array} tirage - Tableau des cartes à afficher
+ */
+function afficherTirageHorseshoe(tirage) {
+  if (tirage.length !== 7) return;
+  
+  const positions = document.querySelectorAll('.horseshoe-spread .card-position');
+  positions.forEach((position, index) => {
+    position.innerHTML = renderCard(tirage[index]);
+  });
+}
+
+/**
  * Met à jour l'affichage des cartes lorsque le jeu est changé
  * @param {Array} tirageActuel - Le tirage actuel à mettre à jour
  * @param {string} jeuSelectionne - Le nouveau jeu sélectionné
@@ -83,29 +96,6 @@ function getPersonaLabel(personaValue) {
 }
 
 /**
- * Fonction pour agrandir/réduire une carte
- * Cette fonction est attachée aux cartes via leur attribut onclick
- * @param {HTMLElement} img - L'élément image à agrandir/réduire
- */
-function toggleEnlarge(img) {
-  if (img.classList.contains('enlarged')) {
-    // Si la carte est déjà agrandie, la réduire
-    img.classList.remove('enlarged');
-    img.style.left = '';
-  } else {
-    // Agrandir la carte et l'aligner précisément avec le panneau gauche
-    img.classList.add('enlarged');
-    
-    // Obtenir la position et les dimensions du panneau gauche (qui est maintenant le right-panel)
-    const leftPanel = document.querySelector('.right-panel');
-    const leftPanelRect = leftPanel.getBoundingClientRect();
-    
-    // Positionner la carte agrandie exactement au-dessus du panneau gauche
-    img.style.left = leftPanelRect.left + 'px';
-  }
-}
-
-/**
  * Met à jour les libellés des options des personas selon la langue sélectionnée
  * @param {string} langue - Le code de langue (fr, en, es, de, it)
  */
@@ -156,11 +146,8 @@ function updateUILanguage(langue) {
   // Mettre à jour l'attribut lang de la balise HTML
   document.documentElement.lang = langue;
   
-  // Mettre à jour le titre de la page
-  document.getElementById('page-title').textContent = getTranslation('appTitle', langue);
-  
-  // Mettre à jour le titre de l'application
-  document.getElementById('app-title').textContent = getTranslation('appTitle', langue);
+  // Mettre à jour le titre avec le type de tirage
+  updateAppTitle();
   
   // Mettre à jour les labels dans l'en-tête
   document.querySelector('.select-group:nth-child(1) .select-label').textContent = getTranslation('header.language', langue);
@@ -263,15 +250,33 @@ function updateOptGroupsLabels(langue) {
   }
 }
 
+/**
+ * Met à jour le titre de l'application avec le type de tirage sélectionné
+ */
+function updateAppTitle() {
+  const langue = document.getElementById('language').value;
+  const modeTirage = document.getElementById('spread-type').value;
+  
+  // Obtenir la base du titre et le nom du tirage
+  const baseTitle = getTranslation('appTitle', langue);
+  const spreadName = getTranslation(`spreadTypes.${modeTirage}`, langue);
+  
+  // Mettre à jour le titre de la page et de l'application
+  const fullTitle = `${baseTitle} ${spreadName}`;
+  document.getElementById('page-title').textContent = fullTitle;
+  document.getElementById('app-title').textContent = fullTitle;
+}
+
 // Exporter les fonctions
 export {
   initSpread,
   afficherTirage,
+  afficherTirageHorseshoe,
   mettreAJourAffichageCartes,
   updatePersonaLogo,
   getPersonaLabel,
-  toggleEnlarge,
   updateUILanguage,
   updatePersonaOptions,
-  updateSpreadTypeOptions
+  updateSpreadTypeOptions,
+  updateAppTitle
 }; 
