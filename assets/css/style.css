@@ -319,7 +319,7 @@ label {
 .horseshoe-spread {
   position: relative;
   width: 800px; /* Augmentation légère de la largeur */
-  height: 800px; /* Réduction de la hauteur pour un fer à cheval plus compact */
+  height: 860px; /* Réduction de la hauteur pour un fer à cheval plus compact */
   margin: 0 auto;
   padding: 20px;
   display: grid;
@@ -349,19 +349,19 @@ label {
 .horseshoe-spread .card-1 {
   grid-area: top-left;
   z-index: 1;
-  transform: translateX(30px) rotate(0deg); /* Déplacement de 30px vers la droite et 0px vers le haut */
+  transform: translateX(30px)rotate(0deg); /* Déplacement de 30px vers la droite et 0px vers le haut */
 }
 
 .horseshoe-spread .card-2 {
   grid-area: mid-left;
   z-index: 2;
-  transform: translateX(-30px) rotate(0deg);
+  transform: translateX(-30px)  rotate(0deg);
 }
 
 .horseshoe-spread .card-3 {
   grid-area: bottom-left;
   z-index: 3;
-  transform: translateX(30px) rotate(0deg);
+  transform: translateX(20px) rotate(0deg);
 }
 
 .horseshoe-spread .card-4 {
@@ -373,19 +373,19 @@ label {
 .horseshoe-spread .card-5 {
   grid-area: bottom-right;
   z-index: 5;
-  transform: translateX(-30px) rotate(0deg);
+  transform: translateX(-20px) rotate(0deg);
 }
 
 .horseshoe-spread .card-6 {
   grid-area: mid-right;
   z-index: 6;
-  transform: translateX(+30px) rotate(0deg);
+  transform: translateX(+20px) rotate(0deg);
 }
 
 .horseshoe-spread .card-7 {
   grid-area: top-right;
   z-index: 7;
-  transform: translateX(-30px) rotate(0deg);
+  transform: translateX(-30px)  rotate(0deg);
 }
 
 .horseshoe-spread .card {

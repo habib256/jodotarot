@@ -461,6 +461,9 @@ async function testerConnectiviteModele() {
  */
 document.addEventListener('DOMContentLoaded', async function() {
   try {
+    // Forcer la sélection du tirage en croix au démarrage
+    document.getElementById('spread-type').value = 'cross';
+    
     // Initialisation du tirage en croix
     initSpread();
     
@@ -556,6 +559,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     document.getElementById('language').dispatchEvent(event);
     // Stocker la préférence de langue en français dans le localStorage
     localStorage.setItem('jodotarot_language', 'fr');
+    
+    // S'assurer que le titre reflète bien le type de tirage par défaut (Croix)
+    updateAppTitle();
   } catch (error) {
     console.error("Erreur lors de l'initialisation de la page:", error);
   }
