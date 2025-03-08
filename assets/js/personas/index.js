@@ -23,6 +23,8 @@ import socrate from './socrate.js';
 import salomon from './salomon.js';
 import quichotte from './quichotte.js';
 import montaigne from './montaigne.js';
+import francmacon from './francmacon.js';
+import dalailama from './dalailama.js';
 
 // Construction de la structure PERSONAS
 const PERSONAS = {
@@ -45,7 +47,9 @@ const PERSONAS = {
     socrate: socrate.fr,
     salomon: salomon.fr,
     quichotte: quichotte.fr,
-    montaigne: montaigne.fr
+    montaigne: montaigne.fr,
+    francmacon: francmacon.fr,
+    dalailama: dalailama.fr
   },
   en: {
     tarologue: tarologue.en,
@@ -66,7 +70,9 @@ const PERSONAS = {
     socrate: socrate.en,
     salomon: salomon.en,
     quichotte: quichotte.en,
-    montaigne: montaigne.en
+    montaigne: montaigne.en,
+    francmacon: francmacon.en,
+    dalailama: dalailama.en
   },
   es: {
     tarologue: tarologue.es,
@@ -87,7 +93,9 @@ const PERSONAS = {
     socrate: socrate.es,
     salomon: salomon.es,
     quichotte: quichotte.es,
-    montaigne: montaigne.es
+    montaigne: montaigne.es,
+    francmacon: francmacon.es,
+    dalailama: dalailama.es
   },
   de: {
     tarologue: tarologue.de,
@@ -108,7 +116,9 @@ const PERSONAS = {
     socrate: socrate.de,
     salomon: salomon.de,
     quichotte: quichotte.de,
-    montaigne: montaigne.de
+    montaigne: montaigne.de,
+    francmacon: francmacon.de,
+    dalailama: dalailama.de
   },
   it: {
     tarologue: tarologue.it,
@@ -129,7 +139,9 @@ const PERSONAS = {
     socrate: socrate.it,
     salomon: salomon.it,
     quichotte: quichotte.it,
-    montaigne: montaigne.it
+    montaigne: montaigne.it,
+    francmacon: francmacon.it,
+    dalailama: dalailama.it
   }
 };
 

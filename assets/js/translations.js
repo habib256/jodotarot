@@ -78,7 +78,9 @@ const TRANSLATIONS = {
       socrate: "Socrate",
       salomon: "Roi Salomon",
       quichotte: "Don Quichotte",
-      montaigne: "Michel de Montaigne"
+      montaigne: "Michel de Montaigne",
+      francmacon: "Franc-Maçon",
+      dalailama: "Dalaï-Lama"
     },
     // Types de tirage - Noms traduits
     spreadTypes: {
@@ -166,7 +168,9 @@ const TRANSLATIONS = {
       socrate: "Socrates",
       salomon: "King Solomon",
       quichotte: "Don Quixote",
-      montaigne: "Michel de Montaigne"
+      montaigne: "Michel de Montaigne",
+      francmacon: "Freemason",
+      dalailama: "Dalai Lama"
     },
     // Types de tirage - Noms traduits
     spreadTypes: {
@@ -252,7 +256,9 @@ const TRANSLATIONS = {
       socrate: "Sócrates",
       salomon: "Rey Salomón",
       quichotte: "Don Quijote",
-      montaigne: "Michel de Montaigne"
+      montaigne: "Michel de Montaigne",
+      francmacon: "Francmasón",
+      dalailama: "Dalái Lama"
     },
     // Types de tirage - Noms traduits
     spreadTypes: {
@@ -338,7 +344,9 @@ const TRANSLATIONS = {
       socrate: "Sokrates",
       salomon: "König Salomon",
       quichotte: "Don Quijote",
-      montaigne: "Michel de Montaigne"
+      montaigne: "Michel de Montaigne",
+      francmacon: "Freimaurer",
+      dalailama: "Dalai Lama"
     },
     // Types de tirage - Noms traduits
     spreadTypes: {
@@ -424,7 +432,9 @@ const TRANSLATIONS = {
       socrate: "Socrate",
       salomon: "Re Salomone",
       quichotte: "Don Chisciotte",
-      montaigne: "Michel de Montaigne"
+      montaigne: "Michel de Montaigne",
+      francmacon: "Massone",
+      dalailama: "Dalai Lama"
     },
     // Types de tirage - Noms traduits
     spreadTypes: {
