@@ -26,27 +26,27 @@ const TRANSLATIONS = {
       default: "Les interprétations s'afficheront ici après le tirage.",
       error: "Une erreur est survenue lors de l'interprétation. Veuillez réessayer.",
       userQuestion: "La question posée par l'utilisateur est:",
-      userMessage: "J'aimerais une interprétation détaillée de mon tirage de tarot en lien avec ma question.",
+      userMessage: "J'aimerais une interprétation détaillée et personnalisée de mon tirage de tarot en croix. Analysez la symbolique de chaque carte en fonction de sa position et établissez les connexions entre les cartes pour offrir une lecture cohérente qui réponde précisément à ma question.",
       ollamaPromo: "Télécharge <a href='https://ollama.com' target='_blank'>ollama</a> avec <a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a> pour commencer. Recharge la page et réalise ton tirage de cartes"
     },
     // Textes pour le prompt de tirage
     tarotReading: {
-      intro: "Voici le tirage en croix à interpréter:",
+      intro: "Voici le tirage en croix à interpréter pour la personne consultant le tarot:",
       positions: {
-        top: "en haut (influences positives/spirituelles)",
-        left: "à gauche (passé/origines de la situation)",
-        center: "au centre (situation actuelle/enjeu principal)",
-        right: "à droite (futur/évolution probable)",
-        bottom: "en bas (influences négatives/défis à surmonter)"
+        top: "en haut (influences positives/spirituelles/conscientes)",
+        left: "à gauche (passé/origines de la situation/causes)",
+        center: "au centre (situation actuelle/enjeu principal/question essentielle)",
+        right: "à droite (futur/évolution probable/direction)",
+        bottom: "en bas (influences négatives/défis à surmonter/inconscient)"
       },
       instructions: {
-        top: "Analyse les forces spirituelles ou mentales qui soutiennent la personne.",
-        left: "Explore comment les événements passés ont contribué à la situation actuelle.",
-        center: "Décris précisément la situation actuelle et les enjeux centraux.",
-        right: "Projette l'évolution probable si la personne suit le chemin actuel.",
-        bottom: "Identifie les obstacles à surmonter et propose des moyens de les gérer."
+        top: "Analyse les forces spirituelles, mentales ou conscientes qui soutiennent la personne. Explore comment ces énergies peuvent être utilisées comme ressources.",
+        left: "Explore en profondeur comment les événements passés ont façonné et contribué à la situation actuelle. Identifie les patterns ou les leçons importantes.",
+        center: "Décris précisément la situation actuelle, les enjeux centraux et les énergies dominantes. Cette carte représente le cœur de la question.",
+        right: "Projette l'évolution probable si la personne suit le chemin actuel. Offre des conseils sur la meilleure façon d'aborder ce futur potentiel.",
+        bottom: "Identifie les obstacles, les peurs, les blocages inconscients à surmonter et propose des moyens concrets de les transformer ou de les gérer."
       },
-      conclusion: "Prends en compte l'interaction entre les cartes et leur position relative dans ton interprétation globale."
+      conclusion: "Synthétise l'ensemble du tirage en prenant en compte les interactions dynamiques entre les cartes, leur symbolisme et leur position relative. Conclue avec des conseils pratiques et une perspective globale qui répond directement à la question posée."
     },
     // Groupes d'options dans les menus déroulants
     optgroups: {
@@ -79,7 +79,7 @@ const TRANSLATIONS = {
       salomon: "Roi Salomon",
       quichotte: "Don Quichotte",
       montaigne: "Michel de Montaigne",
-      francmacon: "Franc-Maçon",
+      francmacon: "Maître Franc-Maçon",
       dalailama: "Dalaï-Lama"
     },
     // Types de tirage - Noms traduits
@@ -90,7 +90,7 @@ const TRANSLATIONS = {
     misc: {
       loadingModels: "Chargement des modèles...",
       crossSpread: "Tirage en Croix",
-      tarotPrompt: "Interprétez ce tirage de tarot {spreadType} en relation avec ma question: \"{question}\""
+      tarotPrompt: "En tant que {persona}, interprétez ce tirage de tarot {spreadType} en relation avec ma question: \"{question}\". Analysez chaque carte individuellement puis dans leur ensemble, en tenant compte de leur position et des interactions entre elles. Offrez une perspective unique basée sur votre expertise particulière."
     }
   },
   
@@ -116,27 +116,27 @@ const TRANSLATIONS = {
       default: "Interpretations will appear here after the cards are drawn.",
       error: "An error occurred during the interpretation. Please try again.",
       userQuestion: "The question posed by the user is:",
-      userMessage: "I would like a detailed interpretation of my tarot spread in relation to my question.",
+      userMessage: "I would like a detailed and personalized interpretation of my cross tarot spread. Analyze the symbolism of each card based on its position and establish connections between the cards to offer a coherent reading that precisely addresses my question.",
       ollamaPromo: "Download <a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a> to start drawing cards with <a href='https://ollama.com' target='_blank'>ollama</a> and reload the page to see your models."
     },
     // Tarot reading prompt texts
     tarotReading: {
-      intro: "Here is the cross spread to interpret:",
+      intro: "Here is the cross spread to interpret for the person consulting the tarot:",
       positions: {
-        top: "at the top (positive/spiritual influences)",
-        left: "on the left (past/origins of the situation)",
-        center: "at the center (current situation/main issue)",
-        right: "on the right (future/probable evolution)",
-        bottom: "at the bottom (negative influences/challenges to overcome)"
+        top: "at the top (positive/spiritual/conscious influences)",
+        left: "on the left (past/origins of the situation/causes)",
+        center: "at the center (current situation/main issue/essential question)",
+        right: "on the right (future/probable evolution/direction)",
+        bottom: "at the bottom (negative influences/challenges to overcome/unconscious)"
       },
       instructions: {
-        top: "Analyze the spiritual or mental forces supporting the person.",
-        left: "Explore how past events have contributed to the current situation.",
-        center: "Describe precisely the current situation and central issues.",
-        right: "Project the likely evolution if the person follows the current path.",
-        bottom: "Identify the obstacles to overcome and suggest ways to manage them."
+        top: "Analyze the spiritual, mental or conscious forces supporting the person. Explore how these energies can be used as resources.",
+        left: "Explore in depth how past events have shaped and contributed to the current situation. Identify important patterns or lessons.",
+        center: "Describe precisely the current situation, central issues and dominant energies. This card represents the heart of the question.",
+        right: "Project the likely evolution if the person follows the current path. Offer advice on the best way to approach this potential future.",
+        bottom: "Identify obstacles, fears, unconscious blocks to overcome and suggest concrete ways to transform or manage them."
       },
-      conclusion: "Take into account the interaction between the cards and their relative position in your overall interpretation."
+      conclusion: "Synthesize the entire spread by taking into account the dynamic interactions between the cards, their symbolism and their relative position. Conclude with practical advice and a global perspective that directly addresses the question asked."
     },
     // Groupes d'options dans les menus déroulants
     optgroups: {
@@ -169,7 +169,7 @@ const TRANSLATIONS = {
       salomon: "King Solomon",
       quichotte: "Don Quixote",
       montaigne: "Michel de Montaigne",
-      francmacon: "Freemason",
+      francmacon: "Master Freemason",
       dalailama: "Dalai Lama"
     },
     // Types de tirage - Noms traduits
@@ -179,7 +179,7 @@ const TRANSLATIONS = {
     misc: {
       loadingModels: "Loading models...",
       crossSpread: "Cross Spread",
-      tarotPrompt: "Interpret this {spreadType} tarot reading in relation to my question: \"{question}\""
+      tarotPrompt: "As a {persona}, interpret this {spreadType} tarot reading in relation to my question: \"{question}\". Analyze each card individually and then as a whole, considering their position and the interactions between them. Offer a unique perspective based on your particular expertise."
     }
   },
   
@@ -205,27 +205,27 @@ const TRANSLATIONS = {
       default: "Las interpretaciones aparecerán aquí después de la tirada.",
       error: "Ha ocurrido un error durante la interpretación. Por favor, inténtelo de nuevo.",
       userQuestion: "La pregunta planteada por el usuario es:",
-      userMessage: "Me gustaría una interpretación detallada de mi tirada de tarot en relación con mi pregunta.",
+      userMessage: "Me gustaría una interpretación detallada y personalizada de mi tirada de tarot en cruz. Analice el simbolismo de cada carta según su posición y establezca conexiones entre las cartas para ofrecer una lectura coherente que responda con precisión a mi pregunta.",
       ollamaPromo: "Descarga <a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a> para empezar a tirar cartas con <a href='https://ollama.com' target='_blank'>ollama</a> y recarga la página para ver tus modelos."
     },
     // Textes pour le tirage de tarot en espagnol
     tarotReading: {
-      intro: "Aquí está la tirada en cruz para interpretar:",
+      intro: "Aquí está la tirada en cruz para interpretar para la persona que consulta el tarot:",
       positions: {
-        top: "en la parte superior (influencias positivas/espirituales)",
-        left: "a la izquierda (pasado/orígenes de la situación)",
-        center: "en el centro (situación actual/tema principal)",
-        right: "a la derecha (futuro/evolución probable)",
-        bottom: "en la parte inferior (influencias negativas/desafíos a superar)"
+        top: "en la parte superior (influencias positivas/espirituales/conscientes)",
+        left: "a la izquierda (pasado/orígenes de la situación/causas)",
+        center: "en el centro (situación actual/tema principal/pregunta esencial)",
+        right: "a la derecha (futuro/evolución probable/dirección)",
+        bottom: "en la parte inferior (influencias negativas/desafíos a superar/inconsciente)"
       },
       instructions: {
-        top: "Analiza las fuerzas espirituales o mentales que apoyan a la persona.",
-        left: "Explora cómo los eventos pasados han contribuido a la situación actual.",
-        center: "Describe con precisión la situacion actual y los temas centrales.",
-        right: "Proyecta la evolución probable si la persona sigue el camino actual.",
-        bottom: "Identifica los obstáculos a superar y sugiere formas de gestionarlos."
+        top: "Analiza las fuerzas espirituales, mentales o conscientes que apoyan a la persona. Explora cómo estas energías pueden utilizarse como recursos.",
+        left: "Explora en profundidad cómo los eventos pasados han moldeado y contribuido a la situación actual. Identifica patrones o lecciones importantes.",
+        center: "Describe con precisión la situación actual, los temas centrales y las energías dominantes. Esta carta representa el corazón de la cuestión.",
+        right: "Proyecta la evolución probable si la persona sigue el camino actual. Ofrece consejos sobre la mejor manera de abordar este futuro potencial.",
+        bottom: "Identifica los obstáculos, miedos, bloqueos inconscientes a superar y sugiere formas concretas de transformarlos o gestionarlos."
       },
-      conclusion: "Ten en cuenta la interacción entre las cartas y su posición relativa en tu interpretación general."
+      conclusion: "Sintetiza toda la tirada teniendo en cuenta las interacciones dinámicas entre las cartas, su simbolismo y su posición relativa. Concluye con consejos prácticos y una perspectiva global que responda directamente a la pregunta planteada."
     },
     optgroups: {
       divinationArts: "Artes Adivinatorias",
@@ -257,7 +257,7 @@ const TRANSLATIONS = {
       salomon: "Rey Salomón",
       quichotte: "Don Quijote",
       montaigne: "Michel de Montaigne",
-      francmacon: "Francmasón",
+      francmacon: "Maestro Francmasón",
       dalailama: "Dalái Lama"
     },
     // Types de tirage - Noms traduits
@@ -267,7 +267,7 @@ const TRANSLATIONS = {
     misc: {
       loadingModels: "Cargando modelos...",
       crossSpread: "Tirada en Cruz",
-      tarotPrompt: "Interpreta esta tirada de tarot {spreadType} en relación con mi pregunta: \"{question}\""
+      tarotPrompt: "Como {persona}, interpreta esta tirada de tarot {spreadType} en relación con mi pregunta: \"{question}\". Analiza cada carta individualmente y poi nel loro insieme, considerando la loro posizione e le interazioni tra di esse. Ofrece una prospettiva única basada sulla tua esperienza particular."
     }
   },
   
@@ -293,27 +293,27 @@ const TRANSLATIONS = {
       default: "Die Interpretationen erscheinen hier nach dem Kartenziehen.",
       error: "Bei der Interpretation ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
       userQuestion: "Die von dem Benutzer gestellte Frage ist:",
-      userMessage: "Ich hätte gerne eine detaillierte Interpretation meiner Tarot-Legung in Bezug auf meine Frage.",
+      userMessage: "Ich hätte gerne eine detaillierte und personalisierte Interpretation meiner Tarot-Kreuzlegung. Analysieren Sie die Symbolik jeder Karte basierend auf ihrer Position und stellen Sie Verbindungen zwischen den Karten her, um eine kohärente Deutung anzubieten, die genau auf meine Frage eingeht.",
       ollamaPromo: "Laden Sie <a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a> herunter, um mit <a href='https://ollama.com' target='_blank'>ollama</a> Karten zu ziehen, und laden Sie die Seite neu, um Ihre Modelle zu sehen."
     },
     // Textes pour le tirage de tarot en allemand
     tarotReading: {
-      intro: "Hier ist die Kreuzlegung zu interpretieren:",
+      intro: "Hier ist die Kreuzlegung zu interpretieren für die Person, die das Tarot konsultiert:",
       positions: {
-        top: "oben (positive/spirituelle Einflüsse)",
-        left: "links (Vergangenheit/Ursprünge der Situation)",
-        center: "in der Mitte (aktuelle Situation/Hauptthema)",
-        right: "rechts (Zukunft/wahrscheinliche Entwicklung)",
-        bottom: "unten (negative Einflüsse/zu überwindende Herausforderungen)"
+        top: "oben (positive/spirituelle/bewusste Einflüsse)",
+        left: "links (Vergangenheit/Ursprünge der Situation/Ursachen)",
+        center: "in der Mitte (aktuelle Situation/Hauptthema/wesentliche Frage)",
+        right: "rechts (Zukunft/wahrscheinliche Entwicklung/Richtung)",
+        bottom: "unten (negative Einflüsse/zu überwindende Herausforderungen/Unbewusstes)"
       },
       instructions: {
-        top: "Analysiere die spirituellen oder mentalen Kräfte, die die Person unterstützen.",
-        left: "Erkunde, wie vergangene Ereignisse zur aktuellen Situation beigetragen haben.",
-        center: "Beschreibe präzise die aktuelle Situation und die zentralen Themen.",
-        right: "Projiziere die wahrscheinliche Entwicklung, wenn die Person dem aktuellen Weg folgt.",
-        bottom: "Identifiziere die zu überwindenden Hindernisse und schlage Wege vor, um mit ihnen umzugehen."
+        top: "Analysiere die spirituellen, mentalen oder bewussten Kräfte, die die Person unterstützen. Erkunde, wie diese Energien als Ressourcen genutzt werden können.",
+        left: "Erkunde eingehend, wie vergangene Ereignisse die aktuelle Situation geprägt und zu ihr beigetragen haben. Identifiziere wichtige Muster oder Lektionen.",
+        center: "Beschreibe präzise die aktuelle Situation, die zentralen Themen und die dominierenden Energien. Diese Karte repräsentiert den Kern der Frage.",
+        right: "Projiziere die wahrscheinliche Entwicklung, wenn die Person dem aktuellen Weg folgt. Biete Ratschläge zur besten Herangehensweise an diese potenzielle Zukunft.",
+        bottom: "Identifiziere Hindernisse, Ängste, unbewusste Blockaden, die überwunden werden müssen, und schlage konkrete Wege vor, um sie zu transformieren oder mit ihnen umzugehen."
       },
-      conclusion: "Berücksichtige die Wechselwirkung zwischen den Karten und ihre relative Position in deiner Gesamtinterpretation."
+      conclusion: "Fasse die gesamte Legung zusammen, indem du die dynamischen Wechselwirkungen zwischen den Karten, ihre Symbolik und ihre relative Position berücksichtigst. Schließe mit praktischen Ratschlägen und einer globalen Perspektive, die direkt auf die gestellte Frage eingeht."
     },
     optgroups: {
       divinationArts: "Wahrsagekünste",
@@ -345,7 +345,7 @@ const TRANSLATIONS = {
       salomon: "König Salomon",
       quichotte: "Don Quijote",
       montaigne: "Michel de Montaigne",
-      francmacon: "Freimaurer",
+      francmacon: "Meister Freimaurer",
       dalailama: "Dalai Lama"
     },
     // Types de tirage - Noms traduits
@@ -355,7 +355,7 @@ const TRANSLATIONS = {
     misc: {
       loadingModels: "Lade Modelle...",
       crossSpread: "Kreuzlegung",
-      tarotPrompt: "Interpretiere diese {spreadType} Tarot-Legung in Bezug auf meine Frage: \"{question}\""
+      tarotPrompt: "Als {persona}, interpretiere diese {spreadType} Tarot-Legung in Bezug auf meine Frage: \"{question}\". Analysiere jede Karte einzeln und dann als Ganzes, unter Berücksichtigung ihrer Position und der Wechselwirkungen zwischen ihnen. Biete eine einzigartige Perspektive basierend auf deiner besonderen Expertise."
     }
   },
   
@@ -381,27 +381,27 @@ const TRANSLATIONS = {
       default: "Le interpretazioni appariranno qui dopo aver pescato le carte.",
       error: "Si è verificato un errore durante l'interpretazione. Per favore riprova.",
       userQuestion: "La domanda posta dall'utente è:",
-      userMessage: "Vorrei un'interpretazione dettagliata della mia stesa di tarocchi in relazione alla mia domanda.",
+      userMessage: "Vorrei un'interpretazione dettagliata e personalizzata della mia stesa di tarocchi a croce. Analizza il simbolismo di ogni carta in base alla sua posizione e stabilisci connessioni tra le carte per offrire una lettura coerente che risponda con precisione alla mia domanda.",
       ollamaPromo: "Scarica <a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a> per iniziare a pescare carte con <a href='https://ollama.com' target='_blank'>ollama</a> e ricarica la pagina per vedere i tuoi modelli."
     },
     // Textes pour le prompt de tirage en italien
     tarotReading: {
-      intro: "Ecco la stesa a croce da interpretare:",
+      intro: "Ecco la stesa a croce da interpretare per la persona che consulta i tarocchi:",
       positions: {
-        top: "in alto (influenze positive/spirituali)",
-        left: "a sinistra (passato/origini della situazione)",
-        center: "al centro (situazione attuale/questione principale)",
-        right: "a destra (futuro/evoluzione probabile)",
-        bottom: "in basso (influenze negative/sfide da superare)"
+        top: "in alto (influenze positive/spirituali/coscienti)",
+        left: "a sinistra (passato/origini della situazione/cause)",
+        center: "al centro (situazione attuale/questione principale/domanda essenziale)",
+        right: "a destra (futuro/evoluzione probabile/direzione)",
+        bottom: "in basso (influenze negative/sfide da superare/inconscio)"
       },
       instructions: {
-        top: "Analizza le forze spirituali o mentali che sostengono la persona.",
-        left: "Esplora come gli eventi passati hanno contribuito alla situazione attuale.",
-        center: "Descrivi precisamente la situazione attuale e le questioni centrali.",
-        right: "Proietta l'evoluzione probabile se la persona segue il percorso attuale.",
-        bottom: "Identifica gli ostacoli da superare e proponi modi per gestirli."
+        top: "Analizza le forze spirituali, mentali o coscienti che sostengono la persona. Esplora come queste energie possono essere utilizzate come risorse.",
+        left: "Esplora in profondità come gli eventi passati hanno plasmato e contribuito alla situazione attuale. Identifica pattern o lezioni importanti.",
+        center: "Descrivi precisamente la situazione attuale, le questioni centrali e le energie dominanti. Questa carta rappresenta il cuore della questione.",
+        right: "Proietta l'evoluzione probabile se la persona segue il percorso attuale. Offri consigli sul modo migliore di affrontare questo potenziale futuro.",
+        bottom: "Identifica gli ostacoli, le paure, i blocchi inconsci da superare e proponi modi concreti per trasformarli o gestirli."
       },
-      conclusion: "Tieni conto dell'interazione tra le carte e la loro posizione relativa nella tua interpretazione globale."
+      conclusion: "Sintetizza l'intera stesa tenendo conto delle interazioni dinamiche tra le carte, il loro simbolismo e la loro posizione relativa. Concludi con consigli pratici e una prospettiva globale che risponda direttamente alla domanda posta."
     },
     optgroups: {
       divinationArts: "Arti Divinatorie",
@@ -433,7 +433,7 @@ const TRANSLATIONS = {
       salomon: "Re Salomone",
       quichotte: "Don Chisciotte",
       montaigne: "Michel de Montaigne",
-      francmacon: "Massone",
+      francmacon: "Maestro Massone",
       dalailama: "Dalai Lama"
     },
     // Types de tirage - Noms traduits
@@ -443,7 +443,7 @@ const TRANSLATIONS = {
     misc: {
       loadingModels: "Caricamento modelli...",
       crossSpread: "Stesa a Croce",
-      tarotPrompt: "Interpreta questa lettura dei tarocchi {spreadType} in relazione alla mia domanda: \"{question}\""
+      tarotPrompt: "Come {persona}, interpreta questa lettura dei tarocchi {spreadType} in relazione alla mia domanda: \"{question}\". Analizza ogni carta individualmente e poi nel loro insieme, considerando la loro posizione e le interazioni tra di esse. Offri una prospettiva unica basata sulla tua particolare competenza."
     }
   }
 };

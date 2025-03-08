@@ -12,80 +12,60 @@ const API_URL_OLLAMA_TAGS = "http://localhost:11434/api/tags";
 
 // Meta prompt de base pour formater les réponses
 const META_PROMPT_BASE = {
-  fr: `Ta réponse doit respecter ces critères STRICTS:
-1) Être concise et compacte (400-450 mots)
-2) Former une interprétation complète en un seul message
-3) Utiliser des émoticônes adaptées à ton personnage
-4) Utiliser UNIQUEMENT des balises HTML pour le formatage:
-   - <h2> pour les titres principaux (sections, thématiques)
-   - <h3> pour les sous-sections
-   - <em> pour les concepts importants
-   - <strong> pour les conseils clés ou points importants
-   - <blockquote> pour les citations ou références
-   - <ul>/<li> pour les listes
-   - <span> avec styles CSS pour les mises en forme spéciales
-5) JAMAIS utiliser de symboles Markdown (# ou ##) ou laisser des titres en texte brut comme "Introduction:" ou "ANALYSE:"
-6) TOUJOURS utiliser la langue française pour ta réponse complète`,
+  fr: `Format obligatoire (400-450 mots):
+1) Réponse concise et complète en un message
+2) Utilise des émojis pertinents pour illustrer les concepts de tarot
+3) Formatage HTML uniquement: <h2>/<h3> titres, <em>/<strong> importance, <blockquote> citations, <ul>/<li> listes
+4) Intègre l'aspect psychologique et symbolique des cartes
+5) Fais des connexions entre les cartes qui se complètent ou s'opposent
+6) Évite le jargon trop ésotérique pour rester accessible
+7) Termine par un conseil pratique et une suggestion d'action
+8) Pas de Markdown ni de titres en texte brut. Pas de titres dans ce type de formatage : ** **
+9) En français`,
 
-  en: `Your response MUST follow these STRICT criteria:
-1) Be concise and compact (400-450 words)
-2) Form a complete interpretation in a single message
-3) Use emojis that match your character
-4) Use ONLY HTML tags for formatting:
-   - <h2> for main titles (sections, themes)
-   - <h3> for subsections
-   - <em> for important concepts
-   - <strong> for key advice or important points
-   - <blockquote> for quotes or references
-   - <ul>/<li> for lists
-   - <span> with CSS styles for special formatting
-5) NEVER use Markdown symbols (# or ##) or leave titles in plain text like "Introduction:" or "ANALYSIS:"
-6) ALWAYS use the English language for your complete response`,
+  en: `Required format (400-450 words):
+1) Concise and complete response in one message
+2) Use relevant tarot-themed emojis to illustrate concepts
+3) HTML formatting only: <h2>/<h3> headings, <em>/<strong> importance, <blockquote> quotes, <ul>/<li> lists
+4) Incorporate psychological and symbolic aspects of the cards
+5) Make connections between cards that complement or oppose each other
+6) Avoid overly esoteric jargon to remain accessible
+7) End with practical advice and a suggested action
+8) No Markdown or plain text headings. No titles in this formatting style: ** **
+9) In English`,
 
-  es: `Tu respuesta DEBE seguir estos criterios ESTRICTOS:
-1) Ser concisa y compacta (400-450 palabras)
-2) Formar una interpretación completa en un solo mensaje
-3) Usar emojis que coincidan con tu personaje
-4) Usar SOLO etiquetas HTML para el formato:
-   - <h2> para títulos principales (secciones, temas)
-   - <h3> para subsecciones
-   - <em> para conceptos importantes
-   - <strong> para consejos clave o puntos importantes
-   - <blockquote> para citas o referencias
-   - <ul>/<li> para listas
-   - <span> con estilos CSS para formato especial
-5) NUNCA uses símbolos de Markdown (# o ##) o dejes títulos en texto plano como "Introducción:" o "ANÁLISIS:"
-6) SIEMPRE utiliza el idioma español para tu respuesta completa`,
+  es: `Formato requerido (400-450 palabras):
+1) Respuesta concisa y completa en un mensaje
+2) Utiliza emojis relacionados con el tarot para ilustrar conceptos
+3) Solo formato HTML: <h2>/<h3> títulos, <em>/<strong> importancia, <blockquote> citas, <ul>/<li> listas
+4) Incorpora aspectos psicológicos y simbólicos de las cartas
+5) Establece conexiones entre cartas complementarias u opuestas
+6) Evita jerga excesivamente esotérica para mantener la accesibilidad
+7) Finaliza con un consejo práctico y una sugerencia de acción
+8) Sin Markdown ni títulos en texto plano. No utilices títulos en este formato: ** **
+9) En español`,
 
-  de: `Deine Antwort MUSS diese STRENGEN Kriterien erfüllen:
-1) Sei präzise und kompakt (400-450 Wörter)
-2) Bilde eine vollständige Interpretation in einer einzigen Nachricht
-3) Verwende Emojis, die zu deinem Charakter passen
-4) Verwende NUR HTML-Tags zur Formatierung:
-   - <h2> für Haupttitel (Abschnitte, Themen)
-   - <h3> für Unterabschnitte
-   - <em> für wichtige Konzepte
-   - <strong> für wichtige Ratschläge oder wichtige Punkte
-   - <blockquote> für Zitate oder Referenzen
-   - <ul>/<li> für Listen
-   - <span> mit CSS-Stilen für spezielle Formatierungen
-5) Verwende NIEMALS Markdown-Symbole (# oder ##) oder belasse Titel in Klartext wie "Einleitung:" oder "ANALYSE:"
-6) Verwende IMMER die deutsche Sprache für deine vollständige Antwort`,
+  de: `Erforderliches Format (400-450 Wörter):
+1) Präzise und vollständige Antwort in einer Nachricht
+2) Verwende relevante Tarot-Emojis, um Konzepte zu illustrieren
+3) Nur HTML-Formatierung: <h2>/<h3> Überschriften, <em>/<strong> Wichtigkeit, <blockquote> Zitate, <ul>/<li> Listen
+4) Integriere psychologische und symbolische Aspekte der Karten
+5) Stelle Verbindungen zwischen sich ergänzenden oder gegensätzlichen Karten her
+6) Vermeide zu esoterischen Fachjargon, um verständlich zu bleiben
+7) Schließe mit praktischem Rat und einem Handlungsvorschlag ab
+8) Kein Markdown oder Überschriften im Klartext. Keine Überschriften in diesem Formatierungsstil: ** **
+9) Auf Deutsch`,
 
-  it: `La tua risposta DEVE seguire questi criteri RIGOROSI:
-1) Essere concisa e compatta (400-450 parole)
-2) Formare un'interpretazione completa in un unico messaggio
-3) Utilizzare emoji che corrispondano al tuo personaggio
-4) Utilizzare SOLO tag HTML per la formattazione:
-   - <h2> per i titoli principali (sezioni, temi)
-   - <h3> per le sottosezioni
-   - <em> per concetti importanti
-   - <strong> per consigli chiave o punti importanti
-   - <blockquote> per citazioni o riferimenti
-   - <ul>/<li> per gli elenchi
-   - <span> con stili CSS per formattazioni speciali
-5) NON utilizzare MAI simboli Markdown (# o ##) o lasciare titoli in testo semplice come "Introduzione:" o "ANALISI:"
-6) Utilizza SEMPRE la lingua italiana per la tua risposta completa`
+  it: `Formato richiesto (400-450 parole):
+1) Risposta concisa e completa in un messaggio
+2) Utilizza emoji a tema tarocchi per illustrare i concetti
+3) Solo formattazione HTML: <h2>/<h3> titoli, <em>/<strong> importanza, <blockquote> citazioni, <ul>/<li> elenchi
+4) Incorpora aspetti psicologici e simbolici delle carte
+5) Crea connessioni tra carte che si completano o si oppongono
+6) Evita un gergo eccessivamente esoterico per rimanere accessibile
+7) Concludi con un consiglio pratico e un suggerimento d'azione
+8) Niente Markdown o titoli in testo normale. Nessun titolo in questo stile di formattazione: ** **
+9) In italiano`
 };
 
 /**
@@ -95,7 +75,10 @@ const META_PROMPT_BASE = {
  */
 function getMetaPrompt(langue = 'fr') {
   // Récupérer le prompt de base dans la langue demandée ou en français par défaut
-  return META_PROMPT_BASE[langue] || META_PROMPT_BASE.fr;
+  const promptLangageSpecifique = META_PROMPT_BASE[langue] || META_PROMPT_BASE.fr;
+  
+  // On peut ajouter des adaptations supplémentaires ici si nécessaire
+  return promptLangageSpecifique;
 }
 
 export {
