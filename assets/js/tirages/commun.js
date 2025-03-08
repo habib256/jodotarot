@@ -77,7 +77,12 @@ Jeder Aspekt deiner Interpretation muss auf einen Aspekt dieser Frage eingehen.`
     it: `IMPORTANTE: La tua risposta deve essere DIRETTAMENTE e SPECIFICAMENTE legata a questa domanda.
 Concentrati su ciò che la domanda chiede precisamente e adatta la tua interpretazione
 in base agli elementi menzionati nella domanda. Non dare una risposta generica.
-Ogni aspetto della tua interpretazione deve rispondere a un aspetto di questa domanda.`
+Ogni aspetto della tua interpretazione deve rispondere a un aspetto di questa domanda.`,
+    
+    zh: `重要提示：您的回答必须与这个问题直接且具体相关。
+请专注于问题所精确询问的内容，并根据问题中提到的元素调整您的解读。
+请勿提供泛泛而论的回答。
+您解读的每个方面都应该回应问题的某个方面。`
   };
   
   // Sélectionner le texte d'emphase dans la langue appropriée

@@ -142,6 +142,29 @@ const PERSONAS = {
     montaigne: montaigne.it,
     francmacon: francmacon.it,
     dalailama: dalailama.it
+  },
+  zh: {
+    tarologue: tarologue.zh,
+    oracle: oracle.zh,
+    voyante: voyante.zh,
+    pretre: pretre.zh,
+    rabbin: rabbin.zh,
+    imam: imam.zh,
+    sorciere: sorciere.zh,
+    alchimiste: alchimiste.zh,
+    mage: mage.zh,
+    freud: freud.zh,
+    jung: jung.zh,
+    lacan: lacan.zh,
+    dolto: dolto.zh,
+    demon: demon.zh,
+    noegoman: noegoman.zh,
+    socrate: socrate.zh,
+    salomon: salomon.zh,
+    quichotte: quichotte.zh,
+    montaigne: montaigne.zh,
+    francmacon: francmacon.zh,
+    dalailama: dalailama.zh
   }
 };
 

@@ -555,6 +555,117 @@ const TRANSLATIONS = {
       horseshoeSpread: "Stesa a Ferro di Cavallo",
       tarotPrompt: "{persona}, cosa rivela questa {spreadType} sulla mia domanda: \"{question}\"? Analizza le carte individualmente e nel loro insieme, considerando le loro posizioni e interazioni. Condividi la tua visione unica."
     }
+  },
+  
+  // Chinois
+  zh: {
+    // Titre de la page
+    pageTitle: "塔罗十字牌阵",
+    appTitle: "神秘塔罗:",
+    // Éléments de l'en-tête
+    header: {
+      language: "语言:",
+      persona: "角色:",
+      cardSet: "牌组:",
+      spreadType: "牌阵类型:",
+      iaModel: "人工智能模型:",
+      question: "您的问题:",
+      questionPlaceholder: "请输入您想为此牌阵解答的问题...",
+      drawButton: "抽牌"
+    },
+    interpretation: {
+      loading: "正在分析牌阵...",
+      loadingWithModel: "正在使用{model}由{persona}解读十字牌阵...",
+      default: "抽牌后解读将显示在这里。",
+      error: "解读过程中出现错误。请重试。",
+      userQuestion: "用户提出的问题是:",
+      userMessage: "我想要一个详细且个性化的十字塔罗牌阵解读。请根据每张牌的位置分析其象征意义，并建立牌与牌之间的联系，以提供准确回应我问题的连贯解读。",
+      ollamaPromo: "下载<a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a>开始使用<a href='https://ollama.com' target='_blank'>ollama</a>抽牌，并重新加载页面查看您的模型。",
+      streamingResponse: "正在生成回应"
+    },
+    // 塔罗解读提示文本
+    tarotReading: {
+      intro: {
+        cross: "以下是为咨询者解读的十字牌阵:",
+        horseshoe: "以下是为咨询者解读的马蹄形牌阵:"
+      },
+      positions: {
+        top: "在顶部（积极/精神/意识的影响）",
+        left: "在左侧（过去/情况的起源/原因）",
+        center: "在中心（当前情况/主要问题/核心问题）",
+        right: "在右侧（未来/可能的发展/方向）",
+        bottom: "在底部（消极影响/需要克服的挑战/潜意识）",
+        // 马蹄形牌阵的位置
+        horseshoe1: "在最左侧（远古过去/基础）",
+        horseshoe2: "第二个位置（近期过去/先前的影响）",
+        horseshoe3: "第三个位置（现在/当前情况）",
+        horseshoe4: "中心位置（决定性因素/核心问题）",
+        horseshoe5: "第五个位置（即将到来的未来/下一步）",
+        horseshoe6: "第六个位置（障碍/需要克服的挑战）",
+        horseshoe7: "在最右侧（最终结果/可能的结论）"
+      },
+      instructions: {
+        top: "分析支持此人的精神、心理或意识力量。探索如何将这些能量用作资源。",
+        left: "深入探索过去事件如何塑造并促成当前情况。识别重要的模式或教训。",
+        center: "准确描述当前情况、核心问题和主导能量。这张牌代表问题的核心。",
+        right: "如果此人沿着当前路径前进，预测可能的发展。提供关于如何最好地应对这个潜在未来的建议。",
+        bottom: "识别需要克服的障碍、恐惧、潜意识阻碍，并提出具体的转化或管理方法。",
+        // 马蹄形牌阵的指导
+        horseshoe1: "揭示情况的深层根源，启动当前路径的过去事件。探索问题的起源。",
+        horseshoe2: "分析最近影响当前情况的因素，催化当前疑问的事件。",
+        horseshoe3: "描述当前心态，目前环境以及此人如何感知和体验当前情况。",
+        horseshoe4: "识别核心作用力，深层动机和影响整体情况的关键因素。",
+        horseshoe5: "预测近期未来出现的能量，需要预见的即将到来的机会或障碍。",
+        horseshoe6: "揭示特定挑战、障碍或阻力，这些需要克服才能朝着期望的解决方向前进。",
+        horseshoe7: "指出如果继续当前路径的可能结果，情况的潜在解决方案和需要整合的教训。"
+      },
+      conclusion: "综合整个牌阵，考虑牌之间的动态互动，它们的象征意义和相对位置。以实用建议和直接回应所提问题的全局视角结束。"
+    },
+    // 下拉菜单中的选项组
+    optgroups: {
+      divinationArts: "占卜艺术",
+      spiritualTraditions: "精神传统",
+      esotericTraditions: "密传传统",
+      psychoanalysts: "精神分析学家",
+      supernaturalEntities: "超自然实体",
+      openai: "OpenAI",
+      ollama: "Ollama"
+    },
+    // 角色 - 翻译名称
+    personas: {
+      tarologue: "塔罗占卜师",
+      oracle: "神秘预言者",
+      voyante: "吉普赛占卜师",
+      pretre: "解经牧师",
+      rabbin: "卡巴拉犹太教士",
+      imam: "苏菲伊玛目",
+      sorciere: "祖传女巫",
+      alchimiste: "密传炼金术士",
+      mage: "元素法师",
+      freud: "西格蒙德·弗洛伊德",
+      jung: "卡尔·古斯塔夫·荣格",
+      lacan: "雅克·拉康",
+      dolto: "弗朗索瓦兹·多尔托",
+      demon: "莫特拉里恩",
+      noegoman: "无我人",
+      socrate: "苏格拉底",
+      salomon: "所罗门王",
+      quichotte: "堂吉诃德",
+      montaigne: "米歇尔·德·蒙田",
+      francmacon: "共济会大师",
+      dalailama: "达赖喇嘛"
+    },
+    // 牌阵类型 - 翻译名称
+    spreadTypes: {
+      cross: "十字牌阵",
+      horseshoe: "马蹄形牌阵"
+    },
+    misc: {
+      loadingModels: "加载模型中...",
+      crossSpread: "十字牌阵",
+      horseshoeSpread: "马蹄形牌阵",
+      tarotPrompt: "{persona}，这个{spreadType}关于我的问题:\"{question}\"揭示了什么？请先单独分析每张牌，然后整体分析，考虑它们的位置和相互作用。分享您独特的见解。"
+    }
   }
 };
 

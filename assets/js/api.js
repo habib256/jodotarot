@@ -2,7 +2,8 @@
  * Module de gestion des appels API aux modèles d'IA
  */
 
-import { API_KEY, API_URL_OPENAI, API_URL_OLLAMA, API_URL_OLLAMA_TAGS, getMetaPrompt, getOllamaModelFormat } from './config.js';
+import { API_KEY, API_URL_OPENAI, API_URL_OLLAMA, API_URL_OLLAMA_TAGS, getOllamaModelFormat } from './config.js';
+import { getMetaPrompt, enrichirPromptContextuel } from './metaprompt.js';
 import { genererPromptTirage } from './tarot.js';
 import PERSONAS, { getPersonaPrompt } from './personas/index.js';
 import { getTranslation } from './translations.js';
@@ -21,75 +22,6 @@ const SETTINGS = {
   MAX_TOKENS: 500,
   // etc.
 };
-
-/**
- * Fonction pour enrichir le prompt système avec le contexte spécifique à la question
- * @param {string} question - La question posée par l'utilisateur
- * @param {string} systemPrompt - Le prompt système de base
- * @param {string} langue - La langue à utiliser (fr par défaut)
- * @returns {string} - Le prompt système enrichi avec la question
- */
-function enrichirPromptContextuel(question, systemPrompt, langue = 'fr') {
-  // Ajouter la question de l'utilisateur au prompt système
-  if (question && question.trim()) {
-    // Obtenir la traduction de l'introduction à la question
-    const questionIntro = getTranslation('interpretation.userQuestion', langue);
-    
-    // Textes d'emphase traduits pour chaque langue
-    const emphaseTextes = {
-      fr: `IMPORTANT: Ta réponse doit être DIRECTEMENT et SPÉCIFIQUEMENT liée à cette question.
-Concentre-toi sur ce que la question demande précisément et adapte ton interprétation 
-en fonction des éléments mentionnés dans la question. Ne donne pas une réponse générique.
-Chaque aspect de ton interprétation doit répondre à un aspect de cette question.`,
-      
-      en: `IMPORTANT: Your answer must be DIRECTLY and SPECIFICALLY related to this question.
-Focus on what the question precisely asks and adapt your interpretation
-based on the elements mentioned in the question. Do not give a generic answer.
-Each aspect of your interpretation must address an aspect of this question.`,
-      
-      es: `IMPORTANTE: Tu respuesta debe estar DIRECTA y ESPECÍFICAMENTE relacionada con esta pregunta.
-Concéntrate en lo que la pregunta pide con precisión y adapta tu interpretación
-según los elementos mencionados en la pregunta. No des una respuesta genérica.
-Cada aspecto de tu interpretación debe responder a un aspecto de esta pregunta.`,
-      
-      de: `WICHTIG: Deine Antwort muss DIREKT und SPEZIFISCH mit dieser Frage zusammenhängen.
-Konzentriere dich darauf, was die Frage genau fragt, und passe deine Interpretation
-an die in der Frage genannten Elemente an. Gib keine allgemeine Antwort.
-Jeder Aspekt deiner Interpretation muss auf einen Aspekt dieser Frage eingehen.`,
-      
-      it: `IMPORTANTE: La tua risposta deve essere DIRETTAMENTE e SPECIFICAMENTE legata a questa domanda.
-Concentrati su ciò che la domanda chiede precisamente e adatta la tua interpretazione
-in base agli elementi menzionati nella domanda. Non dare una risposta generica.
-Ogni aspetto della tua interpretazione deve rispondere a un aspetto di questa domanda.`
-    };
-    
-    // Sélectionner le texte d'emphase dans la langue appropriée
-    const emphaseTexte = emphaseTextes[langue] || emphaseTextes.fr;
-    
-    // Former le bloc d'emphase avec les délimiteurs et la question
-    const questionBlock = `====================
-${questionIntro}:
-"${question.trim()}"
-====================`;
-    
-    // Vérifier si le prompt contient déjà ce bloc ou une partie significative
-    if (systemPrompt.includes(questionBlock) || 
-        (systemPrompt.includes(`"${question.trim()}"`) && 
-         systemPrompt.includes("====================") && 
-         systemPrompt.includes(emphaseTexte.substring(0, 50)))) {
-      return systemPrompt;
-    }
-    
-    return `
-${questionBlock}
-
-${emphaseTexte}
-
-${systemPrompt}`;
-  }
-  
-  return systemPrompt;
-}
 
 /**
  * Fonction pour obtenir une réponse de l'API OpenAI avec GPT-4o
