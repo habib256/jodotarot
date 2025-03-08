@@ -37,6 +37,8 @@ function afficherTirageHorseshoe(tirage) {
   
   const positions = document.querySelectorAll('.horseshoe-spread .card-position');
   positions.forEach((position, index) => {
+    // Ajouter simplement un attribut data-position pour référence
+    position.setAttribute('data-position', index + 1);
     position.innerHTML = renderCard(tirage[index]);
   });
 }

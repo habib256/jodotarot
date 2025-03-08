@@ -318,72 +318,83 @@ label {
 /* Style pour le tirage en fer à cheval */
 .horseshoe-spread {
   position: relative;
-  width: 750px;
-  height: 900px;
+  width: 800px; /* Augmentation légère de la largeur */
+  height: 800px; /* Réduction de la hauteur pour un fer à cheval plus compact */
   margin: 0 auto;
   padding: 20px;
-  display: grid; /* Utiliser grid pour un meilleur contrôle */
+  display: grid;
   grid-template-areas: 
     "top-left . top-right"
     "mid-left . mid-right"
     "bottom-left bottom-center bottom-right";
   grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 300px 300px 300px;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 10px; /* Ajout d'un espacement uniforme entre les cellules */
 }
 
 .horseshoe-spread .card-position {
-  width: 140px;
-  height: 220px;
+  width: 160px; /* Augmentation de la largeur */
+  height: 240px; /* Augmentation de la hauteur */
   display: flex;
   justify-content: center;
   align-items: center;
-  position: relative; /* Changer de absolute à relative */
-  background-color: transparent; /* Enlever le fond blanc */
-  box-shadow: none; /* Enlever l'ombre pour les positions */
-  margin: auto; /* Centrer dans la cellule de grille */
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.05); /* Légère indication visuelle de l'emplacement */
+  border-radius: 10px; /* Arrondissement des coins */
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1); /* Ombre intérieure subtile */
+  margin: auto;
 }
 
-/* Disposition personnalisée des cartes de tarot */
+/* Disposition personnalisée des cartes de tarot avec rotations légères pour effet visuel */
 .horseshoe-spread .card-1 {
   grid-area: top-left;
   z-index: 1;
+  transform: translateX(30px) rotate(0deg); /* Déplacement de 30px vers la droite et 0px vers le haut */
 }
 
 .horseshoe-spread .card-2 {
   grid-area: mid-left;
   z-index: 2;
+  transform: translateX(-30px) rotate(0deg);
 }
 
 .horseshoe-spread .card-3 {
   grid-area: bottom-left;
   z-index: 3;
+  transform: translateX(30px) rotate(0deg);
 }
 
 .horseshoe-spread .card-4 {
   grid-area: bottom-center;
   z-index: 4;
+  transform: translateY(30px) rotate(0deg);
 }
 
 .horseshoe-spread .card-5 {
   grid-area: bottom-right;
   z-index: 5;
+  transform: translateX(-30px) rotate(0deg);
 }
 
 .horseshoe-spread .card-6 {
   grid-area: mid-right;
   z-index: 6;
+  transform: translateX(+30px) rotate(0deg);
 }
 
 .horseshoe-spread .card-7 {
   grid-area: top-right;
   z-index: 7;
+  transform: translateX(-30px) rotate(0deg);
 }
 
 .horseshoe-spread .card {
-  max-width: 140px; /* Fixer une largeur maximale */
+  max-width: 150px; /* Augmentation de la taille des cartes */
   height: auto;
   cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Ombre plus prononcée */
+  border-radius: 8px; /* Coins arrondis */
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Transition pour le survol uniquement */
 }
 
 /* Transition seulement pour le survol des cartes du fer à cheval, pas pour l'agrandissement */
@@ -391,6 +402,15 @@ label {
   transform: scale(1.05);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Suppression des lignes décoratives entre les cartes */
+.horseshoe-spread::before {
+  display: none; /* Masquer la ligne supérieure */
+}
+
+.horseshoe-spread::after {
+  display: none; /* Masquer la ligne courbe inférieure */
 }
 
 /* Styles pour les avertissements et erreurs */
