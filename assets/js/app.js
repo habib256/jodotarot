@@ -12,7 +12,8 @@ import {
   updatePersonaLogo, 
   getPersonaLabel,
   updateUILanguage,
-  updateAppTitle
+  updateAppTitle,
+  resetAllDisplays
 } from './ui.js';
 
 // Import des fonctions de traduction
@@ -212,33 +213,10 @@ function changementModeTirage() {
   
   // Réinitialiser les tirages précédents
   tirageActuel = [];
+  questionActuelle = "";
   
-  // Changer l'affichage selon le mode de tirage
-  if (modeTirage === 'horseshoe') {
-    document.getElementById('spread').style.display = 'none';
-    document.getElementById('horseshoe-spread').style.display = 'grid';
-    
-    // Réinitialiser le tirage en fer à cheval
-    const jeuSelectionne = document.getElementById('card-set').value;
-    const positions = document.querySelectorAll('.horseshoe-spread .card-position');
-    const backCardHTML = `<img src="${cardsData[jeuSelectionne][22].image}" alt="Dos de carte" class="card">`;
-    positions.forEach(position => {
-      position.innerHTML = backCardHTML;
-    });
-  } else {
-    document.getElementById('horseshoe-spread').style.display = 'none';
-    document.getElementById('spread').style.display = 'grid';
-    
-    // Réinitialiser le tirage en croix
-    initSpread();
-  }
-  
-  // Réinitialiser le texte d'interprétation
-  const langue = document.getElementById('language').value;
-  document.getElementById('interpretations').innerHTML = `<p id="default-interpretation">${getTranslation('interpretation.default', langue) || "Les interprétations s'afficheront ici après le tirage."}</p>`;
-  
-  // Mettre à jour le titre avec le nouveau type de tirage
-  updateAppTitle();
+  // Réinitialiser complètement l'affichage
+  resetAllDisplays();
 }
 
 /**
@@ -464,20 +442,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Forcer la sélection du tirage en croix au démarrage
     document.getElementById('spread-type').value = 'cross';
     
-    // Initialisation du tirage en croix
-    initSpread();
-    
-    // Initialisation du tirage en fer à cheval
-    const jeuSelectionne = document.getElementById('card-set').value;
-    const horseshoePositions = document.querySelectorAll('.horseshoe-spread .card-position');
-    const backCardHTML = `<img src="${cardsData[jeuSelectionne][22].image}" alt="Dos de carte" class="card">`;
-    horseshoePositions.forEach(position => {
-      position.innerHTML = backCardHTML;
-    });
-    
-    // Masquer le tirage en fer à cheval par défaut (le tirage en croix est celui par défaut)
-    document.getElementById('horseshoe-spread').style.display = 'none';
-    document.getElementById('spread').style.display = 'grid';
+    // Initialisation complète de l'affichage
+    resetAllDisplays();
     
     // Attacher l'événement au bouton pour effectuer un tirage
     document.getElementById('tirer').addEventListener('click', faireUnTirage);
@@ -491,20 +457,9 @@ document.addEventListener('DOMContentLoaded', async function() {
       if (tirageActuel.length > 0) {
         tirageActuel = mettreAJourAffichageCartes(tirageActuel, jeuSelectionne);
       } else {
-        // Sinon, juste initialiser l'affichage avec le dos des nouvelles cartes
-        initSpread();
-        
-        // Initialiser aussi le tirage en fer à cheval
-        const horseshoePositions = document.querySelectorAll('.horseshoe-spread .card-position');
-        const backCardHTML = `<img src="${cardsData[jeuSelectionne][22].image}" alt="Dos de carte" class="card">`;
-        horseshoePositions.forEach(position => {
-          position.innerHTML = backCardHTML;
-        });
+        // Sinon, réinitialiser complètement l'affichage
+        resetAllDisplays();
       }
-      
-      // Réinitialiser le texte d'interprétation
-      const langue = document.getElementById('language').value;
-      document.getElementById('interpretations').innerHTML = `<p id="default-interpretation">${getTranslation('interpretation.default', langue) || "Les interprétations s'afficheront ici après le tirage."}</p>`;
     });
     
     // Attacher un event listener pour détecter le changement de type de tirage
@@ -512,7 +467,18 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     // Attacher un event listener pour détecter les changements de persona
     document.getElementById('persona').addEventListener('change', function() {
+      // Mettre à jour le logo du persona
       updatePersonaLogo(this.value);
+      
+      // Réinitialiser l'interprétation si un tirage est affiché
+      if (tirageActuel.length > 0) {
+        // Réinitialiser la question et le tirage pour forcer un nouveau tirage
+        questionActuelle = "";
+        tirageActuel = [];
+        
+        // Réinitialiser complètement l'affichage
+        resetAllDisplays();
+      }
     });
     
     // Ajouter un gestionnaire d'événements au menu déroulant de langue

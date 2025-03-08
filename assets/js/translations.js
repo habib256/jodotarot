@@ -74,6 +74,7 @@ const TRANSLATIONS = {
       spiritualTraditions: "Traditions Spirituelles",
       esotericTraditions: "Traditions Ésotériques",
       psychoanalysts: "Psychanalystes",
+      philosophers: "Philosophes et Sages",
       supernaturalEntities: "Entités Surnaturelles",
       openai: "OpenAI",
       ollama: "Ollama"
@@ -186,6 +187,7 @@ const TRANSLATIONS = {
       spiritualTraditions: "Spiritual Traditions",
       esotericTraditions: "Esoteric Traditions",
       psychoanalysts: "Psychoanalysts",
+      philosophers: "Philosophers and Sages",
       supernaturalEntities: "Supernatural Entities",
       openai: "OpenAI",
       ollama: "Ollama"
@@ -296,6 +298,7 @@ const TRANSLATIONS = {
       spiritualTraditions: "Tradiciones Espirituales",
       esotericTraditions: "Tradiciones Esotéricas",
       psychoanalysts: "Psicoanalistas",
+      philosophers: "Filósofos y Sabios",
       supernaturalEntities: "Entidades Sobrenaturales",
       openai: "OpenAI",
       ollama: "Ollama"
@@ -406,6 +409,7 @@ const TRANSLATIONS = {
       spiritualTraditions: "Spirituelle Traditionen",
       esotericTraditions: "Esoterische Traditionen",
       psychoanalysts: "Psychoanalytiker",
+      philosophers: "Philosophen und Weise",
       supernaturalEntities: "Übernatürliche Wesenheiten",
       openai: "OpenAI",
       ollama: "Ollama"
@@ -516,6 +520,7 @@ const TRANSLATIONS = {
       spiritualTraditions: "Tradizioni Spirituali",
       esotericTraditions: "Tradizioni Esoteriche",
       psychoanalysts: "Psicoanalisti",
+      philosophers: "Filosofi e Saggi",
       supernaturalEntities: "Entità Soprannaturali",
       openai: "OpenAI",
       ollama: "Ollama"
@@ -627,6 +632,7 @@ const TRANSLATIONS = {
       spiritualTraditions: "精神传统",
       esotericTraditions: "密传传统",
       psychoanalysts: "精神分析学家",
+      philosophers: "哲学家和智者",
       supernaturalEntities: "超自然实体",
       openai: "OpenAI",
       ollama: "Ollama"
@@ -688,16 +694,12 @@ function getTranslation(key, lang = 'fr', params = {}) {
   // Naviguer dans l'objet de traductions pour trouver la valeur
   let translation = TRANSLATIONS[lang];
   for (const k of keys) {
-    translation = translation[k];
-    // Si la traduction n'existe pas, revenir au français
-    if (translation === undefined) {
-      translation = TRANSLATIONS['fr'];
-      for (const k of keys) {
-        translation = translation[k];
-        if (translation === undefined) {
-          return key; // Clé non trouvée, retourner la clé elle-même
-        }
-      }
+    if (translation && translation[k] !== undefined) {
+      translation = translation[k];
+    } else {
+      // Si la traduction n'existe pas dans la langue courante, essayer le français
+      const frenchTranslation = getFrenchTranslation(key);
+      return frenchTranslation !== undefined ? frenchTranslation : key;
     }
   }
   
@@ -706,6 +708,26 @@ function getTranslation(key, lang = 'fr', params = {}) {
     return translation.replace(/\{(\w+)\}/g, (match, paramName) => {
       return params[paramName] !== undefined ? params[paramName] : match;
     });
+  }
+  
+  return translation;
+}
+
+/**
+ * Fonction auxiliaire pour obtenir une traduction en français
+ * @param {string} key - La clé de traduction
+ * @returns {string|undefined} - La traduction ou undefined si non trouvée
+ */
+function getFrenchTranslation(key) {
+  const keys = key.split('.');
+  let translation = TRANSLATIONS['fr'];
+  
+  for (const k of keys) {
+    if (translation && translation[k] !== undefined) {
+      translation = translation[k];
+    } else {
+      return undefined;
+    }
   }
   
   return translation;

@@ -50,24 +50,34 @@ function afficherTirageHorseshoe(tirage) {
  * @returns {Array} - Le tirage mis à jour avec les nouvelles images
  */
 function mettreAJourAffichageCartes(tirageActuel, jeuSelectionne) {
-  // Si un tirage est en cours, on met à jour les images avec le nouveau jeu
-  if (tirageActuel.length === 5) {
-    // Récupérer les cartes correspondantes dans le nouveau jeu
-    const nouvelleCartes = tirageActuel.map(carte => {
-      const id = carte.id;
-      return cardsData[jeuSelectionne].find(c => c.id === id);
-    });
-    
-    // Afficher le tirage avec les nouvelles images
-    afficherTirage(nouvelleCartes);
-    
-    // Retourner le tirage actualisé
-    return nouvelleCartes;
-  } else {
-    // Sinon, on initialise juste l'affichage avec le dos des cartes
+  // Si aucun tirage en cours, initialiser avec des dos de cartes
+  if (!tirageActuel || tirageActuel.length === 0) {
     initSpread();
     return [];
   }
+  
+  // Récupérer les cartes correspondantes dans le nouveau jeu
+  const nouvelleCartes = tirageActuel.map(carte => {
+    const id = carte.id;
+    return cardsData[jeuSelectionne].find(c => c.id === id);
+  });
+  
+  // Déterminer le type de tirage selon le nombre de cartes
+  if (tirageActuel.length === 5) {
+    // Tirage en croix
+    afficherTirage(nouvelleCartes);
+  } else if (tirageActuel.length === 7) {
+    // Tirage en fer à cheval
+    afficherTirageHorseshoe(nouvelleCartes);
+  } else {
+    // Cas non géré, initialiser avec des dos de cartes
+    console.warn(`Tirage de ${tirageActuel.length} cartes non pris en charge.`);
+    initSpread();
+    return [];
+  }
+  
+  // Retourner le tirage actualisé
+  return nouvelleCartes;
 }
 
 /**
@@ -225,6 +235,13 @@ function updateOptGroupsLabels(langue) {
         case 'Psychoanalytiker':
         case 'Psicoanalisti':
           key = 'optgroups.psychoanalysts'; break;
+        case 'Philosophes et Sages':
+        case 'Philosophers and Sages':
+        case 'Filósofos y Sabios':
+        case 'Philosophen und Weise':
+        case 'Filosofi e Saggi':
+        case '哲学家和智者':
+          key = 'optgroups.philosophers'; break;
         case 'Entités Surnaturelles':
         case 'Supernatural Entities':
         case 'Entidades Sobrenaturales':
@@ -269,6 +286,40 @@ function updateAppTitle() {
   document.getElementById('app-title').textContent = fullTitle;
 }
 
+/**
+ * Réinitialise complètement l'affichage des cartes et des interprétations
+ * Cette fonction est utilisée lorsque l'utilisateur change de jeu, de persona ou de type de tirage
+ */
+function resetAllDisplays() {
+  // Réinitialiser le tirage en croix
+  initSpread();
+  
+  // Réinitialiser le tirage en fer à cheval
+  const jeuSelectionne = document.getElementById('card-set').value;
+  const horseshoePositions = document.querySelectorAll('.horseshoe-spread .card-position');
+  const backCardHTML = `<img src="${cardsData[jeuSelectionne][22].image}" alt="Dos de carte" class="card">`;
+  horseshoePositions.forEach(position => {
+    position.innerHTML = backCardHTML;
+  });
+  
+  // Réinitialiser le texte d'interprétation
+  const langue = document.getElementById('language').value;
+  document.getElementById('interpretations').innerHTML = `<p id="default-interpretation">${getTranslation('interpretation.default', langue) || "Les interprétations s'afficheront ici après le tirage."}</p>`;
+  
+  // Afficher le bon type de tirage selon la sélection
+  const modeTirage = document.getElementById('spread-type').value;
+  if (modeTirage === 'horseshoe') {
+    document.getElementById('spread').style.display = 'none';
+    document.getElementById('horseshoe-spread').style.display = 'grid';
+  } else {
+    document.getElementById('horseshoe-spread').style.display = 'none';
+    document.getElementById('spread').style.display = 'grid';
+  }
+  
+  // Mettre à jour le titre de l'application
+  updateAppTitle();
+}
+
 // Exporter les fonctions
 export {
   initSpread,
@@ -280,5 +331,6 @@ export {
   updateUILanguage,
   updatePersonaOptions,
   updateSpreadTypeOptions,
-  updateAppTitle
+  updateAppTitle,
+  resetAllDisplays
 }; 
