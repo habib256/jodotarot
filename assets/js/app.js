@@ -87,7 +87,7 @@ async function obtenirInterpretation(tirage, question, modeTirage) {
   // Préparation de la question pour l'interprétation
   let typeDeSpread = getTranslation('misc.crossSpread', langue);
   
-  const prompt = getTranslation('misc.tarotPrompt', langue, { spreadType: typeDeSpread, question: question });
+  const prompt = getTranslation('misc.tarotPrompt', langue, { persona: getPersonaLabel(persona), spreadType: typeDeSpread, question: question });
   
   try {
     // Affichage d'un message indiquant le modèle et le personnage utilisés

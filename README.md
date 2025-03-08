@@ -22,38 +22,44 @@ JodoTarot est une application web élégante et intuitive qui vous permet de ré
 
 ## 🎭 Les personas disponibles
 
-JodoTarot propose 20 personnages différents pour interpréter votre tirage:
+JodoTarot propose 20 personnages différents pour interpréter votre tirage. Chaque persona possède:
+- Un style d'expression unique
+- Une approche spécifique d'interprétation du tarot
+- Des **particularités langagières** distinctives (expressions typiques, vocabulaire spécifique, structures de phrases)
+- Des **citations** représentatives de sa tradition ou de sa pensée
 
 ### Arts Divinatoires:
-- 🔮 **Tarologue** - L'expert traditionnel du tarot
-- ✨ **Oracle Mystique** - Porteur de messages des plans supérieurs
-- 🎯 **Voyante Gitane** - Celle qui voit au-delà des apparences
+- 🔮 **Tarologue** - Expert des arts introspectifs inspiré par Jodorowsky, utilisant un langage métaphorique et poétique
+- ✨ **Oracle Mystique** - Porte-parole énigmatique des forces cosmiques s'exprimant par prophéties ambiguës
+- 🎯 **Voyante Gitane** - Diseuse de bonne aventure directe et colorée, mêlant expressions romanis et intuition brute
 
 ### Traditions Spirituelles:
-- ✝️ **Prêtre Exégète** - Interprète des textes sacrés chrétiens
-- ✡️ **Rabbin Kabbaliste** - Érudit des mystères de la Kabbale
-- ☪️ **Imam Soufi** - Guide spirituel dans la tradition islamique
+- ✝️ **Prêtre Exégète** - Interprète des textes sacrés chrétiens, reliant les symboles du tarot aux récits bibliques
+- ✡️ **Rabbin Kabbaliste** - Érudit associant les arcanes aux lettres hébraïques et sentiers de l'Arbre de Vie
+- ☪️ **Imam Soufi** - Guide spirituel explorant les miroirs de l'âme (nafs) et le chemin vers le divin
+- ☸️ **Dalaï-Lama** - Leader bouddhiste tibétain expliquant avec simplicité les causes de la souffrance et la voie du milieu
+
 
 ### Traditions Ésotériques:
-- 🌙 **Sorcière Ancestrale** - Gardienne des savoirs occultes
-- ⚗️ **Alchimiste Ésotérique** - Maître des transformations intérieures
-- 🌟 **Mage Élémentaliste** - Maître des forces de la nature
+- 🌙 **Sorcière Ancestrale** - Gardienne des savoirs païens reliant le tirage aux cycles naturels
+- ⚗️ **Alchimiste Ésotérique** - Maître identifiant les phases alchimiques (nigredo, albedo, rubedo) dans les arcanes
+- 🌟 **Mage Élémentaliste** - Expert des quatre éléments analysant leurs influences dans le tirage
 
 ### Psychanalystes:
-- 🛋️ **Sigmund Freud** - Père de la psychanalyse
-- ☯️ **Carl Gustav Jung** - Explorateur de l'inconscient collectif
-- 🔄 **Jacques Lacan** - Théoricien du symbolisme
-- 👶 **Françoise Dolto** - Spécialiste de la psychanalyse de l'enfant
+- 🛋️ **Sigmund Freud** - Père de la psychanalyse interprétant les symboles comme manifestations de l'inconscient
+- ☯️ **Carl Gustav Jung** - Explorateur des archétypes et du processus d'individuation révélés par les cartes
+- 🔄 **Jacques Lacan** - Théoricien structuraliste décryptant le Réel-Symbolique-Imaginaire dans le tirage
+- 👶 **Françoise Dolto** - Spécialiste de l'enfance analysant l'image inconsciente du corps et les schémas relationnels
 
 ### Philosophes et Sages:
-- 🧠 **Socrate** - Maître du questionnement et de la maïeutique
-- 👑 **Roi Salomon** - Symbole de sagesse et de discernement
-- 📚 **Michel de Montaigne** - Philosophe humaniste et sceptique
-- 🛡️ **Don Quichotte** - Chevalier idéaliste aux visions romanesques
+- 🧠 **Socrate** - Maître de la maïeutique guidant vers la connaissance de soi par le questionnement
+- 👑 **Roi Salomon** - Figure de sagesse biblique offrant discernement et jugement équilibré
+- 📚 **Michel de Montaigne** - Humaniste explorant les contradictions humaines avec nuance et introspection
+- 🛡️ **Don Quichotte** - Idéaliste transformant le tirage en quête chevaleresque et aventure extraordinaire
 
-### Entités Surnaturelles:
-- 💀 **Mortrarion** - Entité des ténèbres offrant des vérités cachées
-- ☯️ **No EGO man** - Guide spirituel au-delà de l'ego
+### Entités Spéciales:
+- 💀 **Mortrarion** - Liche antique révélant des vérités brutales avec un mépris délibéré
+- ☯️ **No EGO man** - Conscience non-duelle transcendant les dualités et dissolvant les questions plutôt que d'y répondre
 
 ## 🃏 Les jeux de tarot
 
@@ -162,7 +168,7 @@ Développé avec ❤️ pour les amateurs de tarot et d'exploration intérieure.
 ## 📝 Licence
 
 JodoTarot est distribué sous licence GNU General Public License v3.0. Vous êtes libre de:
-- Utiliser le logicielde chaque interprétation ds
+- Utiliser le logiciel
 
 Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 

@@ -90,7 +90,7 @@ const TRANSLATIONS = {
     misc: {
       loadingModels: "Chargement des modèles...",
       crossSpread: "Tirage en Croix",
-      tarotPrompt: "En tant que {persona}, interprétez ce tirage de tarot {spreadType} en relation avec ma question: \"{question}\". Analysez chaque carte individuellement puis dans leur ensemble, en tenant compte de leur position et des interactions entre elles. Offrez une perspective unique basée sur votre expertise particulière."
+      tarotPrompt: "{persona}, que révèle ce tirage {spreadType} sur ma question : \"{question}\" ? Analysez les cartes individuellement puis globalement, en considérant leurs positions et interactions. Partagez votre vision unique."
     }
   },
   
@@ -179,7 +179,7 @@ const TRANSLATIONS = {
     misc: {
       loadingModels: "Loading models...",
       crossSpread: "Cross Spread",
-      tarotPrompt: "As a {persona}, interpret this {spreadType} tarot reading in relation to my question: \"{question}\". Analyze each card individually and then as a whole, considering their position and the interactions between them. Offer a unique perspective based on your particular expertise."
+      tarotPrompt: "{persona}, what does this {spreadType} reveal about my question: \"{question}\"? Analyze the cards individually then as a whole, considering their positions and interactions. Share your unique insight."
     }
   },
   
@@ -267,7 +267,7 @@ const TRANSLATIONS = {
     misc: {
       loadingModels: "Cargando modelos...",
       crossSpread: "Tirada en Cruz",
-      tarotPrompt: "Como {persona}, interpreta esta tirada de tarot {spreadType} en relación con mi pregunta: \"{question}\". Analiza cada carta individualmente y poi nel loro insieme, considerando la loro posizione e le interazioni tra di esse. Ofrece una prospettiva única basada sulla tua esperienza particular."
+      tarotPrompt: "{persona}, ¿qué revela esta tirada {spreadType} sobre mi pregunta: \"{question}\"? Analiza las cartas individualmente y en conjunto, considerando sus posiciones e interacciones. Comparte tu visión única."
     }
   },
   
@@ -355,7 +355,7 @@ const TRANSLATIONS = {
     misc: {
       loadingModels: "Lade Modelle...",
       crossSpread: "Kreuzlegung",
-      tarotPrompt: "Als {persona}, interpretiere diese {spreadType} Tarot-Legung in Bezug auf meine Frage: \"{question}\". Analysiere jede Karte einzeln und dann als Ganzes, unter Berücksichtigung ihrer Position und der Wechselwirkungen zwischen ihnen. Biete eine einzigartige Perspektive basierend auf deiner besonderen Expertise."
+      tarotPrompt: "{persona}, was offenbart diese {spreadType} über meine Frage: \"{question}\"? Analysiere die Karten einzeln und im Gesamtbild, unter Berücksichtigung ihrer Positionen und Wechselwirkungen. Teile deine einzigartige Perspektive mit."
     }
   },
   
@@ -443,7 +443,7 @@ const TRANSLATIONS = {
     misc: {
       loadingModels: "Caricamento modelli...",
       crossSpread: "Stesa a Croce",
-      tarotPrompt: "Come {persona}, interpreta questa lettura dei tarocchi {spreadType} in relazione alla mia domanda: \"{question}\". Analizza ogni carta individualmente e poi nel loro insieme, considerando la loro posizione e le interazioni tra di esse. Offri una prospettiva unica basata sulla tua particolare competenza."
+      tarotPrompt: "{persona}, cosa rivela questa {spreadType} sulla mia domanda: \"{question}\"? Analizza le carte singolarmente e nel loro insieme, considerando le loro posizioni e interazioni. Condividi la tua visione unica."
     }
   }
 };
