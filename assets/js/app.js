@@ -241,6 +241,9 @@ async function obtenirInterpretation(tirage, question, modeTirage) {
   const langue = document.getElementById('language').value;
   interpretationsDiv.innerHTML = `<p class="loading">${getTranslation('interpretation.loading', langue)}</p>`;
   
+  // Sauvegarder l'état initial pour pouvoir le restaurer en cas d'erreur
+  const initialContent = interpretationsDiv.innerHTML;
+  
   // Récupération des options sélectionnées
   const modeleIA = document.getElementById('ia-model').value;
   const persona = document.getElementById('persona').value;
@@ -254,18 +257,64 @@ async function obtenirInterpretation(tirage, question, modeTirage) {
     // Affichage d'un message indiquant le modèle et le personnage utilisés
     interpretationsDiv.innerHTML = `<p class="loading">${getTranslation('interpretation.loadingWithModel', langue, { model: modeleIA, persona: getPersonaLabel(persona) })}</p>`;
     
+    // Variable pour stocker l'éventuel contenu de streaming déjà affiché
+    let partialContent = null;
+    
+    // Observer les changements dans le div des interprétations pour sauvegarder le contenu du streaming
+    const observer = new MutationObserver((mutations) => {
+      const partialResponseElement = document.querySelector('.partial-response');
+      if (partialResponseElement && partialResponseElement.innerHTML.length > 50) {
+        // Sauvegarder le contenu partiel actuel
+        partialContent = partialResponseElement.innerHTML;
+      }
+    });
+    
+    // Commencer à observer le div des interprétations
+    observer.observe(interpretationsDiv, { childList: true, subtree: true });
+    
     // Appel à l'API via notre fonction avec les options sélectionnées
-    const reponse = await obtenirReponseGPT4O(question, [], modeleIA, persona, tirage, langue, modeTirage);
-    
-    // Mise en forme de la réponse
-    const formattedResponse = reponse.split('\n').map(paragraph => 
-      paragraph ? `<p>${paragraph}</p>` : ''
-    ).join('');
-    
-    interpretationsDiv.innerHTML = formattedResponse;
+    try {
+      const reponse = await obtenirReponseGPT4O(question, [], modeleIA, persona, tirage, langue, modeTirage);
+      
+      // Arrêter l'observation
+      observer.disconnect();
+      
+      // Vérifier si la réponse s'est terminée correctement
+      const completedCorrectly = reponse.includes("<!-- streaming-completed -->");
+      
+      // Si la réponse contient le marqueur, le supprimer
+      const cleanResponse = reponse.replace("<!-- streaming-completed -->", "").trim();
+      
+      // Mise en forme de la réponse
+      const formattedResponse = cleanResponse.split('\n').map(paragraph => 
+        paragraph ? `<p>${paragraph}</p>` : ''
+      ).join('');
+      
+      // Afficher la réponse
+      interpretationsDiv.innerHTML = formattedResponse;
+    } catch (apiError) {
+      console.error("Erreur API lors de l'interprétation:", apiError);
+      
+      // Arrêter l'observation
+      observer.disconnect();
+      
+      // Si nous avons capturé du contenu partiel pendant le streaming, l'afficher
+      if (partialContent && partialContent.length > 100) {
+        // Ajouter un message d'avertissement mais conserver le contenu
+        interpretationsDiv.innerHTML = `
+          <div class="api-warning">
+            <p><strong>${getTranslation('interpretation.apiWarning', langue) || 'Attention:'}</strong> ${apiError.message}</p>
+          </div>
+          ${partialContent}
+        `;
+      } else {
+        // Si pas de contenu partiel, afficher l'erreur standard
+        interpretationsDiv.innerHTML = `<p class="error">${getTranslation('interpretation.error', langue)}</p>`;
+      }
+    }
   } catch (error) {
-    console.error("Erreur lors de l'interprétation:", error);
-    interpretationsDiv.innerHTML = `<p>${getTranslation('interpretation.error', langue)}</p>`;
+    console.error("Erreur globale lors de l'interprétation:", error);
+    interpretationsDiv.innerHTML = `<p class="error">${getTranslation('interpretation.error', langue)}</p>`;
   }
 }
 

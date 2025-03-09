@@ -25,10 +25,17 @@ const TRANSLATIONS = {
       loadingWithModel: "Analyse du tirage en croix en cours avec {model} interprété par un(e) {persona}...",
       default: "Les interprétations s'afficheront ici après le tirage.",
       error: "Une erreur est survenue lors de l'interprétation. Veuillez réessayer.",
+      apiError: "Erreur de l'API: {0}",
+      apiWarning: "L'interprétation s'est terminée de façon inattendue. Voici le résultat partiel:",
       userQuestion: "La question posée par l'utilisateur est:",
       userMessage: "J'aimerais une interprétation détaillée et personnalisée de mon tirage de tarot en croix. Analysez la symbolique de chaque carte en fonction de sa position et établissez les connexions entre les cartes pour offrir une lecture cohérente qui réponde précisément à ma question.",
       ollamaPromo: "Télécharge <a href='https://ollama.com' target='_blank'>ollama</a> avec <a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a> pour commencer. Recharge la page et réalise ton tirage de cartes",
-      streamingResponse: "Génération de la réponse"
+      streamingResponse: "Génération de la réponse",
+      // Messages pour les cartes spécifiques
+      loveCardsMeaning: {
+        moon_bottomLeft: "\"La lune\" en position des sentiments révèle des émotions profondes, parfois confuses ou ambivalentes. Explorez votre monde intérieur pour mieux comprendre vos désirs véritables.",
+        sun_bottomRight: "\"Le soleil\" en position d'avenir proche annonce une période d'épanouissement et de clarté dans votre vie amoureuse. De nouvelles opportunités lumineuses se présentent à vous."
+      }
     },
     // Textes pour le prompt de tirage
     tarotReading: {
@@ -153,10 +160,17 @@ const TRANSLATIONS = {
       loadingWithModel: "Analyzing the cross spread with {model} interpreted by a {persona}...",
       default: "Interpretations will appear here after the cards are drawn.",
       error: "An error occurred during the interpretation. Please try again.",
-      userQuestion: "The question posed by the user is:",
-      userMessage: "I would like a detailed and personalized interpretation of my cross tarot spread. Analyze the symbolism of each card based on its position and establish connections between the cards to offer a coherent reading that precisely addresses my question.",
-      ollamaPromo: "Download <a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a> to start drawing cards with <a href='https://ollama.com' target='_blank'>ollama</a> and reload the page to see your models.",
-      streamingResponse: "Generating response"
+      apiError: "API Error: {0}",
+      apiWarning: "Interpretation ended unexpectedly. Here is the partial result:",
+      userQuestion: "The user's question is:",
+      userMessage: "I would like a detailed and personalized interpretation of my tarot cross spread. Analyze the symbolism of each card according to its position and establish connections between the cards to offer a coherent reading that precisely addresses my question.",
+      ollamaPromo: "Download <a href='https://ollama.com' target='_blank'>ollama</a> with <a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a> to get started. Reload the page to see your models.",
+      streamingResponse: "Generating response",
+      // Messages for specific cards
+      loveCardsMeaning: {
+        moon_bottomLeft: "\"The Moon\" in the feelings position reveals deep emotions, sometimes confused or ambivalent. Explore your inner world to better understand your true desires.",
+        sun_bottomRight: "\"The Sun\" in the near future position announces a period of fulfillment and clarity in your love life. New bright opportunities are presenting themselves to you."
+      }
     },
     // Tarot reading prompt texts
     tarotReading: {
@@ -198,7 +212,7 @@ const TRANSLATIONS = {
         horseshoe2: "Analyze recent influences that have impacted the situation, events that have catalyzed the current questioning.",
         horseshoe3: "Describe the current state of mind, present circumstances and how the person perceives and experiences the situation now.",
         horseshoe4: "Identify the central forces at play, deep motivations and crucial factors influencing the whole situation.",
-        horseshoe5: "Project the energies manifesting in the near future, opportunities or imminent obstacles to anticipate.",
+        horseshoe5: "Projette the energies manifesting in the near future, opportunities or imminent obstacles to anticipate.",
         horseshoe6: "Reveal specific challenges, obstacles or resistances to overcome in order to progress toward the desired resolution.",
         horseshoe7: "Indicate the probable outcome if the current path is followed, potential resolution of the situation and lessons to integrate.",
         
@@ -277,12 +291,19 @@ const TRANSLATIONS = {
     interpretation: {
       loading: "Analizando la tirada...",
       loadingWithModel: "Analizando la tirada en cruz con {model} interpretado por un(a) {persona}...",
-      default: "Las interpretaciones aparecerán aquí después de la tirada.",
-      error: "Ha ocurrido un error durante la interpretación. Por favor, inténtelo de nuevo.",
-      userQuestion: "La pregunta planteada por el usuario es:",
+      default: "Las interpretaciones aparecerán aquí después de tirar las cartas.",
+      error: "Ocurrió un error durante la interpretación. Por favor, inténtelo de nuevo.",
+      apiError: "Error de la API: {0}",
+      apiWarning: "La interpretación terminó inesperadamente. Aquí está el resultado parcial:",
+      userQuestion: "La pregunta del usuario es:",
       userMessage: "Me gustaría una interpretación detallada y personalizada de mi tirada de tarot en cruz. Analice el simbolismo de cada carta según su posición y establezca conexiones entre las cartas para ofrecer una lectura coherente que responda con precisión a mi pregunta.",
-      ollamaPromo: "Descarga <a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a> para empezar a tirar cartas con <a href='https://ollama.com' target='_blank'>ollama</a> y recarga la página para ver tus modelos.",
-      streamingResponse: "Generando respuesta"
+      ollamaPromo: "Descarga <a href='https://ollama.com' target='_blank'>ollama</a> con <a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a> para comenzar. Recarga la página para ver tus modelos.",
+      streamingResponse: "Generando respuesta",
+      // Messages for specific cards
+      loveCardsMeaning: {
+        moon_bottomLeft: "\"La Luna\" en la posición de los sentimientos revela emociones profundas, a veces confusas o ambivalentes. Explora tu mundo interior para comprender mejor tus verdaderos deseos.",
+        sun_bottomRight: "\"El Sol\" en la posición de futuro cercano anuncia un período de plenitud y claridad en tu vida amorosa. Nuevas oportunidades brillantes se presentan ante ti."
+      }
     },
     // Textes pour le tirage de tarot en espagnol
     tarotReading: {
@@ -310,27 +331,27 @@ const TRANSLATIONS = {
         bottomLeft: "en la parte inferior izquierda (tus sentimientos)",
         bottomRight: "en la parte inferior derecha (tu futuro cercano)",
         top: "en la parte superior (tu percepción de la situación)",
-        left: "a la izquierda (elementos favorables para tus deseos)",
+        left: "a la izquierda (elementos favorevoli for tus deseos)",
         right: "a la derecha (tu amante actual o futuro)"
       },
       instructions: {
         top: "Analiza las fuerzas espirituales, mentales o conscientes que apoyan a la persona. Explora cómo estas energías pueden utilizarse como recursos.",
         left: "Explora en profundidad cómo los eventos pasados han moldeado y contribuido a la situación actual. Identifica patrones o lecciones importantes.",
-        center: "Describe con precisión la situación actual, los temas centrales y las energías dominantes. Esta carta representa el corazón de la cuestión.",
+        center: "Describe precisamente la situación actual, los temas centrales y las energías dominantes. Esta carta representa el corazón de la cuestión.",
         right: "Proyecta la evolución probable si la persona sigue el camino actual. Ofrece consejos sobre la mejor manera de abordar este futuro potencial.",
         bottom: "Identifica los obstáculos, miedos, bloqueos inconscientes a superar y sugiere formas concretas de transformarlos o gestionarlos.",
         // Instrucciones para la tirada en herradura
         horseshoe1: "Revela las raíces profundas de la situación, eventos pasados que iniciaron el camino actual. Explora el origen de la cuestión.",
-        horseshoe2: "Analiza las influencias recientes que han impactado en la situación, eventos que han catalizado el cuestionamiento actual.",
+        horseshoe2: "Analiza las influenzes recientes que han impactado en la situación, eventos que han catalizado el cuestionamiento actual.",
         horseshoe3: "Describe el estado de ánimo actual, las circunstancias presentes y cómo la persona percibe y experimenta la situación ahora.",
         horseshoe4: "Identifica las fuerzas centrales en juego, motivaciones profundas y factores cruciales que influyen en toda la situación.",
-        horseshoe5: "Proyecta las energías que se manifiestan en un futuro cercano, oportunidades u obstáculos inminentes a anticipar.",
+        horseshoe5: "Proyecta las energías que se manifiestan en un futuro cercano, oportunidades o obstáculos inminentes a anticipar.",
         horseshoe6: "Revela desafíos específicos, obstáculos o resistencias da superar para progredir hacia la resolución deseada.",
         horseshoe7: "Indica el resultado probable si se sigue el camino actual, la resolución potencial de la situación y las lecciones a integrar.",
         
         // Instructions for the love tarot spread
-        bottomLeft: "Explora los sentimientos profundos de la persona, sus emociones actuales y cómo influyen en su vida amorosa. Describe las corrientes emocionales subyacentes.",
-        bottomRight: "Reveal the short-term love perspectives, opportunities or changes that are present in a near future. Offer advice on how to approach these developments."
+        bottomLeft: "Explora los sentimientos profundos de la persona, sus emociones actuales y cómo influyen en su vida amorosa. Describe las corrientes emozionales subyacentes.",
+        bottomRight: "Rivela las prospettive amorose a breve termine, les opportunités ou changements qui se présentent dans un avenir proche. Ofre des conseils sur la manière d'aborder ces développements."
       },
       conclusion: "Sintetiza toda la tirada teniendo en cuenta las interacciones dinámicas entre las cartas, su simbolismo y su posición relativa. Concluye con consejos prácticos y una perspectiva global que responda directamente a la pregunta planteada."
     },
@@ -404,10 +425,17 @@ const TRANSLATIONS = {
       loadingWithModel: "Analyse der Kreuzlegung mit {model} interpretiert durch einen {persona}...",
       default: "Die Interpretationen erscheinen hier nach dem Kartenziehen.",
       error: "Bei der Interpretation ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+      apiError: "API-Fehler: {0}",
+      apiWarning: "Die Interpretation endete unerwartet. Hier ist das teilweise Ergebnis:",
       userQuestion: "Die von dem Benutzer gestellte Frage ist:",
       userMessage: "Ich hätte gerne eine detaillierte und personalisierte Interpretation meiner Tarot-Kreuzlegung. Analysieren Sie die Symbolik jeder Karte basierend auf ihrer Position und stellen Sie Verbindungen zwischen den Karten her, um eine kohärente Deutung anzubieten, die genau auf meine Frage eingeht.",
       ollamaPromo: "Laden Sie <a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a> herunter, um mit <a href='https://ollama.com' target='_blank'>ollama</a> Karten zu ziehen, und laden Sie die Seite neu, um Ihre Modelle zu sehen.",
-      streamingResponse: "Antwort wird generiert"
+      streamingResponse: "Antwort wird generiert",
+      // Messages for specific cards
+      loveCardsMeaning: {
+        moon_bottomLeft: "\"Der Mond\" in der Gefühlsposition offenbart tiefe Emotionen, manchmal verwirrend oder ambivalent. Erkunde deine innere Welt, um deine wahren Wünsche besser zu verstehen.",
+        sun_bottomRight: "\"Die Sonne\" in der Position der nahen Zukunft kündigt eine Zeit der Erfüllung und Klarheit in deinem Liebesleben an. Neue strahlende Möglichkeiten bieten sich dir."
+      }
     },
     // Textes pour le tirage de tarot en allemand
     tarotReading: {
@@ -530,12 +558,19 @@ const TRANSLATIONS = {
     interpretation: {
       loading: "Analisi della stesa in corso...",
       loadingWithModel: "Analisi della stesa a croce in corso con {model} interpretato da un(a) {persona}...",
-      default: "Le interpretazioni appariranno qui dopo aver pescato le carte.",
-      error: "Si è verificato un errore durante l'interpretazione. Per favore riprova.",
+      default: "Le interpretazioni appariranno qui dopo aver tirato le carte.",
+      error: "Si è verificato un errore durante l'interpretazione. Si prega di riprovare.",
+      apiError: "Errore API: {0}",
+      apiWarning: "La interpretazione è terminata inaspettatamente. Ecco il risultato parziale:",
       userQuestion: "La domanda posta dall'utente è:",
       userMessage: "Vorrei un'interpretazione dettagliata e personalizzata della mia stesa di tarocchi a croce. Analizza il simbolismo di ogni carta in base alla sua posizione e stabilisci connessioni tra le carte per offrire una lettura coerente che risponda con precisione alla mia domanda.",
-      ollamaPromo: "Scarica <a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a> per iniziare a pescare carte con <a href='https://ollama.com' target='_blank'>ollama</a> e ricarica la pagina per vedere i tuoi modelli.",
-      streamingResponse: "Generazione della risposta"
+      ollamaPromo: "Scarica <a href='https://ollama.com' target='_blank'>ollama</a> con <a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a> per iniziare. Ricarica la pagina per vedere i tuoi modelli.",
+      streamingResponse: "Generazione della risposta",
+      // Messages for specific cards
+      loveCardsMeaning: {
+        moon_bottomLeft: "\"La Luna\" nella posizione dei sentimenti rivela emozioni profonde, a volte confuse o ambivalenti. Esplora il tuo mondo interiore per comprendere meglio i tuoi veri desideri.",
+        sun_bottomRight: "\"Il Sole\" nella posizione del futuro vicino annuncia un periodo di realizzazione e chiarezza nella tua vita amorosa. Nuove opportunità luminose si presentano a te."
+      }
     },
     // Textes pour le prompt de tirage en italien
     tarotReading: {
@@ -657,10 +692,17 @@ const TRANSLATIONS = {
       loadingWithModel: "正在使用{model}由{persona}解读十字牌阵...",
       default: "抽牌后解读将显示在这里。",
       error: "解读过程中出现错误。请重试。",
+      apiError: "API错误: {0}",
+      apiWarning: "解读意外结束。这里是部分结果:",
       userQuestion: "用户提出的问题是:",
       userMessage: "我想要一个详细且个性化的十字塔罗牌阵解读。请根据每张牌的位置分析其象征意义，并建立牌与牌之间的联系，以提供准确回应我问题的连贯解读。",
       ollamaPromo: "下载<a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a>开始使用<a href='https://ollama.com' target='_blank'>ollama</a>抽牌，并重新加载页面查看您的模型。",
-      streamingResponse: "正在生成回应"
+      streamingResponse: "正在生成回应",
+      // Messages for specific cards
+      loveCardsMeaning: {
+        moon_bottomLeft: "\"月亮\"在感情位置揭示了深层情感，有时混乱或矛盾。探索你的内心世界，以更好地理解你真正的渴望。",
+        sun_bottomRight: "\"太阳\"在近期未来位置预示着你爱情生活中的一段充实和明晰时期。新的光明机会正呈现在你面前。"
+      }
     },
     // 塔罗解读提示文本
     tarotReading: {

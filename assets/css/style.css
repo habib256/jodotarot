@@ -361,19 +361,19 @@ label {
 .horseshoe-spread .card-3 {
   grid-area: bottom-left;
   z-index: 3;
-  transform: translateX(20px) rotate(0deg);
+  transform: translateX(30px) rotate(0deg);
 }
 
 .horseshoe-spread .card-4 {
   grid-area: bottom-center;
   z-index: 4;
-  transform: translateY(50px) rotate(0deg);
+  transform: translateY(30px) rotate(0deg);
 }
 
 .horseshoe-spread .card-5 {
   grid-area: bottom-right;
   z-index: 5;
-  transform: translateX(-20px) rotate(0deg);
+  transform: translateX(-30px) rotate(0deg);
 }
 
 .horseshoe-spread .card-6 {
@@ -649,4 +649,34 @@ label {
   z-index: 50;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
   cursor: pointer;
+}
+
+/* Style pour les messages spécifiques des cartes dans le tirage de l'amour */
+.special-card {
+  background-color: rgba(141, 114, 225, 0.1);
+  border-left: 4px solid rgba(141, 114, 225, 0.8);
+  padding: 10px 15px;
+  margin: 15px 0;
+  border-radius: 0 4px 4px 0;
+  font-style: italic;
+  color: #444;
+}
+
+.special-card strong {
+  color: #333;
+}
+
+/* Style pour les messages d'avertissement API */
+.api-warning {
+  background-color: rgba(255, 204, 0, 0.1);
+  border-left: 4px solid rgba(255, 204, 0, 0.8);
+  padding: 10px 15px;
+  margin: 15px 0;
+  border-radius: 0 4px 4px 0;
+  color: #664d00;
+}
+
+.api-warning strong {
+  color: #664d00;
+  font-weight: bold;
 } 

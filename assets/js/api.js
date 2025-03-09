@@ -10,7 +10,7 @@ import { getTranslation } from './translations.js';
 
 // Configuration du niveau de déboggage
 // 0 = Erreurs seulement, 1 = Infos importantes, 2 = Détails, 3 = Verbeux
-const DEBUG_LEVEL = 1; 
+const DEBUG_LEVEL = 2; 
 
 // Système simple de cache pour les réponses
 const responseCache = new Map();
@@ -283,6 +283,11 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
               try {
                 const parsedChunk = JSON.parse(line);
                 
+                // Afficher le premier chunk complet pour le débogage des formats
+                if (!detectedFormat && DEBUG_LEVEL > 0) {
+                  console.log("🔍 DEBUG - Premier chunk Ollama pour analyse:", parsedChunk);
+                }
+                
                 // Détection intelligente du format (si pas encore détecté)
                 if (!detectedFormat) {
                   if (parsedChunk.message?.content !== undefined) {
@@ -298,18 +303,36 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
                   if (DEBUG_LEVEL > 0) console.log(`🔍 DEBUG - Format détecté pour ${modelName}: ${detectedFormat}`);
                 }
                 
-                // Extraction du texte selon le format détecté (approche simplifiée)
-                let responseText;
-                if (detectedFormat === 'message.content' && parsedChunk.message?.content !== undefined) {
-                  responseText = parsedChunk.message.content;
-                } else if (detectedFormat === 'response' && parsedChunk.response !== undefined) {
-                  responseText = parsedChunk.response;
+                // Extraction du texte selon le format détecté (approche améliorée)
+                let responseText = '';
+                
+                // Vérifier d'abord explicitement le format pour llama3.1
+                if (modelName.includes('llama3.1')) {
+                  // Pour llama3.1, essayer spécifiquement ces chemins
+                  if (parsedChunk.message?.content !== undefined) {
+                    responseText = parsedChunk.message.content;
+                  } else if (parsedChunk.content !== undefined) {
+                    responseText = parsedChunk.content;
+                  } else if (parsedChunk.response !== undefined) {
+                    responseText = parsedChunk.response;
+                  }
+                  
+                  if (DEBUG_LEVEL > 1 && responseText) {
+                    console.log(`🔍 DEBUG - Texte extrait pour llama3.1:`, responseText.substring(0, 20) + "...");
+                  }
                 } else {
-                  // Fallback aux autres méthodes si le format détecté n'est pas disponible
-                  responseText = getValueByPath(parsedChunk, detectedFormat) || 
-                                 parsedChunk.response || 
-                                 parsedChunk.message?.content || 
-                                 '';
+                  // Pour les autres modèles, suivre la logique normale
+                  if (detectedFormat === 'message.content' && parsedChunk.message?.content !== undefined) {
+                    responseText = parsedChunk.message.content;
+                  } else if (detectedFormat === 'response' && parsedChunk.response !== undefined) {
+                    responseText = parsedChunk.response;
+                  } else {
+                    // Fallback aux autres méthodes si le format détecté n'est pas disponible
+                    responseText = getValueByPath(parsedChunk, detectedFormat) || 
+                                  parsedChunk.response || 
+                                  parsedChunk.message?.content || 
+                                  '';
+                  }
                 }
                 
                 // Logging minimal des informations importantes
@@ -362,6 +385,21 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
             }
           }
         }
+        
+        // À la fin du traitement du stream, juste avant de retourner la réponse
+        if (fullResponse.trim() === '') {
+          console.error("🔍 DEBUG - Réponse vide après traitement complet.");
+          throw new Error("Réponse vide reçue du modèle");
+        }
+        
+        // Vérifier que la réponse n'est pas trop courte ou incomplète
+        if (fullResponse.length < 20) {
+          console.warn("🔍 DEBUG - Réponse très courte:", fullResponse);
+          // Ne pas lever d'erreur mais enregistrer l'avertissement
+        }
+        
+        // Ajouter un marqueur pour indiquer que le streaming s'est terminé correctement
+        fullResponse += "\n\n<!-- streaming-completed -->";
         
         // Mettre en cache la réponse
         responseCache.set(cacheKey, fullResponse);

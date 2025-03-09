@@ -18,6 +18,9 @@ const OLLAMA_MODEL_FORMATS = {
   "llama": {
     responseKey: "response"
   },
+  "llama3.1": {
+    responseKey: "message.content"
+  },
   "mistral": {
     responseKey: "message.content"
   },
