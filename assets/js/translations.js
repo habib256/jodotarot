@@ -34,14 +34,15 @@ const TRANSLATIONS = {
     tarotReading: {
       intro: {
         cross: "Voici le tirage en croix à interpréter pour la personne consultant le tarot:",
-        horseshoe: "Voici le tirage en fer à cheval à interpréter pour la personne consultant le tarot:"
+        horseshoe: "Voici le tirage en fer à cheval à interpréter pour la personne consultant le tarot:",
+        love: "Voici le tirage du Tarot de l'amour à interpréter pour la personne consultant le tarot:"
       },
       positions: {
         top: "en haut (influences positives/spirituelles/conscientes)",
         left: "à gauche (passé/origines de la situation/causes)",
-        center: "au centre (situation actuelle/enjeu principal/question essentielle)",
-        right: "à droite (futur/évolution probable/direction)",
-        bottom: "en bas (influences négatives/défis à surmonter/inconscient)",
+        center: "au centre (vos désirs)",
+        right: "à droite (votre amoureux actuel ou à venir)",
+        bottom: "en bas (actions que vous allez ou devriez poser dans votre vie sentimentale)",
         // Positions pour le tirage en fer à cheval
         horseshoe1: "à gauche (passé lointain/fondations)",
         horseshoe2: "deuxième position (passé récent/influences précédentes)",
@@ -49,7 +50,15 @@ const TRANSLATIONS = {
         horseshoe4: "position centrale (facteurs déterminants/enjeux centraux)",
         horseshoe5: "cinquième position (avenir immédiat/prochaines étapes)",
         horseshoe6: "sixième position (obstacles/défis à surmonter)",
-        horseshoe7: "à droite (résultat final/conclusion possible)"
+        horseshoe7: "à droite (résultat final/conclusion possible)",
+        
+        // Positions pour le tirage de l'amour
+        bottomLeft: "en bas à gauche (vos sentiments)",
+        bottomRight: "en bas à droite (votre avenir proche)",
+        top: "au sommet (votre perception de la situation)",
+        left: "à gauche (le \"pour\" dans la réalisation de vos désirs)",
+        right: "à droite (votre amoureux actuel ou à venir)",
+        bottom: "en bas (actions que vous allez ou devriez poser dans votre vie sentimentale)"
       },
       instructions: {
         top: "Analyse les forces spirituelles, mentales ou conscientes qui soutiennent la personne. Explore comment ces énergies peuvent être utilisées comme ressources.",
@@ -64,7 +73,11 @@ const TRANSLATIONS = {
         horseshoe4: "Identifie les forces centrales en jeu, les motivations profondes et les facteurs cruciaux qui influencent l'ensemble de la situation.",
         horseshoe5: "Projette les énergies qui se manifestent dans un futur proche, les opportunités ou les obstacles imminents à anticiper.",
         horseshoe6: "Révèle les défis spécifiques, les obstacles ou les résistances à surmonter pour progresser vers la résolution souhaitée.",
-        horseshoe7: "Indique le résultat probable si le chemin actuel est suivi, l'aboutissement potentiel de la situation et les leçons à intégrer."
+        horseshoe7: "Indique le résultat probable si le chemin actuel est suivi, l'aboutissement potentiel de la situation et les leçons à intégrer.",
+        
+        // Instructions pour le tirage de l'amour
+        bottomLeft: "Explore les sentiments profonds de la personne, ses émotions actuelles et comment elles influencent sa vie amoureuse. Décris les courants émotionnels sous-jacents.",
+        bottomRight: "Révèle les perspectives amoureuses à court terme, les opportunités ou changements qui se présentent dans un avenir proche. Offre des conseils sur la manière d'aborder ces développements."
       },
       conclusion: "Synthétise l'ensemble du tirage en prenant en compte les interactions dynamiques entre les cartes, leur symbolisme et leur position relative. Conclue avec des conseils pratiques et une perspective globale qui répond directement à la question posée."
     },
@@ -106,13 +119,15 @@ const TRANSLATIONS = {
     // Types de tirage - Noms traduits
     spreadTypes: {
       cross: "Tirage en Croix",
-      horseshoe: "Tirage en Fer à Cheval"
+      horseshoe: "Tirage en Fer à Cheval",
+      love: "Tarot de l'amour"
     },
     // Messages divers
     misc: {
       loadingModels: "Chargement des modèles...",
       crossSpread: "Tirage en Croix",
       horseshoeSpread: "Tirage en Fer à Cheval",
+      loveSpread: "Tarot de l'amour",
       tarotPrompt: "{persona}, que révèle ce tirage {spreadType} sur ma question : \"{question}\" ? Analysez les cartes individuellement puis globalement, en considérant leurs positions et interactions. Partagez votre vision unique."
     }
   },
@@ -147,7 +162,8 @@ const TRANSLATIONS = {
     tarotReading: {
       intro: {
         cross: "Here is the cross spread to interpret for the person consulting the tarot:",
-        horseshoe: "Here is the horseshoe spread to interpret for the person consulting the tarot:"
+        horseshoe: "Here is the horseshoe spread to interpret for the person consulting the tarot:",
+        love: "Here is the love tarot spread to interpret for the person consulting the tarot:"
       },
       positions: {
         top: "at the top (positive/spiritual/conscious influences)",
@@ -162,7 +178,14 @@ const TRANSLATIONS = {
         horseshoe4: "center position (determining factors/central issues)",
         horseshoe5: "fifth position (immediate future/next steps)",
         horseshoe6: "sixth position (obstacles/challenges to overcome)",
-        horseshoe7: "on the far right (final outcome/possible conclusion)"
+        horseshoe7: "on the far right (final outcome/possible conclusion)",
+        
+        // Positions for the love tarot spread
+        bottomLeft: "bottom left (your feelings)",
+        bottomRight: "bottom right (your near future)",
+        top: "at the top (your perception of the situation)",
+        left: "on the left (favorable elements for your desires)",
+        right: "on the right (your current or future lover)"
       },
       instructions: {
         top: "Analyze the spiritual, mental or conscious forces supporting the person. Explore how these energies can be used as resources.",
@@ -177,7 +200,11 @@ const TRANSLATIONS = {
         horseshoe4: "Identify the central forces at play, deep motivations and crucial factors influencing the whole situation.",
         horseshoe5: "Project the energies manifesting in the near future, opportunities or imminent obstacles to anticipate.",
         horseshoe6: "Reveal specific challenges, obstacles or resistances to overcome in order to progress toward the desired resolution.",
-        horseshoe7: "Indicate the probable outcome if the current path is followed, potential resolution of the situation and lessons to integrate."
+        horseshoe7: "Indicate the probable outcome if the current path is followed, potential resolution of the situation and lessons to integrate.",
+        
+        // Instructions for the love tarot spread
+        bottomLeft: "Explore the deep feelings of the person, their current emotions and how they influence their love life. Describe the underlying emotional currents.",
+        bottomRight: "Reveal the short-term love perspectives, opportunities or changes that are present in a near future. Offer advice on how to approach these developments."
       },
       conclusion: "Synthesize the entire spread by taking into account the dynamic interactions between the cards, their symbolism and their relative position. Conclude with practical advice and a global perspective that directly addresses the question asked."
     },
@@ -219,13 +246,15 @@ const TRANSLATIONS = {
     // Types de tirage - Noms traduits
     spreadTypes: {
       cross: "Cross Spread",
-      horseshoe: "Horseshoe Spread"
+      horseshoe: "Horseshoe Spread",
+      love: "Love Tarot"
     },
     misc: {
       loadingModels: "Loading models...",
       crossSpread: "Cross Spread",
       horseshoeSpread: "Horseshoe Spread",
-      tarotPrompt: "{persona}, what does this {spreadType} reveal about my question: \"{question}\"? Analyze the cards individually then as a whole, considering their positions and interactions. Share your unique insight."
+      loveSpread: "Love Tarot",
+      tarotPrompt: "{persona}, what does this {spreadType} reveal about my question: \"{question}\"? Analyze the cards individually and as a whole, considering their positions and interactions. Share your unique insight."
     }
   },
   
@@ -259,7 +288,8 @@ const TRANSLATIONS = {
     tarotReading: {
       intro: {
         cross: "Aquí está la tirada en cruz para interpretar para la persona que consulta el tarot:",
-        horseshoe: "Aquí está la tirada en herradura para interpretar para la persona que consulta el tarot:"
+        horseshoe: "Aquí está la tirada en herradura para interpretar para la persona que consulta el tarot:",
+        love: "Aquí está la tirada del Tarot del Amor para interpretar para la persona que consulta el tarot:"
       },
       positions: {
         top: "en la parte superior (influencias positivas/espirituales/conscientes)",
@@ -274,7 +304,14 @@ const TRANSLATIONS = {
         horseshoe4: "posición central (factores determinantes/temas centrales)",
         horseshoe5: "quinta posición (futuro inmediato/próximos pasos)",
         horseshoe6: "sexta posición (obstáculos/desafíos a superar)",
-        horseshoe7: "en el extremo derecho (resultado final/conclusión posible)"
+        horseshoe7: "en el extremo derecho (resultado final/conclusión posible)",
+        
+        // Posiciones para el amor tarot
+        bottomLeft: "en la parte inferior izquierda (tus sentimientos)",
+        bottomRight: "en la parte inferior derecha (tu futuro cercano)",
+        top: "en la parte superior (tu percepción de la situación)",
+        left: "a la izquierda (elementos favorables para tus deseos)",
+        right: "a la derecha (tu amante actual o futuro)"
       },
       instructions: {
         top: "Analiza las fuerzas espirituales, mentales o conscientes que apoyan a la persona. Explora cómo estas energías pueden utilizarse como recursos.",
@@ -289,7 +326,11 @@ const TRANSLATIONS = {
         horseshoe4: "Identifica las fuerzas centrales en juego, motivaciones profundas y factores cruciales que influyen en toda la situación.",
         horseshoe5: "Proyecta las energías que se manifiestan en un futuro cercano, oportunidades u obstáculos inminentes a anticipar.",
         horseshoe6: "Revela desafíos específicos, obstáculos o resistencias da superar para progredir hacia la resolución deseada.",
-        horseshoe7: "Indica el resultado probable si se sigue el camino actual, la resolución potencial de la situación y las lecciones a integrar."
+        horseshoe7: "Indica el resultado probable si se sigue el camino actual, la resolución potencial de la situación y las lecciones a integrar.",
+        
+        // Instructions for the love tarot spread
+        bottomLeft: "Explora los sentimientos profundos de la persona, sus emociones actuales y cómo influyen en su vida amorosa. Describe las corrientes emocionales subyacentes.",
+        bottomRight: "Reveal the short-term love perspectives, opportunities or changes that are present in a near future. Offer advice on how to approach these developments."
       },
       conclusion: "Sintetiza toda la tirada teniendo en cuenta las interacciones dinámicas entre las cartas, su simbolismo y su posición relativa. Concluye con consejos prácticos y una perspectiva global que responda directamente a la pregunta planteada."
     },
@@ -330,13 +371,15 @@ const TRANSLATIONS = {
     // Types de tirage - Noms traduits
     spreadTypes: {
       cross: "Tirada en Cruz",
-      horseshoe: "Tirada en Herradura"
+      horseshoe: "Tirada en Herradura",
+      love: "Tarot del Amor"
     },
     misc: {
       loadingModels: "Cargando modelos...",
       crossSpread: "Tirada en Cruz",
       horseshoeSpread: "Tirada en Herradura",
-      tarotPrompt: "{persona}, ¿qué revela esta tirada {spreadType} sobre mi pregunta: \"{question}\"? Analiza las cartas individualmente y en conjunto, considerando sus posiciones e interacciones. Comparte tu visión única."
+      loveSpread: "Tarot del Amor",
+      tarotPrompt: "{persona}, ¿qué revela esta tirada {spreadType} sobre mi pregunta: \"{question}\"? Analice las cartas individualmente y en conjunto, considerando sus posiciones e interacciones. Comparta su visión única."
     }
   },
   
@@ -370,7 +413,8 @@ const TRANSLATIONS = {
     tarotReading: {
       intro: {
         cross: "Hier ist die Kreuzlegung zu interpretieren für die Person, die das Tarot konsultiert:",
-        horseshoe: "Hier ist die Hufeisenlegung zu interpretieren für die Person, die das Tarot konsultiert:"
+        horseshoe: "Hier ist die Hufeisenlegung zu interpretieren für die Person, die das Tarot konsultiert:",
+        love: "Hier ist die Liebetarot-Legung zu interpretieren für die Person, die das Tarot konsultiert:"
       },
       positions: {
         top: "oben (positive/spirituelle/bewusste Einflüsse)",
@@ -385,13 +429,27 @@ const TRANSLATIONS = {
         horseshoe4: "mittlere Position (bestimmende Faktoren/zentrale Themen)",
         horseshoe5: "fünfte Position (unmittelbare Zukunft/nächste Schritte)",
         horseshoe6: "sechste Position (Hindernisse/zu überwindende Herausforderungen)",
-        horseshoe7: "ganz rechts (endgültiges Ergebnis/mögliche Schlussfolgerung)"
+        horseshoe7: "ganz rechts (endgültiges Ergebnis/mögliche Schlussfolgerung)",
+        
+        // Positionen für die Liebestarot-Legung
+        bottomLeft: "unten links (deine Gefühle)",
+        bottomRight: "unten rechts (deine nahe Zukunft)",
+        top: "oben (deine Wahrnehmung der Situation)",
+        left: "links (günstige Elemente für deine Wünsche)",
+        right: "rechts (dein aktueller oder zukünftiger Liebhaber)",
+        
+        // Positions for the love tarot spread
+        bottomLeft: "en la parte inferior izquierda (tus sentimientos)",
+        bottomRight: "en la parte inferior derecha (tu futuro cercano)",
+        top: "en la parte superior (tu percepción de la situación)",
+        left: "a la izquierda (elementos favorables para tus deseos)",
+        right: "a la derecha (tu amante actual o futuro)"
       },
       instructions: {
         top: "Analysiere die spirituellen, mentalen oder bewussten Kräfte, die die Person unterstützen. Erkunde, wie diese Energien als Ressourcen genutzt werden können.",
         left: "Erkunde eingehend, wie vergangene Ereignisse die aktuelle Situation geprägt und zu ihr beigetragen haben. Identifiziere wichtige Muster oder Lektionen.",
         center: "Beschreibe präzise die aktuelle Situation, die zentralen Themen und die dominierenden Energien. Diese Karte repräsentiert den Kern der Frage.",
-        right: "Projiziere die wahrscheinliche Entwicklung, wenn die Person dem aktuellen Weg folgt. Biete Ratschläge zur besten Herangehensweise an diese potenzielle Zukunft.",
+        right: "Projiziere die wahrscheinliche Entwicklung, wenn die Person dem aktuellen Weg folgt. Offer advice on the best way to approach this potential future.",
         bottom: "Identifiziere Hindernisse, Ängste, unbewusste Blockaden, die überwunden werden müssen, und schlage konkrete Wege vor, um sie zu transformieren oder mit ihnen umzugehen.",
         // Anweisungen für die Hufeisenlegung
         horseshoe1: "Decke die tiefen Wurzeln der Situation auf, vergangene Ereignisse, die den aktuellen Weg eingeleitet haben. Erforsche den Ursprung der Frage.",
@@ -441,13 +499,15 @@ const TRANSLATIONS = {
     // Types de tirage - Noms traduits
     spreadTypes: {
       cross: "Kreuzlegung",
-      horseshoe: "Hufeisenlegung"
+      horseshoe: "Hufeisenlegung",
+      love: "Liebestarot"
     },
     misc: {
-      loadingModels: "Lade Modelle...",
+      loadingModels: "Modelle werden geladen...",
       crossSpread: "Kreuzlegung",
       horseshoeSpread: "Hufeisenlegung",
-      tarotPrompt: "{persona}, was offenbart diese {spreadType} über meine Frage: \"{question}\"? Analysiere die Karten einzeln und im Gesamtbild, unter Berücksichtigung ihrer Positionen und Wechselwirkungen. Teile deine einzigartige Perspektive mit."
+      loveSpread: "Liebestarot",
+      tarotPrompt: "{persona}, was offenbart diese {spreadType} über meine Frage: \"{question}\"? Analysieren Sie die Karten einzeln und als Ganzes, unter Berücksichtigung ihrer Positionen und Wechselwirkungen. Teilen Sie Ihre einzigartige Einsicht mit."
     }
   },
   
@@ -481,14 +541,15 @@ const TRANSLATIONS = {
     tarotReading: {
       intro: {
         cross: "Ecco la stesa a croce da interpretare per la persona che consulta i tarocchi:",
-        horseshoe: "Ecco la stesa a ferro di cavallo da interpretare per la persona che consulta i tarocchi:"
+        horseshoe: "Ecco la stesa a ferro di cavallo da interpretare per la persona che consulta i tarocchi:",
+        love: "Ecco la stesa del Tarot dell'amore da interpretare per la persona che consulta i tarocchi:"
       },
       positions: {
         top: "in alto (influenze positive/spirituali/coscienti)",
         left: "a sinistra (passato/origini della situazione/cause)",
-        center: "al centro (situazione attuale/questione principale/domanda essenziale)",
-        right: "a destra (futuro/evoluzione probabile/direzione)",
-        bottom: "in basso (influenze negative/sfide da superare/inconscio)",
+        center: "al centro (vos désirs)",
+        right: "a destra (votre amoureux actuel ou à venir)",
+        bottom: "in basso (actions que vous allez ou devriez poser dans votre vie sentimentale)",
         // Posizioni per la stesa a ferro di cavallo
         horseshoe1: "all'estrema sinistra (passato lontano/fondamenta)",
         horseshoe2: "seconda posizione (passato recente/influenze precedenti)",
@@ -496,7 +557,14 @@ const TRANSLATIONS = {
         horseshoe4: "posizione centrale (fattori determinanti/questioni centrali)",
         horseshoe5: "quinta posizione (futuro immediato/prossimi passi)",
         horseshoe6: "sesta posizione (ostacoli/sfide da superare)",
-        horseshoe7: "all'estrema destra (risultato finale/possibile conclusione)"
+        horseshoe7: "all'estrema destra (risultato finale/possibile conclusione)",
+        
+        // Posizioni per i tarocchi dell'amore
+        bottomLeft: "in basso a sinistra (i tuoi sentimenti)",
+        bottomRight: "in basso a destra (il tuo futuro immediato)",
+        top: "in alto (la tua percezione della situazione)",
+        left: "a sinistra (elementi favorevoli per i tuoi desideri)",
+        right: "a destra (il tuo amante attuale o futuro)"
       },
       instructions: {
         top: "Analizza le forze spirituali, mentali o coscienti che sostengono la persona. Esplora come queste energie possono essere utilizzate come risorse.",
@@ -511,7 +579,11 @@ const TRANSLATIONS = {
         horseshoe4: "Identifica le forze centrali in gioco, le motivazioni profonde e i fattori cruciali che influenzano l'intera situazione.",
         horseshoe5: "Proietta le energie che si manifestano nel futuro prossimo, le opportunità o gli ostacoli imminenti da anticipare.",
         horseshoe6: "Rivela le sfide specifiche, gli ostacoli o le resistenze da superare per progredire verso la risoluzione desiderata.",
-        horseshoe7: "Indica il risultato probabile se viene seguito il percorso attuale, la possibile risoluzione della situazione e le lezioni da integrare."
+        horseshoe7: "Indica il risultato probabile se viene seguito il percorso attuale, la possibile risoluzione della situazione e le lezioni da integrare.",
+        
+        // Instructions for the love tarot spread
+        bottomLeft: "Esplora i sentimenti profondi della persona, le sue emozioni attuali e come influenzano la sua vita amorosa. Descrivi le correnti emozionali sottostanti.",
+        bottomRight: "Rivela le prospettive amorose a breve termine, le opportunità o i cambiamenti che si presentano in un futuro prossimo. Offri consigli su come affrontare questi sviluppi."
       },
       conclusion: "Sintetizza l'intera stesa tenendo conto delle interazioni dinamiche tra le carte, il loro simbolismo e la loro posizione relativa. Concludi con consigli pratici e una prospettiva globale che risponda direttamente alla domanda posta."
     },
@@ -552,12 +624,14 @@ const TRANSLATIONS = {
     // Types de tirage - Noms traduits
     spreadTypes: {
       cross: "Stesa a Croce",
-      horseshoe: "Stesa a Ferro di Cavallo"
+      horseshoe: "Stesa a Ferro di Cavallo",
+      love: "Tarot dell'amore"
     },
     misc: {
       loadingModels: "Caricamento modelli...",
       crossSpread: "Stesa a Croce",
       horseshoeSpread: "Stesa a Ferro di Cavallo",
+      loveSpread: "Tarot dell'amore",
       tarotPrompt: "{persona}, cosa rivela questa {spreadType} sulla mia domanda: \"{question}\"? Analizza le carte individualmente e nel loro insieme, considerando le loro posizioni e interazioni. Condividi la tua visione unica."
     }
   },
@@ -592,14 +666,15 @@ const TRANSLATIONS = {
     tarotReading: {
       intro: {
         cross: "以下是为咨询者解读的十字牌阵:",
-        horseshoe: "以下是为咨询者解读的马蹄形牌阵:"
+        horseshoe: "以下是为咨询者解读的马蹄形牌阵:",
+        love: "以下是为咨询者解读的塔罗爱情牌阵:"
       },
       positions: {
-        top: "在顶部（积极/精神/意识的影响）",
-        left: "在左侧（过去/情况的起源/原因）",
-        center: "在中心（当前情况/主要问题/核心问题）",
-        right: "在右侧（未来/可能的发展/方向）",
-        bottom: "在底部（消极影响/需要克服的挑战/潜意识）",
+        top: "在顶部（您对情况的看法）",
+        left: "在左侧（实现愿望的有利因素）",
+        center: "在中心（您的愿望）",
+        right: "在右侧（您现在或未来的爱人）",
+        bottom: "在底部（您在情感生活中应采取的行动）",
         // 马蹄形牌阵的位置
         horseshoe1: "在最左侧（远古过去/基础）",
         horseshoe2: "第二个位置（近期过去/先前的影响）",
@@ -607,7 +682,14 @@ const TRANSLATIONS = {
         horseshoe4: "中心位置（决定性因素/核心问题）",
         horseshoe5: "第五个位置（即将到来的未来/下一步）",
         horseshoe6: "第六个位置（障碍/需要克服的挑战）",
-        horseshoe7: "在最右侧（最终结果/可能的结论）"
+        horseshoe7: "在最右侧（最终结果/可能的结论）",
+        
+        // 爱情塔罗牌阵的位置
+        bottomLeft: "左下方（您的感受）",
+        bottomRight: "右下方（您的近期未来）",
+        top: "顶部（您的观点）",
+        left: "左侧（实现愿望的有利因素）",
+        right: "右侧（您现在的爱人或未来爱人）"
       },
       instructions: {
         top: "分析支持此人的精神、心理或意识力量。探索如何将这些能量用作资源。",
@@ -622,7 +704,11 @@ const TRANSLATIONS = {
         horseshoe4: "识别核心作用力，深层动机和影响整体情况的关键因素。",
         horseshoe5: "预测近期未来出现的能量，需要预见的即将到来的机会或障碍。",
         horseshoe6: "揭示特定挑战、障碍或阻力，这些需要克服才能朝着期望的解决方向前进。",
-        horseshoe7: "指出如果继续当前路径的可能结果，情况的潜在解决方案和需要整合的教训。"
+        horseshoe7: "指出如果继续当前路径的可能结果，情况的潜在解决方案和需要整合的教训。",
+        
+        // Instructions for the love tarot spread
+        bottomLeft: "探索此人的深层感受，当前情绪以及它们如何影响爱情生活。描述潜在的情感暗流。",
+        bottomRight: "揭示短期爱情前景，即将出现的机会或变化。提供关于如何应对这些发展的建议。"
       },
       conclusion: "综合整个牌阵，考虑牌之间的动态互动，它们的象征意义和相对位置。以实用建议和直接回应所提问题的全局视角结束。"
     },
@@ -664,13 +750,15 @@ const TRANSLATIONS = {
     // 牌阵类型 - 翻译名称
     spreadTypes: {
       cross: "十字牌阵",
-      horseshoe: "马蹄形牌阵"
+      horseshoe: "马蹄形牌阵",
+      love: "爱情塔罗"
     },
     misc: {
-      loadingModels: "加载模型中...",
+      loadingModels: "正在加载模型...",
       crossSpread: "十字牌阵",
       horseshoeSpread: "马蹄形牌阵",
-      tarotPrompt: "{persona}，这个{spreadType}关于我的问题:\"{question}\"揭示了什么？请先单独分析每张牌，然后整体分析，考虑它们的位置和相互作用。分享您独特的见解。"
+      loveSpread: "爱情塔罗",
+      tarotPrompt: "{persona}，这个{spreadType}关于我的问题：\"{question}\"揭示了什么？请逐个分析牌并考虑其整体，考虑它们的位置和相互作用。分享您独特的见解。"
     }
   }
 };

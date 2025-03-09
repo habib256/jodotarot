@@ -8,6 +8,7 @@ import {
   initSpread, 
   afficherTirage, 
   afficherTirageHorseshoe,
+  afficherTirageLove,
   mettreAJourAffichageCartes, 
   updatePersonaLogo, 
   getPersonaLabel,
@@ -185,15 +186,25 @@ function faireUnTirage() {
   
   // Afficher les cartes selon le mode de tirage
   if (modeTirage === 'horseshoe') {
-    // Cacher le tirage en croix et afficher le tirage en fer à cheval
+    // Cacher les autres tirages et afficher le tirage en fer à cheval
     document.getElementById('spread').style.display = 'none';
+    document.getElementById('love-spread').style.display = 'none';
     document.getElementById('horseshoe-spread').style.display = 'grid';
     
     // Afficher les cartes dans le fer à cheval
     afficherTirageHorseshoe(tirageActuel);
-  } else {
-    // Cacher le tirage en fer à cheval et afficher le tirage en croix
+  } else if (modeTirage === 'love') {
+    // Cacher les autres tirages et afficher le tirage de l'amour
+    document.getElementById('spread').style.display = 'none';
     document.getElementById('horseshoe-spread').style.display = 'none';
+    document.getElementById('love-spread').style.display = 'grid';
+    
+    // Afficher les cartes dans le tirage de l'amour
+    afficherTirageLove(tirageActuel);
+  } else {
+    // Cacher les autres tirages et afficher le tirage en croix
+    document.getElementById('horseshoe-spread').style.display = 'none';
+    document.getElementById('love-spread').style.display = 'none';
     document.getElementById('spread').style.display = 'grid';
     
     // Afficher les cartes dans la croix
@@ -450,12 +461,26 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     // Attacher un event listener pour détecter les changements du jeu de cartes
     document.getElementById('card-set').addEventListener('change', function() {
-      // Récupérer le jeu sélectionné
+      // Récupérer le jeu sélectionné et le type de tirage actuel
       const jeuSelectionne = this.value;
+      const typeTirageActuel = document.getElementById('spread-type').value;
       
       // Si un tirage a déjà été effectué, mettre à jour les images des cartes
       if (tirageActuel.length > 0) {
         tirageActuel = mettreAJourAffichageCartes(tirageActuel, jeuSelectionne);
+        
+        // Assurons-nous que seul le bon conteneur est affiché
+        document.getElementById('spread').style.display = 'none';
+        document.getElementById('horseshoe-spread').style.display = 'none';
+        document.getElementById('love-spread').style.display = 'none';
+        
+        if (typeTirageActuel === 'horseshoe') {
+          document.getElementById('horseshoe-spread').style.display = 'grid';
+        } else if (typeTirageActuel === 'love') {
+          document.getElementById('love-spread').style.display = 'grid';
+        } else {
+          document.getElementById('spread').style.display = 'grid';
+        }
       } else {
         // Sinon, réinitialiser complètement l'affichage
         resetAllDisplays();

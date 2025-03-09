@@ -44,40 +44,74 @@ function afficherTirageHorseshoe(tirage) {
 }
 
 /**
+ * Affiche le tirage "Tarot de l'amour"
+ * @param {Array} tirage - Tableau des cartes à afficher
+ */
+function afficherTirageLove(tirage) {
+  if (tirage.length !== 7) return;
+  
+  const positions = document.querySelectorAll('.love-spread .card-position');
+  positions.forEach((position, index) => {
+    position.setAttribute('data-position', index + 1);
+    position.innerHTML = renderCard(tirage[index]);
+  });
+}
+
+/**
  * Met à jour l'affichage des cartes lorsque le jeu est changé
  * @param {Array} tirageActuel - Le tirage actuel à mettre à jour
  * @param {string} jeuSelectionne - Le nouveau jeu sélectionné
  * @returns {Array} - Le tirage mis à jour avec les nouvelles images
  */
 function mettreAJourAffichageCartes(tirageActuel, jeuSelectionne) {
-  // Si aucun tirage en cours, initialiser avec des dos de cartes
-  if (!tirageActuel || tirageActuel.length === 0) {
-    initSpread();
-    return [];
+  if (!tirageActuel || !tirageActuel.length) return [];
+
+  // Vérifier que cardsData[jeuSelectionne] existe
+  if (!cardsData[jeuSelectionne]) {
+    console.error(`Jeu de cartes '${jeuSelectionne}' non trouvé!`);
+    return tirageActuel;
   }
-  
-  // Récupérer les cartes correspondantes dans le nouveau jeu
-  const nouvelleCartes = tirageActuel.map(carte => {
-    const id = carte.id;
-    return cardsData[jeuSelectionne].find(c => c.id === id);
+
+  // Créer un nouveau tableau avec les mêmes cartes mais des images du nouveau jeu
+  const nouveauTirage = tirageActuel.map(carte => {
+    if (!carte || !carte.id) {
+      console.error("Carte invalide trouvée dans tirageActuel:", carte);
+      return carte;
+    }
+    
+    // Trouver la carte correspondante dans le nouveau jeu
+    const nouvelleCarteDonnees = cardsData[jeuSelectionne].find(c => c.id === carte.id);
+    
+    // Vérifier que la carte existe dans le nouveau jeu
+    if (!nouvelleCarteDonnees) {
+      console.error(`Carte avec ID '${carte.id}' non trouvée dans le jeu '${jeuSelectionne}'`);
+      return carte;
+    }
+    
+    return {
+      ...carte,
+      image: nouvelleCarteDonnees.image
+    };
   });
+
+  console.log("Mise à jour tirage:", {
+    typeSpread: document.getElementById('spread-type').value,
+    nombreCartes: nouveauTirage.length,
+    jeuSelectionne: jeuSelectionne
+  });
+
+  // Mettre à jour l'affichage selon le type de tirage
+  const typeSpread = document.getElementById('spread-type').value;
   
-  // Déterminer le type de tirage selon le nombre de cartes
-  if (tirageActuel.length === 5) {
-    // Tirage en croix
-    afficherTirage(nouvelleCartes);
-  } else if (tirageActuel.length === 7) {
-    // Tirage en fer à cheval
-    afficherTirageHorseshoe(nouvelleCartes);
-  } else {
-    // Cas non géré, initialiser avec des dos de cartes
-    console.warn(`Tirage de ${tirageActuel.length} cartes non pris en charge.`);
-    initSpread();
-    return [];
+  if (typeSpread === 'cross') {
+    afficherTirage(nouveauTirage);
+  } else if (typeSpread === 'horseshoe') {
+    afficherTirageHorseshoe(nouveauTirage);
+  } else if (typeSpread === 'love') {
+    afficherTirageLove(nouveauTirage);
   }
-  
-  // Retourner le tirage actualisé
-  return nouvelleCartes;
+
+  return nouveauTirage;
 }
 
 /**
@@ -299,11 +333,19 @@ function resetAllDisplays() {
   // Réinitialiser le tirage en croix
   initSpread();
   
-  // Réinitialiser le tirage en fer à cheval
+  // Obtenir l'image du dos de carte pour le jeu sélectionné
   const jeuSelectionne = document.getElementById('card-set').value;
-  const horseshoePositions = document.querySelectorAll('.horseshoe-spread .card-position');
   const backCardHTML = `<img src="${cardsData[jeuSelectionne][22].image}" alt="Dos de carte" class="card">`;
+  
+  // Réinitialiser le tirage en fer à cheval
+  const horseshoePositions = document.querySelectorAll('.horseshoe-spread .card-position');
   horseshoePositions.forEach(position => {
+    position.innerHTML = backCardHTML;
+  });
+  
+  // Réinitialiser le tirage de l'amour
+  const lovePositions = document.querySelectorAll('.love-spread .card-position');
+  lovePositions.forEach(position => {
     position.innerHTML = backCardHTML;
   });
   
@@ -316,11 +358,18 @@ function resetAllDisplays() {
   
   // Afficher le bon type de tirage selon la sélection
   const modeTirage = document.getElementById('spread-type').value;
+  
+  // Cacher tous les tirages d'abord
+  document.getElementById('spread').style.display = 'none';
+  document.getElementById('horseshoe-spread').style.display = 'none';
+  document.getElementById('love-spread').style.display = 'none';
+  
+  // Afficher le tirage sélectionné
   if (modeTirage === 'horseshoe') {
-    document.getElementById('spread').style.display = 'none';
     document.getElementById('horseshoe-spread').style.display = 'grid';
+  } else if (modeTirage === 'love') {
+    document.getElementById('love-spread').style.display = 'grid';
   } else {
-    document.getElementById('horseshoe-spread').style.display = 'none';
     document.getElementById('spread').style.display = 'grid';
   }
   
@@ -333,6 +382,7 @@ export {
   initSpread,
   afficherTirage,
   afficherTirageHorseshoe,
+  afficherTirageLove,
   mettreAJourAffichageCartes,
   updatePersonaLogo,
   getPersonaLabel,

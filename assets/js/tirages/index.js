@@ -5,11 +5,13 @@
 
 import * as Croix from './croix.js';
 import * as FerACheval from './feracheval.js';
+import * as Amour from './amour.js';
 
 // Objet mappage des types de tirage vers leurs modules
 const TIRAGES = {
   'cross': Croix,
-  'horseshoe': FerACheval
+  'horseshoe': FerACheval,
+  'love': Amour
 };
 
 /**
@@ -83,5 +85,6 @@ export {
   getPositions,
   interpreterPositions,
   Croix,
-  FerACheval
+  FerACheval,
+  Amour
 }; 
