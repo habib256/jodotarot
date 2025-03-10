@@ -1,0 +1,157 @@
+/**
+ * Styles pour le tirage en croix celtique
+ */
+
+.celtic-cross-spread {
+  position: relative;
+  width: var(--spread-width);
+  height: var(--spread-height);
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: var(--border-radius-lg);
+  margin-left: 0;
+}
+
+/* Positions des cartes */
+.celtic-cross-spread .card-position {
+  position: absolute;
+  width: var(--card-width);
+  height: var(--card-height);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Positionnement spécifique pour chaque carte */
+.celtic-cross-spread .card-1 {
+  left: var(--celtic-present-x);
+  top: var(--celtic-present-y);
+  transform: translate(-50%, -50%);
+}
+
+.celtic-cross-spread .card-2 {
+  left: var(--celtic-challenge-x);
+  top: var(--celtic-challenge-y);
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.celtic-cross-spread .card-3 {
+  left: var(--celtic-foundation-x);
+  top: var(--celtic-foundation-y);
+  transform: translate(-50%, -50%);
+}
+
+.celtic-cross-spread .card-4 {
+  left: var(--celtic-past-x);
+  top: var(--celtic-past-y);
+  transform: translate(-50%, -50%);
+}
+
+.celtic-cross-spread .card-5 {
+  left: var(--celtic-crown-x);
+  top: var(--celtic-crown-y);
+  transform: translate(-50%, -50%);
+}
+
+.celtic-cross-spread .card-6 {
+  left: var(--celtic-future-x);
+  top: var(--celtic-future-y);
+  transform: translate(-50%, -50%);
+}
+
+.celtic-cross-spread .card-7 {
+  left: var(--celtic-self-x);
+  top: var(--celtic-self-y);
+  transform: translate(-50%, -50%);
+}
+
+.celtic-cross-spread .card-8 {
+  left: var(--celtic-environment-x);
+  top: var(--celtic-environment-y);
+  transform: translate(-50%, -50%);
+}
+
+.celtic-cross-spread .card-9 {
+  left: var(--celtic-hopes-x);
+  top: var(--celtic-hopes-y);
+  transform: translate(-50%, -50%);
+}
+
+.celtic-cross-spread .card-10 {
+  left: var(--celtic-outcome-x);
+  top: var(--celtic-outcome-y);
+  transform: translate(-50%, -50%);
+}
+
+/* Positions vides */
+.celtic-cross-spread .card-position:empty {
+  border: 2px dashed rgba(107, 91, 149, 0.5);
+  border-radius: var(--border-radius-sm);
+}
+
+/* Effet de survol */
+.celtic-cross-spread .card-position:hover {
+  z-index: var(--z-index-above);
+}
+
+/* Éléments visuels de la croix celtique */
+.celtic-cross-vertical,
+.celtic-cross-horizontal {
+  position: absolute;
+  background-color: rgba(107, 91, 149, 0.1);
+  border: 1px solid rgba(107, 91, 149, 0.2);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.celtic-cross-vertical {
+  width: 10px;
+  height: 200px;
+  left: 40%;
+  top: 20%;
+}
+
+.celtic-cross-horizontal {
+  width: 200px;
+  height: 10px;
+  left: 20%;
+  top: 45%;
+}
+
+.celtic-cross-circle {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border: 1px solid rgba(107, 91, 149, 0.2);
+  border-radius: 50%;
+  left: 35%;
+  top: 35%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Styles responsifs */
+@media (max-width: 768px) {
+  .celtic-cross-spread {
+    height: 450px;
+    overflow: auto;
+  }
+  
+  .celtic-cross-spread .card-position {
+    width: calc(var(--card-width) * 0.9);
+    height: calc(var(--card-height) * 0.9);
+  }
+}
+
+@media (max-width: 480px) {
+  .celtic-cross-spread {
+    height: 400px;
+  }
+  
+  .celtic-cross-spread .card-position {
+    width: calc(var(--card-width) * 0.7);
+    height: calc(var(--card-height) * 0.7);
+  }
+} 

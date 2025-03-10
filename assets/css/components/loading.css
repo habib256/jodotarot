@@ -1,0 +1,120 @@
+/**
+ * Styles pour les indicateurs de chargement
+ */
+
+/* Conteneur de chargement avec overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-index-modal);
+}
+
+/* Conteneur de spinner - Supprimé pour affichage statique */
+.loading-spinner {
+  display: none; /* Masquer complètement le spinner */
+}
+
+/* Animation de spinner avec 3 cercles - Supprimée */
+.loading-spinner div {
+  display: none; /* Masquer les cercles */
+}
+
+.loading-spinner div:nth-child(2) {
+  display: none;
+}
+
+.loading-spinner div:nth-child(3) {
+  display: none;
+}
+
+/* Suppression de l'animation */
+@keyframes loading-spinner {
+  0%, 100% {
+    opacity: 0; /* Animation vide pour être compatible sans effet */
+  }
+}
+
+/* Spinner pour les boutons - Supprimé */
+.btn-spinner {
+  display: none; /* Masquer le spinner */
+}
+
+/* Suppression de l'animation spin */
+@keyframes spin {
+  to { transform: none; } /* Animation vide */
+}
+
+/* Indicateur de chargement pour l'interprétation */
+.interpretation-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg);
+}
+
+.interpretation-loading p {
+  margin-top: var(--spacing-md);
+  font-size: var(--font-size-md);
+  color: var(--color-text);
+}
+
+/* Conteneur pour la barre de progression - Supprimé */
+.progress-container {
+  display: none; /* Masquer la barre de progression */
+}
+
+/* Barre de progression - Supprimée */
+.progress-bar {
+  display: none; /* Masquer la barre */
+}
+
+/* Suppression de l'animation de la barre de progression */
+@keyframes progress-animation {
+  0%, 100% {
+    width: 0%; /* Animation vide */
+  }
+}
+
+/* Suppression de l'animation pulse */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1; /* Opacité fixe */
+  }
+}
+
+/* Classe pour les éléments en chargement - style statique au lieu d'animé */
+.loading {
+  opacity: 1; /* Opacité fixe au lieu d'animée */
+  animation: none; /* Supprimer l'animation */
+}
+
+/* Points de suspension statiques au lieu d'animés */
+.loading-dots:after {
+  content: '...'; /* Points fixes au lieu d'animés */
+  animation: none; /* Supprimer l'animation */
+}
+
+/* Suppression de l'animation des points */
+@keyframes loading-dots {
+  0%, 100% {
+    content: '...'; /* Contenu fixe */
+  }
+}
+
+/* Texte de réponse partielle pendant le streaming */
+.partial-response {
+  padding: var(--spacing-md);
+  background-color: rgba(107, 91, 149, 0.05);
+  border-left: 4px solid var(--color-primary);
+  border-radius: var(--border-radius-sm);
+  font-family: var(--font-family-special);
+  line-height: var(--line-height-loose);
+} 

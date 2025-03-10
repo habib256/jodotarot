@@ -1,0 +1,130 @@
+/**
+ * Styles pour le tirage en croix
+ */
+
+.spread {
+  position: relative;
+  width: var(--spread-width);
+  height: var(--spread-height);
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: var(--border-radius-lg);
+  margin-left: 0;
+  perspective: 1000px; /* Ajoute une perspective pour les effets 3D */
+}
+
+/* Positions des cartes */
+.card-position.top, .card-position.left, .card-position.center, .card-position.right, .card-position.bottom,
+.top, .left, .center, .right, .bottom {
+  position: absolute;
+  width: var(--card-width);
+  height: var(--card-height);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: filter 0.2s ease-in-out, box-shadow 0.2s ease-in-out, z-index 0.1s ease, transform 0.2s ease-out;
+  filter: brightness(1);
+  backface-visibility: hidden; /* Améliore les performances des animations 3D */
+}
+
+.card-position.empty {
+  border: 2px dashed var(--color-primary-light) !important;
+  border-radius: var(--border-radius-sm) !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  box-shadow: none !important;
+}
+
+/* Positions spécifiques pour chaque carte */
+.card-position.center, .center {
+  left: var(--cross-center-x);
+  top: var(--cross-center-y);
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  transform-origin: center center;
+}
+
+.card-position.top, .top {
+  left: var(--cross-top-x);
+  top: var(--cross-top-y);
+  transform: translate(-50%, 0);
+  z-index: 2;
+  transform-origin: center top;
+}
+
+.card-position.left, .left {
+  left: var(--cross-left-x);
+  top: var(--cross-left-y);
+  transform: translate(0, -50%);
+  z-index: 2;
+  transform-origin: left center;
+}
+
+.card-position.right, .right {
+  left: var(--cross-right-x);
+  top: var(--cross-right-y);
+  transform: translate(-100%, -50%);
+  z-index: 2;
+  transform-origin: right center;
+}
+
+.card-position.bottom, .bottom {
+  left: var(--cross-bottom-x);
+  top: var(--cross-bottom-y);
+  transform: translate(-50%, -100%);
+  z-index: 2;
+  transform-origin: center bottom;
+}
+
+/* Effets 3D au survol spécifiques à chaque position */
+.center:hover, .card-position.center:hover {
+  transform: translate(-50%, -50%) scale(1.02);
+}
+
+.top:hover, .card-position.top:hover {
+  transform: translate(-50%, 0) scale(1.02);
+}
+
+.left:hover, .card-position.left:hover {
+  transform: translate(0, -50%) scale(1.02);
+}
+
+.right:hover, .card-position.right:hover {
+  transform: translate(-100%, -50%) scale(1.02);
+}
+
+.bottom:hover, .card-position.bottom:hover {
+  transform: translate(-50%, -100%) scale(1.02);
+}
+
+/* Styles responsifs */
+@media (max-width: 768px) {
+  .spread {
+    width: var(--spread-width);
+    height: 480px;
+    overflow: auto;
+  }
+  
+  .top, .left, .center, .right, .bottom,
+  .card-position.top, .card-position.left, .card-position.center, .card-position.right, .card-position.bottom {
+    width: calc(var(--card-width) * 0.9);
+    height: calc(var(--card-height) * 0.9);
+  }
+}
+
+@media (max-width: 480px) {
+  .spread {
+    width: var(--spread-width);
+    height: 430px;
+    overflow: auto;
+  }
+  
+  .top, .left, .center, .right, .bottom,
+  .card-position.top, .card-position.left, .card-position.center, .card-position.right, .card-position.bottom {
+    width: calc(var(--card-width) * 0.7);
+    height: calc(var(--card-height) * 0.7);
+  }
+} 

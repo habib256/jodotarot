@@ -1,0 +1,134 @@
+/**
+ * Styles pour les menus déroulants
+ */
+
+/* Groupe de sélection avec label */
+.select-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+/* Label du menu déroulant */
+.select-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  margin-bottom: 2px;
+  font-weight: 600;
+}
+
+/* Menu déroulant */
+.select-dropdown {
+  padding: 8px 12px;
+  font-size: var(--font-size-sm);
+  border: 1px solid rgba(107, 91, 149, 0.3);
+  border-radius: var(--border-radius-sm);
+  background-color: rgba(255, 255, 255, 0.95);
+  cursor: pointer;
+  width: 100%;
+  box-shadow: 0 2px 4px rgba(107, 91, 149, 0.1);
+}
+
+.select-dropdown:hover {
+  border-color: var(--color-primary);
+  background-color: rgba(255, 255, 255, 1);
+}
+
+.select-dropdown:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(107, 91, 149, 0.2);
+}
+
+/* Style pour les groupes d'options */
+.select-dropdown optgroup {
+  font-size: var(--font-size-sm);
+  color: var(--color-primary);
+  background-color: rgba(240, 235, 250, 0.95);
+  font-weight: 600;
+  padding: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid rgba(107, 91, 149, 0.2);
+}
+
+.select-dropdown option {
+  font-size: var(--font-size-sm);
+  padding: 8px;
+  margin: 2px 0;
+  background-color: rgba(255, 255, 255, 0.98);
+}
+
+.select-dropdown option:hover,
+.select-dropdown option:focus {
+  background-color: rgba(107, 91, 149, 0.1);
+}
+
+/* Sélection des contrôles - conteneur pour tous les menus déroulants */
+.selection-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Style pour les menus déroulants spécifiques */
+#language {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-left: 3px solid #6c5ce7;
+}
+
+#persona {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-left: 3px solid #00b894;
+}
+
+#card-set {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-left: 3px solid #e17055;
+}
+
+#spread-type {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-left: 3px solid #0984e3;
+}
+
+#ia-model {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-left: 3px solid #6c5ce7;
+}
+
+/* État désactivé */
+.select-dropdown:disabled {
+  background-color: var(--color-text-lightest);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Version sombre des menus déroulants */
+.dark-theme .select-dropdown {
+  background-color: var(--color-tertiary);
+  color: white;
+  border-color: var(--color-primary-dark);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23fff' d='M6 8.825L1.175 4 2.238 2.938 6 6.7 9.763 2.938 10.825 4z'/%3E%3C/svg%3E");
+}
+
+/* Ajustements responsifs */
+@media (max-width: 768px) {
+  .select-group {
+    width: 100%;
+  }
+  
+  .select-dropdown {
+    width: 100%;
+  }
+}
+
+/* Supprimer les couleurs personnalisées des labels */
+.select-group:nth-child(1) .select-label,
+.select-group:nth-child(2) .select-label,
+.select-group:nth-child(3) .select-label,
+.select-group:nth-child(4) .select-label,
+.select-group:nth-child(5) .select-label {
+  color: var(--color-text);
+} 

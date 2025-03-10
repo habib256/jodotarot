@@ -1,0 +1,118 @@
+/* 
+ * Zone d'Information - Styles
+ * Ce fichier contient tous les styles pour la zone d'affichage des interprétations
+ */
+
+.information-zone {
+  /* Structure de base */
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: var(--spacing-lg) auto;
+  padding: var(--spacing-lg);
+  
+  /* Style visuel distinctif */
+  background-color: var(--color-card-background);
+  border-radius: var(--border-radius-md);
+  border-left: var(--border-width-thick) solid var(--color-primary);
+  box-shadow: var(--shadow-md);
+  
+  /* Effets visuels */
+  backdrop-filter: blur(8px);
+  transition: var(--transition-base);
+}
+
+/* En-tête de la zone d'information */
+.information-zone__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: var(--border-width-thin) solid var(--color-secondary);
+}
+
+.information-zone__title {
+  font-family: var(--font-family-headings);
+  font-size: var(--font-size-lg);
+  color: var(--color-primary);
+  margin: 0;
+}
+
+/* Corps du texte d'interprétation */
+.information-zone__content {
+  font-family: var(--font-family-special);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-loose);
+  color: var(--color-text);
+}
+
+/* Mise en évidence des points importants */
+.information-zone__highlight {
+  background-color: rgba(107, 91, 149, 0.1);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  font-weight: 500;
+}
+
+/* État de chargement */
+.information-zone--loading {
+  opacity: 0.7;
+}
+
+.information-zone--loading::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.1), 
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Variations selon les personas */
+.information-zone--tarologue {
+  background-color: rgba(107, 91, 149, 0.05);
+  border-left-color: var(--color-primary);
+}
+
+.information-zone--psychanalyste {
+  background-color: rgba(23, 162, 184, 0.05);
+  border-left-color: var(--color-info);
+}
+
+.information-zone--mystique {
+  background-color: rgba(40, 167, 69, 0.05);
+  border-left-color: var(--color-success);
+}
+
+/* Adaptation mobile */
+@media screen and (max-width: 768px) {
+  .information-zone {
+    padding: var(--spacing-md);
+    margin: var(--spacing-md) auto;
+  }
+  
+  .information-zone__title {
+    font-size: var(--font-size-md);
+  }
+  
+  .information-zone__content {
+    font-size: var(--font-size-sm);
+  }
+} 

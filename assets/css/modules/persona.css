@@ -1,0 +1,1369 @@
+/**
+ * Styles spécifiques aux personas
+ */
+
+/* Badge du persona actif */
+.persona-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(107, 91, 149, 0.1);
+  border-radius: var(--border-radius-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+.persona-badge-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: var(--spacing-sm);
+}
+
+.persona-badge-name {
+  font-weight: bold;
+  color: var(--color-primary);
+}
+
+/* Conteneur d'information sur le persona */
+.persona-info {
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--color-secondary);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.persona-info-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.persona-info-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: var(--spacing-md);
+  border: 2px solid var(--color-primary);
+}
+
+.persona-info-name {
+  font-size: var(--font-size-lg);
+  font-weight: bold;
+  color: var(--color-primary);
+}
+
+.persona-info-role {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+  margin-top: 2px;
+}
+
+.persona-info-description {
+  font-style: italic;
+  line-height: var(--line-height-loose);
+  color: var(--color-text);
+  margin-bottom: var(--spacing-md);
+}
+
+.persona-info-specialties {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
+}
+
+.persona-specialty {
+  background-color: var(--color-secondary);
+  color: var(--color-text);
+  font-size: var(--font-size-xs);
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+/* Styles spécifiques à chaque persona */
+
+/* Tarologue */
+.persona-tarologue .interpretation-text {
+  font-family: var(--font-family-special);
+}
+
+/* Oracle Mystique */
+.interpretation-oracle {
+  font-family: 'Georgia', serif;
+  font-style: italic;
+  line-height: 1.8;
+  color: #4b3b82;
+  background-color: rgba(181, 169, 212, 0.1);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  position: relative;
+}
+
+.interpretation-oracle::before,
+.interpretation-oracle::after {
+  content: '✨';
+  font-size: 18px;
+  color: #8775af;
+  position: absolute;
+}
+
+.interpretation-oracle::before {
+  top: 10px;
+  left: 10px;
+}
+
+.interpretation-oracle::after {
+  bottom: 10px;
+  right: 10px;
+}
+
+.oracle-invocation {
+  text-align: center;
+  font-weight: bold;
+  color: #6b5b95;
+  margin-bottom: var(--spacing-md);
+  font-size: var(--font-size-md);
+}
+
+.oracle-closing {
+  text-align: center;
+  font-style: italic;
+  color: #6b5b95;
+  margin-top: var(--spacing-md);
+  font-size: var(--font-size-md);
+}
+
+/* Jung */
+.interpretation-jung {
+  font-family: var(--font-family-base);
+  line-height: 1.6;
+  color: #333;
+  background-color: rgba(245, 245, 247, 0.8);
+  padding: var(--spacing-md);
+  border-left: 4px solid #3a3a3a;
+  border-radius: var(--border-radius-sm);
+}
+
+.jung-quote {
+  font-style: italic;
+  font-weight: bold;
+  color: #534672;
+  border-bottom: 1px solid rgba(83, 70, 114, 0.3);
+  padding-bottom: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  font-size: var(--font-size-md);
+}
+
+.jung-content {
+  margin: var(--spacing-md) 0;
+}
+
+.jung-closing {
+  font-style: italic;
+  color: #534672;
+  text-align: right;
+  margin-top: var(--spacing-md);
+  border-top: 1px solid rgba(83, 70, 114, 0.3);
+  padding-top: var(--spacing-sm);
+}
+
+/* Psychanalystes */
+.persona-freud .interpretation-text,
+.persona-jung .interpretation-text,
+.persona-lacan .interpretation-text,
+.persona-dolto .interpretation-text {
+  font-family: var(--font-family-base);
+  font-style: italic;
+}
+
+/* Spirituels */
+.persona-pretre .interpretation-text,
+.persona-rabbin .interpretation-text,
+.persona-imam .interpretation-text,
+.persona-dalailama .interpretation-text {
+  font-family: var(--font-family-headings);
+}
+
+/* Ésotériques */
+.persona-sorciere .interpretation-text,
+.persona-alchimiste .interpretation-text,
+.persona-mage .interpretation-text {
+  font-family: var(--font-family-special);
+  letter-spacing: 0.5px;
+}
+
+/* Philosophes */
+.persona-socrate .interpretation-text,
+.persona-montaigne .interpretation-text {
+  font-family: 'Georgia', serif;
+}
+
+/* Surnaturels */
+.persona-demon .interpretation-text,
+.persona-noegoman .interpretation-text {
+  font-family: 'Arial', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Style pour la Voyante Gitane */
+.interpretation-voyante {
+  font-family: 'Georgia', serif;
+  line-height: 1.6;
+  color: #5d3954;
+  background-color: rgba(146, 79, 120, 0.05);
+  padding: 1.5rem;
+  border-radius: 8px;
+  position: relative;
+  margin: 1rem 0;
+}
+
+.voyante-greeting {
+  font-style: italic;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #924f78;
+  font-size: 1.1rem;
+}
+
+.voyante-content {
+  position: relative;
+  padding: 0 1rem;
+}
+
+.voyante-content p {
+  text-align: justify;
+}
+
+.voyante-closing {
+  text-align: center;
+  font-style: italic;
+  margin-top: 1.5rem;
+  color: #924f78;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.interpretation-voyante::before {
+  content: '🔮';
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  font-size: 1.5rem;
+}
+
+.interpretation-voyante::after {
+  content: '🔮';
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  font-size: 1.5rem;
+}
+
+/* Style pour Freud */
+.interpretation-freud {
+  font-family: 'Times New Roman', Times, serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: rgba(235, 235, 235, 0.5);
+  padding: 1.5rem;
+  border-left: 4px solid #8B4513;
+  border-radius: 0 8px 8px 0;
+  position: relative;
+  margin: 1rem 0;
+}
+
+.freud-intro {
+  font-size: 1.1rem;
+  font-style: italic;
+  color: #555;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  border-bottom: 1px solid #8B4513;
+  padding-bottom: 0.5rem;
+}
+
+.freud-content {
+  text-align: justify;
+  padding: 0 1rem;
+}
+
+.freud-content p {
+  margin-bottom: 1rem;
+}
+
+.freud-closing {
+  font-style: italic;
+  color: #555;
+  margin-top: 1.5rem;
+  text-align: right;
+  border-top: 1px solid #8B4513;
+  padding-top: 0.5rem;
+}
+
+/* Style pour le Prêtre Exégète */
+.interpretation-pretre {
+  font-family: 'Garamond', serif;
+  line-height: 1.6;
+  color: #2d3142;
+  background-color: rgba(235, 235, 235, 0.5);
+  padding: 1.5rem;
+  border-left: 4px solid #7c334f;
+  border-radius: 0 8px 8px 0;
+  position: relative;
+  margin: 1rem 0;
+}
+
+.pretre-intro {
+  font-size: 1.1rem;
+  text-align: center;
+  color: #7c334f;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #7c334f;
+  padding-bottom: 0.5rem;
+}
+
+.pretre-content {
+  text-align: justify;
+  padding: 0 1rem;
+}
+
+.pretre-content p {
+  margin-bottom: 1rem;
+}
+
+.pretre-closing {
+  font-style: italic;
+  color: #7c334f;
+  margin-top: 1.5rem;
+  text-align: right;
+  border-top: 1px solid #7c334f;
+  padding-top: 0.5rem;
+}
+
+/* Style pour la Sorcière Ancestrale */
+.interpretation-sorciere {
+  font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+  line-height: 1.6;
+  color: #2a3d45;
+  background-color: rgba(226, 235, 226, 0.5);
+  padding: 1.5rem;
+  border-radius: 8px;
+  position: relative;
+  margin: 1rem 0;
+  box-shadow: 0 0 10px rgba(76, 115, 67, 0.1);
+}
+
+.sorciere-invocation {
+  font-size: 1.1rem;
+  font-style: italic;
+  text-align: center;
+  color: #4c7343;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(76, 115, 67, 0.3);
+  padding-bottom: 0.5rem;
+}
+
+.sorciere-content {
+  text-align: justify;
+  padding: 0 1rem;
+}
+
+.sorciere-content p {
+  margin-bottom: 1rem;
+}
+
+.sorciere-closing {
+  font-style: italic;
+  color: #4c7343;
+  margin-top: 1.5rem;
+  text-align: right;
+  border-top: 1px solid rgba(76, 115, 67, 0.3);
+  padding-top: 0.5rem;
+}
+
+.interpretation-sorciere::before,
+.interpretation-sorciere::after {
+  content: "⁂";
+  position: absolute;
+  color: rgba(76, 115, 67, 0.4);
+  font-size: 1.2rem;
+}
+
+.interpretation-sorciere::before {
+  top: 10px;
+  left: 10px;
+}
+
+.interpretation-sorciere::after {
+  bottom: 10px;
+  right: 10px;
+}
+
+/* Style pour Socrate */
+.interpretation-socrate {
+  font-family: 'Georgia', serif;
+  line-height: 1.7;
+  color: #284b63;
+  background-color: rgba(236, 240, 243, 0.6);
+  padding: 1.5rem;
+  border-radius: 8px;
+  position: relative;
+  margin: 1rem 0;
+  box-shadow: 0 0 5px rgba(40, 75, 99, 0.1);
+}
+
+.socrate-intro {
+  font-style: italic;
+  font-size: 1.1rem;
+  text-align: center;
+  color: #284b63;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(40, 75, 99, 0.3);
+  padding-bottom: 0.5rem;
+}
+
+.socrate-content {
+  text-align: justify;
+  padding: 0 1rem;
+}
+
+.socrate-content p {
+  margin-bottom: 1rem;
+}
+
+.socrate-content p::before {
+  content: "?";
+  display: inline-block;
+  color: #284b63;
+  font-weight: bold;
+  margin-right: 0.4rem;
+  opacity: 0.6;
+}
+
+.socrate-closing {
+  font-style: italic;
+  color: #284b63;
+  margin-top: 1.5rem;
+  text-align: center;
+  font-weight: bold;
+  border-top: 1px solid rgba(40, 75, 99, 0.3);
+  padding-top: 0.5rem;
+}
+
+/* Style pour Mortrarion (Démon) */
+.interpretation-demon {
+  font-family: 'Courier New', monospace;
+  line-height: 1.6;
+  color: #a30000;
+  background-color: rgba(15, 15, 15, 0.95);
+  padding: 1.5rem;
+  border-radius: 8px;
+  position: relative;
+  margin: 1rem 0;
+  box-shadow: 0 0 15px rgba(163, 0, 0, 0.3);
+  text-shadow: 0 0 2px rgba(163, 0, 0, 0.4);
+}
+
+.demon-greeting {
+  font-size: 1.1rem;
+  text-align: center;
+  color: #ff3333;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(163, 0, 0, 0.5);
+  padding-bottom: 0.5rem;
+}
+
+.demon-content {
+  text-align: justify;
+  padding: 0 1rem;
+  color: #cccccc;
+}
+
+.demon-content p {
+  margin-bottom: 1rem;
+}
+
+.demon-closing {
+  font-style: italic;
+  color: #ff3333;
+  margin-top: 1.5rem;
+  text-align: right;
+  border-top: 1px solid rgba(163, 0, 0, 0.5);
+  padding-top: 0.5rem;
+}
+
+.interpretation-demon::before,
+.interpretation-demon::after {
+  content: "⛧";
+  position: absolute;
+  color: rgba(163, 0, 0, 0.6);
+  font-size: 1.2rem;
+}
+
+.interpretation-demon::before {
+  top: 10px;
+  left: 10px;
+}
+
+.interpretation-demon::after {
+  bottom: 10px;
+  right: 10px;
+}
+
+/* Style pour le Rabbin Kabbaliste */
+.interpretation-rabbin {
+  font-family: 'Garamond', serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: rgba(218, 224, 231, 0.6);
+  padding: 1.5rem;
+  border-radius: 8px;
+  position: relative;
+  margin: 1rem 0;
+  box-shadow: 0 0 5px rgba(0, 51, 102, 0.1);
+  border-left: 4px solid #003366;
+}
+
+.rabbin-intro {
+  font-size: 1.1rem;
+  text-align: center;
+  color: #003366;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(0, 51, 102, 0.3);
+  padding-bottom: 0.5rem;
+}
+
+.rabbin-content {
+  text-align: justify;
+  padding: 0 1rem;
+}
+
+.rabbin-content p {
+  margin-bottom: 1rem;
+}
+
+.rabbin-closing {
+  font-style: italic;
+  color: #003366;
+  margin-top: 1.5rem;
+  text-align: right;
+  border-top: 1px solid rgba(0, 51, 102, 0.3);
+  padding-top: 0.5rem;
+}
+
+/* Étoile de David en filigrane */
+.interpretation-rabbin::before {
+  content: "✡";
+  position: absolute;
+  font-size: 12rem;
+  opacity: 0.03;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #003366;
+  z-index: 0;
+}
+
+/* Style pour l'Alchimiste Ésotérique */
+.interpretation-alchimiste {
+  font-family: 'Baskerville', 'Times New Roman', serif;
+  line-height: 1.6;
+  color: #3c2f2f;
+  background-color: rgba(245, 235, 224, 0.8);
+  padding: 1.5rem;
+  border-radius: 8px;
+  position: relative;
+  margin: 1rem 0;
+  box-shadow: 0 0 15px rgba(101, 67, 33, 0.1);
+  border: 1px solid rgba(101, 67, 33, 0.2);
+}
+
+.alchimiste-intro {
+  font-size: 1.1rem;
+  text-align: center;
+  color: #654321;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(101, 67, 33, 0.3);
+  padding-bottom: 0.5rem;
+  font-style: italic;
+}
+
+.alchimiste-content {
+  text-align: justify;
+  padding: 0 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.alchimiste-content p {
+  margin-bottom: 1rem;
+}
+
+.alchimiste-closing {
+  font-style: italic;
+  color: #654321;
+  margin-top: 1.5rem;
+  text-align: center;
+  border-top: 1px solid rgba(101, 67, 33, 0.3);
+  padding-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+/* Symbole alchimique en filigrane */
+.interpretation-alchimiste::before {
+  content: "☉☽☿";
+  position: absolute;
+  font-size: 8rem;
+  opacity: 0.05;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #654321;
+  z-index: 0;
+  letter-spacing: -10px;
+}
+
+/* Style pour Jacques Lacan */
+.interpretation-lacan {
+  font-family: 'Arial', sans-serif;
+  line-height: 1.7;
+  color: #292929;
+  background-color: rgba(240, 240, 240, 0.7);
+  padding: 1.5rem;
+  border-radius: 0;
+  position: relative;
+  margin: 1rem 0;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-left: 3px solid #292929;
+}
+
+.lacan-intro {
+  font-size: 1rem;
+  text-align: left;
+  color: #292929;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  font-style: italic;
+}
+
+.lacan-content {
+  text-align: justify;
+  padding: 0 1rem;
+}
+
+.lacan-content p {
+  margin-bottom: 1rem;
+}
+
+.lacan-content p::first-letter {
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+.lacan-closing {
+  font-style: italic;
+  color: #292929;
+  margin-top: 1.5rem;
+  text-align: right;
+  padding-top: 0.5rem;
+  font-size: 0.9rem;
+  border-top: 1px solid rgba(41, 41, 41, 0.2);
+}
+
+/* Ajout d'un bord de type nœud borroméen */
+.interpretation-lacan::before {
+  content: "RSI";
+  position: absolute;
+  font-size: 1rem;
+  top: 0.5rem;
+  right: 0.5rem;
+  color: #292929;
+  font-weight: bold;
+  opacity: 0.4;
+  letter-spacing: 2px;
+}
+
+/* Style pour No EGO man */
+.interpretation-noego {
+  font-family: 'Open Sans', Arial, sans-serif;
+  line-height: 1.8;
+  color: #555;
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 2rem;
+  border-radius: 10px;
+  position: relative;
+  margin: 1rem 0;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.noego-intro {
+  font-size: 1.2rem;
+  text-align: center;
+  color: #555;
+  margin-bottom: 2rem;
+  padding-bottom: 0.5rem;
+}
+
+.noego-content {
+  text-align: justify;
+  padding: 0 1rem;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+}
+
+.noego-content p {
+  margin-bottom: 1.5rem;
+}
+
+.noego-closing {
+  font-style: italic;
+  color: #555;
+  margin-top: 2rem;
+  text-align: center;
+  padding-top: 0.5rem;
+  font-weight: 300;
+}
+
+/* Grand symbole yin-yang en arrière-plan */
+.interpretation-noego::before {
+  content: "";
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="none" stroke="%23f0f0f0" stroke-width="2"/><path d="M50,2 a48,48 0 0,1 0,96 a24,24 0 0,1 0,-48 a24,24 0 0,0 0,-48" fill="%23f9f9f9"/><circle cx="50" cy="26" r="5" fill="%23f0f0f0"/><circle cx="50" cy="74" r="5" fill="%23ffffff"/></svg>');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  opacity: 0.1;
+  z-index: -1;
+}
+
+/* Style pour le Dalaï-Lama */
+.interpretation-dalailama {
+  font-family: 'Calibri', 'Open Sans', sans-serif;
+  line-height: 1.7;
+  color: #4a4a4a;
+  background-color: rgba(255, 252, 245, 0.9);
+  padding: 1.5rem;
+  border-radius: 10px;
+  position: relative;
+  margin: 1rem 0;
+  box-shadow: 0 0 20px rgba(204, 170, 102, 0.1);
+  border: 1px solid rgba(204, 170, 102, 0.2);
+}
+
+.dalailama-intro {
+  font-size: 1.1rem;
+  text-align: center;
+  color: #8c6d3f;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(204, 170, 102, 0.3);
+}
+
+.dalailama-content {
+  text-align: justify;
+  padding: 0 1rem;
+  font-weight: 300;
+}
+
+.dalailama-content p {
+  margin-bottom: 1rem;
+}
+
+.dalailama-closing {
+  font-style: italic;
+  color: #8c6d3f;
+  margin-top: 1.5rem;
+  text-align: center;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(204, 170, 102, 0.3);
+}
+
+/* Roue du Dharma en filigrane */
+.interpretation-dalailama::before {
+  content: "";
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="%23f0ead6" stroke-width="1.5"/><circle cx="50" cy="50" r="30" fill="none" stroke="%23f0ead6" stroke-width="1.5"/><circle cx="50" cy="50" r="5" fill="%23f0ead6"/><path d="M50,10 L50,90 M10,50 L90,50 M22,22 L78,78 M22,78 L78,22" stroke="%23f0ead6" stroke-width="1.5"/></svg>');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  opacity: 0.08;
+  z-index: 0;
+}
+
+/* Style pour le Mage Élémentaliste */
+.interpretation-mage {
+  font-family: 'Cinzel', 'Times New Roman', serif;
+  line-height: 1.7;
+  color: #2c3e50;
+  background-color: rgba(245, 245, 250, 0.9);
+  padding: 1.8rem;
+  border-radius: 12px;
+  position: relative;
+  margin: 1rem 0;
+  box-shadow: 0 0 25px rgba(113, 66, 147, 0.15);
+  border: 1px solid rgba(113, 66, 147, 0.2);
+  overflow: hidden;
+}
+
+.mage-invocation {
+  font-size: 1.1rem;
+  text-align: center;
+  color: #714293;
+  margin-bottom: 1.8rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid rgba(113, 66, 147, 0.3);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+
+.mage-content {
+  text-align: justify;
+  padding: 0 1rem;
+  position: relative;
+  z-index: 2;
+}
+
+.mage-content p {
+  margin-bottom: 1.2rem;
+}
+
+.mage-content strong {
+  color: #714293;
+}
+
+.mage-closing {
+  font-style: italic;
+  color: #714293;
+  margin-top: 1.8rem;
+  text-align: center;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(113, 66, 147, 0.3);
+  font-weight: 500;
+}
+
+/* Effet de fond avec les éléments */
+.interpretation-mage::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 10% 10%, rgba(255, 100, 50, 0.03) 40%, transparent 60%),
+    radial-gradient(circle at 90% 10%, rgba(100, 200, 255, 0.03) 40%, transparent 60%),
+    radial-gradient(circle at 10% 90%, rgba(100, 255, 100, 0.03) 40%, transparent 60%),
+    radial-gradient(circle at 90% 90%, rgba(255, 220, 100, 0.03) 40%, transparent 60%);
+  z-index: 1;
+}
+
+/* Style pour Françoise Dolto */
+.interpretation-dolto {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  line-height: 1.8;
+  color: #333;
+  background-color: rgba(255, 252, 245, 0.85);
+  padding: 1.8rem;
+  border-radius: 8px;
+  position: relative;
+  margin: 1rem 0;
+  box-shadow: 0 0 15px rgba(144, 164, 194, 0.15);
+  border-left: 3px solid #90a4c2;
+}
+
+.dolto-intro {
+  font-size: 1.1rem;
+  font-style: italic;
+  color: #617894;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(144, 164, 194, 0.3);
+}
+
+.dolto-content {
+  text-align: justify;
+  padding: 0 1rem;
+}
+
+.dolto-content p {
+  margin-bottom: 1.2rem;
+}
+
+.dolto-content strong {
+  color: #617894;
+}
+
+.dolto-closing {
+  font-style: italic;
+  color: #617894;
+  margin-top: 1.5rem;
+  text-align: right;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(144, 164, 194, 0.3);
+}
+
+/* Image en filigrane d'un profil d'enfant */
+.interpretation-dolto::before {
+  content: "";
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  bottom: 20px;
+  right: 20px;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50,20 C60,20 70,35 70,55 C70,75 60,80 50,80 C40,80 30,75 30,55 C30,35 40,20 50,20 Z" fill="none" stroke="%23f0f0f0" stroke-width="1"/><circle cx="43" cy="45" r="2" fill="%23f0f0f0"/><circle cx="57" cy="45" r="2" fill="%23f0f0f0"/><path d="M43,60 C45,63 55,63 57,60" fill="none" stroke="%23f0f0f0" stroke-width="1"/></svg>');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  opacity: 0.07;
+  z-index: 0;
+}
+
+/* Style pour Michel de Montaigne */
+.interpretation-montaigne {
+  font-family: 'Libre Baskerville', 'Garamond', serif;
+  line-height: 1.7;
+  color: #433626;
+  background-color: rgba(250, 245, 235, 0.9);
+  padding: 2rem;
+  border-radius: 5px;
+  position: relative;
+  margin: 1.2rem 0;
+  box-shadow: 0 0 15px rgba(163, 141, 109, 0.1);
+  border: 1px solid rgba(163, 141, 109, 0.2);
+}
+
+.montaigne-intro {
+  font-size: 1.05rem;
+  font-style: italic;
+  color: #6b5a44;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid rgba(163, 141, 109, 0.3);
+  text-align: justify;
+}
+
+.montaigne-content {
+  text-align: justify;
+  padding: 0 1rem;
+  font-weight: 400;
+  position: relative;
+  z-index: 1;
+}
+
+.montaigne-content p {
+  margin-bottom: 1.2rem;
+  text-indent: 1.5rem;
+}
+
+.montaigne-content p:first-child {
+  text-indent: 0;
+}
+
+.montaigne-closing {
+  font-style: italic;
+  color: #6b5a44;
+  margin-top: 1.5rem;
+  text-align: right;
+  padding-top: 0.7rem;
+  border-top: 1px solid rgba(163, 141, 109, 0.3);
+}
+
+/* Effet de papier ancien et plume en filigrane */
+.interpretation-montaigne::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M20,80 Q30,70 25,65 T30,50 Q40,40 30,30 T10,15 Q40,5 50,10 T70,5 Q90,10 75,25 T80,40 Q90,50 80,60 T90,80 Q70,85 60,75 T30,85 Q15,90 20,80 Z" fill="none" stroke="%23e8e0d0" stroke-width="0.5"/></svg>') no-repeat right bottom / 150px,
+    repeating-linear-gradient(rgba(250, 245, 235, 0.1) 0px, rgba(235, 225, 205, 0.05) 1px, rgba(250, 245, 235, 0.1) 2px);
+  opacity: 0.4;
+  z-index: 0;
+}
+
+/* Style pour l'Imam Soufis */
+.interpretation-imam {
+  font-family: 'Georgia', serif;
+  line-height: 1.8;
+  color: #2c3e50;
+  background-color: rgba(245, 252, 255, 0.9);
+  padding: 1.8rem;
+  border-radius: 8px;
+  position: relative;
+  margin: 1rem 0;
+  box-shadow: 0 0 20px rgba(52, 152, 219, 0.1);
+  border: 1px solid rgba(52, 152, 219, 0.2);
+  overflow: hidden;
+}
+
+.imam-intro {
+  font-size: 1.1rem;
+  text-align: center;
+  color: #1e88a2;
+  margin-bottom: 1.8rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid rgba(52, 152, 219, 0.3);
+  font-style: italic;
+}
+
+.imam-content {
+  text-align: justify;
+  padding: 0 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.imam-content p {
+  margin-bottom: 1.2rem;
+}
+
+.imam-content p:first-letter {
+  font-size: 1.1em;
+  color: #1e88a2;
+}
+
+.imam-closing {
+  font-style: italic;
+  color: #1e88a2;
+  margin-top: 1.8rem;
+  text-align: center;
+  padding-top: 0.7rem;
+  border-top: 1px solid rgba(52, 152, 219, 0.3);
+}
+
+/* Motif géométrique islamique en filigrane */
+.interpretation-imam::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M25,25 L75,25 L75,75 L25,75 Z" fill="none" stroke="%23e6f2f7" stroke-width="0.5"/><path d="M40,25 L25,40 M60,25 L25,60 M75,40 L40,75 M75,60 L60,75" stroke="%23e6f2f7" stroke-width="0.5"/><path d="M50,25 L25,50 L50,75 L75,50 Z" fill="none" stroke="%23e6f2f7" stroke-width="0.5"/></svg>');
+  background-repeat: repeat;
+  background-size: 50px 50px;
+  opacity: 0.1;
+  z-index: 0;
+}
+
+/* Style pour le Maître Franc-Maçon */
+.interpretation-francmacon {
+  font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+  line-height: 1.7;
+  color: #333;
+  background-color: rgba(245, 245, 245, 0.95);
+  padding: 1.8rem;
+  border-radius: 0;
+  position: relative;
+  margin: 1rem 0;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  border-left: 3px solid #b8860b;
+  border-right: 3px solid #b8860b;
+}
+
+.francmacon-intro {
+  font-size: 1.1rem;
+  text-align: center;
+  color: #333;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid rgba(184, 134, 11, 0.3);
+}
+
+.francmacon-content {
+  text-align: justify;
+  padding: 0 1rem;
+  position: relative;
+  z-index: 2;
+}
+
+.francmacon-content p {
+  margin-bottom: 1.2rem;
+}
+
+.francmacon-content strong {
+  color: #b8860b;
+}
+
+.francmacon-closing {
+  font-style: italic;
+  color: #333;
+  margin-top: 1.5rem;
+  text-align: center;
+  padding-top: 0.7rem;
+  border-top: 1px solid rgba(184, 134, 11, 0.3);
+}
+
+/* Symboles maçonniques en filigrane */
+.interpretation-francmacon::before {
+  content: "";
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="%23f0f0f0" stroke-width="0.7"/><path d="M50,10 L90,70 L10,70 Z" fill="none" stroke="%23f0f0f0" stroke-width="0.7"/><path d="M30,70 A20,20 0 0,0 70,70" fill="none" stroke="%23f0f0f0" stroke-width="0.7"/><path d="M50,10 L50,70" fill="none" stroke="%23f0f0f0" stroke-width="0.7"/></svg>');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  opacity: 0.05;
+  z-index: 1;
+}
+
+.interpretation-francmacon::after {
+  content: "G";
+  position: absolute;
+  font-family: 'Times New Roman', serif;
+  font-size: 1.5rem;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(184, 134, 11, 0.15);
+  z-index: 1;
+}
+
+/* Suppression du commentaire problématique */
+.empty-rule {
+  /* Règle vide pour terminer le fichier correctement */
+}
+
+/* Style pour le Roi Salomon */
+.interpretation-salomon {
+  font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+  line-height: 1.7;
+  color: #483C32;
+  background-color: rgba(252, 250, 240, 0.9);
+  padding: 2rem;
+  border-radius: 8px;
+  position: relative;
+  margin: 1rem 0;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.salomon-intro {
+  font-size: 1.1rem;
+  text-align: center;
+  color: #8B4513;
+  margin-bottom: 1.8rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+  font-weight: 500;
+}
+
+.salomon-content {
+  text-align: justify;
+  padding: 0 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.salomon-content p {
+  margin-bottom: 1.2rem;
+  text-indent: 1.5rem;
+}
+
+.salomon-content p:first-of-type {
+  text-indent: 0;
+}
+
+.salomon-content strong {
+  color: #8B4513;
+}
+
+.salomon-closing {
+  font-style: italic;
+  color: #8B4513;
+  margin-top: 1.8rem;
+  text-align: center;
+  padding-top: 0.7rem;
+  border-top: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+/* Symbole du sceau de Salomon et éléments royaux en filigrane */
+.interpretation-salomon::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50,10 L90,70 L10,70 Z" fill="none" stroke="%23fcf5e5" stroke-width="1"/><path d="M50,70 L90,10 L10,10 Z" fill="none" stroke="%23fcf5e5" stroke-width="1"/><circle cx="50" cy="40" r="25" fill="none" stroke="%23fcf5e5" stroke-width="1"/></svg>') no-repeat center / 120px,
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M20,85 L30,75 L40,85 L50,75 L60,85 L70,75 L80,85" fill="none" stroke="%23fcf5e5" stroke-width="1"/></svg>') no-repeat bottom center / 200px 30px;
+  opacity: 0.1;
+  z-index: 0;
+}
+
+/* Style pour Don Quichotte */
+.interpretation-quichotte {
+  font-family: 'Garamond', 'Georgia', serif;
+  line-height: 1.6;
+  color: #654321;
+  background-color: rgba(255, 248, 235, 0.9);
+  padding: 1.8rem;
+  border-radius: 10px;
+  position: relative;
+  margin: 1rem 0;
+  box-shadow: 0 0 15px rgba(205, 133, 63, 0.2);
+  border: 1px dashed rgba(205, 133, 63, 0.5);
+  overflow: hidden;
+}
+
+.quichotte-intro {
+  font-size: 1.1rem;
+  text-align: center;
+  color: #CD853F;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(205, 133, 63, 0.3);
+  font-style: italic;
+}
+
+.quichotte-content {
+  text-align: justify;
+  padding: 0 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.quichotte-content p {
+  margin-bottom: 1.2rem;
+}
+
+.quichotte-content p::first-letter {
+  font-size: 1.3em;
+  font-weight: bold;
+  color: #8B4513;
+}
+
+.quichotte-closing {
+  font-style: italic;
+  color: #CD853F;
+  margin-top: 1.5rem;
+  text-align: center;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(205, 133, 63, 0.3);
+}
+
+/* Silhouette de Don Quichotte en filigrane */
+.interpretation-quichotte::before {
+  content: "";
+  position: absolute;
+  width: 200px;
+  height: 250px;
+  right: -30px;
+  bottom: -30px;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 150"><path d="M70,30 L75,20 L65,10 L50,15 L45,10 L40,20 L45,30 L50,40 L45,50 L40,70 L50,90 L45,110 L40,130 L60,140 L55,110 L60,100 L65,85 L55,70 L60,50 L55,30" stroke="%23f7e8d5" fill="none" stroke-width="1"/><circle cx="57" cy="20" r="8" stroke="%23f7e8d5" fill="none" stroke-width="1"/><path d="M65,40 L75,45 L80,60" stroke="%23f7e8d5" fill="none" stroke-width="1"/></svg>');
+  background-repeat: no-repeat;
+  background-position: bottom right;
+  background-size: contain;
+  opacity: 0.1;
+  z-index: 0;
+}
+
+/* Animations pour l'affichage progressif des interprétations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Styles généraux pour les interprétations progressives */
+[class^="interpretation-"] {
+  animation: fadeIn 0.5s ease-out;
+  transition: all 0.3s ease;
+  background-color: transparent !important;
+  pointer-events: none; /* Les clics passent à travers */
+}
+
+[class$="-intro"], [class$="-content"], [class$="-closing"] {
+  animation: slideIn 0.5s ease-out;
+  transition: opacity 0.3s ease;
+  background: none !important;
+  pointer-events: none; /* Les clics passent à travers */
+}
+
+/* Assurer la transparence absolue pendant le défilement */
+.interpretation-panel,
+#interpretations,
+#interpretations * {
+  background-color: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+/* Réactiver les interactions uniquement sur les paragraphes */
+[class^="interpretation-"] p,
+[class$="-intro"] p,
+[class$="-content"] p,
+[class$="-closing"] p {
+  pointer-events: auto; /* On peut sélectionner le texte */
+  background-color: rgba(255, 255, 255, 0.75) !important;
+  padding: 8px;
+  border-radius: 4px;
+  margin-bottom: 0.8em;
+  line-height: 1.5;
+  transition: color 0.3s ease;
+  /* Ajouter une bordure légère pour améliorer la lisibilité */
+  border: 1px solid rgba(107, 91, 149, 0.1);
+}
+
+/* Supprimer tous les pseudo-éléments qui pourraient bloquer les interactions */
+[class^="interpretation-"]::before,
+[class^="interpretation-"]::after,
+[class$="-intro"]::before,
+[class$="-intro"]::after,
+[class$="-content"]::before,
+[class$="-content"]::after,
+[class$="-closing"]::before,
+[class$="-closing"]::after {
+  display: none !important;
+}
+
+/* Animation d'écriture avec clics activés */
+.typing-effect {
+  pointer-events: auto;
+  border-right: 2px solid transparent;
+  animation: typing 0.5s steps(1, end) infinite;
+}
+
+@keyframes typing {
+  from { border-right-color: currentColor; }
+  to { border-right-color: transparent; }
+}
+
+/* S'assurer que le scrollbar ne crée pas d'effet indésirable */
+#interpretations::-webkit-scrollbar {
+  width: 8px;
+}
+
+#interpretations::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#interpretations::-webkit-scrollbar-thumb {
+  background-color: rgba(107, 91, 149, 0.3);
+  border-radius: 4px;
+} 

@@ -1,0 +1,168 @@
+/**
+ * Styles pour les fenêtres modales
+ */
+
+/* Overlay de la modale */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-index-modal);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--transition-base), visibility var(--transition-base);
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Conteneur de la modale */
+.modal {
+  background-color: white;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-lg);
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: translateY(-20px);
+  opacity: 0;
+  transition: transform var(--transition-base), opacity var(--transition-base);
+}
+
+.modal-overlay.active .modal {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* En-tête de la modale */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.modal-title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-text);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: var(--font-size-xl);
+  line-height: 1;
+  cursor: pointer;
+  color: var(--color-text-light);
+  transition: color var(--transition-fast);
+}
+
+.modal-close:hover {
+  color: var(--color-text);
+}
+
+/* Corps de la modale */
+.modal-body {
+  padding: var(--spacing-lg);
+}
+
+/* Pied de la modale */
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Animation d'entrée et de sortie */
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modal-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+/* Modale spécifique pour les informations des cartes */
+.card-modal {
+  display: flex;
+  flex-direction: column;
+  max-width: 800px;
+}
+
+.card-modal-content {
+  display: flex;
+  gap: var(--spacing-lg);
+}
+
+.card-modal-image {
+  flex: 0 0 200px;
+}
+
+.card-modal-info {
+  flex: 1;
+}
+
+.card-modal-title {
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--spacing-md);
+  color: var(--color-primary);
+}
+
+.card-modal-meaning {
+  margin-bottom: var(--spacing-md);
+}
+
+.card-modal-position {
+  font-weight: bold;
+  color: var(--color-text);
+}
+
+/* Modale pour les avertissements */
+.warning-modal .modal-header {
+  background-color: var(--color-warning);
+  color: white;
+}
+
+.warning-modal .modal-title {
+  color: white;
+}
+
+/* Modale pour les erreurs */
+.error-modal .modal-header {
+  background-color: var(--color-error);
+  color: white;
+}
+
+.error-modal .modal-title {
+  color: white;
+} 

@@ -1,0 +1,165 @@
+/**
+ * Variables globales pour JodoTarot
+ * Définit les couleurs, tailles, espacements et autres valeurs réutilisables
+ */
+
+:root {
+  /* Palette de couleurs */
+  --color-primary: #6b5b95;
+  --color-primary-dark: #534672;
+  --color-primary-light: #8775af;
+  --color-secondary: #b5a9d4;
+  --color-tertiary: #282639;
+  
+  --color-background: #f5f5f7;
+  --color-card-background: #fff;
+  --color-text: #333;
+  --color-text-light: #666;
+  --color-text-lightest: #999;
+  
+  --color-success: #28a745;
+  --color-warning: #ffc107;
+  --color-error: #dc3545;
+  --color-info: #17a2b8;
+  
+  /* Typographie */
+  --font-family-base: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --font-family-headings: 'Georgia', serif;
+  --font-family-special: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+  
+  --font-size-xs: 0.75rem;   /* 12px */
+  --font-size-sm: 0.875rem;  /* 14px */
+  --font-size-base: 1rem;    /* 16px */
+  --font-size-md: 1.125rem;  /* 18px */
+  --font-size-lg: 1.25rem;   /* 20px */
+  --font-size-xl: 1.5rem;    /* 24px */
+  --font-size-xxl: 2rem;     /* 32px */
+  
+  --line-height-tight: 1.25;
+  --line-height-base: 1.5;
+  --line-height-loose: 1.75;
+  
+  /* Espacement */
+  --spacing-xs: 0.25rem;   /* 4px */
+  --spacing-sm: 0.5rem;    /* 8px */
+  --spacing-md: 1rem;      /* 16px */
+  --spacing-lg: 1.5rem;    /* 24px */
+  --spacing-xl: 2rem;      /* 32px */
+  --spacing-xxl: 3rem;     /* 48px */
+  
+  /* Bordures et ombres */
+  --border-radius-sm: 0.25rem;  /* 4px */
+  --border-radius-md: 0.5rem;   /* 8px */
+  --border-radius-lg: 1rem;     /* 16px */
+  
+  --border-width-thin: 1px;
+  --border-width-medium: 2px;
+  --border-width-thick: 4px;
+  
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1);
+  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+  
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  
+  /* Z-index */
+  --z-index-below: -1;
+  --z-index-base: 1;
+  --z-index-above: 10;
+  --z-index-modal: 100;
+  --z-index-toast: 1000;
+  
+  /* Dimensions des cartes */
+  --card-width: 100px;
+  --card-height: 170px;
+  --card-width-large: 160px;
+  --card-height-large: 272px;
+  
+  /* Dimensions du conteneur de tirage */
+  --spread-width: 600px;
+  --spread-height: 550px;
+
+  /* Variables pour les positions des cartes */
+
+  /* Tirage en croix */
+  --cross-center-x: 50%;
+  --cross-center-y: 50%;
+  --cross-top-x: 50%;
+  --cross-top-y: 18%;
+  --cross-left-x: 30%;
+  --cross-left-y: 50%;
+  --cross-right-x: 70%;
+  --cross-right-y: 50%;
+  --cross-bottom-x: 50%;
+  --cross-bottom-y: 82%;
+
+  /* Positions en fer à cheval */
+  --horseshoe-past-x: 40%;
+  --horseshoe-past-y: 20%;
+  --horseshoe-recent-x: 50%;
+  --horseshoe-recent-y: 90%;
+  --horseshoe-present-x: 20%;
+  --horseshoe-present-y: 45%;
+  --horseshoe-future-x: 32%;
+  --horseshoe-future-y: 80%;
+  --horseshoe-outcome-x: 60%;
+  --horseshoe-outcome-y: 20%;
+  --horseshoe-influences-x: 68%;
+  --horseshoe-influences-y: 80%;
+  --horseshoe-advice-x: 80%;
+  --horseshoe-advice-y: 45%;
+
+  /* Positions du tirage de l'amour */
+  /* Première ligne - Vous et Partenaire */
+  --love-you-x: 50%;          /* card-1: self */
+  --love-you-y: 55%;
+  --love-partner-x: 50%;      /* card-2: partner */
+  --love-partner-y: 20%;
+  
+  /* Deuxième ligne - Relation et Obstacles */
+  --love-relationship-x: 30%; /* card-3: relationship */
+  --love-relationship-y: 40%;
+  --love-foundation-x: 70%;   /* card-4: obstacles */
+  --love-foundation-y: 40%;
+  
+  /* Troisième ligne - Passé (Désirs), Présent (Résultat), Futur (Conseil) */
+  --love-past-x: 30%;         /* card-5: desires */
+  --love-past-y: 75%;
+  --love-present-x: 50%;      /* card-6: outcome */
+  --love-present-y: 90%;
+  --love-future-x: 70%;       /* card-7: advice */
+  --love-future-y: 75%;
+
+  /* Positions de la croix celtique */
+  /* Centre de la croix */
+  --celtic-present-x: 35%;    /* Carte 1: Situation actuelle */
+  --celtic-present-y: 45%;
+  --celtic-challenge-x: 35%;  /* Carte 2: Obstacle/Défi (croisée) */
+  --celtic-challenge-y: 45%;
+  
+  /* Tige de la croix */
+  --celtic-crown-x: 35%;     /* Carte 5: Couronne/Objectif */
+  --celtic-crown-y: 15%;
+  --celtic-foundation-x: 35%; /* Carte 3: Base/Fondation */
+  --celtic-foundation-y: 75%;
+  
+  /* Bras de la croix */
+  --celtic-past-x: 15%;      /* Carte 4: Passé */
+  --celtic-past-y: 45%;
+  --celtic-future-x: 55%;    /* Carte 6: Futur */
+  --celtic-future-y: 45%;
+  
+  /* Bâton à droite (de bas en haut) */
+  --celtic-self-x: 75%;      /* Carte 7: Vous-même */
+  --celtic-self-y: 80%;
+  --celtic-environment-x: 75%; /* Carte 8: Environnement */
+  --celtic-environment-y: 60%;
+  --celtic-hopes-x: 75%;      /* Carte 9: Espoirs/Craintes */
+  --celtic-hopes-y: 40%;
+  --celtic-outcome-x: 75%;    /* Carte 10: Résultat final */
+  --celtic-outcome-y: 20%;
+} 

@@ -1,0 +1,147 @@
+/**
+ * Styles pour les panneaux de l'application
+ */
+
+/* Conteneur principal */
+.container {
+  display: flex;
+  width: 100%;
+  height: calc(100vh - 200px); /* Hauteur totale moins la hauteur du header */
+  margin: 0;
+  padding: 0;
+}
+
+/* Zone de tirage - Panneau fixe à gauche */
+.spread-panel {
+  flex: 0 0 600px;  /* Largeur fixe de 600px comme demandé */
+  width: 600px;
+  min-width: 600px;
+  height: 600px; /* Hauteur fixe de 600px comme demandé */
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  position: relative;
+  padding: 0;
+  background-color: transparent;
+  overflow: hidden;
+}
+
+/* Zone d'interprétation - Panneau flexible à droite */
+.interpretation-panel {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  background-color: transparent;
+  overflow-y: auto;
+  position: relative;
+  display: block; /* Assure que le panneau est toujours affiché */
+  max-width: 900px; /* Définir une largeur maximale pour éviter des lignes trop longues */
+  margin: 0 auto; /* Centrer le panneau */
+}
+
+/* Zone pour les interprétations */
+#interpretations {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family-special);
+  line-height: var(--line-height-loose);
+  color: var(--color-text);
+  text-align: left;
+}
+
+/* Conteneur d'interprétation */
+#interpretations [class^="interpretation-"] {
+  width: 100%;
+  margin-bottom: var(--spacing-lg);
+  background-color: transparent;
+}
+
+/* Paragraphes d'interprétation */
+#interpretations [class^="interpretation-"] p,
+#interpretations #default-interpretation,
+#interpretations .promo-text,
+#interpretations .typing-effect {
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid rgba(107, 91, 149, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  font-size: var(--font-size-md);
+  line-height: 1.8;
+}
+
+/* Sections spécifiques de l'interprétation */
+[class$="-intro"],
+[class$="-content"],
+[class$="-closing"] {
+  width: 100%;
+  margin-bottom: var(--spacing-md);
+}
+
+/* Texte par défaut */
+#default-interpretation {
+  text-align: center;
+  font-style: italic;
+  color: var(--color-text-light);
+  padding: var(--spacing-xl);
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: var(--border-radius-lg);
+  margin: var(--spacing-xl) 0;
+}
+
+/* Styles responsifs */
+@media (max-width: 1200px) {
+  .container {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh; /* S'assure que le conteneur prend au moins toute la hauteur de la fenêtre */
+  }
+  
+  .spread-panel {
+    width: 600px;
+    max-width: 600px;
+    min-width: 600px;
+    margin: 0 auto;
+    height: 600px;
+  }
+  
+  .interpretation-panel {
+    width: 100%;
+    margin: 0;
+    padding: var(--spacing-md);
+    min-height: 300px; /* Hauteur minimale pour assurer la visibilité */
+    display: block; /* Force l'affichage du panneau */
+    overflow-y: auto; /* Permet de faire défiler si le contenu est trop grand */
+  }
+  
+  #interpretations {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .spread-panel {
+    width: 100%;
+    max-width: 600px;
+    min-width: 320px;
+    height: 600px;
+  }
+  
+  .interpretation-panel {
+    padding: var(--spacing-sm);
+    min-height: 250px; /* Ajusté pour les écrans encore plus petits */
+  }
+  
+  #interpretations [class^="interpretation-"] p,
+  #interpretations #default-interpretation,
+  #interpretations .promo-text,
+  #interpretations .typing-effect {
+    padding: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+  }
+} 

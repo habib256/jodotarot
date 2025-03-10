@@ -4,20 +4,24 @@
 
 ## ✨ Présentation
 
-JodoTarot est une application web élégante et intuitive qui vous permet de réaliser des tirages de tarot en croix et d'obtenir des interprétations générées par intelligence artificielle. Inspirée par l'univers mystique du tarot, cette application combine l'art divinatoire traditionnel avec les technologies modernes d'IA pour vous offrir une expérience de consultation unique.
+JodoTarot est une application web élégante et intuitive qui vous permet de réaliser des tirages de tarot et d'obtenir des interprétations générées par intelligence artificielle. Inspirée par l'univers mystique du tarot, cette application combine l'art divinatoire traditionnel avec les technologies modernes d'IA pour vous offrir une expérience de consultation unique.
 
 [Lancer JodoTarot dans votre navigateur pour tester l'interface (Attention, l'accès à l'IA n'est pas fonctionelle d'ici)](https://habib256.github.io/jodotarot/index.html)  
 
 ## 🌟 Fonctionnalités principales
 
-- 🎴 **Tirage en croix** avec 5 cartes (influences positives, passé, situation actuelle, futur, influences négatives)
+- 🎴 **Multiples modes de tirage**:
+  - **Tirage en croix** avec 5 cartes (influences positives, passé, situation actuelle, futur, influences négatives)
+  - **Tirage en fer à cheval** pour analyser la progression d'une situation
+  - **Tirage de l'amour** dédié aux questions sentimentales
+  - **Croix celtique** pour une analyse approfondie de 10 cartes
 - 🧠 **Interprétation par IA** de votre tirage en fonction de votre question
 - 👤 **Personnages variés** pour interpréter votre tirage (20 personas différents)
 - 🔄 **Flexibilité des modèles d'IA** (OpenAI et modèles locaux Ollama)
 - 📱 **Interface responsive** adaptée à tous les appareils
 - 🖼️ **Visualisation claire** des cartes et de leur signification dans le tirage
 - 🎨 **Choix de jeux de cartes** (Tarot de Marseille et Tarot Thiago Lehmann)
-- 🌍 **Support multilingue** (Français, Anglais, Espagnol, Allemand, Italien)
+- 🌍 **Support multilingue** (Français, Anglais, Espagnol, Allemand, Italien, Chinois)
 - 🔄 **Cache intégré** pour les réponses d'IA afin d'optimiser les performances
 
 ## 🎭 Les personas disponibles
@@ -38,7 +42,7 @@ JodoTarot propose 20 personnages différents pour interpréter votre tirage. Cha
 - ✡️ **Rabbin Kabbaliste** - Érudit associant les arcanes aux lettres hébraïques et sentiers de l'Arbre de Vie
 - ☪️ **Imam Soufi** - Guide spirituel explorant les miroirs de l'âme (nafs) et le chemin vers le divin
 - ☸️ **Dalaï-Lama** - Leader bouddhiste tibétain expliquant avec simplicité les causes de la souffrance et la voie du milieu
-
+- 🏛️ **Maître Franc-Maçon** - Sage utilisant les symboles maçonniques pour dévoiler les vérités universelles
 
 ### Traditions Ésotériques:
 - 🌙 **Sorcière Ancestrale** - Gardienne des savoirs païens reliant le tirage aux cycles naturels
@@ -73,15 +77,58 @@ Une interprétation artistique moderne des arcanes.
 
 ## 🌍 Langues disponibles
 
-JodoTarot prend en charge 5 langues différentes:
+JodoTarot prend en charge 6 langues différentes:
 
 - 🇫🇷 **Français** (langue par défaut)
 - 🇬🇧 **Anglais**
 - 🇪🇸 **Espagnol**
 - 🇩🇪 **Allemand**
 - 🇮🇹 **Italien**
+- 🇨🇳 **Chinois**
 
-L'interface utilisateur complète ainsi que les interprétations générées par l'IA sont adaptées à la langue sélectionnée.
+
+## 🔮 Types de tirages disponibles
+
+### Tirage en Croix (Cross Spread)
+Un tirage classique à 5 cartes qui examine la situation à travers différentes perspectives :
+- Influences positives
+- Passé
+- Situation actuelle
+- Futur
+- Influences négatives
+
+### Tirage en Fer à Cheval (Horseshoe Spread)
+Un tirage à 7 cartes qui suit l'évolution d'une situation :
+- Situation actuelle
+- Obstacles immédiats
+- Influences inconscientes
+- Conseils à suivre
+- Influences extérieures
+- Espoirs et craintes
+- Résultat final
+
+### Tirage de l'Amour (Love Spread)
+Un tirage spécialisé à 7 cartes pour les questions relationnelles et sentimentales :
+- Vous (votre énergie)
+- Partenaire (son énergie)
+- Relation (ce qui vous lie)
+- Obstacles (défis à surmonter)
+- Désirs (passé/attentes)
+- Résultat (présent/situation actuelle)
+- Conseil (futur/direction)
+
+### Croix Celtique (Celtic Cross Spread)
+Un tirage approfondi à 10 cartes qui offre une lecture très complète de la situation :
+- Situation actuelle
+- Obstacle/Défi
+- Base/Fondation
+- Passé
+- Couronne/Objectif
+- Futur
+- Vous-même
+- Environnement
+- Espoirs/Craintes
+- Résultat final
 
 ## 🤖 Modèles d'IA supportés
 
@@ -93,12 +140,13 @@ L'interface utilisateur complète ainsi que les interprétations générées par
 ### Ollama (modèles locaux):
 - Tous les modèles installés sur votre serveur Ollama local sont automatiquement détectés
 - Premier modèle Ollama disponible utilisé par défaut si le serveur est accessible
+- Support optimisé pour différentes familles de modèles (llama, mistral, phi, gemma, etc.)
 
 ## 🚀 Comment utiliser JodoTarot
 
 1. **Choisissez votre langue** dans le menu déroulant en haut à gauche
 2. **Posez votre question** dans le champ dédié
-3. **Choisissez votre persona**, le **jeu de cartes** et le **modèle d'IA** souhaités
+3. **Choisissez votre persona**, le **jeu de cartes**, le **mode de tirage** et le **modèle d'IA** souhaités
 4. **Cliquez sur "Tirer les cartes"**
 5. **Contemplez** le tirage qui s'affiche
 6. **Lisez l'interprétation** générée par l'IA dans le style du persona choisi
@@ -118,6 +166,7 @@ Voici un exemple de tirage en croix avec son interprétation complète:
 - Expérimentez avec différents personas pour découvrir diverses perspectives sur votre tirage
 - Les modèles plus avancés comme GPT-4o offrent généralement des interprétations plus nuancées
 - Essayez les deux jeux de cartes pour voir lequel résonne le plus avec vous
+- Expérimentez les différents types de tirages en fonction de vos questions
 - Prenez le temps de méditer sur chaque carte avant de lire l'interprétation complète
 
 
@@ -153,13 +202,52 @@ Développé avec ❤️ pour les amateurs de tarot et d'exploration intérieure.
 
 - Application entièrement modulaire en JavaScript ES6
 - Architecture orientée composants avec séparation claire des responsabilités:
-  - `app.js`: Point d'entrée principal et gestion des événements
-  - `tarot.js`: Logique des cartes et des tirages
-  - `api.js`: Communication avec les API d'IA (OpenAI et Ollama)
-  - `ui.js`: Gestion de l'interface utilisateur
-  - `translations.js`: Système de traduction multilingue
-  - `config.js`: Configuration globale de l'application
-  - `personas/*.js`: Définition des différents personnages interprètes
+  - `main.js` (231 lignes): Point d'entrée principal qui initialise l'application
+  - `app.js` (188 lignes): Gestion des événements et de l'interaction utilisateur
+  - `api.js` (658 lignes): Communication avec les API d'IA (OpenAI et Ollama)
+  - `ui.js` (281 lignes): Gestion de l'interface utilisateur
+  - `metaprompt.js` (72 lignes): Gestion des prompts IA
+  - `config.js` (103 lignes): Configuration globale de l'application
+
+- Architecture MVC claire avec:
+  - **Contrôleurs** pour la logique métier:
+    - `AppController.js` (216 lignes): Contrôleur principal de l'application
+    - `ReadingController.js` (604 lignes): Contrôleur de lecture de tarot
+    - `ConfigController.js` (654 lignes): Contrôleur de configuration
+  - **Services** pour la gestion des ressources:
+    - `AIService.js` (412 lignes): Service d'intelligence artificielle
+    - `DeckService.js` (436 lignes): Service de gestion du jeu de cartes
+    - `UIService.js` (128 lignes): Service d'interface utilisateur
+  - **Modèles** pour les données:
+    - `spreads/`: Types de tirages disponibles
+      - `BaseSpread.js` (331 lignes): Classe de base pour tous les tirages
+      - `CrossSpread.js` (141 lignes): Tirage en Croix
+      - `HorseshoeSpread.js` (184 lignes): Tirage en Fer à Cheval
+      - `LoveSpread.js` (216 lignes): Tirage de l'Amour
+      - `CelticCrossSpread.js` (295 lignes): Croix Celtique
+    - `personas/`: Définitions des différents personnages interprètes
+    - `cards/`: Définition des cartes et de leurs significations
+
+- Organisation CSS modulaire et sophistiquée:
+  - `main.css` (47 lignes): Point d'entrée CSS
+  - **Base**:
+    - `variables.css` (165 lignes): Définition des variables CSS, notamment pour les positions des cartes
+    - `reset.css` (222 lignes): Réinitialisation des styles
+    - `typography.css` (138 lignes): Styles typographiques
+  - **Modules**:
+    - `interpretations.css` (352 lignes): Styles pour les interprétations
+    - `cross-spread.css` (130 lignes): Styles pour le tirage en Croix
+    - `horseshoe-spread.css` (110 lignes): Styles pour le tirage en Fer à Cheval  
+    - `love-spread.css` (115 lignes): Styles pour le tirage de l'Amour
+    - `celtic-cross-spread.css` (157 lignes): Styles pour la Croix Celtique
+    - `persona.css` (1369 lignes): Styles pour les personas
+
+- Approche innovante de positionnement des cartes:
+  - CSS comme "source unique de vérité" pour le positionnement
+  - Séparation claire entre la logique de tirage (JavaScript) et la présentation (CSS)
+  - Variables CSS pour définir toutes les positions des cartes
+  - Facilité de maintenance et d'extension pour de nouveaux tirages
+
 - Système de cache pour optimiser les performances et réduire les appels API
 - Formatage des réponses avec des balises HTML pour une présentation élégante
 - Gestion des erreurs robuste pour les problèmes de connexion API
@@ -203,7 +291,6 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ## 🔄 Mises à jour futures envisageables
 
-- Ajout de nouveaux types de tirages (tirage en fer à cheval, tirage celtique, etc.)
 - Support pour les arcanes mineurs (jeu complet de 78 cartes)
 - Possibilité de sauvegarder et partager vos tirages
 - Thèmes visuels alternatifs pour l'interface comme un mode sombre

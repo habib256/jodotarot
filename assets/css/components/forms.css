@@ -1,0 +1,170 @@
+/**
+ * Styles pour les éléments de formulaire
+ */
+
+/* Groupe d'entrée et label */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--spacing-md);
+  width: 100%;
+}
+
+label {
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-xs);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* Styles pour le conteneur de question */
+.question-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--spacing-md);
+  width: 100%;
+}
+
+/* Styles pour le conteneur des contrôles */
+.controls-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+/* Champs de texte */
+.text-input,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+input[type="tel"],
+input[type="url"] {
+  display: block;
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  color: var(--color-text);
+  background-color: white;
+  border: 1px solid var(--color-text-lightest);
+  border-radius: var(--border-radius-sm);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+.text-input:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus {
+  border-color: var(--color-primary);
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(107, 91, 149, 0.2);
+}
+
+/* Textarea */
+.question-input,
+textarea {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 100px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  color: var(--color-text);
+  background-color: white;
+  border: 1px solid var(--color-text-lightest);
+  border-radius: var(--border-radius-sm);
+  resize: vertical;
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+.question-input:focus,
+textarea:focus {
+  border-color: var(--color-primary);
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(107, 91, 149, 0.2);
+}
+
+/* Select */
+select {
+  display: block;
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  color: var(--color-text);
+  background-color: white;
+  border: 1px solid var(--color-text-lightest);
+  border-radius: var(--border-radius-sm);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 8.825L1.175 4 2.238 2.938 6 6.7 9.763 2.938 10.825 4z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--spacing-md) center;
+  padding-right: var(--spacing-xl);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+select:focus {
+  border-color: var(--color-primary);
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(107, 91, 149, 0.2);
+}
+
+/* Checkbox et radio */
+.checkbox-group,
+.radio-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  margin-right: var(--spacing-sm);
+}
+
+/* États d'erreur */
+.input-error {
+  border-color: var(--color-error) !important;
+}
+
+.error-message {
+  display: block;
+  margin-top: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--color-error);
+}
+
+/* Style spécifique pour le champ de question */
+#question {
+  width: 100%;
+  border: 1px solid var(--color-secondary);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-sm);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  transition: border-color 0.3s, box-shadow 0.3s;
+  resize: none;
+}
+
+#question:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(107, 91, 149, 0.2);
+  outline: none;
+}
+
+/* Placeholder */
+#question::placeholder {
+  color: var(--color-text-lightest);
+  opacity: 0.7;
+}
+
+/* Suppression des styles liés au toggle switch de streaming */
+/* .streaming-option, .switch, .slider ont été supprimés */ 

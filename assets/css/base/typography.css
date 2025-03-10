@@ -1,0 +1,138 @@
+/**
+ * Styles typographiques de base pour JodoTarot
+ */
+
+/* Styles de base */
+html {
+  font-size: 16px;
+  line-height: var(--line-height-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-family-base);
+  color: var(--color-text);
+  font-size: var(--font-size-base);
+}
+
+/* Titres */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-headings);
+  margin-top: 0;
+  margin-bottom: var(--spacing-md);
+  line-height: var(--line-height-tight);
+  color: var(--color-text);
+}
+
+h1 {
+  font-size: var(--font-size-xxl);
+}
+
+h2 {
+  font-size: var(--font-size-xl);
+}
+
+h3 {
+  font-size: var(--font-size-lg);
+}
+
+h4 {
+  font-size: var(--font-size-md);
+}
+
+h5, h6 {
+  font-size: var(--font-size-base);
+}
+
+/* Texte */
+p {
+  margin-top: 0;
+  margin-bottom: var(--spacing-md);
+}
+
+/* Liens */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+
+/* Listes */
+ul, ol {
+  margin-top: 0;
+  margin-bottom: var(--spacing-md);
+  padding-left: var(--spacing-xl);
+}
+
+li {
+  margin-bottom: var(--spacing-xs);
+}
+
+/* Texte spécial */
+.text-special {
+  font-family: var(--font-family-special);
+}
+
+/* Tailles de texte utilitaires */
+.text-xs {
+  font-size: var(--font-size-xs);
+}
+
+.text-sm {
+  font-size: var(--font-size-sm);
+}
+
+.text-md {
+  font-size: var(--font-size-md);
+}
+
+.text-lg {
+  font-size: var(--font-size-lg);
+}
+
+.text-xl {
+  font-size: var(--font-size-xl);
+}
+
+.text-xxl {
+  font-size: var(--font-size-xxl);
+}
+
+/* Styles de texte utilitaires */
+.text-light {
+  color: var(--color-text-light);
+}
+
+.text-lightest {
+  color: var(--color-text-lightest);
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-bold {
+  font-weight: bold;
+}
+
+.text-italic {
+  font-style: italic;
+}
+
+/* Styles pour les étiquettes des positions de cartes */
+.card-position-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+  text-align: center;
+  margin-top: var(--spacing-xs);
+} 

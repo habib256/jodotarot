@@ -4,113 +4,125 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title id="page-title">JodoTarot</title>
-  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="icon" href="http://localhost/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
   <div class="header">
-    <div class="left-side-container">
-      <!-- Menus déroulants à gauche -->
-      <div class="selection-controls">
-        <div class="select-group">
-          <span class="select-label">Langue :</span>
-          <select id="language" class="select-dropdown">
-            <option value="fr" selected>🇫🇷 Français</option>
-            <option value="en">🇬🇧 English</option>
-            <option value="es">🇪🇸 Español</option>
-            <option value="de">🇩🇪 Deutsch</option>
-            <option value="it">🇮🇹 Italiano</option>
-            <option value="zh">🇨🇳 中文</option>
-          </select>
-        </div>
-        
-        <div class="select-group">
-          <span class="select-label">Personnage :</span>
-          <select id="persona" class="select-dropdown">
-            <optgroup label="Arts Divinatoires">
-              <option value="tarologue">🔮 Tarologue</option>
-              <option value="oracle">✨ Oracle Mystique</option>
-              <option value="voyante">🎯 Voyante Gitane</option>
-            </optgroup>
-            <optgroup label="Traditions Spirituelles">
-              <option value="pretre">✝️ Prêtre Exégète</option>
-              <option value="rabbin">✡️ Rabbin Kabbaliste</option>
-              <option value="imam">☪️ Imam Soufis</option>
-              <option value="dalailama">☸️ Dalaï-Lama</option>
-            </optgroup>
-            <optgroup label="Traditions Ésotériques">
-              <option value="sorciere">🌙 Sorcière Ancestrale</option>
-              <option value="alchimiste">⚗️ Alchimiste Ésotérique</option>
-              <option value="mage">🌟 Mage Élémentaliste</option>
-              <option value="francmacon">🏛️ Maître Franc-Maçon</option>
-            </optgroup>
-            <optgroup label="Psychanalystes">
-              <option value="freud">🛋️ Sigmund Freud</option>
-              <option value="jung">☯️ Carl Gustav Jung</option>
-              <option value="lacan">🔄 Jacques Lacan</option>
-              <option value="dolto">👶 Françoise Dolto</option>
-            </optgroup>
-            <optgroup label="Philosophes et Sages">
-              <option value="socrate">🧠 Socrate</option>
-              <option value="salomon">👑 Roi Salomon</option>
-              <option value="montaigne">📚 Michel de Montaigne</option>
-              <option value="quichotte">🛡️ Don Quichotte</option>
-            </optgroup>
-            <optgroup label="Entités Surnaturelles">
-              <option value="demon">💀 Mortrarion</option>
-              <option value="noegoman">☯️ No EGO man</option>
-            </optgroup>
-          </select>
-        </div>
-        
-        <div class="select-group">
-          <span class="select-label">Jeu de cartes :</span>
-          <select id="card-set" class="select-dropdown">
-            <option value="set01" selected>Tarot Marseille</option>
-            <option value="set02">Tarot Thiago Lehmann</option>
-          </select>
-        </div>
-        
-        <div class="select-group">
-          <span class="select-label">Mode de tirage :</span>
-          <select id="spread-type" class="select-dropdown">
-            <option value="cross" selected>Croix</option>
-            <option value="horseshoe">Fer à Cheval</option>
-            <option value="love">Tarot de l'amour</option>
-          </select>
-        </div>
-        
-        <div class="select-group">
-          <span class="select-label">Modèle d'IA :</span>
-          <select id="ia-model" class="select-dropdown">
-            <optgroup label="Ollama">
-              <!-- Les modèles Ollama seront chargés dynamiquement au démarrage -->
-              <option value="" disabled>Chargement des modèles...</option>
-            </optgroup>
-            <optgroup label="OpenAI">
-              <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
-              <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo</option>
-              <option value="openai/gpt-4o">GPT-4o</option>
-            </optgroup>
-          </select>
-        </div>
+    <!-- 1. Menus déroulants (zone de menu) -->
+    <div class="selection-controls">
+      <div class="select-group">
+        <span class="select-label">Langue :</span>
+        <select id="language" class="select-dropdown">
+          <option value="fr" selected>🇫🇷 Français</option>
+          <option value="en">🇬🇧 English</option>
+          <option value="es">🇪🇸 Español</option>
+          <option value="de">🇩🇪 Deutsch</option>
+          <option value="it">🇮🇹 Italiano</option>
+          <option value="zh">🇨🇳 中文</option>
+        </select>
       </div>
       
-      <!-- Logo persona juste à côté des menus -->
-      <div class="logo-container">
-        <img id="persona-logo" src="assets/images/personas/tarologue.png" style="width: 210%;" alt="Persona Tarologue" />
+      <div class="select-group">
+        <span class="select-label">Personnage :</span>
+        <select id="persona" class="select-dropdown">
+          <optgroup label="Arts Divinatoires">
+            <option value="tarologue">🔮 Tarologue</option>
+            <option value="oracle">✨ Oracle Mystique</option>
+            <option value="voyante">🎯 Voyante Gitane</option>
+          </optgroup>
+          <optgroup label="Traditions Spirituelles">
+            <option value="pretre">✝️ Prêtre Exégète</option>
+            <option value="rabbin">✡️ Rabbin Kabbaliste</option>
+            <option value="imam">☪️ Imam Soufis</option>
+            <option value="dalailama">☸️ Dalaï-Lama</option>
+          </optgroup>
+          <optgroup label="Traditions Ésotériques">
+            <option value="sorciere">🌙 Sorcière Ancestrale</option>
+            <option value="alchimiste">⚗️ Alchimiste Ésotérique</option>
+            <option value="mage">🌟 Mage Élémentaliste</option>
+            <option value="francmacon">🏛️ Maître Franc-Maçon</option>
+          </optgroup>
+          <optgroup label="Psychanalystes">
+            <option value="freud">🛋️ Sigmund Freud</option>
+            <option value="jung">☯️ Carl Gustav Jung</option>
+            <option value="lacan">🔄 Jacques Lacan</option>
+            <option value="dolto">👶 Françoise Dolto</option>
+          </optgroup>
+          <optgroup label="Philosophes et Sages">
+            <option value="socrate">🧠 Socrate</option>
+            <option value="salomon">👑 Roi Salomon</option>
+            <option value="montaigne">📚 Michel de Montaigne</option>
+            <option value="quichotte">🛡️ Don Quichotte</option>
+          </optgroup>
+          <optgroup label="Entités Surnaturelles">
+            <option value="demon">💀 Mortrarion</option>
+            <option value="noegoman">☯️ No EGO man</option>
+          </optgroup>
+        </select>
+      </div>
+      
+      <div class="select-group">
+        <span class="select-label">Jeu de cartes :</span>
+        <select id="card-set" class="select-dropdown">
+          <option value="set01" selected>Tarot Marseille</option>
+          <option value="set02">Tarot Thiago Lehmann</option>
+        </select>
+      </div>
+      
+      <div class="select-group">
+        <span class="select-label">Mode de tirage :</span>
+        <select id="spread-type" class="select-dropdown">
+          <option value="cross" selected>Croix</option>
+          <option value="horseshoe">Fer à Cheval</option>
+          <option value="love">Tarot de l'amour</option>
+          <option value="celticCross" disabled>Croix Celtique</option>
+        </select>
+      </div>
+      
+      <div class="select-group">
+        <span class="select-label">Modèle d'IA :</span>
+        <select id="ia-model" class="select-dropdown">
+          <optgroup label="Ollama">
+            <!-- Les modèles Ollama seront chargés dynamiquement au démarrage -->
+            <option value="" disabled>Chargement des modèles...</option>
+          </optgroup>
+          <optgroup label="OpenAI">
+            <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
+            <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo</option>
+            <option value="openai/gpt-4o">GPT-4o</option>
+          </optgroup>
+        </select>
       </div>
     </div>
     
-    <!-- Question et bouton à droite -->
+    <!-- 2. Logo persona (image du persona) -->
+    <div class="logo-container">
+      <img id="persona-logo" src="assets/images/personas/tarologue.png" alt="Persona Tarologue" />
+    </div>
+    
+    <!-- 3. Question et titre (zone de titre et question) -->
     <div class="header-question">
-      <h1 class="header-title" id="app-title">JodoTarot Croix</h1>
+      <h1 class="header-title" id="app-title">JodoTarot</h1>
       <hr class="title-separator">
-      <div class="input-group">
+      <div class="question-container">
         <label for="question">Votre question :</label>
         <textarea id="question" placeholder="Entrez votre question pour ce tirage..." class="question-input" rows="3"></textarea>
       </div>
       <div class="controls-container">
-        <button id="tirer">Tirer les cartes</button>
+        <button id="tirer" class="primary-button">Tirer les cartes</button>
+      </div>
+      
+      <!-- Panneau d'information, d'erreur et de chargement déplacé sous la question -->
+      <div id="interpretations-info" class="interpretation-section info-panel information-zone">
+        <div class="information-zone__header">
+          <h3 class="information-zone__title">Information</h3>
+        </div>
+        <div class="information-zone__content">
+          <p id="default-interpretation">Les interprétations s'afficheront après le tirage.</p>
+          <p id="ollama-promo" class="promo-text"></p>
+          <div id="loading-animations" class="loading-container"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -119,42 +131,31 @@
   <hr style="width: 95%; margin: 0 auto 20px auto; border: 0; height: 1px; background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(107, 91, 149, 0.75), rgba(0, 0, 0, 0));">
   
   <div class="container">
-    <div class="right-panel">
-      <div id="spread" class="spread">
-        <div class="top"></div>
-        <div class="left"></div>
-        <div class="center"></div>
-        <div class="right"></div>
-        <div class="bottom"></div>
-      </div>
-      <div id="horseshoe-spread" class="horseshoe-spread" style="display: none;">
-        <div class="card-position card-1"></div>
-        <div class="card-position card-2"></div>
-        <div class="card-position card-3"></div>
-        <div class="card-position card-4"></div>
-        <div class="card-position card-5"></div>
-        <div class="card-position card-6"></div>
-        <div class="card-position card-7"></div>
-      </div>
-      <div id="love-spread" class="love-spread" style="display: none;">
-        <div class="card-position card-1"></div>
-        <div class="card-position card-2"></div>
-        <div class="card-position card-3"></div>
-        <div class="card-position card-4"></div>
-        <div class="card-position card-5"></div>
-        <div class="card-position card-6"></div>
-        <div class="card-position card-7"></div>
-      </div>
+    <div class="spread-panel">
+      <!-- Conteneurs pour les différents types de tirages (un seul est visible à la fois) -->
+      <div id="spread" class="spread"></div>
+      <div id="horseshoe-spread" class="horseshoe-spread" style="display: none;"></div>
+      <div id="love-spread" class="love-spread" style="display: none;"></div>
+      <div id="celtic-cross-spread" class="celtic-cross-spread" style="display: none;"></div>
     </div>
-    <div class="left-panel">
-      <div id="interpretations">
-        <p id="default-interpretation">Les interprétations s'afficheront ici après le tirage.</p>
-        <p id="ollama-promo" class="promo-text"></p>
+    <div class="interpretation-panel">
+      <!-- Premier cadre d'information SUPPRIMÉ car déplacé dans le header -->
+      
+      <!-- Deuxième cadre: affichage du prompt envoyé à l'IA -->
+      <div id="interpretations-prompt" class="interpretation-section">
+        <h3>Prompt</h3>
+        <div class="prompt-content"></div>
+      </div>
+      
+      <!-- Troisième cadre: texte généré par l'IA -->
+      <div id="interpretations-response" class="interpretation-section">
+        <h3>Interprétation</h3>
+        <div class="response-content"></div>
       </div>
     </div>
   </div>
 
   <!-- Import du module principal -->
-  <script type="module" src="assets/js/app.js"></script>
+  <script type="module" src="assets/js/main.js"></script>
 </body>
 </html> 

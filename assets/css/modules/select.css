@@ -1,0 +1,60 @@
+/**
+ * Styles pour les menus de sélection
+ */
+
+.select-group {
+  margin-bottom: var(--spacing-sm);
+  width: 100%;
+  position: relative;
+  z-index: 10; /* S'assurer que les sélecteurs sont toujours visibles */
+}
+
+.select-label {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.select-dropdown {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid rgba(107, 91, 149, 0.3);
+  border-radius: var(--border-radius-sm);
+  background-color: white;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 10; /* Toujours au dessus des autres éléments */
+}
+
+.select-dropdown:hover {
+  border-color: rgba(107, 91, 149, 0.5);
+}
+
+.select-dropdown:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(107, 91, 149, 0.2);
+}
+
+/* Style pour les options de groupe */
+.select-dropdown optgroup {
+  font-weight: bold;
+  color: var(--color-primary);
+}
+
+.select-dropdown option {
+  padding: 8px;
+}
+
+/* Styles responsifs */
+@media (max-width: 768px) {
+  .select-dropdown {
+    font-size: var(--font-size-xs);
+    padding: 6px 10px;
+  }
+} 

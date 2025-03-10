@@ -1,0 +1,115 @@
+/**
+ * Styles pour le tirage de l'amour
+ */
+
+.love-spread {
+  position: relative;
+  width: var(--spread-width);
+  height: var(--spread-height);
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: var(--border-radius-lg);
+  margin-left: 0;
+  perspective: 1000px; /* Ajoute une perspective pour les effets 3D */
+}
+
+/* Positions des cartes */
+.love-spread .card-position {
+  position: absolute;
+  width: var(--card-width);
+  height: var(--card-height);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: filter 0.2s ease-in-out, box-shadow 0.2s ease-in-out, z-index 0.1s ease;
+  filter: brightness(1);
+}
+
+/* Positionnement spécifique pour chaque carte */
+/* Première ligne - Vous et Partenaire */
+.love-spread .card-1 { /* self - Votre cœur */
+  left: var(--love-you-x);
+  top: var(--love-you-y);
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.love-spread .card-2 { /* partner - Son cœur */
+  left: var(--love-partner-x);
+  top: var(--love-partner-y);
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+/* Deuxième ligne - Relation et Obstacles */
+.love-spread .card-3 { /* relationship - Relation actuelle */
+  left: var(--love-relationship-x);
+  top: var(--love-relationship-y);
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.love-spread .card-4 { /* obstacles - Fondation */
+  left: var(--love-foundation-x);
+  top: var(--love-foundation-y);
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+/* Troisième ligne - Désirs, Résultat, Conseil */
+.love-spread .card-5 { /* desires - Passé */
+  left: var(--love-past-x);
+  top: var(--love-past-y);
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.love-spread .card-6 { /* outcome - Présent */
+  left: var(--love-present-x);
+  top: var(--love-present-y);
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.love-spread .card-7 { /* advice - Futur */
+  left: var(--love-future-x);
+  top: var(--love-future-y);
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+/* Effet de survol */
+.love-spread .card-position:hover {
+  z-index: 10;
+  filter: brightness(1.08);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* Le cercle a été supprimé selon la demande du client */
+
+/* Styles responsifs */
+@media (max-width: 768px) {
+  .love-spread {
+    height: 450px;
+    overflow: auto;
+  }
+  
+  .love-spread .card-position {
+    width: calc(var(--card-width) * 0.9);
+    height: calc(var(--card-height) * 0.9);
+  }
+}
+
+@media (max-width: 480px) {
+  .love-spread {
+    height: 400px;
+  }
+  
+  .love-spread .card-position {
+    width: calc(var(--card-width) * 0.7);
+    height: calc(var(--card-height) * 0.7);
+  }
+} 

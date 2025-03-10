@@ -2,26 +2,13 @@
  * Module de gestion des appels API aux modèles d'IA
  */
 
-import { API_KEY, API_URL_OPENAI, API_URL_OLLAMA, API_URL_OLLAMA_TAGS, getOllamaModelFormat } from './config.js';
+import { API_KEY, API_URL_OPENAI, API_URL_OLLAMA, API_URL_OLLAMA_TAGS, getOllamaModelFormat, DEBUG_LEVEL, SETTINGS } from './config.js';
 import { getMetaPrompt, enrichirPromptContextuel } from './metaprompt.js';
-import { genererPromptTirage } from './tarot.js';
-import PERSONAS, { getPersonaPrompt } from './personas/index.js';
-import { getTranslation } from './translations.js';
-
-// Configuration du niveau de déboggage
-// 0 = Erreurs seulement, 1 = Infos importantes, 2 = Détails, 3 = Verbeux
-const DEBUG_LEVEL = 2; 
+import PERSONAS, { getPersonaPrompt } from './models/personas/index.js';
+import { TRANSLATIONS, getTranslation } from './translations/index.js';
 
 // Système simple de cache pour les réponses
 const responseCache = new Map();
-
-// Créer un fichier de configuration centrale
-const SETTINGS = {
-  DEFAULT_PERSONA: "tarologue",
-  DEFAULT_LANGUAGE: "fr",
-  MAX_TOKENS: 500,
-  // etc.
-};
 
 /**
  * Fonction pour obtenir une réponse de l'API OpenAI avec GPT-4o
@@ -35,119 +22,132 @@ const SETTINGS = {
  * @returns {Promise<string>} - Réponse de l'API
  */
 async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai/gpt-3.5-turbo', persona = 'tarologue', tirage = [], langue = 'fr', spreadType = 'cross') {
-  // Vérifier quel type d'API nous utilisons (OpenAI ou Ollama)
-  const isOllama = !modele.startsWith('openai/');
-  
-  console.log("🔍 DEBUG - Démarrage appel API:", { 
-    modele, 
-    isOllama, 
-    persona,
-    nombreCartes: tirage.length,
-    langue,
-    spreadType
-  });
-  
-  // Récupérer l'élément pour afficher les erreurs et l'interprétation
-  const interpretationsDiv = document.getElementById('interpretations');
-  
   try {
-    // Préparer les données pour l'API
-    const modelName = isOllama ? modele.split('/')[1] : modele.split('/')[1];
+    console.log(`🔍 DEBUG - Requête API avec modèle: ${modele}`);
+    
+    // Préparer les éléments UI
+    const interpretationsInfo = document.getElementById('interpretations-info');
+    const interpretationsPrompt = document.getElementById('interpretations-prompt');
+    const interpretationsResponse = document.getElementById('interpretations-response');
+    const promptContent = document.querySelector('#interpretations-prompt .prompt-content');
+    const responseContent = document.querySelector('#interpretations-response .response-content');
+    const loadingAnimations = document.getElementById('loading-animations');
+    
+    // Si on utilise Ollama, vérifier d'abord la connexion
+    const isOllama = modele.startsWith('ollama/');
+    const ollamaModelName = isOllama ? modele.replace('ollama/', '') : '';
+    
+    if (isOllama) {
+      // Afficher la promotion Ollama
+      const ollamaPromo = document.getElementById('ollama-promo');
+      if (ollamaPromo) {
+        ollamaPromo.innerText = getTranslation('ollama.promo', langue) || "Powered by Ollama - A local AI model running on your computer";
+      }
+      
+      try {
+        const connectivityTest = await testOllamaConnectivity(ollamaModelName);
+        
+        if (DEBUG_LEVEL > 0) {
+          console.log("⚙️ Test Ollama connectivité:", connectivityTest);
+        }
+        
+        if (connectivityTest.status === 'testing') {
+          const testingText = getTranslation('ollama.testing', langue) || `Vérification de la connexion à Ollama...`;
+          
+          // Mise à jour pour respecter la nouvelle structure HTML
+          const infoContent = interpretationsInfo.querySelector('.information-zone__content');
+          if (infoContent) {
+            infoContent.innerHTML = `<p>${testingText}</p>`;
+          } else {
+            interpretationsInfo.innerHTML = `
+              <div class="information-zone__header">
+                <h3 class="information-zone__title">${getTranslation('information.title', langue, 'Information')}</h3>
+              </div>
+              <div class="information-zone__content">
+                <p>${testingText}</p>
+              </div>
+            `;
+          }
+          
+          interpretationsPrompt.style.display = 'none';
+          interpretationsResponse.style.display = 'none';
+          return testingText;
+        } else if (connectivityTest.status === 'error') {
+          const errorMessage = `${getTranslation('interpretation.connectionError', langue) || 'Erreur de connexion à Ollama:'} ${connectivityTest.message}`;
+          
+          // Mise à jour pour respecter la nouvelle structure HTML
+          const infoContent = interpretationsInfo.querySelector('.information-zone__content');
+          if (infoContent) {
+            infoContent.innerHTML = `<p class="error">${errorMessage}</p>`;
+          } else {
+            interpretationsInfo.innerHTML = `
+              <div class="information-zone__header">
+                <h3 class="information-zone__title">${getTranslation('information.title', langue, 'Information')}</h3>
+              </div>
+              <div class="information-zone__content">
+                <p class="error">${errorMessage}</p>
+              </div>
+            `;
+          }
+          
+          interpretationsPrompt.style.display = 'none';
+          interpretationsResponse.style.display = 'none';
+          throw new Error(`Erreur Ollama: ${connectivityTest.message}`);
+        }
+      } catch (err) {
+        console.error("❌ Erreur lors du test de connectivité Ollama:", err);
+        throw err;
+      }
+    }
+    
+    // Construction des messages à envoyer à l'API
+    const messages = [];
+    
+    // Ajouter les system prompts (instructions pour l'IA)
+    systemPrompts.forEach(prompt => {
+      messages.push({
+        role: "system",
+        content: prompt
+      });
+    });
+    
+    // Ajouter le message de l'utilisateur
+    messages.push({
+      role: "user",
+      content: message
+    });
+    
+    // Construire l'URL en fonction du type de modèle (Ollama ou OpenAI)
     const API_URL = isOllama ? API_URL_OLLAMA : API_URL_OPENAI;
     
-    console.log("🔍 DEBUG - Configuration API:", { 
-      modelName, 
-      API_URL,
-      headers: isOllama ? "Standard" : "Avec API_KEY" 
-    });
-    
-    // Tester la connectivité d'Ollama si applicable
-    if (isOllama) {
-      interpretationsDiv.innerHTML = `<p class="loading">${getTranslation('interpretation.testingConnection', langue) || 'Test de connexion à Ollama...'}</p>`;
-      const connectivityTest = await testOllamaConnectivity(modelName);
-      
-      if (!connectivityTest.success) {
-        console.error("🔍 DEBUG - Échec du test de connectivité Ollama:", connectivityTest.message);
-        interpretationsDiv.innerHTML = `<p class="error">${getTranslation('interpretation.connectionError', langue) || 'Erreur de connexion à Ollama:'} ${connectivityTest.message}</p>`;
-        return `Erreur de connexion: ${connectivityTest.message}`;
-      }
-    }
-    
-    // Obtenir le prompt spécifique au persona
-    const personaPrompt = getPersonaPrompt(persona, langue);
-    
-    // Obtenir le prompt spécifique au tirage des cartes
-    const tiragePrompt = tirage.length > 0 ? genererPromptTirage(tirage, message, spreadType, langue) : "";
-    
-    // Fusionner les prompts système avec ceux du persona et du tirage
-    const mergedSystemPrompt = 
-      `${getMetaPrompt(langue)}\n\n${personaPrompt}\n\n${tiragePrompt}`;
-    
-    // Ajouter l'emphase sur la question au début du système prompt
-    const finalSystemPrompt = enrichirPromptContextuel(message, mergedSystemPrompt, langue);
-    
-    console.log("🔍 DEBUG - Prompts préparés:", { 
-      personaPromptLength: personaPrompt.length,
-      tiragePromptLength: tiragePrompt.length,
-      finalSystemPromptLength: finalSystemPrompt.length
-    });
-    
-    // Pour le débogage
-    logPrompt(persona, message, finalSystemPrompt);
-    
-    // Créer les messages pour l'API
-    const messages = [
-      {
-        role: "system",
-        content: finalSystemPrompt
-      },
-      {
-        role: "user",
-        content: message
-      }
-    ];
-    
-    // Ajouter les messages système supplémentaires s'il y en a
-    if (systemPrompts && systemPrompts.length > 0) {
-      for (const sysPrompt of systemPrompts) {
-        messages.push({
-          role: "system",
-          content: sysPrompt
-        });
-      }
-    }
-    
-    // Construire la clé de cache
-    const cacheKey = JSON.stringify({
-      persona,
-      message,
-      tirage: tirage.map(card => card.id),
-      spreadType,
-      langue
-    });
-    
-    // Vérifier si nous avons déjà cette réponse en cache
-    if (responseCache.has(cacheKey)) {
-      console.log("🔍 DEBUG - Réponse trouvée dans le cache");
-      return responseCache.get(cacheKey);
-    }
-    
-    // Préparer les données de la requête pour OpenAI ou Ollama
-    const requestData = isOllama ? {
-      model: modelName,
+    // Construire les données de la requête
+    const requestData = {
+      model: isOllama ? ollamaModelName : modele.replace('openai/', ''),
       messages: messages,
-      stream: true
-    } : {
-      model: modelName,
-      messages: messages,
-      max_tokens: SETTINGS.MAX_TOKENS,
-      stream: true
+      ...(isOllama ? 
+        { stream: SETTINGS.ENABLE_STREAMING } : 
+        { 
+          max_tokens: parseInt(SETTINGS.MAX_TOKENS || 1000),
+          temperature: parseFloat(SETTINGS.TEMPERATURE || 0.7),
+          stream: SETTINGS.ENABLE_STREAMING
+        }
+      )
     };
     
+    // Logs de débogage pour diagnostiquer les problèmes
+    if (DEBUG_LEVEL > 0) {
+      logPrompt(persona, message, systemPrompts);
+    }
+    
+    // Format adapté selon que c'est Ollama ou OpenAI
+    if (!isOllama) {
+      requestData.stream = SETTINGS.ENABLE_STREAMING;
+    }
+    
     console.log("🔍 DEBUG - Données de la requête:", {
-      model: modelName,
+      model: modele,
       messagesCount: messages.length,
-      stream: true,
+      stream: SETTINGS.ENABLE_STREAMING,
       max_tokens: isOllama ? "Non spécifié" : SETTINGS.MAX_TOKENS
     });
     
@@ -168,12 +168,12 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
         <div class="progress-bar"></div>
       </div>
     `;
-    interpretationsDiv.innerHTML = '';
-    interpretationsDiv.appendChild(progressContainer);
+    interpretationsInfo.innerHTML = '';
+    interpretationsInfo.appendChild(progressContainer);
     
     const partialResponse = document.createElement('div');
     partialResponse.className = 'partial-response';
-    interpretationsDiv.appendChild(partialResponse);
+    responseContent.appendChild(partialResponse);
     
     try {
       console.log("🔍 DEBUG - Début fetch API");
@@ -275,7 +275,7 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
             if (DEBUG_LEVEL > 1) console.log("🔍 DEBUG - Traitement chunk Ollama:", { nombreLignes: lines.length });
             
             // Obtenir le format de réponse pour ce modèle (utilisé comme référence initiale)
-            const modelFormat = getOllamaModelFormat(modelName);
+            const modelFormat = getOllamaModelFormat(ollamaModelName);
             
             for (const line of lines) {
               if (!line.trim()) continue;
@@ -300,14 +300,14 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
                     detectedFormat = 'unknown';
                   }
                   
-                  if (DEBUG_LEVEL > 0) console.log(`🔍 DEBUG - Format détecté pour ${modelName}: ${detectedFormat}`);
+                  if (DEBUG_LEVEL > 0) console.log(`🔍 DEBUG - Format détecté pour ${ollamaModelName}: ${detectedFormat}`);
                 }
                 
                 // Extraction du texte selon le format détecté (approche améliorée)
                 let responseText = '';
                 
                 // Vérifier d'abord explicitement le format pour llama3.1
-                if (modelName.includes('llama3.1')) {
+                if (ollamaModelName.includes('llama3.1')) {
                   // Pour llama3.1, essayer spécifiquement ces chemins
                   if (parsedChunk.message?.content !== undefined) {
                     responseText = parsedChunk.message.content;
@@ -350,7 +350,7 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
                   responseChunks.push(responseText);
                   // Mise à jour de l'affichage avec la réponse cumulative
                   fullResponse = responseChunks.join('');
-                  partialResponse.innerHTML = formatStreamingResponse(fullResponse);
+                  responseContent.innerHTML = formatStreamingResponse(fullResponse);
                 }
                 
                 if (parsedChunk.done) {
@@ -377,7 +377,7 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
                 const content = parsedChunk.choices[0]?.delta?.content || '';
                 if (content) {
                   fullResponse += content;
-                  partialResponse.innerHTML = formatStreamingResponse(fullResponse);
+                  responseContent.innerHTML = formatStreamingResponse(fullResponse);
                 }
               } catch (e) {
                 console.error("Erreur lors du parsing du chunk OpenAI:", e);
@@ -402,7 +402,13 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
         fullResponse += "\n\n<!-- streaming-completed -->";
         
         // Mettre en cache la réponse
-        responseCache.set(cacheKey, fullResponse);
+        responseCache.set(JSON.stringify({
+          persona,
+          message,
+          tirage: tirage.map(card => card.id),
+          spreadType,
+          langue
+        }), fullResponse);
         
         // Retourner la réponse complète
         return fullResponse;
@@ -411,12 +417,12 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
       }
     } catch (fetchError) {
       console.error("🔍 DEBUG - Erreur critique fetch:", fetchError);
-      interpretationsDiv.innerHTML = `<p class="error">${getTranslation('interpretation.apiError', langue) || 'Erreur API:'} ${fetchError.message}</p>`;
+      responseContent.innerHTML = `<p class="error">${getTranslation('interpretation.apiError', langue) || 'Erreur API:'} ${fetchError.message}</p>`;
       throw fetchError;
     }
   } catch (error) {
     console.error("🔍 DEBUG - Erreur globale:", error);
-    interpretationsDiv.innerHTML = `<p class="error">${getTranslation('interpretation.error', langue) || 'Erreur:'} ${error.message}</p>`;
+    responseContent.innerHTML = `<p class="error">${getTranslation('interpretation.error', langue) || 'Erreur:'} ${error.message}</p>`;
     throw error;
   }
 }
@@ -635,3 +641,18 @@ export {
   logPrompt,
   testOllamaConnectivity
 };
+
+// Remplacer par un service ou une fonction locale si nécessaire
+/**
+ * Fonction temporaire pour remplacer le genererPromptTirage de l'ancien tarot.js
+ * @param {Array} tirage - Le tirage de cartes
+ * @param {string} question - La question posée
+ * @param {string} spreadType - Le type de tirage
+ * @param {string} langue - La langue utilisée
+ * @returns {string} - Le prompt formaté pour l'IA
+ */
+function genererPromptTirage(tirage, question, spreadType, langue) {
+  // Utiliser les traductions et le format approprié
+  // Fonction simplifiée pour maintenir la compatibilité
+  return `Tirage ${spreadType} pour la question: "${question}"`;
+}

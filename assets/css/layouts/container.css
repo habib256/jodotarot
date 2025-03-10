@@ -1,0 +1,63 @@
+/**
+ * Styles pour le conteneur principal de l'application
+ */
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-lg);
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+  max-width: 1600px;
+  min-height: 600px;
+}
+
+/* Conteneur à largeur restreinte */
+.container-sm {
+  max-width: 800px;
+}
+
+/* Conteneur à largeur moyenne */
+.container-md {
+  max-width: 1200px;
+}
+
+/* Conteneur pour le tirage avec une hauteur minimale */
+.spread-container {
+  min-height: 500px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Ligne centrale qui sépare les sections */
+.section-divider {
+  width: 95%;
+  margin: var(--spacing-lg) auto;
+  border: 0;
+  height: 1px;
+  background-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0),
+    rgba(107, 91, 149, 0.75),
+    rgba(0, 0, 0, 0)
+  );
+}
+
+/* Styles responsifs */
+@media (max-width: 1024px) {
+  .container {
+    padding: 0 var(--spacing-md);
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column-reverse;
+    padding: 0 var(--spacing-sm);
+  }
+  
+  .spread-container {
+    min-height: 400px;
+  }
+} 

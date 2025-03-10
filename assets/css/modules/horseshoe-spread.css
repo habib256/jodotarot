@@ -1,0 +1,110 @@
+/**
+ * Styles pour le tirage en fer à cheval
+ */
+
+.horseshoe-spread {
+  position: relative;
+  width: var(--spread-width);
+  height: var(--spread-height);
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: var(--border-radius-lg);
+  margin-left: 0;
+}
+
+/* Positions des cartes */
+.horseshoe-spread .card-position {
+  position: absolute;
+  width: var(--card-width);
+  height: var(--card-height);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Positionnement spécifique pour chaque carte */
+.horseshoe-spread .card-1,
+.horseshoe-spread .past {
+  left: var(--horseshoe-past-x);
+  top: var(--horseshoe-past-y);
+  transform: translate(-50%, -50%);
+}
+
+.horseshoe-spread .card-2,
+.horseshoe-spread .recent {
+  left: var(--horseshoe-recent-x);
+  top: var(--horseshoe-recent-y);
+  transform: translate(-50%, -50%);
+}
+
+.horseshoe-spread .card-3,
+.horseshoe-spread .present {
+  left: var(--horseshoe-present-x);
+  top: var(--horseshoe-present-y);
+  transform: translate(-50%, -50%);
+}
+
+.horseshoe-spread .card-4,
+.horseshoe-spread .future {
+  left: var(--horseshoe-future-x);
+  top: var(--horseshoe-future-y);
+  transform: translate(-50%, -50%);
+}
+
+.horseshoe-spread .card-5,
+.horseshoe-spread .outcome {
+  left: var(--horseshoe-outcome-x);
+  top: var(--horseshoe-outcome-y);
+  transform: translate(-50%, -50%);
+}
+
+.horseshoe-spread .card-6,
+.horseshoe-spread .influences {
+  left: var(--horseshoe-influences-x);
+  top: var(--horseshoe-influences-y);
+  transform: translate(-50%, -50%);
+}
+
+.horseshoe-spread .card-7,
+.horseshoe-spread .advice {
+  left: var(--horseshoe-advice-x);
+  top: var(--horseshoe-advice-y);
+  transform: translate(-50%, -50%);
+}
+
+/* Positions vides */
+.horseshoe-spread .card-position.empty {
+  border: 2px dashed rgba(107, 91, 149, 0.5);
+  border-radius: var(--border-radius-sm);
+}
+
+/* Effet de survol */
+.horseshoe-spread .card-position:hover {
+  z-index: var(--z-index-above);
+}
+
+/* Styles responsifs */
+@media (max-width: 768px) {
+  .horseshoe-spread {
+    height: 450px;
+    overflow: auto;
+  }
+  
+  .horseshoe-spread .card-position {
+    width: calc(var(--card-width) * 0.9);
+    height: calc(var(--card-height) * 0.9);
+  }
+}
+
+@media (max-width: 480px) {
+  .horseshoe-spread {
+    height: 400px;
+  }
+  
+  .horseshoe-spread .card-position {
+    width: calc(var(--card-width) * 0.7);
+    height: calc(var(--card-height) * 0.7);
+  }
+} 
