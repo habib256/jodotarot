@@ -79,7 +79,16 @@
   transform-origin: center bottom;
 }
 
-/* Effets 3D au survol spécifiques à chaque position */
+/* Effets au survol uniformisés */
+.center:hover, .top:hover, .left:hover, .right:hover, .bottom:hover,
+.card-position.center:hover, .card-position.top:hover, .card-position.left:hover, .card-position.right:hover, .card-position.bottom:hover,
+.spread .card-position:hover {
+  z-index: 10;
+  filter: brightness(1.08);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* Maintien des transformations originales */
 .center:hover, .card-position.center:hover {
   transform: translate(-50%, -50%) scale(1.02);
 }

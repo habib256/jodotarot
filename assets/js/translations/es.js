@@ -17,6 +17,7 @@ const es = {
     question: "Tu pregunta:",
     questionPlaceholder: "Introduce tu pregunta para esta lectura...",
     drawButton: "Tirar las cartas",
+    drawButtonGenerating: "Generando... Por favor espera",
     streamingOption: "Respuesta en vivo:"
   },
   
@@ -25,8 +26,11 @@ const es = {
     loading: "Analizando la tirada...",
     loadingWithModel: "Analizando la tirada en cruz con {model} interpretado por un/una {persona}...",
     default: "Las interpretaciones aparecerán aquí después de tirar las cartas.",
-    error: "Ha ocurrido un error durante la interpretación. Por favor, inténtalo de nuevo.",
-    apiError: "Error de API: {0}",
+    error: {
+      general: "Ha ocurrido un error durante la interpretación. Por favor, inténtalo de nuevo.",
+      noQuestion: "Por favor, introduce una pregunta antes de tirar las cartas",
+      api: "Error de API: {0}"
+    },
     apiWarning: "La interpretación se ha terminado de forma inesperada. Aquí está el resultado parcial:",
     userQuestion: "La pregunta planteada por el usuario es:",
     userMessage: "Me gustaría una interpretación detallada y personalizada de mi tirada de tarot en cruz. Analiza el simbolismo de cada carta según su posición y establece las conexiones entre las cartas para ofrecer una lectura coherente que responda con precisión a mi pregunta.",
@@ -160,6 +164,20 @@ Cada aspecto de tu interpretación debe abordar un aspecto de esta pregunta.`
   iaGroups: {
     ollama: "🧠 Ollama",
     openai: "🤖 OpenAI"
+  },
+  
+  // Mensajes de conectividad
+  connectivity: {
+    connecting: "Conectando...",
+    connected: "Conectado",
+    disconnected: "Desconectado",
+    error: "Error de conexión"
+  },
+  
+  // Títulos de secciones
+  sections: {
+    reading: "Tirada",
+    interpretations: "Interpretación"
   }
 };
 

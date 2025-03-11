@@ -4,8 +4,79 @@
  */
 class UIService {
   constructor() {
-    // Initialiser les gestionnaires d'événements globaux si nécessaire
+    // Initialiser les gestionnaires d'événements globaux
     this.initGlobalEvents();
+    
+    // Écouter l'événement de disponibilité de l'état
+    document.addEventListener('stateManager:ready', this.handleStateReady.bind(this));
+    
+    // Écouter les changements globaux d'état
+    document.addEventListener('state:changed', this.handleStateChanged.bind(this));
+  }
+  
+  /**
+   * Gère l'événement indiquant que l'état est prêt
+   * @param {CustomEvent} event - Événement avec les détails de l'état
+   */
+  handleStateReady(event) {
+    console.log('🔄 UIService: État disponible, synchronisation de l\'interface');
+    this.synchronizeUIWithState(event.detail.state);
+  }
+  
+  /**
+   * Gère les changements d'état
+   * @param {CustomEvent} event - Événement avec les détails des changements
+   */
+  handleStateChanged(event) {
+    const { changes, state } = event.detail;
+    this.synchronizeUIWithState(state, changes);
+  }
+  
+  /**
+   * Synchronise tous les éléments d'interface avec l'état actuel
+   * @param {Object} state - État actuel
+   * @param {Object} changes - Changements spécifiques (optionnel)
+   */
+  synchronizeUIWithState(state, changes = null) {
+    // Vérifier les propriétés critiques et les synchroniser avec l'UI
+    this.ensureInterpretationPanelVisibility();
+    
+    // Synchroniser d'autres éléments d'interface selon les besoins
+    this.updateStatusIndicators(state);
+    
+    console.log('✅ UIService: Synchronisation UI/État terminée');
+  }
+  
+  /**
+   * S'assure que le panneau d'interprétation est toujours visible
+   */
+  ensureInterpretationPanelVisibility() {
+    const interpretationPanel = document.querySelector('.interpretation-panel');
+    if (interpretationPanel) {
+      interpretationPanel.style.display = 'block';
+      
+      // Ajuster la hauteur minimale en fonction de la hauteur de la fenêtre sur mobile
+      if (window.innerWidth <= 1200) {
+        const minHeight = Math.max(250, window.innerHeight * 0.3);
+        interpretationPanel.style.minHeight = `${minHeight}px`;
+      }
+    }
+  }
+  
+  /**
+   * Met à jour les indicateurs de statut dans l'interface
+   * @param {Object} state - État actuel
+   */
+  updateStatusIndicators(state) {
+    // Mettre à jour les indicateurs de statut (connexion IA, etc.)
+    const statusMessage = document.getElementById('status-message');
+    if (statusMessage && state.iaModel) {
+      // Afficher l'indicateur du modèle actif
+      const modelType = state.iaModel.startsWith('openai/') ? 'OpenAI' : 'Ollama';
+      statusMessage.textContent = `Modèle actif: ${modelType}`;
+      statusMessage.style.display = 'block';
+      statusMessage.className = 'status-indicator';
+    }
   }
   
   /**
@@ -14,24 +85,12 @@ class UIService {
   initGlobalEvents() {
     // S'assurer que le panneau d'interprétation est toujours visible
     window.addEventListener('DOMContentLoaded', () => {
-      const interpretationPanel = document.querySelector('.interpretation-panel');
-      if (interpretationPanel) {
-        interpretationPanel.style.display = 'block';
-      }
+      this.ensureInterpretationPanelVisibility();
     });
     
     // S'assurer que le panneau d'interprétation reste visible après les redimensionnements de fenêtre
     window.addEventListener('resize', () => {
-      const interpretationPanel = document.querySelector('.interpretation-panel');
-      if (interpretationPanel) {
-        interpretationPanel.style.display = 'block';
-        
-        // Ajuster la hauteur minimale en fonction de la hauteur de la fenêtre sur mobile
-        if (window.innerWidth <= 1200) {
-          const minHeight = Math.max(250, window.innerHeight * 0.3);
-          interpretationPanel.style.minHeight = `${minHeight}px`;
-        }
-      }
+      this.ensureInterpretationPanelVisibility();
     });
   }
   

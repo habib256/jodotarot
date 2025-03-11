@@ -153,14 +153,43 @@ class StateManager {
     // État par défaut
     this.state = this.getDefaultState();
     
-    // Liste des écouteurs
-    this.listeners = new Set();
+    // Écouteurs pour les changements d'état
+    this.listeners = [];
     
-    // Version de l'état pour la migration
+    // Version actuelle du schema d'état (pour migrations)
     this.STATE_VERSION = '1.0.0';
     
-    // Restaurer l'état depuis le localStorage au démarrage
-    this.restoreState();
+    // Initialiser immédiatement l'état avec les valeurs par défaut
+    for (const [key, config] of Object.entries(this.schema)) {
+      if ('default' in config) {
+        this.state[key] = config.default;
+      }
+    }
+  }
+
+  /**
+   * Initialise le gestionnaire d'état en restaurant les données et en émettant un événement de prêt
+   * @returns {Promise} Une promesse résolue quand l'état est prêt
+   */
+  async initialize() {
+    return new Promise((resolve) => {
+      try {
+        // Restaurer l'état depuis localStorage
+        this.restoreState();
+        
+        // Émettre un événement indiquant que l'état est prêt
+        document.dispatchEvent(new CustomEvent('stateManager:ready', {
+          detail: { state: this.getState() }
+        }));
+        
+        console.log('✅ StateManager initialisé avec succès');
+        resolve(this.getState());
+      } catch (error) {
+        console.error('❌ Erreur d\'initialisation du StateManager:', error);
+        // Résoudre quand même pour ne pas bloquer l'application
+        resolve(this.getDefaultState());
+      }
+    });
   }
 
   /**
@@ -245,9 +274,13 @@ class StateManager {
     try {
       const validatedUpdates = {};
       const errors = [];
+      const importantKeys = ['language', 'persona', 'cardSet', 'spreadType', 'iaModel'];
+      const importantUpdates = Object.keys(updates).filter(key => importantKeys.includes(key));
 
-      // Ajouter un log pour déboguer
-      console.log('🔄 StateManager.setState appelé avec:', JSON.stringify(updates));
+      // Tracer les mises à jour importantes
+      if (importantUpdates.length > 0) {
+        console.log('🔄 Mise à jour de clés importantes:', importantUpdates.map(key => `${key}: ${updates[key]}`));
+      }
       
       // Synchroniser cardSet et deckId si l'un des deux change
       if (updates.cardSet && updates.cardSet !== this.state.cardSet) {
@@ -260,17 +293,9 @@ class StateManager {
       
       // Valider chaque mise à jour
       for (const [key, value] of Object.entries(updates)) {
-        console.log(`📋 Validation de ${key}:`, value);
-        if (key === 'cards') {
-          console.log(`🃏 Type de cards:`, typeof value);
-          console.log(`🃏 Est un tableau?`, Array.isArray(value));
-          console.log(`🃏 Contenu de cards:`, JSON.stringify(value));
-        }
-        
         const validation = this.validateValue(key, value);
         if (validation.isValid) {
           validatedUpdates[key] = validation.value;
-          console.log(`✅ Validation réussie pour ${key}`);
         } else {
           errors.push(validation.error);
           console.error(`❌ Validation échouée pour ${key}:`, validation.error);
@@ -279,7 +304,6 @@ class StateManager {
 
       // S'il y a des erreurs, les regrouper et les lancer
       if (errors.length > 0) {
-        console.error('❌ Erreurs de validation détectées:', errors);
         throw new Error(`Erreurs de validation:\n${errors.join('\n')}`);
       }
 
@@ -299,12 +323,20 @@ class StateManager {
 
       // Notifier les écouteurs et émettre les événements
       if (Object.keys(changedValues).length > 0) {
+        // Tracer les changements effectifs
+        const importantChanges = Object.keys(changedValues).filter(key => importantKeys.includes(key));
+        if (importantChanges.length > 0) {
+          console.log('✅ Changements effectifs de clés importantes:', importantChanges.map(key => `${key}: ${changedValues[key]}`));
+        }
+        
         this.notifyListeners(changedValues);
         this.emitChangeEvents(changedValues);
         this.persistState();
+      } else {
+        console.log('ℹ️ Aucun changement effectif détecté, état non modifié');
       }
     } catch (error) {
-      console.error('Erreur lors de la mise à jour de l\'état:', error);
+      console.error('❌ Erreur lors de la mise à jour de l\'état:', error);
       this.state.error = error.message;
       throw error;
     }
@@ -419,18 +451,36 @@ class StateManager {
    * @return {Function} Fonction de désabonnement
    */
   subscribe(listener) {
-    this.listeners.add(listener);
+    if (typeof listener !== 'function') {
+      console.error('❌ L\'écouteur doit être une fonction');
+      return () => {}; // Retourner une fonction vide en cas d'erreur
+    }
+    
+    // Ajouter l'écouteur au tableau
+    this.listeners.push(listener);
+    
+    // Retourner une fonction de désabonnement
     return () => {
-      this.listeners.delete(listener);
+      const index = this.listeners.indexOf(listener);
+      if (index !== -1) {
+        this.listeners.splice(index, 1);
+      }
     };
   }
   
   /**
-   * Notifie tous les écouteurs des changements d'état
-   * @param {Object} changes - Les changements effectués
+   * Notifie tous les écouteurs d'un changement d'état
+   * @param {Object} changes - Les changements apportés à l'état
    */
   notifyListeners(changes = {}) {
-    this.listeners.forEach(listener => listener(this.state, changes));
+    // Parcourir le tableau des écouteurs au lieu du Set
+    this.listeners.forEach(listener => {
+      try {
+        listener(this.state, changes);
+      } catch (error) {
+        console.error('❌ Erreur dans un écouteur d\'état:', error);
+      }
+    });
   }
 
   /**
@@ -442,6 +492,18 @@ class StateManager {
       const stateToPersist = {...this.state};
       const temporaryKeys = ['isLoading', 'error', 'isCardEnlarged', 'enlargedCardId'];
       temporaryKeys.forEach(key => delete stateToPersist[key]);
+      
+      // Vérifier explicitement que les clés importantes sont présentes
+      const importantKeys = ['language', 'persona', 'cardSet', 'spreadType', 'iaModel'];
+      const keysPresent = importantKeys.filter(key => key in stateToPersist);
+      const keysMissing = importantKeys.filter(key => !(key in stateToPersist));
+      
+      console.log('🔐 Persistance de l\'état dans localStorage:');
+      console.log('✅ Clés importantes sauvegardées:', keysPresent.map(key => `${key}: ${stateToPersist[key]}`));
+      
+      if (keysMissing.length > 0) {
+        console.warn('⚠️ Clés importantes manquantes:', keysMissing);
+      }
       
       // Convertir les types spéciaux pour la sérialisation
       const serializedState = {
@@ -461,8 +523,9 @@ class StateManager {
       }
       
       localStorage.setItem('jodotarot_state', stateString);
+      console.log('✅ État sauvegardé dans localStorage avec succès');
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde de l\'état:', error);
+      console.error('❌ Erreur lors de la sauvegarde de l\'état:', error);
       // Émettre un événement d'erreur
       document.dispatchEvent(new CustomEvent('stateManager:error', {
         detail: { error: error.message }
@@ -472,36 +535,79 @@ class StateManager {
 
   /**
    * Restaure l'état depuis le localStorage
+   * @return {boolean} Indique si la restauration a réussi
    */
   restoreState() {
     try {
       const savedState = localStorage.getItem('jodotarot_state');
-      if (!savedState) return;
-      
-      const { version, data } = JSON.parse(savedState);
-      
-      // Vérifier la version et migrer si nécessaire
-      const migratedData = this.migrateState(version, data);
-      
-      // Désérialiser l'état
-      const restoredState = this.deserializeState(migratedData);
-      
-      // Fusionner l'état restauré avec l'état par défaut pour s'assurer que toutes les propriétés requises sont présentes
-      const defaultState = this.getDefaultState();
-      const mergedState = { ...defaultState, ...restoredState };
-
-      // Valider l'état fusionné
-      const validationErrors = this.validateState(mergedState);
-      if (validationErrors.length > 0) {
-        throw new Error(`État invalide:\n${validationErrors.join('\n')}`);
+      if (!savedState) {
+        console.log('🔍 Aucun état sauvegardé trouvé dans localStorage');
+        return false;
       }
-
-      // Utiliser setState pour appliquer l'état fusionné
-      this.setState(mergedState);
+      
+      console.log('🔄 Restauration de l\'état depuis localStorage...');
+      
+      const parsed = JSON.parse(savedState);
+      const version = parsed.version || '0.0.0';
+      
+      // Vérifier la version pour les migrations
+      if (version !== this.STATE_VERSION) {
+        console.log(`⚠️ Migration d'état nécessaire: ${version} -> ${this.STATE_VERSION}`);
+        const migratedData = this.migrateState(version, parsed.data);
+        this.applyRestoredState(migratedData);
+      } else {
+        console.log('✅ Version de l\'état compatible, restauration directe');
+        this.applyRestoredState(parsed.data);
+      }
+      
+      return true;
     } catch (error) {
-      console.error('Erreur lors de la restauration de l\'état:', error);
-      // Réinitialiser à l'état par défaut
-      this.state = this.getDefaultState();
+      console.error('❌ Erreur lors de la restauration de l\'état:', error);
+      // En cas d'erreur, continuer avec l'état par défaut
+      return false;
+    }
+  }
+  
+  /**
+   * Applique l'état restauré avec traçage des clés importantes
+   * @param {Object} data - Données d'état à appliquer
+   */
+  applyRestoredState(data) {
+    if (!data) {
+      console.warn('⚠️ Données d\'état invalides, utilisation des valeurs par défaut');
+      return;
+    }
+    
+    try {
+      // Désérialiser l'état
+      const deserialized = this.deserializeState(data);
+      
+      // Vérifier les clés importantes
+      const importantKeys = ['language', 'persona', 'cardSet', 'spreadType', 'iaModel'];
+      const restoredKeys = importantKeys.filter(key => key in deserialized);
+      const missingKeys = importantKeys.filter(key => !(key in deserialized));
+      
+      console.log('🔄 Restauration des clés importantes:');
+      console.log('✅ Clés restaurées:', restoredKeys.map(key => `${key}: ${deserialized[key]}`));
+      
+      if (missingKeys.length > 0) {
+        console.warn('⚠️ Clés importantes non restaurées (valeurs par défaut):', missingKeys);
+      }
+      
+      // Appliquer l'état désérialisé
+      for (const [key, value] of Object.entries(deserialized)) {
+        // Valider chaque valeur avant de l'appliquer
+        const validation = this.validateValue(key, value);
+        if (validation.isValid) {
+          this.state[key] = validation.value;
+        } else {
+          console.warn(`⚠️ Valeur invalide pour ${key}, utilisation de la valeur par défaut`);
+        }
+      }
+      
+      console.log('✅ État restauré avec succès');
+    } catch (error) {
+      console.error('❌ Erreur lors de l\'application de l\'état restauré:', error);
     }
   }
 

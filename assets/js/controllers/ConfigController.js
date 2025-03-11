@@ -32,8 +32,13 @@ class ConfigController {
     // Initialiser les écouteurs d'événements
     this.initEventListeners();
     
+    // Synchroniser l'UI avec l'état actuel lors de l'initialisation
+    this.syncUIWithState();
+    console.log('🔄 Interface synchronisée avec l\'état restauré');
+    
     // S'abonner aux changements d'état pour maintenir l'UI synchronisée
     this.stateManager.subscribe((newState, changes = {}) => {
+      console.log('🔄 Changement d\'état détecté:', changes);
       this.syncUIWithState();
       
       // Traitements spécifiques
@@ -47,12 +52,6 @@ class ConfigController {
         this.testModelConnectivity();
       }
     });
-    
-    // Initialiser l'UI
-    this.syncUIWithState();
-    
-    // Note: Le chargement initial des modèles Ollama est fait dans main.js (loadInitialResources)
-    // Ne pas charger les modèles ici pour éviter le double chargement
     
     // Écouter l'événement spécifique pour la mise à jour du menu déroulant des modèles IA
     document.addEventListener('iaModelUI:update', (event) => {
@@ -355,6 +354,12 @@ class ConfigController {
     const ollamaPromo = document.getElementById('ollama-promo');
     if (ollamaPromo) {
       ollamaPromo.innerHTML = getTranslation('interpretation.ollamaPromo', language);
+    }
+    
+    // Mettre à jour le titre de la section d'interprétation
+    const interpretationTitle = document.querySelector('.interpretation-title');
+    if (interpretationTitle) {
+      interpretationTitle.textContent = getTranslation('sections.interpretations', language);
     }
     
     // Notifier les écouteurs que la langue a changé
@@ -943,34 +948,82 @@ class ConfigController {
   
   /**
    * Synchronise l'interface utilisateur avec l'état actuel
-   * @param {Object} [previousState] - État précédent pour comparaison
+   * @param {Object} previousState - État précédent pour déterminer les changements
    */
   syncUIWithState(previousState = null) {
     const state = this.stateManager.getState();
+    console.log('🔄 Synchronisation de l\'UI avec l\'état:', {
+      language: state.language,
+      persona: state.persona,
+      cardSet: state.cardSet,
+      spreadType: state.spreadType,
+      iaModel: state.iaModel
+    });
+    
+    // Vérifier que tous les éléments DOM existent
+    if (!this.elements.languageSelect || !this.elements.personaSelect || 
+        !this.elements.cardSetSelect || !this.elements.spreadTypeSelect || 
+        !this.elements.iaModelSelect || !this.elements.personaLogo) {
+      console.error('❌ Certains éléments DOM sont manquants pour la synchronisation UI/État');
+      return;
+    }
     
     // Mise à jour des sélecteurs uniquement si nécessaire
     if (!previousState || previousState.language !== state.language) {
-      this.elements.languageSelect.value = state.language;
-      this.updateDropdownOptions(state.language);
+      console.log(`🔤 Mise à jour du sélecteur de langue: ${state.language}`);
+      
+      // Vérifier si la valeur est une option valide
+      if (this.isValidOption(this.elements.languageSelect, state.language)) {
+        this.elements.languageSelect.value = state.language;
+        this.updateDropdownOptions(state.language);
+      } else {
+        console.warn(`⚠️ Langue invalide dans l'état: ${state.language}`);
+      }
     }
     
     if (!previousState || previousState.persona !== state.persona) {
-      this.elements.personaSelect.value = state.persona;
-      this.updatePersonaLogo(state.persona);
+      console.log(`👤 Mise à jour du sélecteur de persona: ${state.persona}`);
+      
+      if (this.isValidOption(this.elements.personaSelect, state.persona)) {
+        this.elements.personaSelect.value = state.persona;
+        this.updatePersonaLogo(state.persona);
+      } else {
+        console.warn(`⚠️ Persona invalide dans l'état: ${state.persona}`);
+      }
     }
     
     if (!previousState || previousState.cardSet !== state.cardSet) {
-      this.elements.cardSetSelect.value = state.cardSet;
+      console.log(`🃏 Mise à jour du sélecteur de jeu de cartes: ${state.cardSet}`);
+      
+      if (this.isValidOption(this.elements.cardSetSelect, state.cardSet)) {
+        this.elements.cardSetSelect.value = state.cardSet;
+      } else {
+        console.warn(`⚠️ Jeu de cartes invalide dans l'état: ${state.cardSet}`);
+      }
     }
     
     if (!previousState || previousState.spreadType !== state.spreadType) {
-      this.elements.spreadTypeSelect.value = state.spreadType;
-      this.updateAppTitle();
+      console.log(`🔀 Mise à jour du sélecteur de type de tirage: ${state.spreadType}`);
+      
+      if (this.isValidOption(this.elements.spreadTypeSelect, state.spreadType)) {
+        this.elements.spreadTypeSelect.value = state.spreadType;
+        this.updateAppTitle();
+      } else {
+        console.warn(`⚠️ Type de tirage invalide dans l'état: ${state.spreadType}`);
+      }
     }
     
     if (!previousState || previousState.iaModel !== state.iaModel) {
-      this.elements.iaModelSelect.value = state.iaModel;
+      console.log(`🤖 Mise à jour du sélecteur de modèle IA: ${state.iaModel}`);
+      
+      if (this.isValidOption(this.elements.iaModelSelect, state.iaModel)) {
+        this.elements.iaModelSelect.value = state.iaModel;
+      } else {
+        console.warn(`⚠️ Modèle IA invalide dans l'état: ${state.iaModel}`);
+      }
     }
+    
+    console.log('✅ Synchronisation UI/État terminée');
   }
   
   /**

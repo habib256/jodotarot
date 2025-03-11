@@ -17,6 +17,7 @@ const zh = {
     question: "您的问题：",
     questionPlaceholder: "输入您对此次塔罗牌阅读的问题...",
     drawButton: "抽牌",
+    drawButtonGenerating: "生成中...请稍候",
     streamingOption: "实时回应:"
   },
   
@@ -25,8 +26,11 @@ const zh = {
     loading: "正在分析牌阵...",
     loadingWithModel: "正在使用{model}由{persona}解析十字牌阵...",
     default: "解读将在抽牌后显示在这里。",
-    error: "解读过程中发生错误。请重试。",
-    apiError: "API错误: {0}",
+    error: {
+      general: "解读过程中发生错误。请重试。",
+      noQuestion: "请在抽牌前输入问题",
+      api: "API错误: {0}"
+    },
     apiWarning: "解读意外终止。以下是部分结果：",
     userQuestion: "用户提出的问题是：",
     userMessage: "我想要一个详细且个性化的十字塔罗牌阅读。请根据每张牌的位置分析其象征意义，并建立牌与牌之间的联系，提供一个连贯的解读，准确回应我的问题。",
@@ -161,6 +165,20 @@ const zh = {
 请专注于问题所精确询问的内容，并根据问题中提到的元素调整您的解读。
 请勿提供泛泛而论的回答。
 您解读的每个方面都应该回应问题的某个方面。`
+  },
+  
+  // 连接消息
+  connectivity: {
+    connecting: "连接中...",
+    connected: "已连接",
+    disconnected: "已断开",
+    error: "连接错误"
+  },
+  
+  // 部分标题
+  sections: {
+    reading: "塔罗牌阵",
+    interpretations: "解读"
   }
 };
 

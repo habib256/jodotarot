@@ -6,6 +6,7 @@ import StateManager from '../utils/StateManager.js';
 import DeckService from '../services/DeckService.js';
 import AIService from '../services/AIService.js';
 import { createSpread } from '../main.js';
+import { getTranslation } from '../translations/index.js';
 
 class ReadingController {
   /**
@@ -76,6 +77,13 @@ class ReadingController {
       this.stateManager.setState({ spreadType });
       this.updateSpreadDisplay(spreadType);
     });
+    
+    // Écouter les changements de langue pour mettre à jour les positions des cartes
+    document.addEventListener('language:changed', (event) => {
+      console.log(`🔤 Changement de langue détecté: ${event.detail.language}`);
+      // Réinitialiser tous les tirages avec la nouvelle langue
+      this.initializeAllSpreads();
+    });
   }
   
   /**
@@ -85,6 +93,17 @@ class ReadingController {
     // Récupérer la langue actuelle
     const state = this.stateManager.getState();
     const language = state.language || 'fr';
+    
+    // Sauvegarder les cartes actuellement affichées si elles existent
+    const currentSpreadType = state.spreadType || 'cross';
+    let currentCards = [];
+    
+    // Sauvegarder les cartes du spread actuel si elles existent
+    if (this.currentSpread && this.currentSpread.cards && this.currentSpread.cards.length > 0) {
+      currentCards = [...this.currentSpread.cards];
+    } else if (this.currentReading && this.currentReading.length > 0) {
+      currentCards = [...this.currentReading];
+    }
     
     // Initialiser le tirage en croix
     this.crossSpread = createSpread('cross', this.elements.spreadPanels.cross, language);
@@ -102,8 +121,21 @@ class ReadingController {
     this.celticCrossSpread = createSpread('celticCross', this.elements.spreadPanels.celticCross, language);
     this.celticCrossSpread.initializeCardPositions();
     
-    // Afficher le tirage initial (par défaut en croix)
-    this.updateSpreadDisplay(state.spreadType || 'cross');
+    // Restaurer les cartes si nécessaire
+    if (currentCards.length > 0) {
+      // Mettre à jour le spread actuel
+      this.updateSpreadDisplay(currentSpreadType);
+      
+      // Restaurer les cartes dans le spread actuel
+      this.currentSpread.cards = currentCards;
+      this.currentReading = currentCards;
+      
+      // Rendre les cartes restaurées
+      this.currentSpread.render();
+    } else {
+      // Afficher le tirage initial (par défaut en croix)
+      this.updateSpreadDisplay(currentSpreadType);
+    }
   }
   
   /**
@@ -232,12 +264,19 @@ class ReadingController {
   async performReading() {
     try {
       const state = this.stateManager.getState();
+      const currentLanguage = state.language || 'fr';
+      
+      // Désactiver le bouton et changer son texte avec le texte traduit
+      this.elements.tirerButton.disabled = true;
+      this.elements.tirerButton.textContent = getTranslation('header.drawButtonGenerating', currentLanguage);
+      this.elements.tirerButton.classList.add('disabled');
+      
       let deck = this.deckService.getCurrentDeck();
       
       // Récupérer et valider la question
       const question = this.elements.questionInput.value.trim();
       if (!question) {
-        throw new Error('Veuillez entrer une question avant de tirer les cartes');
+        throw new Error(getTranslation('interpretation.error.noQuestion', currentLanguage));
       }
       
       // Mémoriser la question
@@ -316,16 +355,28 @@ class ReadingController {
         state.language,
         state.spreadType
       );
+      
+      // Réactiver le bouton et restaurer son texte original avec le texte traduit
+      this.elements.tirerButton.disabled = false;
+      this.elements.tirerButton.textContent = getTranslation('header.drawButton', currentLanguage);
+      this.elements.tirerButton.classList.remove('disabled');
+      
     } catch (error) {
       console.error("Erreur lors du tirage:", error);
       
       // Mettre à jour l'état avec l'erreur
-      // Attention: garder les propriétés qui ont un default défini
       this.stateManager.setState({
         isLoading: false
       });
       
-      // Nous gérons l'affichage de l'erreur directement sans passer par l'état
+      const state = this.stateManager.getState();
+      const currentLanguage = state.language || 'fr';
+      
+      // Réactiver le bouton et restaurer son texte en cas d'erreur
+      this.elements.tirerButton.disabled = false;
+      this.elements.tirerButton.textContent = getTranslation('header.drawButton', currentLanguage);
+      this.elements.tirerButton.classList.remove('disabled');
+      
       // Afficher l'erreur à l'utilisateur
       this.elements.responseContent.innerHTML = `<p class="error">${error.message}</p>`;
     }

@@ -75,8 +75,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     registerSpread('love', LoveSpread);
     registerSpread('celticCross', CelticCrossSpread);
     
-    // Créer et initialiser les services
+    // Créer et initialiser le gestionnaire d'état en premier
     stateManager = new StateManager();
+    console.log('🔄 Initialisation du gestionnaire d\'état...');
+    
+    // Initialiser le StateManager de manière asynchrone
+    // et attendre que l'état soit complètement chargé
+    await stateManager.initialize();
+    console.log('✅ État chargé avec succès');
+    
+    // Créer les services après l'initialisation de l'état
     aiService = new AIService(stateManager);
     deckService = new DeckService(stateManager);
     uiService = new UIService();
@@ -126,9 +134,6 @@ async function loadInitialResources() {
     
     // Mettre à jour le titre de l'application
     configController.updateAppTitle();
-    
-    // Initialiser le logo avec le persona par défaut
-    configController.updatePersonaLogo('tarologue');
     
     // Charger les modèles d'IA disponibles
     const ollamaModelsLoaded = await configController.loadOllamaModels();

@@ -17,6 +17,7 @@ const en = {
     question: "Your question:",
     questionPlaceholder: "Enter your question for this reading...",
     drawButton: "Draw Cards",
+    drawButtonGenerating: "Generation in progress... Please wait",
     streamingOption: "Live Response:"
   },
   
@@ -25,8 +26,11 @@ const en = {
     loading: "Analyzing the spread...",
     loadingWithModel: "Analyzing the cross spread with {model} interpreted by a {persona}...",
     default: "Interpretations will appear here after the cards are drawn.",
-    error: "An error occurred during interpretation. Please try again.",
-    apiError: "API Error: {0}",
+    error: {
+      general: "An error occurred during interpretation. Please try again.",
+      noQuestion: "Please enter a question before drawing cards",
+      api: "API Error: {0}"
+    },
     apiWarning: "The interpretation ended unexpectedly. Here is the partial result:",
     userQuestion: "The user's question is:",
     userMessage: "I would like a detailed and personalized interpretation of my tarot cross spread. Analyze the symbolism of each card based on its position and establish connections between the cards to offer a coherent reading that precisely answers my question.",

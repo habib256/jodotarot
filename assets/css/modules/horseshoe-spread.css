@@ -80,9 +80,12 @@
   border-radius: var(--border-radius-sm);
 }
 
-/* Effet de survol */
+/* Effet de survol uniformisé */
 .horseshoe-spread .card-position:hover {
-  z-index: var(--z-index-above);
+  z-index: 10;
+  filter: brightness(1.08);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  transform: translate(-50%, -50%) scale(1.02);
 }
 
 /* Styles responsifs */

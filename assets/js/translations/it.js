@@ -17,6 +17,7 @@ const it = {
     question: "La tua domanda:",
     questionPlaceholder: "Inserisci la tua domanda per questa lettura...",
     drawButton: "Pesca le carte",
+    drawButtonGenerating: "Generazione in corso... Attendere prego",
     streamingOption: "Risposta in diretta:"
   },
   
@@ -25,8 +26,11 @@ const it = {
     loading: "Analisi della stesa in corso...",
     loadingWithModel: "Analisi della stesa a croce in corso con {model} interpretato da un/una {persona}...",
     default: "Le interpretazioni appariranno qui dopo aver pescato le carte.",
-    error: "Si è verificato un errore durante l'interpretazione. Si prega di riprovare.",
-    apiError: "Errore API: {0}",
+    error: {
+      general: "Si è verificato un errore durante l'interpretazione. Si prega di riprovare.",
+      noQuestion: "Inserisci una domanda prima di pescare le carte",
+      api: "Errore API: {0}"
+    },
     apiWarning: "L'interpretazione è terminata in modo inaspettato. Ecco il risultato parziale:",
     userQuestion: "La domanda posta dall'utente è:",
     userMessage: "Vorrei un'interpretazione dettagliata e personalizzata della mia stesa di tarocchi a croce. Analizza il simbolismo di ogni carta in base alla sua posizione e stabilisci le connessioni tra le carte per offrire una lettura coerente che risponda con precisione alla mia domanda.",
@@ -160,6 +164,20 @@ const it = {
 Concentrati su ciò che la domanda chiede precisamente e adatta la tua interpretazione
 in base agli elementi menzionati nella domanda. Non dare una risposta generica.
 Ogni aspetto della tua interpretazione deve affrontare un aspetto di questa domanda.`
+  },
+  
+  // Messaggi di connettività
+  connectivity: {
+    connecting: "Connessione in corso...",
+    connected: "Connesso",
+    disconnected: "Disconnesso",
+    error: "Errore di connessione"
+  },
+  
+  // Titoli delle sezioni
+  sections: {
+    reading: "Lettura",
+    interpretations: "Interpretazione"
   }
 };
 

@@ -17,6 +17,7 @@ const de = {
     question: "Deine Frage:",
     questionPlaceholder: "Gib deine Frage für diese Lesung ein...",
     drawButton: "Karten ziehen",
+    drawButtonGenerating: "Generierung läuft... Bitte warten",
     streamingOption: "Live-Antwort:"
   },
   
@@ -25,8 +26,11 @@ const de = {
     loading: "Analysiere die Legung...",
     loadingWithModel: "Analysiere die Kreuzlegung mit {model} interpretiert von einem/einer {persona}...",
     default: "Die Interpretationen werden nach dem Ziehen der Karten hier angezeigt.",
-    error: "Bei der Interpretation ist ein Fehler aufgetreten. Bitte versuche es erneut.",
-    apiError: "API-Fehler: {0}",
+    error: {
+      general: "Bei der Interpretation ist ein Fehler aufgetreten. Bitte versuche es erneut.",
+      noQuestion: "Bitte gib eine Frage ein, bevor du die Karten ziehst",
+      api: "API-Fehler: {0}"
+    },
     apiWarning: "Die Interpretation wurde unerwartet beendet. Hier ist das teilweise Ergebnis:",
     userQuestion: "Die vom Benutzer gestellte Frage lautet:",
     userMessage: "Ich hätte gerne eine detaillierte und personalisierte Interpretation meiner Tarot-Kreuzlegung. Analysiere die Symbolik jeder Karte entsprechend ihrer Position und stelle Verbindungen zwischen den Karten her, um eine kohärente Lesung zu bieten, die genau auf meine Frage eingeht.",
@@ -160,6 +164,20 @@ Jeder Aspekt deiner Interpretation muss einen Aspekt dieser Frage ansprechen.`
   iaGroups: {
     ollama: "🧠 Ollama",
     openai: "🤖 OpenAI"
+  },
+  
+  // Konnektivitätsmeldungen
+  connectivity: {
+    connecting: "Verbindung wird hergestellt...",
+    connected: "Verbunden",
+    disconnected: "Getrennt",
+    error: "Verbindungsfehler"
+  },
+  
+  // Abschnittstitel
+  sections: {
+    reading: "Kartenlegung",
+    interpretations: "Interpretation"
   }
 };
 

@@ -115,8 +115,7 @@ function updateUILanguage(langue) {
   updateOptGroupsLabels(langue);
   
   // Mettre à jour les titres de section
-  document.querySelector('.reading-section h2').textContent = getTranslation('sections.reading', langue);
-  document.querySelector('.interpretations-section h2').textContent = getTranslation('sections.interpretations', langue);
+  document.querySelector('.interpretation-title').textContent = getTranslation('sections.interpretations', langue);
   
   // Masquer les autres panneaux d'interprétation
   const interpretationsPrompt = document.getElementById('interpretations-prompt');

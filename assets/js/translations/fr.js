@@ -17,6 +17,7 @@ const fr = {
     question: "Votre question :",
     questionPlaceholder: "Entrez votre question pour ce tirage...",
     drawButton: "Tirer les cartes",
+    drawButtonGenerating: "Génération en cours... Patientez",
     streamingOption: "Réponse en direct :"
   },
   
@@ -25,8 +26,11 @@ const fr = {
     loading: "Analyse du tirage en cours...",
     loadingWithModel: "Analyse du tirage en croix en cours avec {model} interprété par un(e) {persona}...",
     default: "Les interprétations s'afficheront ici après le tirage.",
-    error: "Une erreur est survenue lors de l'interprétation. Veuillez réessayer.",
-    apiError: "Erreur de l'API: {0}",
+    error: {
+      general: "Une erreur est survenue lors de l'interprétation. Veuillez réessayer.",
+      noQuestion: "Veuillez entrer une question avant de tirer les cartes",
+      api: "Erreur de l'API: {0}"
+    },
     apiWarning: "L'interprétation s'est terminée de façon inattendue. Voici le résultat partiel:",
     userQuestion: "La question posée par l'utilisateur est:",
     userMessage: "J'aimerais une interprétation détaillée et personnalisée de mon tirage de tarot en croix. Analysez la symbolique de chaque carte en fonction de sa position et établissez les connexions entre les cartes pour offrir une lecture cohérente qui réponde précisément à ma question.",
@@ -245,9 +249,16 @@ Chaque aspect de ton interprétation doit répondre à un aspect de cette questi
   
   // Messages de connectivité
   connectivity: {
-    suggestions: "Solution:",
-    dismiss: "Fermer",
-    ollamaConnectionError: "Ollama non connecté. <a href='https://ollama.com' target='_blank'>Installer</a> ou démarrer le serveur."
+    connecting: "Connexion en cours...",
+    connected: "Connecté",
+    disconnected: "Déconnecté",
+    error: "Erreur de connexion"
+  },
+  
+  // Titres des sections
+  sections: {
+    reading: "Tirage",
+    interpretations: "Interprétation"
   }
 };
 
