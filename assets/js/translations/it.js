@@ -129,7 +129,35 @@ const it = {
     downloadModel: "Scarica il modello con: ollama pull {model}",
     useOpenAI: "Usa un modello OpenAI come alternativa",
     customizePrompt: "Personalizza la tua richiesta per ottenere risultati migliori",
-    useStandardPrompt: "Usa un prompt standard per migliorare la compatibilità"
+    useStandardPrompt: "Usa un prompt standard per migliorare la compatibilità",
+    modelUnavailable: "Modello non disponibile",
+    modelUnavailableDetails: "Il modello {modelName} non è disponibile",
+    error: "Errore",
+    checkConnection: "Verifica la tua connessione internet",
+    checkOllamaRunning: "Ollama non avviato",
+    checkNetworkConnection: "Verifica la tua connessione di rete",
+    checkOllama: "Ollama non disponibile",
+    checkAPIKey: "Verifica la tua chiave API",
+    configureOpenAI: "Aggiungi una chiave API",
+    apiKeyMissing: "API OpenAI inaccessibile",
+    apiKeyMissingDetails: "Chiave API richiesta per {modelName}",
+    configureAPIKey: "Configura una chiave API",
+    useLocalModel: "Usa un modello locale (Ollama)",
+    refreshOllamaModels: "Aggiorna la lista dei modelli Ollama",
+    tryAgain: "Riprova",
+    unexpectedError: "Si è verificato un errore imprevisto",
+    pullModel: "Installa tramite 'ollama pull'",
+    selectDifferentModel: "Seleziona un modello diverso",
+    modelMayBeLoading: "Il modello potrebbe essere in fase di caricamento",
+    checkOllamaMemory: "Verifica che il tuo sistema abbia memoria sufficiente",
+    pullModelManually: "Installa tramite <a href='https://ollama.com/library' target='_blank'>ollama.com/library</a>",
+    checkOllamaVersion: "Verifica di utilizzare l'ultima versione di Ollama",
+    modelTooLarge: "Il modello potrebbe essere troppo grande per il tuo sistema",
+    ollamaUnavailable: "Problema Ollama",
+    noOllamaModels: "Modelli mancanti",
+    noOllamaModelsDetails: "Installa un modello Ollama",
+    installModel: "Installa tramite <a href='https://ollama.com/library' target='_blank'>ollama.com</a>",
+    selectModel: "Seleziona un modello"
   },
   
   personaGroups: {
@@ -179,6 +207,24 @@ Ogni aspetto della tua interpretazione deve affrontare un aspetto di questa doma
   sections: {
     reading: "Lettura",
     interpretations: "Interpretazione"
+  },
+  
+  // Configurazione
+  config: {
+    apiKeyTitle: "Configurazione della chiave API di OpenAI",
+    apiKeyDescription: "Inserisci la tua chiave API OpenAI per accedere ai modelli OpenAI. La tua chiave API è memorizzata localmente nel tuo browser e non viene mai condivisa.",
+    configureAPIKey: "Configura chiave API",
+    save: "Salva",
+    cancel: "Annulla",
+    apiKeySaved: "Chiave API salvata con successo",
+    apiKeyEmpty: "La chiave API non può essere vuota"
+  },
+  
+  // Messaggi
+  messages: {
+    ollamaConnected: "Ollama connesso con successo",
+    modelAvailable: "Modello disponibile",
+    modelUnavailable: "Modello non disponibile"
   }
 };
 

@@ -129,7 +129,35 @@ const es = {
     downloadModel: "Descarga el modelo con: ollama pull {model}",
     useOpenAI: "Usa un modelo OpenAI como alternativa",
     customizePrompt: "Personaliza tu petición para obtener mejores resultados",
-    useStandardPrompt: "Usa un prompt estándar para mejorar la compatibilidad"
+    useStandardPrompt: "Usa un prompt estándar para mejorar la compatibilidad",
+    modelUnavailable: "Modelo no disponible",
+    modelUnavailableDetails: "El modelo {modelName} no está disponible",
+    error: "Error",
+    checkConnection: "Verifica tu conexión a internet",
+    checkOllamaRunning: "Ollama no iniciado",
+    checkNetworkConnection: "Verifica tu conexión de red",
+    checkOllama: "Ollama no disponible",
+    checkAPIKey: "Verifica tu clave API",
+    configureOpenAI: "Añade una clave API",
+    apiKeyMissing: "API de OpenAI inaccesible",
+    apiKeyMissingDetails: "Clave API requerida para {modelName}",
+    configureAPIKey: "Configurar una clave API",
+    useLocalModel: "Usar un modelo local (Ollama)",
+    refreshOllamaModels: "Actualizar la lista de modelos de Ollama",
+    tryAgain: "Intentar de nuevo",
+    unexpectedError: "Ha ocurrido un error inesperado",
+    pullModel: "Instalar vía 'ollama pull'",
+    selectDifferentModel: "Selecciona un modelo diferente",
+    modelMayBeLoading: "El modelo podría estar cargándose",
+    checkOllamaMemory: "Verifica que tu sistema tiene suficiente memoria",
+    pullModelManually: "Instalar vía <a href='https://ollama.com/library' target='_blank'>ollama.com/library</a>",
+    checkOllamaVersion: "Verifica que estás usando la última versión de Ollama",
+    modelTooLarge: "El modelo puede ser demasiado grande para tu sistema",
+    ollamaUnavailable: "Problema con Ollama",
+    noOllamaModels: "Modelos faltantes",
+    noOllamaModelsDetails: "Instalar un modelo de Ollama",
+    installModel: "Instalar vía <a href='https://ollama.com/library' target='_blank'>ollama.com</a>",
+    selectModel: "Selecciona un modelo"
   },
   
   // Meta prompt pour l'IA
@@ -179,6 +207,24 @@ Cada aspecto de tu interpretación debe abordar un aspecto de esta pregunta.`
   sections: {
     reading: "Tirada",
     interpretations: "Interpretación"
+  },
+  
+  // Configuration
+  config: {
+    apiKeyTitle: "Configuración de la clave API de OpenAI",
+    apiKeyDescription: "Introduce tu clave API de OpenAI para acceder a los modelos de OpenAI. Tu clave API se almacena localmente en tu navegador y nunca se comparte.",
+    configureAPIKey: "Configurar clave API",
+    save: "Guardar",
+    cancel: "Cancelar",
+    apiKeySaved: "Clave API guardada con éxito",
+    apiKeyEmpty: "La clave API no puede estar vacía"
+  },
+  
+  // Mensajes
+  messages: {
+    ollamaConnected: "Ollama conectado con éxito",
+    modelAvailable: "Modelo disponible",
+    modelUnavailable: "Modelo no disponible"
   }
 };
 

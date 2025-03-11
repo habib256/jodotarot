@@ -145,7 +145,35 @@ const zh = {
     downloadModel: "使用以下命令下载模型：ollama pull {model}",
     useOpenAI: "使用OpenAI模型作为替代",
     customizePrompt: "自定义您的提示以获得更好的结果",
-    useStandardPrompt: "使用标准提示以提高兼容性"
+    useStandardPrompt: "使用标准提示以提高兼容性",
+    modelUnavailable: "模型不可用",
+    modelUnavailableDetails: "模型{modelName}不可用",
+    error: "错误",
+    checkConnection: "检查您的互联网连接",
+    checkOllamaRunning: "Ollama未启动",
+    checkNetworkConnection: "检查您的网络连接",
+    checkOllama: "Ollama不可用",
+    checkAPIKey: "检查您的API密钥",
+    configureOpenAI: "添加API密钥",
+    apiKeyMissing: "无法访问OpenAI API",
+    apiKeyMissingDetails: "{modelName}需要API密钥",
+    configureAPIKey: "配置API密钥",
+    useLocalModel: "使用本地模型(Ollama)",
+    refreshOllamaModels: "刷新Ollama模型列表",
+    tryAgain: "重试",
+    unexpectedError: "发生意外错误",
+    pullModel: "通过'ollama pull'安装",
+    selectDifferentModel: "选择不同的模型",
+    modelMayBeLoading: "模型可能正在加载中",
+    checkOllamaMemory: "检查您的系统是否有足够的内存",
+    pullModelManually: "通过<a href='https://ollama.com/library' target='_blank'>ollama.com/library</a>安装",
+    checkOllamaVersion: "检查您是否使用最新版本的Ollama",
+    modelTooLarge: "模型可能对您的系统来说太大",
+    ollamaUnavailable: "Ollama问题",
+    noOllamaModels: "缺少模型",
+    noOllamaModelsDetails: "安装Ollama模型",
+    installModel: "通过<a href='https://ollama.com/library' target='_blank'>ollama.com</a>安装",
+    selectModel: "选择模型"
   },
   
   // Meta prompt pour l'IA
@@ -180,6 +208,24 @@ const zh = {
   sections: {
     reading: "塔罗牌阵",
     interpretations: "解读"
+  },
+  
+  // 配置
+  config: {
+    apiKeyTitle: "OpenAI API密钥配置",
+    apiKeyDescription: "输入您的OpenAI API密钥以访问OpenAI模型。您的API密钥存储在本地浏览器中，永远不会被共享。",
+    configureAPIKey: "配置API密钥",
+    save: "保存",
+    cancel: "取消",
+    apiKeySaved: "API密钥保存成功",
+    apiKeyEmpty: "API密钥不能为空"
+  },
+  
+  // 消息
+  messages: {
+    ollamaConnected: "Ollama连接成功",
+    modelAvailable: "模型可用",
+    modelUnavailable: "模型不可用"
   }
 };
 

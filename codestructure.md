@@ -10,9 +10,9 @@ JodoTarot est une application web modulaire construite en JavaScript ES6. L'arch
 jodotarot/
 ├── assets/
 │   ├── js/
-│   │   ├── main.js           # Point d'entrée et initialisation (198 lignes)
-│   │   ├── api.js            # Communication avec OpenAI et Ollama (868 lignes)
-│   │   ├── ui.js             # Gestion de l'interface utilisateur (281 lignes)
+│   │   ├── main.js           # Point d'entrée et initialisation (203 lignes)
+│   │   ├── api.js            # Communication avec OpenAI et Ollama (864 lignes)
+│   │   ├── ui.js             # Gestion de l'interface utilisateur (255 lignes)
 │   │   ├── config.js         # Configuration globale (143 lignes)
 │   │   ├── app.js            # Gestion des événements et interactions (228 lignes)
 │   │   ├── prompt.js         # Gestion des prompts IA (72 lignes)
@@ -26,15 +26,15 @@ jodotarot/
 │   │   │   ├── README.md    # Documentation des traductions (66 lignes)
 │   │   │   └── index.js     # Point d'entrée des traductions (80 lignes)
 │   │   ├── services/
-│   │   │   ├── AIService.js     # Service d'intelligence artificielle (787 lignes)
-│   │   │   ├── UIService.js     # Service d'interface utilisateur (128 lignes)
+│   │   │   ├── AIService.js     # Service d'intelligence artificielle (883 lignes)
+│   │   │   ├── UIService.js     # Service d'interface utilisateur (187 lignes)
 │   │   │   └── DeckService.js   # Service de gestion du jeu de cartes (445 lignes)
 │   │   ├── controllers/
-│   │   │   ├── AppController.js       # Contrôleur principal (216 lignes)
-│   │   │   ├── ConfigController.js    # Contrôleur de configuration (1184 lignes)
-│   │   │   └── ReadingController.js   # Contrôleur de lecture (634 lignes)
+│   │   │   ├── AppController.js       # Contrôleur principal (217 lignes)
+│   │   │   ├── ConfigController.js    # Contrôleur de configuration (1320 lignes)
+│   │   │   └── ReadingController.js   # Contrôleur de lecture (869 lignes)
 │   │   ├── utils/
-│   │   │   └── StateManager.js   # Gestionnaire d'état (645 lignes)
+│   │   │   └── StateManager.js   # Gestionnaire d'état (816 lignes)
 │   │   └── models/
 │   │       ├── personas/         # Définitions des personas (23 personas)
 │   │       │   ├── BasePersona.js           # Classe de base (94 lignes)
@@ -69,30 +69,38 @@ jodotarot/
 │   │       │   └── index.js              # (50 lignes)
 │   │       └── cards/            # Définitions des cartes
 │   ├── css/                      # Styles
-│   │   ├── main.css              # Point d'entrée CSS (66 lignes)
+│   │   ├── main.css              # Point d'entrée CSS (79 lignes)
 │   │   ├── style.css             # Styles généraux (24 lignes)
 │   │   ├── base/                 # Styles de base
-│   │   │   ├── variables.css     # Variables CSS (168 lignes)
+│   │   │   ├── variables.css     # Variables CSS (172 lignes)
 │   │   │   ├── reset.css         # Reset CSS (222 lignes)
 │   │   │   └── typography.css    # Typographie (138 lignes)
 │   │   ├── modules/              # Modules CSS
-│   │   │   ├── cross-spread.css         # Tirage en Croix (130 lignes)
-│   │   │   ├── horseshoe-spread.css     # Tirage en Fer à Cheval (113 lignes)
-│   │   │   ├── love-spread.css          # Tirage de l'Amour (118 lignes)
-│   │   │   ├── celtic-cross-spread.css  # Croix Celtique (160 lignes)
+│   │   │   ├── cross-spread.css         # Tirage en Croix (131 lignes)
+│   │   │   ├── horseshoe-spread.css     # Tirage en Fer à Cheval (110 lignes)
+│   │   │   ├── love-spread.css          # Tirage de l'Amour (113 lignes)
+│   │   │   ├── celtic-cross-spread.css  # Croix Celtique (162 lignes)
 │   │   │   ├── interpretations.css      # Interprétations (504 lignes)
 │   │   │   ├── persona.css              # Styles des personas (1372 lignes)
 │   │   │   └── select.css               # Styles des select (60 lignes)
-│   │   ├── layouts/              # Mises en page
 │   │   ├── components/           # Composants CSS
+│   │   │   ├── buttons.css              # Styles des boutons (119 lignes)
+│   │   │   ├── cards.css                # Styles des cartes (170 lignes)
+│   │   │   ├── forms.css                # Styles des formulaires (170 lignes)
+│   │   │   ├── information-zone.css     # Zone d'information (118 lignes)
+│   │   │   ├── loading.css              # Indicateurs de chargement (120 lignes)
+│   │   │   ├── modal.css                # Fenêtres modales (168 lignes)
+│   │   │   ├── select.css               # Sélecteurs (134 lignes)
+│   │   │   └── warnings.css             # Messages d'avertissement (167 lignes)
+│   │   ├── layouts/              # Mises en page
 │   │   └── utils/                # Utilitaires CSS
 │   └── images/                   # Images et ressources graphiques
-├── index.html                    # Page principale (148 lignes)
+├── index.html                    # Page principale (147 lignes)
 ├── favicon.ico                   # Icône du site (23 lignes)
 ├── screenshot.png                # Capture d'écran de l'application (2165 lignes)
 ├── LICENSE                       # Licence du projet (675 lignes)
 ├── README.md                     # Documentation du projet (289 lignes)
-└── codestructure.md              # Structure technique du projet (905 lignes)
+└── codestructure.md              # Structure technique du projet (944 lignes)
 ```
 
 ## 🧩 Composants Principaux
@@ -335,7 +343,7 @@ Le système de construction des prompts suit une architecture en couches qui ass
 assets/js/
 ├── prompt.js              # Gestion centrale des prompts (72 lignes)
 ├── services/
-│   └── AIService.js      # Service d'IA et construction des prompts (787 lignes)
+│   └── AIService.js      # Service d'IA et construction des prompts (883 lignes)
 ├── models/
 │   └── personas/         # Définitions des personas (23 personas)
 └── translations/         # Traductions des prompts (6 langues)
@@ -633,18 +641,23 @@ assets/
 - Support automatique des modèles installés
 - Détection automatique du premier modèle disponible
 - Optimisation pour différentes familles (llama, mistral, phi, gemma)
+- Système robuste de vérification de la connectivité
 
 ### Système de Prompts
 - Construction dynamique selon le contexte
 - Adaptation au persona sélectionné
 - Intégration des éléments de tirage
 - Formatage des réponses en HTML
+- Support du streaming en temps réel
+- Système de gestion d'erreurs amélioré
+- Mécanisme d'annulation des requêtes
 
 ## 🔐 Sécurité
 - Validation des entrées utilisateur
 - Gestion sécurisée des clés API
 - Protection contre les injections
 - Gestion des limites de rate
+- Système de reconnexion automatique
 
 ## 📊 État Actuel du Projet
 
@@ -657,6 +670,9 @@ assets/
 - Cache des réponses
 - Gestion optimisée du défilement
 - Affichage HTML dans l'interprétation
+- Système d'avertissements et notifications
+- Contrôle avancé des états
+- Tests de connexion des modèles IA
 
 ### En Développement
 - Support des arcanes mineurs
@@ -664,6 +680,7 @@ assets/
 - Mode sombre
 - Intégration d'oracles
 - Analyse d'images par IA
+- Amélioration des performances mobiles
 
 ## 🔄 Cycles de Vie et Événements
 
@@ -941,3 +958,87 @@ Le StateManager inclut un système de migration pour gérer les changements de v
 ```
 
 Les migrations sont gérées via des fonctions dédiées comme `migrate_0_9_0_to_1_0_0(oldData)` qui permettent de mettre à jour les données entre les versions de l'application.
+
+## 🖥️ Composants d'Interface Utilisateur
+
+L'interface utilisateur de JodoTarot est construite selon une architecture modulaire qui favorise la réutilisation et la maintenance. Voici les principaux composants UI organisés par catégorie:
+
+### 1. Composants de Base (`assets/css/components/`)
+
+#### Contrôles et Interactions
+- **Boutons** (`buttons.css`, 119 lignes)
+  - Styles primaires et secondaires
+  - États hover, focus, disabled
+  - Animations de transition
+
+- **Formulaires** (`forms.css`, 170 lignes)
+  - Champs de texte et zones de texte
+  - Validation visuelle
+  - Labels et messages d'aide
+
+- **Sélecteurs** (`select.css`, 134 lignes)
+  - Menus déroulants personnalisés
+  - Indicateurs d'état
+  - Support des groupes d'options
+
+#### Éléments Visuels
+- **Cartes** (`cards.css`, 170 lignes)
+  - Styles des cartes de tarot
+  - Animations de retournement
+  - États sélectionnés et inactifs
+
+- **Chargement** (`loading.css`, 120 lignes)
+  - Indicateurs de progression
+  - Animations de chargement
+  - Styles de transition
+
+- **Modales** (`modal.css`, 168 lignes)
+  - Fenêtres de dialogue
+  - Animations d'entrée/sortie
+  - Superposition et focus
+
+- **Avertissements** (`warnings.css`, 167 lignes)
+  - Messages d'erreur et d'avertissement
+  - Niveaux de sévérité
+  - Animation d'apparition/disparition
+
+- **Zones d'information** (`information-zone.css`, 118 lignes)
+  - Panneaux contextuels
+  - Sections explicatives
+  - États d'expansion/réduction
+
+### 2. Modules Spécifiques (`assets/css/modules/`)
+
+- **Tirages** (4 types distincts)
+  - Positionnement précis des cartes
+  - Animations de tirage
+  - Adaptativité selon les écrans
+
+- **Interprétations** (`interpretations.css`, 504 lignes)
+  - Formatage des réponses IA
+  - Effet machine à écrire
+  - Mise en page structurée
+
+- **Personas** (`persona.css`, 1372 lignes)
+  - Styles spécifiques à chaque archétype
+  - Indicateurs visuels
+  - Thèmes personnalisés
+
+### 3. Interactions UI Avancées
+
+- **Défilement Optimisé**
+  - Gestion fluide du défilement
+  - Support tactile et souris
+  - Prévention des conflits d'événement
+
+- **Animations Réactives**
+  - Transitions entre états
+  - Retournement de cartes
+  - Effet de machine à écrire
+
+- **Adaptativité**
+  - Design responsive
+  - Points d'arrêt multiples
+  - Adaptation aux orientations
+
+Ces composants sont orchestrés par `UIService.js` qui assure la cohérence des interactions et la synchronisation avec l'état global de l'application via le `StateManager`.

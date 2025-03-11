@@ -16,17 +16,20 @@ JodoTarot est une application web élégante et intuitive qui vous permet de ré
   - **Tirage de l'amour** dédié aux questions sentimentales
   - **Croix celtique** pour une analyse approfondie de 10 cartes
 - 🧠 **Interprétation par IA** de votre tirage en fonction de votre question
-- 👤 **Personnages variés** pour interpréter votre tirage (20 personas différents)
+- 👤 **Personnages variés** pour interpréter votre tirage (21 personas différents)
 - 🔄 **Flexibilité des modèles d'IA** (OpenAI et modèles locaux Ollama)
 - 📱 **Interface responsive** adaptée à tous les appareils
 - 🖼️ **Visualisation claire** des cartes et de leur signification dans le tirage
 - 🎨 **Choix de jeux de cartes** (Tarot de Marseille et Tarot Thiago Lehmann)
 - 🌍 **Support multilingue** (Français, Anglais, Espagnol, Allemand, Italien, Chinois)
 - 🔄 **Cache intégré** pour les réponses d'IA afin d'optimiser les performances
+- ⚡ **Streaming des réponses** en temps réel avec effet machine à écrire
+- 🚨 **Système d'avertissements** pour les erreurs de connexion et problèmes API
+- 🔍 **Tests de connectivité** automatiques pour les modèles d'IA
 
 ## 🎭 Les personas disponibles
 
-JodoTarot propose 20 personnages différents pour interpréter votre tirage. Chaque persona possède:
+JodoTarot propose 21 personnages différents pour interpréter votre tirage. Chaque persona possède:
 - Un style d'expression unique
 - Une approche spécifique d'interprétation du tarot
 - Des **particularités langagières** distinctives (expressions typiques, vocabulaire spécifique, structures de phrases)
@@ -202,45 +205,58 @@ Développé avec ❤️ pour les amateurs de tarot et d'exploration intérieure.
 
 - Application entièrement modulaire en JavaScript ES6
 - Architecture orientée composants avec séparation claire des responsabilités:
-  - `main.js` (259 lignes): Point d'entrée et initialisation de l'application
-  - `app.js` (188 lignes): Gestion des événements et de l'interaction utilisateur
-  - `api.js` (658 lignes): Communication avec les API d'IA (OpenAI et Ollama)
-  - `ui.js` (281 lignes): Gestion de l'interface utilisateur
+  - `main.js` (203 lignes): Point d'entrée et initialisation de l'application
+  - `app.js` (228 lignes): Gestion des événements et de l'interaction utilisateur
+  - `api.js` (864 lignes): Communication avec les API d'IA (OpenAI et Ollama)
+  - `ui.js` (255 lignes): Gestion de l'interface utilisateur
   - `prompt.js` (72 lignes): Gestion des prompts IA
-  - `config.js` (103 lignes): Configuration globale de l'application
+  - `config.js` (143 lignes): Configuration globale de l'application
 
 - Architecture MVC claire avec:
   - **Contrôleurs** pour la logique métier:
-    - `AppController.js` (215 lignes): Contrôleur principal de l'application
-    - `ReadingController.js` (545 lignes): Contrôleur de lecture de tarot
-    - `ConfigController.js` (752 lignes): Contrôleur de configuration
+    - `AppController.js` (217 lignes): Contrôleur principal de l'application
+    - `ReadingController.js` (869 lignes): Contrôleur de lecture de tarot
+    - `ConfigController.js` (1320 lignes): Contrôleur de configuration
   - **Services** pour la gestion des ressources:
-    - `AIService.js` (417 lignes): Service d'intelligence artificielle
-    - `DeckService.js` (435 lignes): Service de gestion du jeu de cartes
-    - `UIService.js` (127 lignes): Service d'interface utilisateur
+    - `AIService.js` (883 lignes): Service d'intelligence artificielle
+    - `DeckService.js` (445 lignes): Service de gestion du jeu de cartes
+    - `UIService.js` (187 lignes): Service d'interface utilisateur
   - **Modèles** pour les données:
     - `spreads/`: Types de tirages disponibles
       - `BaseSpread.js` (331 lignes): Classe de base pour tous les tirages
-      - `CrossSpread.js` (140 lignes): Tirage en Croix
-      - `HorseshoeSpread.js` (183 lignes): Tirage en Fer à Cheval
+      - `CrossSpread.js` (141 lignes): Tirage en Croix
+      - `HorseshoeSpread.js` (184 lignes): Tirage en Fer à Cheval
       - `LoveSpread.js` (216 lignes): Tirage de l'Amour
       - `CelticCrossSpread.js` (295 lignes): Croix Celtique
     - `personas/`: 21 personas différents avec leurs styles d'interprétation uniques
     - `cards/`: Définition des cartes et de leurs significations
 
+- Système CSS modulaire et extensible:
+  - `main.css` (79 lignes): Point d'entrée des styles
+  - Composants réutilisables:
+    - `buttons.css` (119 lignes): Styles des boutons
+    - `cards.css` (170 lignes): Styles des cartes
+    - `forms.css` (170 lignes): Styles des formulaires
+    - `modal.css` (168 lignes): Fenêtres modales
+    - `warnings.css` (167 lignes): Messages d'avertissement
+  - Modules spécifiques pour chaque type de tirage
+  - Variables CSS centralisées pour les couleurs et positions
+
 - Support multilingue complet:
   - 6 langues supportées avec fichiers de traduction dédiés:
-    - Français (195 lignes)
-    - Anglais (195 lignes)
-    - Espagnol (165 lignes)
-    - Allemand (165 lignes)
-    - Italien (165 lignes)
-    - Chinois (166 lignes)
+    - Français (246 lignes)
+    - Anglais (246 lignes)
+    - Espagnol (166 lignes)
+    - Allemand (166 lignes)
+    - Italien (166 lignes)
+    - Chinois (167 lignes)
 
 - Gestionnaire d'état centralisé:
-  - `StateManager.js` (200 lignes): Gestion de l'état global de l'application
+  - `StateManager.js` (816 lignes): Gestion de l'état global de l'application
+  - Validation stricte des données
   - Persistance des préférences utilisateur
   - Système d'événements pour la synchronisation UI/État
+  - Migrations automatiques entre versions
 
 ## 📝 Licence
 
@@ -256,21 +272,25 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 1. **"Erreur de connexion à l'API OpenAI"**
    - Vérifiez que votre clé API est correcte et possède des crédits suffisants
    - Assurez-vous que votre connexion internet fonctionne correctement
+   - Utilisez le test de connectivité intégré pour valider l'état de la connexion
 
 2. **"Impossible de se connecter à Ollama"**
    - Vérifiez que le serveur Ollama est bien lancé: `ollama serve`
    - Assurez-vous qu'Ollama écoute sur le port 11434
    - Vérifiez que vous avez au moins un modèle installé: `ollama list`
+   - Utilisez le bouton de test pour vérifier automatiquement la connexion
 
 3. **"Le tirage ne s'affiche pas correctement"**
    - Essayez de rafraîchir la page
    - Vérifiez que JavaScript est activé dans votre navigateur
    - Assurez-vous que le chemin vers les images est correct
+   - Vérifiez les erreurs dans la console développeur (F12)
 
-4. **"L'interprétation est toujours la même"**
-   - Essayez de poser des questions plus variées
-   - Utilisez un modèle d'IA plus avancé (comme GPT-4o)
-   - Alternez entre différents personas
+4. **"L'interprétation est coupée ou incomplète"**
+   - Vérifiez votre connexion internet
+   - Essayez un autre modèle d'IA
+   - Si vous utilisez un modèle local, assurez-vous qu'il a suffisamment de RAM
+   - Vous pouvez annuler et recommencer la génération avec le bouton dédié
 
 5. **"Problèmes avec le changement de langue"**
    - Assurez-vous que la page est entièrement chargée avant de changer de langue
@@ -285,4 +305,8 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 - Thèmes visuels alternatifs pour l'interface comme un mode sombre
 - Intégration d'autres modèles d'IA locaux
 - Rajout de la gestion des Oracles et du Yi King
-- Permettre à l'IA de lire les images des cartes pour identifier les particularités symboliques spécifiques à chaque set. Ce sera très utile pour les oracles.
+- Permettre à l'IA de lire les images des cartes pour identifier les particularités symboliques spécifiques à chaque set
+- Amélioration des performances sur appareils mobiles
+- Optimisation du streaming des réponses
+- Interface de personnalisation des prompts système
+- Visualisation avancée avec animations des relations entre cartes

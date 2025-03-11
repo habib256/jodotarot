@@ -129,7 +129,35 @@ const de = {
     downloadModel: "Lade das Modell herunter mit: ollama pull {model}",
     useOpenAI: "Verwende ein OpenAI-Modell als Alternative",
     customizePrompt: "Passe deinen Prompt an, um bessere Ergebnisse zu erzielen",
-    useStandardPrompt: "Verwende einen Standardprompt für bessere Kompatibilität"
+    useStandardPrompt: "Verwende einen Standardprompt für bessere Kompatibilität",
+    modelUnavailable: "Modell nicht verfügbar",
+    modelUnavailableDetails: "Das Modell {modelName} ist nicht verfügbar",
+    error: "Fehler",
+    checkConnection: "Überprüfe deine Internetverbindung",
+    checkOllamaRunning: "Ollama nicht gestartet",
+    checkNetworkConnection: "Überprüfe deine Netzwerkverbindung",
+    checkOllama: "Ollama nicht verfügbar",
+    checkAPIKey: "Überprüfe deinen API-Schlüssel",
+    configureOpenAI: "API-Schlüssel hinzufügen",
+    apiKeyMissing: "OpenAI API nicht zugänglich",
+    apiKeyMissingDetails: "API-Schlüssel erforderlich für {modelName}",
+    configureAPIKey: "API-Schlüssel konfigurieren",
+    useLocalModel: "Lokales Modell verwenden (Ollama)",
+    refreshOllamaModels: "Ollama-Modellliste aktualisieren",
+    tryAgain: "Erneut versuchen",
+    unexpectedError: "Ein unerwarteter Fehler ist aufgetreten",
+    pullModel: "Über 'ollama pull' installieren",
+    selectDifferentModel: "Anderes Modell auswählen",
+    modelMayBeLoading: "Das Modell wird möglicherweise gerade geladen",
+    checkOllamaMemory: "Überprüfe, ob dein System genügend Speicher hat",
+    pullModelManually: "Über <a href='https://ollama.com/library' target='_blank'>ollama.com/library</a> installieren",
+    checkOllamaVersion: "Überprüfe, ob du die neueste Ollama-Version verwendest",
+    modelTooLarge: "Das Modell ist möglicherweise zu groß für dein System",
+    ollamaUnavailable: "Ollama-Problem",
+    noOllamaModels: "Fehlende Modelle",
+    noOllamaModelsDetails: "Ollama-Modell installieren",
+    installModel: "Über <a href='https://ollama.com/library' target='_blank'>ollama.com</a> installieren",
+    selectModel: "Modell auswählen"
   },
   
   // Meta prompt pour l'IA
@@ -179,6 +207,24 @@ Jeder Aspekt deiner Interpretation muss einen Aspekt dieser Frage ansprechen.`
   sections: {
     reading: "Kartenlegung",
     interpretations: "Interpretation"
+  },
+  
+  // Konfiguration
+  config: {
+    apiKeyTitle: "OpenAI API-Schlüssel-Konfiguration",
+    apiKeyDescription: "Gib deinen OpenAI API-Schlüssel ein, um auf OpenAI-Modelle zuzugreifen. Dein API-Schlüssel wird lokal in deinem Browser gespeichert und niemals geteilt.",
+    configureAPIKey: "API-Schlüssel konfigurieren",
+    save: "Speichern",
+    cancel: "Abbrechen",
+    apiKeySaved: "API-Schlüssel erfolgreich gespeichert",
+    apiKeyEmpty: "Der API-Schlüssel darf nicht leer sein"
+  },
+  
+  // Nachrichten
+  messages: {
+    ollamaConnected: "Ollama erfolgreich verbunden",
+    modelAvailable: "Modell verfügbar",
+    modelUnavailable: "Modell nicht verfügbar"
   }
 };
 
