@@ -10,71 +10,115 @@ JodoTarot est une application web modulaire construite en JavaScript ES6. L'arch
 jodotarot/
 ├── assets/
 │   ├── js/
-│   │   ├── main.js           # Point d'entrée et initialisation (259 lignes)
-│   │   ├── api.js            # Communication avec OpenAI et Ollama (658 lignes)
+│   │   ├── main.js           # Point d'entrée et initialisation (198 lignes)
+│   │   ├── api.js            # Communication avec OpenAI et Ollama (868 lignes)
 │   │   ├── ui.js             # Gestion de l'interface utilisateur (281 lignes)
-│   │   ├── config.js         # Configuration globale (103 lignes)
-│   │   ├── app.js            # Gestion des événements et interactions (188 lignes)
+│   │   ├── config.js         # Configuration globale (143 lignes)
+│   │   ├── app.js            # Gestion des événements et interactions (228 lignes)
 │   │   ├── prompt.js         # Gestion des prompts IA (72 lignes)
 │   │   ├── translations/     # Fichiers de traduction
-│   │   │   ├── fr.js        # Français (195 lignes)
-│   │   │   ├── en.js        # Anglais (195 lignes)
-│   │   │   ├── es.js        # Espagnol (165 lignes)
-│   │   │   ├── de.js        # Allemand (165 lignes)
-│   │   │   ├── it.js        # Italien (165 lignes)
-│   │   │   ├── zh.js        # Chinois (166 lignes)
-│   │   │   └── index.js     # Point d'entrée des traductions
+│   │   │   ├── fr.js        # Français (246 lignes)
+│   │   │   ├── en.js        # Anglais (246 lignes)
+│   │   │   ├── es.js        # Espagnol (166 lignes)
+│   │   │   ├── de.js        # Allemand (166 lignes)
+│   │   │   ├── it.js        # Italien (166 lignes)
+│   │   │   ├── zh.js        # Chinois (167 lignes)
+│   │   │   ├── README.md    # Documentation des traductions (66 lignes)
+│   │   │   └── index.js     # Point d'entrée des traductions (80 lignes)
 │   │   ├── services/
-│   │   │   ├── AIService.js     # Service d'intelligence artificielle (417 lignes)
-│   │   │   ├── UIService.js     # Service d'interface utilisateur (127 lignes)
-│   │   │   └── DeckService.js   # Service de gestion du jeu de cartes (435 lignes)
+│   │   │   ├── AIService.js     # Service d'intelligence artificielle (787 lignes)
+│   │   │   ├── UIService.js     # Service d'interface utilisateur (128 lignes)
+│   │   │   └── DeckService.js   # Service de gestion du jeu de cartes (445 lignes)
 │   │   ├── controllers/
-│   │   │   ├── AppController.js       # Contrôleur principal (215 lignes)
-│   │   │   ├── ConfigController.js    # Contrôleur de configuration (752 lignes)
-│   │   │   └── ReadingController.js   # Contrôleur de lecture (545 lignes)
+│   │   │   ├── AppController.js       # Contrôleur principal (216 lignes)
+│   │   │   ├── ConfigController.js    # Contrôleur de configuration (1184 lignes)
+│   │   │   └── ReadingController.js   # Contrôleur de lecture (634 lignes)
 │   │   ├── utils/
-│   │   │   └── StateManager.js   # Gestionnaire d'état (200 lignes)
+│   │   │   └── StateManager.js   # Gestionnaire d'état (645 lignes)
 │   │   └── models/
-│   │       ├── personas/         # Définitions des personas (21 personas)
-│   │       │   ├── BasePersona.js
-│   │       │   ├── TarologuePersona.js
-│   │       │   ├── OraclePersona.js
-│   │       │   └── ... (18 autres personas)
+│   │       ├── personas/         # Définitions des personas (23 personas)
+│   │       │   ├── BasePersona.js           # Classe de base (94 lignes)
+│   │       │   ├── TarologuePersona.js      # (75 lignes)
+│   │       │   ├── OraclePersona.js         # (80 lignes)
+│   │       │   ├── VoyantePersona.js        # (82 lignes)
+│   │       │   ├── PretrePersona.js         # (82 lignes)
+│   │       │   ├── RabbinPersona.js         # (82 lignes)
+│   │       │   ├── ImamPersona.js           # (82 lignes)
+│   │       │   ├── DalailamaPersona.js      # (82 lignes)
+│   │       │   ├── SorcierePersona.js       # (82 lignes)
+│   │       │   ├── AlchimistePersona.js     # (82 lignes)
+│   │       │   ├── MagePersona.js           # (82 lignes)
+│   │       │   ├── FrancmaconPersona.js     # (82 lignes)
+│   │       │   ├── FreudPersona.js          # (97 lignes)
+│   │       │   ├── JungPersona.js           # (82 lignes)
+│   │       │   ├── LacanPersona.js          # (82 lignes)
+│   │       │   ├── DoltoPersona.js          # (82 lignes)
+│   │       │   ├── SocratePersona.js        # (82 lignes)
+│   │       │   ├── SalomonPersona.js        # (82 lignes)
+│   │       │   ├── MontaignePersona.js      # (82 lignes)
+│   │       │   ├── QuichottePersona.js      # (82 lignes)
+│   │       │   ├── DemonPersona.js          # (82 lignes)
+│   │       │   ├── NoEgoPersona.js          # (82 lignes)
+│   │       │   └── index.js                 # (75 lignes)
 │   │       ├── spreads/          # Types de tirages
 │   │       │   ├── BaseSpread.js         # Classe de base (331 lignes)
-│   │       │   ├── CrossSpread.js        # Tirage en Croix (140 lignes)
-│   │       │   ├── HorseshoeSpread.js    # Tirage en Fer à Cheval (183 lignes)
+│   │       │   ├── CrossSpread.js        # Tirage en Croix (141 lignes)
+│   │       │   ├── HorseshoeSpread.js    # Tirage en Fer à Cheval (184 lignes)
 │   │       │   ├── LoveSpread.js         # Tirage de l'Amour (216 lignes)
 │   │       │   ├── CelticCrossSpread.js  # Croix Celtique (295 lignes)
-│   │       │   └── index.js
+│   │       │   └── index.js              # (50 lignes)
 │   │       └── cards/            # Définitions des cartes
-│   ├── css/                      # Styles (voir structure CSS existante)
+│   ├── css/                      # Styles
+│   │   ├── main.css              # Point d'entrée CSS (66 lignes)
+│   │   ├── style.css             # Styles généraux (24 lignes)
+│   │   ├── base/                 # Styles de base
+│   │   │   ├── variables.css     # Variables CSS (168 lignes)
+│   │   │   ├── reset.css         # Reset CSS (222 lignes)
+│   │   │   └── typography.css    # Typographie (138 lignes)
+│   │   ├── modules/              # Modules CSS
+│   │   │   ├── cross-spread.css         # Tirage en Croix (130 lignes)
+│   │   │   ├── horseshoe-spread.css     # Tirage en Fer à Cheval (113 lignes)
+│   │   │   ├── love-spread.css          # Tirage de l'Amour (118 lignes)
+│   │   │   ├── celtic-cross-spread.css  # Croix Celtique (160 lignes)
+│   │   │   ├── interpretations.css      # Interprétations (504 lignes)
+│   │   │   ├── persona.css              # Styles des personas (1372 lignes)
+│   │   │   └── select.css               # Styles des select (60 lignes)
+│   │   ├── layouts/              # Mises en page
+│   │   ├── components/           # Composants CSS
+│   │   └── utils/                # Utilitaires CSS
 │   └── images/                   # Images et ressources graphiques
-├── index.html                    # Page principale (151 lignes)
+├── index.html                    # Page principale (148 lignes)
 ├── favicon.ico                   # Icône du site (23 lignes)
-├── screenshot.png                # Capture d'écran de l'application
+├── screenshot.png                # Capture d'écran de l'application (2165 lignes)
 ├── LICENSE                       # Licence du projet (675 lignes)
-└── README.md                     # Documentation du projet (300 lignes)
+├── README.md                     # Documentation du projet (289 lignes)
+└── codestructure.md              # Structure technique du projet (905 lignes)
 ```
 
 ## 🧩 Composants Principaux
 
-### 1. Système de Configuration (`config.js`)
+### 1. Système de Configuration (`config.js`, `ConfigController.js`)
 - Gestion des clés API (OpenAI)
 - Configuration des endpoints (Ollama: http://localhost:11434)
 - Paramètres globaux de l'application
+- Interface utilisateur de configuration
+- Gestion des modèles IA disponibles
+- Tests de connectivité des modèles
 
-### 2. API Integration (`api.js`)
+### 2. API Integration (`api.js`, `AIService.js`)
 - Communication avec OpenAI API
 - Intégration avec Ollama pour les modèles locaux
+- Support du streaming pour les réponses
 - Gestion du cache des réponses
 - Formatage des prompts et réponses
+- Détection automatique des modèles Ollama
 
-### 3. Interface Utilisateur (`ui.js`)
+### 3. Interface Utilisateur (`ui.js`, `UIService.js`)
 - Rendu des cartes de tarot
 - Gestion des animations
 - Mise à jour dynamique du DOM
 - Gestion des événements utilisateur
+- Adaptation multilingue de l'interface
 
 ### 4. Gestion des Données
 
@@ -86,20 +130,27 @@ jodotarot/
 #### Types de Tirages (`models/spreads/`)
 - Tirage en Croix (5 cartes)
 - Fer à Cheval (7 cartes)
-- Tirage de l'Amour
+- Tirage de l'Amour (7 cartes)
 - Croix Celtique (10 cartes)
 
 #### Personas (`models/personas/`)
-20 personas différents avec:
+23 personas différents avec:
 - Style d'expression unique
 - Approche d'interprétation
 - Particularités langagières
 - Citations caractéristiques
 
-### 5. Système de Traduction
-- Support de 6 langues
+### 5. Système de Traduction (`translations/`)
+- Support de 6 langues (fr, en, es, de, it, zh)
 - Fichiers de traduction modulaires
 - Changement dynamique de langue
+- Documentation pour les traducteurs
+
+### 6. Gestion d'État Global (`StateManager.js`)
+- Validation stricte des données d'état
+- Persistance dans localStorage
+- Gestion des événements et notifications
+- Schéma de migration pour les mises à jour
 
 ## 🔄 Flux de Données
 
@@ -107,17 +158,20 @@ jodotarot/
    - Chargement des configurations
    - Initialisation des modèles
    - Chargement des traductions
+   - Restauration de l'état précédent
 
 2. **Tirage de Cartes**
    - Sélection du type de tirage
    - Génération aléatoire des cartes
    - Positionnement selon le schéma choisi
+   - Affichage avec animations
 
 3. **Interprétation IA**
    - Construction du prompt avec contexte
    - Appel API (OpenAI ou Ollama)
+   - Streaming de la réponse si disponible
    - Mise en cache des réponses
-   - Formatage et affichage
+   - Formatage et affichage avec effet machine à écrire
 
 ## 🔄 Interactions entre Composants
 
@@ -279,23 +333,24 @@ Le système de construction des prompts suit une architecture en couches qui ass
 
 ```
 assets/js/
-├── prompt.js              # Gestion centrale des prompts
+├── prompt.js              # Gestion centrale des prompts (72 lignes)
 ├── services/
-│   └── AIService.js      # Service d'IA et construction des prompts
+│   └── AIService.js      # Service d'IA et construction des prompts (787 lignes)
 ├── models/
-│   └── personas/         # Définitions des personas
-└── translations/         # Traductions des prompts
+│   └── personas/         # Définitions des personas (23 personas)
+└── translations/         # Traductions des prompts (6 langues)
 ```
 
 #### 2. Flux de Construction du Prompt
 
 1. **Initialisation** (`AIService.getInterpretation`):
-   - Reçoit: cartes, question, persona, modèle, langue
+   - Reçoit: cartes, question, persona, modèle, langue, type de tirage, callback streaming
    - Coordonne la construction des prompts système et utilisateur
+   - Gère la décision entre mode standard et streaming
 
 2. **Construction des Prompts Système** (`AIService.buildSystemPrompts`):
    - Récupère le métaprompt via `getMetaPrompt(langue)`
-   - Obtient le prompt du persona via `getPersonaPrompt()`
+   - Obtient le prompt du persona via `getPersonaPrompt(persona, language, spreadType)`
    - Combine dans l'ordre:
      1. Métaprompt (règles générales)
      2. Prompt du persona (style et approche)
@@ -304,11 +359,11 @@ assets/js/
    - Crée une instance du type de tirage
    - Génère la description détaillée des cartes
    - Enrichit avec la question via `enrichirPromptContextuel()`
-   - Ajoute le texte d'emphase pour la spécificité
+   - Adapte la structure selon le type de tirage
 
 #### 3. Composants du Prompt Final
 
-1. **Métaprompt** (via `prompt.js`):
+1. **Métaprompt** (via `prompt.js` et les traductions):
    ```
    Format obligatoire (400-450 mots):
    - Réponse concise et complète
@@ -325,6 +380,7 @@ assets/js/
    - Approche d'interprétation spécifique
    - Vocabulaire caractéristique
    - Citations représentatives
+   - Spécialisations particulières
 
 3. **Description du Tirage**:
    - Position et signification de chaque carte
@@ -333,6 +389,11 @@ assets/js/
 
 4. **Emphase sur la Question**:
    ```
+   ====================
+   Question de l'utilisateur:
+   "Question précise posée par l'utilisateur"
+   ====================
+
    IMPORTANT: Réponse DIRECTEMENT liée à la question
    - Focus sur les éléments spécifiques
    - Adaptation à la demande précise
@@ -345,12 +406,13 @@ assets/js/
 - Validation du format des cartes
 - Contrôle de la cohérence du tirage
 - Logs de débogage en mode développement
+- Affichage du prompt complet en mode debug
 
 #### 5. Gestion des Langues
 
-- Support multilingue intégré
+- Support multilingue intégré via translations
 - Traductions des prompts système
-- Adaptation des personas
+- Adaptation des personas aux différentes langues
 - Messages d'interface localisés
 
 ## 🔧 Caractéristiques Techniques
@@ -757,9 +819,16 @@ L'état est défini par un schéma strict qui inclut:
 
 ```javascript
 {
-  language: {type: 'string', enum: ['fr', 'en', 'es', 'de', 'it', 'zh']},
-  persona: {type: 'string', enum: ['tarologue', 'oracle', /* ... */]},
-  cardSet: {type: 'string', enum: ['set01', 'set02']},
+  language: {type: 'string', enum: ['fr', 'en', 'es', 'de', 'it', 'zh'], default: 'fr'},
+  persona: {
+    type: 'string', 
+    enum: ['tarologue', 'oracle', 'voyante', 'pretre', 'rabbin', 'imam',
+          'dalailama', 'sorciere', 'alchimiste', 'mage', 'francmacon',
+          'freud', 'jung', 'lacan', 'dolto', 'socrate', 'salomon',
+          'montaigne', 'quichotte', 'demon', 'noegoman'],
+    default: 'tarologue'
+  },
+  cardSet: {type: 'string', enum: ['set01', 'set02'], default: 'set01'},
   deckId: {type: 'string', enum: ['set01', 'set02']},
   spreadType: {type: 'string', enum: ['cross', 'horseshoe', 'love', 'celticCross']},
   iaModel: {type: 'string', validate: /* validation personnalisée */},
@@ -770,9 +839,9 @@ L'état est défini par un schéma strict qui inclut:
   error: {type: 'string', nullable: true},
   isCardEnlarged: {type: 'boolean'},
   enlargedCardId: {type: 'number', nullable: true},
-  availableModels: {type: 'set'},
+  availableModels: {type: 'array'},
   currentSpreadType: {type: 'string', enum: ['cross', 'horseshoe', 'love', 'celticCross']},
-  currentCardsDrawn: {type: 'string'}
+  currentCardsDrawn: {type: 'array'}
 }
 ```
 
@@ -845,51 +914,19 @@ sequenceDiagram
    const unsubscribe = subscribe((state, changes) => {})
    ```
 
-#### 5. Bonnes Pratiques d'Utilisation
-
-1. **Modifications d'État**
+5. **getState()**
    ```javascript
-   // ✅ CORRECT
-   stateManager.setState({language: 'fr'})
-   
-   // ❌ INCORRECT
-   stateManager.state.language = 'fr'
+   // Obtient une copie de l'état actuel
+   const state = getState()
    ```
 
-2. **Écoute des Changements**
+6. **restoreState()**
    ```javascript
-   // ✅ CORRECT
-   stateManager.subscribe((state, changes) => {
-     if ('language' in changes) updateUI()
-   })
-   
-   // ❌ INCORRECT
-   setInterval(() => checkStateChanges(), 1000)
+   // Restaure l'état depuis localStorage
+   restoreState()
    ```
 
-3. **Validation des Données**
-   ```javascript
-   // ✅ CORRECT
-   if (stateManager.validateValue('cards', newCards).isValid) {
-     stateManager.setState({cards: newCards})
-   }
-   
-   // ❌ INCORRECT
-   stateManager.setState({cards: newCards}) // Sans validation
-   ```
-
-#### 6. Gestion des Erreurs
-
-```javascript
-try {
-  stateManager.setState({invalidKey: 'value'})
-} catch (error) {
-  console.error('Erreur de mise à jour:', error.message)
-  // Gérer l'erreur de manière appropriée
-}
-```
-
-#### 7. Migration des Données
+#### 5. Migration des Données
 
 Le StateManager inclut un système de migration pour gérer les changements de version:
 
@@ -902,3 +939,5 @@ Le StateManager inclut un système de migration pour gérer les changements de v
   }
 }
 ```
+
+Les migrations sont gérées via des fonctions dédiées comme `migrate_0_9_0_to_1_0_0(oldData)` qui permettent de mettre à jour les données entre les versions de l'application.
