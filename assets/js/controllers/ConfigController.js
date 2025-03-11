@@ -895,6 +895,13 @@ class ConfigController {
       // Mettre à jour l'état avec les modèles disponibles
       this.stateManager.setState({ availableModels });
       
+      // Si aucun modèle n'est actuellement sélectionné ou si c'est un modèle OpenAI par défaut, 
+      // sélectionner le premier modèle Ollama
+      const currentModel = this.stateManager.getState().iaModel;
+      if (currentModel === 'openai/gpt-3.5-turbo' && ollamaModels.length > 0) {
+        this.selectFirstOllamaModel();
+      }
+      
       return true;
     } catch (error) {
       console.error("Erreur lors du chargement des modèles Ollama:", error);
@@ -1185,6 +1192,28 @@ class ConfigController {
     
     // Focus sur le champ
     setTimeout(() => apiKeyInput.focus(), 100);
+  }
+  
+  /**
+   * Sélectionne le premier modèle Ollama disponible
+   */
+  selectFirstOllamaModel() {
+    // Obtenir le premier modèle du groupe Ollama
+    const ollamaOptgroup = this.elements.iaModelSelect.querySelector('optgroup[label="🤖 Ollama"]');
+    if (ollamaOptgroup && ollamaOptgroup.querySelector('option')) {
+      const firstOption = ollamaOptgroup.querySelector('option');
+      const ollamaModel = firstOption.value;
+      
+      console.log(`Sélection du premier modèle Ollama disponible: ${ollamaModel}`);
+      
+      // D'abord mettre à jour le select
+      if (this.elements.iaModelSelect) {
+        this.elements.iaModelSelect.value = ollamaModel;
+      }
+      
+      // Ensuite mettre à jour l'état
+      this.stateManager.setState({ iaModel: ollamaModel });
+    }
   }
 }
 

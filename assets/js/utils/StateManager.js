@@ -51,7 +51,26 @@ class StateManager {
           
           return true;
         },
-        default: 'openai/gpt-3.5-turbo'
+        default: function() {
+          // Vérifier si des modèles Ollama sont disponibles dans le localStorage
+          try {
+            const cacheKey = 'ollama_models_cache';
+            const cachedData = localStorage.getItem(cacheKey);
+            
+            if (cachedData) {
+              const cache = JSON.parse(cachedData);
+              if (cache.models && Array.isArray(cache.models) && cache.models.length > 0) {
+                // Utiliser le premier modèle Ollama disponible
+                return `ollama:${cache.models[0].name}`;
+              }
+            }
+          } catch (e) {
+            console.warn("Erreur lors de la lecture de la cache Ollama:", e);
+          }
+          
+          // Fallback sur OpenAI si aucun modèle Ollama n'est disponible
+          return 'openai/gpt-3.5-turbo';
+        }
       },
       cards: {
         type: 'array',
