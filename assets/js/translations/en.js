@@ -157,22 +157,22 @@ const en = {
   
   // Spread types
   spreadTypes: {
-    cross: "Cross",
-    horseshoe: "Horseshoe",
-    love: "Love Tarot",
-    celticCross: "Celtic Cross"
+    cross: "➕ Cross",
+    horseshoe: "🧲 Horseshoe",
+    love: "❤️ Love Tarot",
+    celticCross: "☘️ Celtic Cross"
   },
   
   // Miscellaneous
   misc: {
     loadingModels: "Loading models...",
-    crossSpread: "Cross Spread",
-    horseshoeSpread: "Horseshoe Spread",
-    loveSpread: "Love Tarot",
-    celticCross: "Celtic Cross"
+    crossSpread: "➕ Cross Spread",
+    horseshoeSpread: "🧲 Horseshoe Spread",
+    loveSpread: "❤️ Love Tarot",
+    celticCross: "☘️ Celtic Cross"
   },
   
-  // Meta prompt pour l'IA
+  // Meta prompt for AI
   metaprompt: {
     base: `Required format (400-450 words):
 1) Concise and complete response in one message
@@ -190,6 +190,56 @@ const en = {
 Focus on what the question precisely asks and adapt your interpretation
 based on the elements mentioned in the question. Do not give a generic answer.
 Each aspect of your interpretation must address an aspect of this question.`
+  },
+  
+  // Configuration
+  config: {
+    apiKeyTitle: "OpenAI API Key Configuration",
+    apiKeyDescription: "Enter your OpenAI API key to access OpenAI models. Your API key is stored locally in your browser and is never shared.",
+    configureAPIKey: "Configure API Key",
+    save: "Save",
+    cancel: "Cancel",
+    apiKeySaved: "API key saved successfully",
+    apiKeyEmpty: "API key cannot be empty"
+  },
+  
+  // Messages
+  messages: {
+    ollamaConnected: "Ollama connected successfully",
+    modelAvailable: "Model available",
+    modelUnavailable: "Model unavailable"
+  },
+  
+  // Warnings
+  warnings: {
+    modelUnavailable: "Model unavailable",
+    modelUnavailableDetails: "The model {modelName} is not available",
+    error: "Error",
+    checkConnection: "Check your internet connection",
+    checkOllamaRunning: "Check if Ollama is running",
+    checkNetworkConnection: "Check your network connection",
+    installOllama: "Install Ollama from ollama.ai",
+    checkOllama: "Check if Ollama is installed and running",
+    checkAPIKey: "Check your API key",
+    configureOpenAI: "Configure your OpenAI API key",
+    apiKeyMissing: "OpenAI API key missing",
+    apiKeyMissingDetails: "To use {modelName}, you need to configure a valid OpenAI API key",
+    configureAPIKey: "Configure API key in config.js",
+    useLocalModel: "Use a local model (Ollama)",
+    refreshOllamaModels: "Refresh Ollama models list",
+    tryAgain: "Try again",
+    unexpectedError: "An unexpected error occurred",
+    pullModel: "Download the model with 'ollama pull [model-name]'",
+    selectDifferentModel: "Select a different model",
+    modelMayBeLoading: "The model may be loading",
+    checkOllamaMemory: "Check if your system has enough memory",
+    pullModelManually: "Download a model manually with 'ollama pull [model-name]'",
+    checkOllamaVersion: "Check if you're using the latest version of Ollama",
+    modelTooLarge: "The model may be too large for your system",
+    ollamaUnavailable: "Ollama unavailable",
+    noOllamaModels: "No Ollama models available",
+    noOllamaModelsDetails: "Ollama is accessible but no models are available",
+    selectModel: "Select a model"
   }
 };
 

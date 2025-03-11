@@ -75,8 +75,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     registerSpread('love', LoveSpread);
     registerSpread('celticCross', CelticCrossSpread);
     
-    // Initialiser les services et contrôleurs
-    await initializeApp();
+    // Créer et initialiser les services
+    stateManager = new StateManager();
+    aiService = new AIService(stateManager);
+    deckService = new DeckService(stateManager);
+    uiService = new UIService();
+    
+    // Créer et initialiser les contrôleurs
+    configController = new ConfigController(stateManager, aiService);
+    readingController = new ReadingController(stateManager, deckService, aiService);
+    appController = new AppController(stateManager, configController, readingController);
     
     // Charger les ressources initiales
     await loadInitialResources();
@@ -92,40 +100,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 /**
- * Initialise les services et contrôleurs
- */
-async function initializeApp() {
-  console.log("Initialisation de JodoTarot...");
-  
-  try {
-    // Créer et initialiser les services
-    stateManager = new StateManager();
-    aiService = new AIService(stateManager);
-    deckService = new DeckService(stateManager);
-    uiService = new UIService();
-    
-    // Créer et initialiser les contrôleurs
-    configController = new ConfigController(stateManager, aiService);
-    readingController = new ReadingController(stateManager, deckService, aiService);
-    appController = new AppController(stateManager, configController, readingController);
-    
-    // Charger les ressources nécessaires
-    await loadInitialResources();
-    
-    // Configurer les écouteurs d'événements globaux
-    setupEventListeners();
-    
-    // Améliorer le défilement
-    enhanceScrolling();
-    
-    console.log("JodoTarot initialisé avec succès!");
-  } catch (error) {
-    console.error("Erreur lors de l'initialisation de JodoTarot:", error);
-    showErrorMessage("Erreur lors de l'initialisation de l'application");
-  }
-}
-
-/**
  * Charge les ressources initiales
  */
 async function loadInitialResources() {
@@ -139,8 +113,11 @@ async function loadInitialResources() {
     
     // Charger le jeu de cartes par défaut (set01)
     try {
-      await deckService.loadDeck('set01');
-      console.log("✅ Jeu de cartes par défaut (set01) chargé avec succès");
+      // Vérifier si le jeu est déjà chargé pour éviter les doublons
+      if (!deckService.isDeckLoaded('set01')) {
+        await deckService.loadDeck('set01');
+        console.log("✅ Jeu de cartes par défaut (set01) chargé avec succès");
+      }
       stateManager.setState({ deckId: 'set01' });
     } catch (deckError) {
       console.error("❌ Erreur lors du chargement du jeu de cartes par défaut:", deckError);
@@ -180,44 +157,6 @@ function setupEventListeners() {
   window.addEventListener('unhandledrejection', (event) => {
     console.error('Promesse rejetée non gérée:', event.reason);
     showErrorMessage(`Erreur asynchrone: ${event.reason}`);
-  });
-}
-
-/**
- * Initialise le gestionnaire de défilement pour la zone d'interprétation
- * Cela permet de défiler avec la molette de souris dans la zone d'interprétation
- */
-function enhanceScrolling() {
-  const responseContent = document.querySelector('.response-content');
-  
-  if (!responseContent) return;
-  
-  // Permettre de recevoir le focus pour une meilleure accessibilité
-  responseContent.setAttribute('tabindex', '0');
-  
-  // Gestionnaire pour l'événement de la molette
-  responseContent.addEventListener('wheel', (event) => {
-    // Vérifier si l'élément est visible
-    if (responseContent.style.display === 'none') return;
-    
-    // Empêcher le comportement de défilement par défaut
-    event.preventDefault();
-    
-    // Calculer les dimensions de défilement
-    const scrollHeight = responseContent.scrollHeight;
-    const clientHeight = responseContent.clientHeight;
-    
-    // Si le contenu nécessite un défilement
-    if (scrollHeight <= clientHeight) return;
-    
-    // Calculer la position de défilement
-    const scrollTop = responseContent.scrollTop;
-    
-    // Calculer la quantité de défilement
-    const delta = event.deltaY || event.detail || event.wheelDelta;
-    
-    // Appliquer le défilement
-    responseContent.scrollTop += delta;
   });
 }
 

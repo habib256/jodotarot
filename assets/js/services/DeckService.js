@@ -28,6 +28,15 @@ class DeckService {
   }
   
   /**
+   * Vérifie si un jeu spécifique est déjà chargé
+   * @param {string} deckId - Identifiant du jeu à vérifier
+   * @return {boolean} true si le jeu est chargé, false sinon
+   */
+  isDeckLoaded(deckId) {
+    return !!this.decks[deckId];
+  }
+  
+  /**
    * Obtient la liste des jeux disponibles
    * @return {Array} Liste des jeux disponibles
    */

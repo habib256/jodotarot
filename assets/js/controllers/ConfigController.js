@@ -35,29 +35,32 @@ class ConfigController {
     // Initialiser les écouteurs d'événements
     this.initEventListeners();
     
-    // Synchroniser l'UI avec l'état actuel
+    // S'abonner aux changements d'état pour maintenir l'UI synchronisée
+    this.stateManager.subscribe((newState, changes = {}) => {
+      this.syncUIWithState();
+      
+      // Traitements spécifiques
+      if (changes.language) {
+        this.updateUILanguage(newState.language);
+      }
+      if (changes.spreadType) {
+        this.updateAppTitle();
+      }
+      if (changes.iaModel) {
+        this.testModelConnectivity();
+      }
+    });
+    
+    // Initialiser l'UI
     this.syncUIWithState();
     
-    // S'abonner aux changements d'état pour maintenir l'UI synchronisée
-    // On utilise directement l'abonnement au StateManager plutôt que les événements
-    this.stateManager.subscribe(() => this.syncUIWithState());
-    
-    // Écouter les événements spécifiques pour les traitements additionnels
-    document.addEventListener('language:changed', () => this.updateUILanguage(this.stateManager.getState().language));
-    document.addEventListener('spreadType:changed', () => this.updateAppTitle());
+    // Note: Le chargement initial des modèles Ollama est fait dans main.js (loadInitialResources)
+    // Ne pas charger les modèles ici pour éviter le double chargement
     
     // Écouter l'événement spécifique pour la mise à jour du menu déroulant des modèles IA
     document.addEventListener('iaModelUI:update', (event) => {
       console.log('ConfigController: Réception de iaModelUI:update avec le modèle:', event.detail.model);
       this.updateModelSelectUI(event.detail.model);
-    });
-    
-    // Écouter l'événement global pour les changements d'état
-    document.addEventListener('state:changed', (event) => {
-      // S'il y a eu des changements liés à la connectivité ou au modèle IA
-      if (event.detail.changes.iaModel) {
-        this.testModelConnectivity();
-      }
     });
   }
   
@@ -70,9 +73,27 @@ class ConfigController {
     container.id = 'connectivity-warning';
     container.className = 'warning-container';
     
-    // Insérer avant la zone d'interprétation
-    const interpretationsInfo = document.getElementById('interpretations-info');
-    interpretationsInfo.parentNode.insertBefore(container, interpretationsInfo);
+    // Insérer après le sélecteur de modèle IA ou son parent
+    const modelSelect = document.getElementById('ia-model');
+    if (modelSelect && modelSelect.parentNode) {
+      // Trouver le groupe select parent
+      const selectGroup = modelSelect.closest('.select-group');
+      if (selectGroup) {
+        selectGroup.appendChild(container);
+      } else {
+        // Fallback: insérer après le parent direct du select
+        modelSelect.parentNode.appendChild(container);
+      }
+    } else {
+      // Fallback: insérer dans le header
+      const header = document.querySelector('.header');
+      if (header) {
+        header.appendChild(container);
+      } else {
+        // Dernier fallback: ajouter au body
+        document.body.appendChild(container);
+      }
+    }
     
     return container;
   }
@@ -164,27 +185,59 @@ class ConfigController {
   
   /**
    * Gère le changement de modèle d'IA
-   * @param {Event} event - Événement de changement
+   * @param {Event} event - L'événement de changement
    */
-  handleModelChange(event) {
+  async handleModelChange(event) {
     const iaModel = event.target.value;
     const previousModel = this.stateManager.getState().iaModel;
     
-    // Vérifier que la valeur est valide
-    if (!this.isValidOption(this.elements.iaModelSelect, iaModel)) {
-      console.error("Modèle IA invalide sélectionné:", iaModel);
-      // Restaurer la sélection précédente
-      this.elements.iaModelSelect.value = previousModel;
-      return;
+    if (iaModel === previousModel) {
+      return; // Pas de changement, ne rien faire
     }
     
-    console.log(`Changement de modèle IA: ${previousModel} -> ${iaModel}`);
+    // Désactiver le sélecteur pendant le test pour éviter les clics multiples
+    this.elements.iaModelSelect.disabled = true;
     
-    // Mettre à jour l'état
-    this.stateManager.setState({ iaModel });
-    
-    // Tester la connectivité sans fallback automatique
-    this.testModelConnectivity();
+    try {
+      // Tester la disponibilité du modèle avant de changer l'état
+      const modelTest = await this.aiService.testModelAvailability(iaModel);
+      
+      // Vérifier que modelTest n'est pas undefined
+      if (!modelTest) {
+        throw new Error(`Résultat du test pour le modèle ${iaModel} non disponible`);
+      }
+      
+      if (modelTest.available) {
+        // Le modèle est disponible, mettre à jour l'état
+        this.stateManager.setState({ iaModel });
+        this.showTemporaryMessage(`Modèle ${iaModel} activé avec succès`, 'success');
+      } else {
+        // Le modèle n'est pas disponible, annuler le changement
+        console.warn(`Modèle ${iaModel} non disponible:`, modelTest);
+        this.elements.iaModelSelect.value = previousModel;
+        
+        // Afficher un avertissement
+        this.showWarning(
+          'Modèle non disponible',
+          modelTest.message || `Le modèle ${iaModel} n'est pas accessible.`,
+          modelTest.suggestions || []
+        );
+      }
+    } catch (error) {
+      // En cas d'erreur, annuler le changement
+      console.error(`Erreur lors du test du modèle ${iaModel}:`, error);
+      this.elements.iaModelSelect.value = previousModel;
+      
+      // Afficher l'erreur dans le conteneur d'avertissement au lieu d'un message temporaire
+      this.showWarning(
+        'Erreur de changement de modèle',
+        `${error.message}`,
+        ['Vérifier la disponibilité du modèle', 'Vérifier la configuration de votre API']
+      );
+    } finally {
+      // Réactiver le sélecteur dans tous les cas
+      this.elements.iaModelSelect.disabled = false;
+    }
   }
   
   /**
@@ -436,45 +489,171 @@ class ConfigController {
   
   /**
    * Teste la connectivité avec le modèle d'IA sélectionné
+   * et affiche des avertissements appropriés en cas de problème
    */
   async testModelConnectivity() {
     const state = this.stateManager.getState();
-    const model = state.iaModel;
-    const language = state.language;
+    const modelName = state.iaModel;
     
     try {
-      const isConnected = await this.aiService.testConnectivity(model);
+      this.clearWarnings();
       
-      if (!isConnected) {
-        // Afficher un avertissement sans changer le modèle
+      // Si aucun modèle n'est spécifié, ne rien faire
+      if (!modelName) {
+        console.warn('Tentative de test de connectivité sans modèle spécifié');
+        return;
+      }
+      
+      // Si c'est un modèle OpenAI et qu'il n'y a pas de clé API configurée,
+      // afficher un avertissement spécifique
+      if (modelName.startsWith('openai/') && (!this.aiService.apiKey || this.aiService.apiKey === "YOUR API KEY")) {
+        console.warn(`La clé API OpenAI n'est pas configurée pour utiliser ${modelName}`);
+        
         this.showWarning(
-          getTranslation('connectivity.warning', language),
-          getTranslation('connectivity.modelUnavailable', language),
+          getTranslation('warnings.apiKeyMissing', state.language),
+          getTranslation('warnings.apiKeyMissingDetails', state.language, { modelName }),
           [
-            getTranslation('connectivity.checkConnection', language),
-            getTranslation('connectivity.tryOtherModel', language)
+            getTranslation('warnings.configureAPIKey', state.language),
+            getTranslation('warnings.useLocalModel', state.language)
           ]
         );
         
-        // Garder le modèle sélectionné même s'il n'est pas connecté
-        this.elements.iaModelSelect.value = model;
-        return false;
+        // Ajouter un bouton pour configurer la clé API
+        const configButton = document.createElement('button');
+        configButton.textContent = getTranslation('config.configureAPIKey', state.language);
+        configButton.className = 'config-button';
+        configButton.style.marginTop = '10px';
+        configButton.style.padding = '8px 12px';
+        configButton.style.backgroundColor = '#4CAF50';
+        configButton.style.color = 'white';
+        configButton.style.border = 'none';
+        configButton.style.borderRadius = '4px';
+        configButton.style.cursor = 'pointer';
+        configButton.onclick = () => this.showAPIKeyConfigDialog();
+        
+        const warningElement = document.querySelector('.warning-message');
+        if (warningElement) {
+          warningElement.appendChild(configButton);
+        }
+        
+        // On ne recharge pas automatiquement les modèles Ollama ici pour éviter les doublons
+        // Ajouter juste un bouton pour suggérer de passer à Ollama
+        const switchToOllamaButton = document.createElement('button');
+        switchToOllamaButton.textContent = getTranslation('warnings.useLocalModel', state.language);
+        switchToOllamaButton.className = 'config-button';
+        switchToOllamaButton.style.marginTop = '10px';
+        switchToOllamaButton.style.marginLeft = '10px';
+        switchToOllamaButton.style.padding = '8px 12px';
+        switchToOllamaButton.style.backgroundColor = '#2196F3';
+        switchToOllamaButton.style.color = 'white';
+        switchToOllamaButton.style.border = 'none';
+        switchToOllamaButton.style.borderRadius = '4px';
+        switchToOllamaButton.style.cursor = 'pointer';
+        switchToOllamaButton.onclick = async () => {
+          // On recharge les modèles Ollama seulement lorsque l'utilisateur clique sur le bouton
+          await this.loadOllamaModels();
+        };
+        
+        if (warningElement) {
+          warningElement.appendChild(switchToOllamaButton);
+        }
+        
+        return;
+      }
+      
+      // Utiliser le test amélioré qui fournit des informations détaillées
+      const result = await this.aiService.testModelAvailability(modelName);
+      
+      if (!result.available) {
+        console.warn(`Modèle ${modelName} non disponible:`, result);
+        
+        // Si le modèle n'est pas disponible, afficher un avertissement approprié
+        // mais ne pas recharger automatiquement les modèles pour éviter les doublons
+        if (modelName.startsWith('ollama:')) {
+          // Au lieu de recharger automatiquement, proposer un bouton
+          this.showWarning(
+            getTranslation('warnings.modelUnavailable', state.language),
+            result.message || getTranslation('warnings.modelUnavailableDetails', state.language, { modelName }),
+            [
+              getTranslation('warnings.checkOllamaRunning', state.language),
+              getTranslation('warnings.refreshOllamaModels', state.language),
+              getTranslation('warnings.selectDifferentModel', state.language)
+            ]
+          );
+          
+          // Ajouter un bouton pour recharger la liste des modèles
+          const refreshButton = document.createElement('button');
+          refreshButton.textContent = getTranslation('warnings.refreshOllamaModels', state.language);
+          refreshButton.className = 'config-button';
+          refreshButton.style.marginTop = '10px';
+          refreshButton.style.padding = '8px 12px';
+          refreshButton.style.backgroundColor = '#2196F3';
+          refreshButton.style.color = 'white';
+          refreshButton.style.border = 'none';
+          refreshButton.style.borderRadius = '4px';
+          refreshButton.style.cursor = 'pointer';
+          refreshButton.onclick = async () => {
+            await this.loadOllamaModels();
+          };
+          
+          setTimeout(() => {
+            const warningElement = document.querySelector('.warning-message');
+            if (warningElement) {
+              warningElement.appendChild(refreshButton);
+            }
+          }, 100);
+        } else if (modelName.startsWith('openai/')) {
+          // Si l'échec est dû à une clé API invalide, proposer de la configurer
+          if (result.message && result.message.includes('API')) {
+            const configButton = document.createElement('button');
+            configButton.textContent = getTranslation('config.configureAPIKey', state.language);
+            configButton.className = 'config-button';
+            configButton.style.marginTop = '10px';
+            configButton.style.padding = '8px 12px';
+            configButton.style.backgroundColor = '#4CAF50';
+            configButton.style.color = 'white';
+            configButton.style.border = 'none';
+            configButton.style.borderRadius = '4px';
+            configButton.style.cursor = 'pointer';
+            configButton.onclick = () => this.showAPIKeyConfigDialog();
+            
+            // Ajouter après l'affichage de l'avertissement
+            setTimeout(() => {
+              const warningElement = document.querySelector('.warning-message');
+              if (warningElement) {
+                warningElement.appendChild(configButton);
+              }
+            }, 100);
+          }
+          
+          this.selectDefaultOpenAIModel();
+        }
+        
+        // Utiliser les suggestions fournies par le test de disponibilité
+        // ou une liste par défaut si aucune suggestion n'est fournie
+        const suggestions = result.suggestions && result.suggestions.length > 0 
+          ? result.suggestions.map(s => getTranslation(s, state.language, s))
+          : [
+              getTranslation('warnings.checkConnection', state.language),
+              getTranslation('warnings.tryAgain', state.language)
+            ];
+        
+        // Afficher un avertissement avec les informations détaillées
+        this.showWarning(
+          getTranslation('warnings.modelUnavailable', state.language),
+          result.message || getTranslation('warnings.modelUnavailableDetails', state.language, { modelName }),
+          suggestions
+        );
       } else {
-        // Effacer les avertissements
-        this.clearWarnings();
-        return true;
+        console.log(`Modèle ${modelName} disponible:`, result);
       }
     } catch (error) {
-      // Afficher l'erreur sans changer le modèle
+      console.error('Erreur lors du test de connectivité:', error);
       this.showWarning(
-        getTranslation('connectivity.error', language),
+        getTranslation('warnings.error', state.language),
         error.message,
-        [getTranslation('connectivity.tryOtherModel', language)]
+        [getTranslation('warnings.tryAgain', state.language)]
       );
-      
-      // Garder le modèle sélectionné même en cas d'erreur
-      this.elements.iaModelSelect.value = model;
-      return false;
     }
   }
   
@@ -484,9 +663,18 @@ class ConfigController {
    * @param {string} message - Message de l'avertissement
    * @param {Array} suggestions - Suggestions pour résoudre le problème
    */
-  showWarning(title, message, suggestions = []) {
+  showWarning(title = 'Avertissement', message = '', suggestions = []) {
     const state = this.stateManager.getState();
-    const language = state.language;
+    const language = state.language || 'fr';
+    
+    // S'assurer que title et message sont des chaînes
+    title = String(title || 'Avertissement');
+    message = String(message || '');
+    
+    // S'assurer que suggestions est un tableau
+    if (!Array.isArray(suggestions)) {
+      suggestions = [];
+    }
     
     // Créer le contenu HTML de l'avertissement
     let warningHTML = `
@@ -512,13 +700,21 @@ class ConfigController {
       </div>
     `;
     
+    // Vérifier que le conteneur d'avertissement existe
+    if (!this.elements.warningContainer) {
+      this.elements.warningContainer = this.createWarningContainer();
+    }
+    
     // Afficher l'avertissement
     this.elements.warningContainer.innerHTML = warningHTML;
     
     // Ajouter un gestionnaire d'événements pour fermer l'avertissement
-    document.getElementById('dismiss-warning').addEventListener('click', () => {
-      this.clearWarnings();
-    });
+    const dismissButton = document.getElementById('dismiss-warning');
+    if (dismissButton) {
+      dismissButton.addEventListener('click', () => {
+        this.clearWarnings();
+      });
+    }
   }
   
   /**
@@ -529,74 +725,176 @@ class ConfigController {
   }
   
   /**
-   * Charge et configure les modèles Ollama disponibles
-   * @return {Promise<boolean>} True si un modèle Ollama a été sélectionné
+   * Charge les modèles Ollama disponibles
+   * @returns {Promise<boolean>} true si des modèles ont été chargés, false sinon
    */
   async loadOllamaModels() {
     try {
-      const ollamaOptgroup = this.elements.iaModelSelect.querySelector('optgroup[label="Ollama"]');
-      if (!ollamaOptgroup) {
-        console.error("Groupe Ollama non trouvé dans le sélecteur de modèles");
+      // Vérifier que le select existe
+      if (!this.elements.iaModelSelect) {
+        console.error("Sélecteur de modèles IA non trouvé");
         return false;
       }
+
+      // Trouver ou créer le groupe Ollama
+      let ollamaOptgroup = this.elements.iaModelSelect.querySelector('optgroup[label="🤖 Ollama"]');
+      if (!ollamaOptgroup) {
+        console.log("Création du groupe Ollama");
+        ollamaOptgroup = document.createElement('optgroup');
+        ollamaOptgroup.label = "🤖 Ollama";
+        
+        // Trouver le groupe OpenAI pour insérer après
+        const openaiGroup = this.elements.iaModelSelect.querySelector('optgroup[label="OpenAI"]');
+        if (openaiGroup) {
+          openaiGroup.after(ollamaOptgroup);
+        } else {
+          this.elements.iaModelSelect.appendChild(ollamaOptgroup);
+        }
+      }
+      
+      // Marquer un modèle sélectionné avant de vider le groupe
+      const currentModelName = this.elements.iaModelSelect.value;
+      const isOllamaModelSelected = currentModelName && currentModelName.startsWith('ollama:');
       
       // Afficher un message de chargement
-      ollamaOptgroup.innerHTML = '<option disabled>Chargement des modèles...</option>';
+      ollamaOptgroup.innerHTML = '<option disabled>Chargement des modèles Ollama...</option>';
       
-      // Récupérer les modèles Ollama
-      const models = await this.aiService.getOllamaModels();
+      // Vérifier la cache - Éviter de recharger trop fréquemment
+      const cacheKey = 'ollama_models_cache';
+      const cacheTimeout = 60 * 1000; // 1 minute de cache
+      const cachedData = localStorage.getItem(cacheKey);
       
-      // Vider le groupe
-      ollamaOptgroup.innerHTML = '';
+      let ollamaModels = [];
+      let usedCache = false;
       
-      if (!models || models.length === 0) {
-        // Aucun modèle disponible
-        ollamaOptgroup.innerHTML = '<option disabled>Aucun modèle disponible</option>';
-        console.log("Aucun modèle Ollama disponible, utilisation du modèle OpenAI par défaut");
-        this.selectDefaultOpenAIModel();
+      if (cachedData) {
+        try {
+          const cache = JSON.parse(cachedData);
+          const now = Date.now();
+          
+          // Utiliser le cache si pas trop ancien
+          if (cache.timestamp && (now - cache.timestamp < cacheTimeout) && cache.models && Array.isArray(cache.models)) {
+            ollamaModels = cache.models;
+            usedCache = true;
+            console.log("Utilisation de la cache pour les modèles Ollama", ollamaModels.length, "modèles");
+          }
+        } catch (e) {
+          console.warn("Erreur lors de la lecture de la cache Ollama:", e);
+          // En cas d'erreur, on continue sans utiliser la cache
+        }
+      }
+      
+      // Si pas de cache valide, récupérer les modèles frais
+      if (!usedCache) {
+        // Définir un timeout pour le chargement des modèles
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('Timeout lors du chargement des modèles Ollama')), 10000);
+        });
+        
+        try {
+          // Utiliser Promise.race pour limiter le temps d'attente
+          const modelsPromise = this.aiService.getOllamaModels();
+          ollamaModels = await Promise.race([modelsPromise, timeoutPromise]);
+          
+          // Mettre à jour la cache
+          localStorage.setItem(cacheKey, JSON.stringify({
+            timestamp: Date.now(),
+            models: ollamaModels
+          }));
+        } catch (error) {
+          console.warn("Erreur lors du chargement des modèles Ollama:", error);
+          
+          // Afficher un message d'erreur
+          ollamaOptgroup.innerHTML = '<option disabled>Erreur de chargement des modèles</option>';
+          
+          // Afficher un avertissement avec un bouton pour réessayer
+          this.showWarning(
+            "Problème de chargement des modèles Ollama",
+            `Erreur: ${error.message}`,
+            ["Vérifier que le serveur Ollama est démarré", "Vérifier votre connexion réseau"]
+          );
+          
+          // Si un modèle Ollama était sélectionné, mais pas de modèles, fallback sur OpenAI
+          if (isOllamaModelSelected) {
+            this.selectDefaultOpenAIModel();
+          }
+          
+          return false;
+        }
+      }
+      
+      // Si aucun modèle n'a été trouvé (même après tentative)
+      if (!ollamaModels || ollamaModels.length === 0) {
+        console.warn("Aucun modèle Ollama trouvé");
+        ollamaOptgroup.innerHTML = '<option disabled>Aucun modèle Ollama trouvé</option>';
+        
+        // Afficher un message d'erreur avec instructions pour installer des modèles
+        this.showWarning(
+          "Aucun modèle Ollama disponible",
+          "Vous devez installer au moins un modèle pour utiliser Ollama.",
+          ["Utilisez la commande 'ollama pull llama3' pour installer un modèle", 
+           "Consultez ollama.com pour plus d'informations"]
+        );
+        
+        // Si un modèle Ollama était sélectionné, fallback sur OpenAI
+        if (isOllamaModelSelected) {
+          this.selectDefaultOpenAIModel();
+        }
+        
         return false;
       }
       
-      // Ajouter d'abord tous les modèles au select
-      models.forEach(model => {
-        const option = document.createElement('option');
-        option.value = model.name;
-        option.textContent = model.name;
-        ollamaOptgroup.appendChild(option);
+      // Vider le groupe Ollama pour le remplir avec les nouveaux modèles
+      ollamaOptgroup.innerHTML = '';
+      
+      // Remplir le groupe avec les modèles disponibles, en triant alphabétiquement
+      ollamaModels
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .forEach(model => {
+          // Formater le nom pour l'affichage
+          const displayName = model.name.replace(/^ollama:/, '');
+          const optionValue = `ollama:${model.name}`;
+          
+          const option = document.createElement('option');
+          option.value = optionValue;
+          option.textContent = displayName;
+          
+          ollamaOptgroup.appendChild(option);
+          
+          // Conserver le modèle si précédemment sélectionné
+          if (currentModelName === optionValue) {
+            option.selected = true;
+          }
+        });
+      
+      // Ajouter les modèles au Set des modèles disponibles
+      const availableModels = new Set();
+      ollamaModels.forEach(model => {
+        availableModels.add(`ollama:${model.name}`);
       });
       
-      // Attendre que le DOM soit mis à jour
-      await new Promise(resolve => setTimeout(resolve, 0));
+      // Mettre à jour l'état avec les modèles disponibles
+      this.stateManager.setState({ availableModels });
       
-      // Chercher un modèle Llama3
-      const llama3Model = this.aiService.findLlama3Model(models);
-      
-      if (llama3Model) {
-        // Si un modèle Llama3 est trouvé, le sélectionner
-        console.log(`Sélection du modèle Llama3: ${llama3Model.name}`);
-        this.elements.iaModelSelect.value = llama3Model.name;
-        this.stateManager.setState({ iaModel: llama3Model.name });
-        return true;
-      }
-      
-      if (models.length > 0) {
-        // Si pas de Llama3 mais d'autres modèles Ollama existent, prendre le premier
-        console.log(`Sélection du premier modèle Ollama: ${models[0].name}`);
-        this.elements.iaModelSelect.value = models[0].name;
-        this.stateManager.setState({ iaModel: models[0].name });
-        return true;
-      }
-      
-      // En dernier recours, utiliser OpenAI
-      this.selectDefaultOpenAIModel();
-      return false;
-      
+      return true;
     } catch (error) {
       console.error("Erreur lors du chargement des modèles Ollama:", error);
+      const ollamaOptgroup = this.elements.iaModelSelect.querySelector('optgroup[label="🤖 Ollama"]');
       if (ollamaOptgroup) {
         ollamaOptgroup.innerHTML = '<option disabled>Erreur de connexion à Ollama</option>';
       }
-      this.selectDefaultOpenAIModel();
+      
+      // Afficher un message d'erreur
+      this.showWarning(
+        getTranslation('warnings.error', this.stateManager.getState().language),
+        error.message,
+        [getTranslation('warnings.tryAgain', this.stateManager.getState().language)]
+      );
+      
+      const currentModelName = this.elements.iaModelSelect.value;
+      if (currentModelName && currentModelName.startsWith('ollama:')) {
+        this.selectDefaultOpenAIModel();
+      }
       return false;
     }
   }
@@ -618,74 +916,35 @@ class ConfigController {
   }
   
   /**
-   * Synchronise l'interface utilisateur avec l'état actuel du StateManager
+   * Synchronise l'interface utilisateur avec l'état actuel
+   * @param {Object} [previousState] - État précédent pour comparaison
    */
-  syncUIWithState() {
+  syncUIWithState(previousState = null) {
     const state = this.stateManager.getState();
-    let stateUpdated = false;
-    const updates = {};
     
-    // Vérifier que tous les éléments existent
-    if (!this.elements.iaModelSelect || !this.elements.languageSelect || 
-        !this.elements.personaSelect || !this.elements.cardSetSelect || 
-        !this.elements.spreadTypeSelect) {
-      console.error("Éléments manquants pour la synchronisation UI");
-      return;
-    }
-
-    // Synchroniser chaque menu avec l'état correspondant
-    
-    // Langue
-    if (!this.isValidOption(this.elements.languageSelect, state.language)) {
-      updates.language = this.elements.languageSelect.options[0].value;
-      stateUpdated = true;
-    }
-    this.elements.languageSelect.value = updates.language || state.language;
-    
-    // Persona
-    if (!this.isValidOption(this.elements.personaSelect, state.persona)) {
-      updates.persona = this.elements.personaSelect.options[0].value;
-      stateUpdated = true;
-    }
-    this.elements.personaSelect.value = updates.persona || state.persona;
-    
-    // Jeu de cartes
-    if (!this.isValidOption(this.elements.cardSetSelect, state.cardSet)) {
-      updates.cardSet = this.elements.cardSetSelect.options[0].value;
-      stateUpdated = true;
-    }
-    this.elements.cardSetSelect.value = updates.cardSet || state.cardSet;
-    
-    // Type de tirage
-    if (!this.isValidOption(this.elements.spreadTypeSelect, state.spreadType)) {
-      updates.spreadType = this.elements.spreadTypeSelect.options[0].value;
-      stateUpdated = true;
-    }
-    this.elements.spreadTypeSelect.value = updates.spreadType || state.spreadType;
-    
-    // Modèle IA
-    if (!this.isValidOption(this.elements.iaModelSelect, state.iaModel)) {
-      // Si le modèle actuel n'est pas valide, essayer de trouver un modèle Ollama
-      const ollamaOptgroup = this.elements.iaModelSelect.querySelector('optgroup[label="Ollama"]');
-      if (ollamaOptgroup && ollamaOptgroup.options && ollamaOptgroup.options.length > 0) {
-        updates.iaModel = ollamaOptgroup.options[0].value;
-      } else {
-        // Sinon, utiliser le modèle OpenAI par défaut
-        updates.iaModel = 'openai/gpt-3.5-turbo';
-      }
-      stateUpdated = true;
-    }
-    this.updateModelSelectUI(updates.iaModel || state.iaModel);
-    
-    // Si des valeurs ont été mises à jour, mettre à jour l'état
-    if (stateUpdated) {
-      console.log("Mise à jour de l'état avec les valeurs par défaut:", updates);
-      setTimeout(() => this.stateManager.setState(updates), 0);
+    // Mise à jour des sélecteurs uniquement si nécessaire
+    if (!previousState || previousState.language !== state.language) {
+      this.elements.languageSelect.value = state.language;
+      this.updateDropdownOptions(state.language);
     }
     
-    // Mettre à jour les éléments visuels
-    this.updatePersonaLogo(updates.persona || state.persona);
-    this.updateAppTitle();
+    if (!previousState || previousState.persona !== state.persona) {
+      this.elements.personaSelect.value = state.persona;
+      this.updatePersonaLogo(state.persona);
+    }
+    
+    if (!previousState || previousState.cardSet !== state.cardSet) {
+      this.elements.cardSetSelect.value = state.cardSet;
+    }
+    
+    if (!previousState || previousState.spreadType !== state.spreadType) {
+      this.elements.spreadTypeSelect.value = state.spreadType;
+      this.updateAppTitle();
+    }
+    
+    if (!previousState || previousState.iaModel !== state.iaModel) {
+      this.elements.iaModelSelect.value = state.iaModel;
+    }
   }
   
   /**
@@ -697,8 +956,11 @@ class ConfigController {
   isValidOption(selectElement, value) {
     if (!selectElement) return false;
     
+    // Pour les modèles Ollama, vérifier avec et sans le préfixe
+    const valueToCheck = value.startsWith('ollama:') ? [value, value.replace('ollama:', '')] : [value];
+    
     // Vérifier directement dans les options du select
-    if (Array.from(selectElement.options).some(option => option.value === value)) {
+    if (Array.from(selectElement.options).some(option => valueToCheck.includes(option.value))) {
       return true;
     }
     
@@ -706,7 +968,7 @@ class ConfigController {
     const optgroups = selectElement.querySelectorAll('optgroup');
     for (const optgroup of optgroups) {
       const options = optgroup.querySelectorAll('option');
-      if (Array.from(options).some(option => option.value === value)) {
+      if (Array.from(options).some(option => valueToCheck.includes(option.value))) {
         return true;
       }
     }
@@ -736,7 +998,7 @@ class ConfigController {
       // Si le modèle n'est pas dans les options, vérifier s'il s'agit d'un modèle Ollama
       if (!modelName.startsWith('openai/')) {
         // Tenter de l'ajouter dynamiquement au groupe Ollama
-        const ollamaOptgroup = this.elements.iaModelSelect.querySelector('optgroup[label="Ollama"]');
+        const ollamaOptgroup = this.elements.iaModelSelect.querySelector('optgroup[label="🤖 Ollama"]');
         if (ollamaOptgroup) {
           const option = document.createElement('option');
           option.value = modelName;
@@ -747,6 +1009,163 @@ class ConfigController {
         }
       }
     }
+  }
+  
+  /**
+   * Affiche un message temporaire
+   * @param {string} message - Le message à afficher
+   * @param {string} type - Le type de message (success, warning, error, info)
+   * @param {number} duration - La durée d'affichage en millisecondes
+   */
+  showTemporaryMessage(message, type = 'info', duration = 3000) {
+    // Créer ou récupérer l'élément de message
+    let messageElement = document.getElementById('status-message');
+    
+    if (!messageElement) {
+      messageElement = document.createElement('div');
+      messageElement.id = 'status-message';
+      messageElement.style.display = 'none';
+      messageElement.style.marginTop = '5px';
+      messageElement.style.padding = '5px';
+      messageElement.style.borderRadius = '4px';
+      messageElement.style.fontSize = '0.9em';
+      
+      // Ajouter l'élément après le sélecteur de modèle
+      const modelSelect = document.getElementById('ia-model');
+      if (modelSelect && modelSelect.parentNode) {
+        modelSelect.parentNode.appendChild(messageElement);
+      } else {
+        // Fallback: ajouter au corps du document
+        document.body.appendChild(messageElement);
+      }
+    }
+    
+    // Définir le contenu et le style
+    messageElement.textContent = message;
+    messageElement.className = `${type}-message`;
+    messageElement.style.display = 'block';
+    
+    // Masquer après la durée spécifiée
+    setTimeout(() => {
+      messageElement.style.display = 'none';
+    }, duration);
+  }
+  
+  /**
+   * Affiche une interface pour permettre à l'utilisateur de configurer sa clé API OpenAI
+   */
+  showAPIKeyConfigDialog() {
+    // Supprimer le dialogue existant s'il y en a un
+    const existingDialog = document.getElementById('api-key-dialog');
+    if (existingDialog) {
+      existingDialog.remove();
+    }
+    
+    // Créer le dialogue
+    const dialog = document.createElement('div');
+    dialog.id = 'api-key-dialog';
+    dialog.className = 'config-dialog';
+    dialog.style.position = 'fixed';
+    dialog.style.top = '50%';
+    dialog.style.left = '50%';
+    dialog.style.transform = 'translate(-50%, -50%)';
+    dialog.style.backgroundColor = '#fff';
+    dialog.style.padding = '20px';
+    dialog.style.borderRadius = '8px';
+    dialog.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+    dialog.style.zIndex = '1000';
+    dialog.style.width = '400px';
+    dialog.style.maxWidth = '90%';
+    
+    // Overlay de fond
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    overlay.style.zIndex = '999';
+    overlay.onclick = () => {
+      overlay.remove();
+      dialog.remove();
+    };
+    
+    // Titre
+    const title = document.createElement('h3');
+    title.textContent = getTranslation('config.apiKeyTitle', this.stateManager.getState().language);
+    title.style.marginTop = '0';
+    dialog.appendChild(title);
+    
+    // Description
+    const description = document.createElement('p');
+    description.textContent = getTranslation('config.apiKeyDescription', this.stateManager.getState().language);
+    dialog.appendChild(description);
+    
+    // Champ pour la clé API
+    const apiKeyInput = document.createElement('input');
+    apiKeyInput.type = 'text';
+    apiKeyInput.id = 'api-key-input';
+    apiKeyInput.placeholder = 'sk-...';
+    apiKeyInput.value = this.aiService.apiKey && this.aiService.apiKey !== 'YOUR API KEY' ? this.aiService.apiKey : '';
+    apiKeyInput.style.width = '100%';
+    apiKeyInput.style.padding = '8px';
+    apiKeyInput.style.marginBottom = '15px';
+    apiKeyInput.style.borderRadius = '4px';
+    apiKeyInput.style.border = '1px solid #ccc';
+    dialog.appendChild(apiKeyInput);
+    
+    // Boutons
+    const buttonsContainer = document.createElement('div');
+    buttonsContainer.style.display = 'flex';
+    buttonsContainer.style.justifyContent = 'flex-end';
+    buttonsContainer.style.gap = '10px';
+    
+    const cancelButton = document.createElement('button');
+    cancelButton.textContent = getTranslation('config.cancel', this.stateManager.getState().language);
+    cancelButton.className = 'secondary-button';
+    cancelButton.onclick = () => {
+      overlay.remove();
+      dialog.remove();
+    };
+    
+    const saveButton = document.createElement('button');
+    saveButton.textContent = getTranslation('config.save', this.stateManager.getState().language);
+    saveButton.className = 'primary-button';
+    saveButton.onclick = () => {
+      const apiKey = apiKeyInput.value.trim();
+      if (apiKey) {
+        this.aiService.setApiKey(apiKey);
+        this.showTemporaryMessage(
+          getTranslation('config.apiKeySaved', this.stateManager.getState().language),
+          'success',
+          3000
+        );
+        
+        // Tester à nouveau la connexion avec le modèle actuel
+        this.testModelConnectivity();
+      } else {
+        // Message d'erreur si la clé est vide
+        this.showTemporaryMessage(
+          getTranslation('config.apiKeyEmpty', this.stateManager.getState().language),
+          'error',
+          3000
+        );
+      }
+      overlay.remove();
+      dialog.remove();
+    };
+    
+    buttonsContainer.appendChild(cancelButton);
+    buttonsContainer.appendChild(saveButton);
+    dialog.appendChild(buttonsContainer);
+    
+    // Ajouter au document
+    document.body.appendChild(overlay);
+    document.body.appendChild(dialog);
+    
+    // Focus sur le champ
+    setTimeout(() => apiKeyInput.focus(), 100);
   }
 }
 

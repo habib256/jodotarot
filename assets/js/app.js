@@ -135,47 +135,87 @@ async function chargerModelesOllama() {
       
       // Ajouter l'option par défaut d'OpenAI
       const optionGPT = document.createElement('option');
-      optionGPT.value = 'gpt-4o';
+      optionGPT.value = 'openai:gpt-4o';
       optionGPT.textContent = 'GPT-4o (OpenAI)';
       selectModele.appendChild(optionGPT);
       
       // Ajouter l'option 3.5 d'OpenAI
       const optionGPT35 = document.createElement('option');
-      optionGPT35.value = 'gpt-3.5-turbo';
+      optionGPT35.value = 'openai:gpt-3.5-turbo';
       optionGPT35.textContent = 'GPT-3.5 (OpenAI)';
       selectModele.appendChild(optionGPT35);
       
       // Ajouter l'option Claude
       const optionClaude = document.createElement('option');
-      optionClaude.value = 'claude-3-opus-20240229';
+      optionClaude.value = 'anthropic:claude-3-opus-20240229';
       optionClaude.textContent = 'Claude-3 Opus (Anthropic)';
       selectModele.appendChild(optionClaude);
       
       // Ajouter les modèles Ollama disponibles
-      modeles.forEach(modele => {
-        const option = document.createElement('option');
-        option.value = `ollama:${modele.name}`;
-        option.textContent = `${modele.name} (Ollama - Local)`;
-        selectModele.appendChild(option);
-      });
+      if (modeles && modeles.length > 0) {
+        // Trier les modèles par ordre alphabétique
+        modeles.sort((a, b) => a.name.localeCompare(b.name));
+        
+        modeles.forEach(modele => {
+          const option = document.createElement('option');
+          option.value = `ollama:${modele.name}`;
+          option.textContent = `${modele.name} (Ollama - Local)`;
+          selectModele.appendChild(option);
+        });
+        
+        console.log(`Modèles Ollama chargés: ${modeles.length} modèles trouvés.`);
+      } else {
+        console.warn('Aucun modèle Ollama disponible.');
+      }
       
       // Restaurer le modèle précédemment sélectionné, si disponible
       if (Array.from(selectModele.options).some(option => option.value === modelActuel)) {
         selectModele.value = modelActuel;
       }
       
-      // Afficher le badge de connexion Ollama
-      document.getElementById('ollama-status').className = 'status connected';
-      document.getElementById('ollama-status-text').textContent = 'Ollama connecté';
+      // Afficher un message de statut positif
+      const statusElement = document.getElementById('status-message');
+      if (statusElement) {
+        statusElement.textContent = "Ollama connecté avec succès.";
+        statusElement.style.display = 'block';
+        statusElement.className = 'success-message';
+        
+        // Masquer le message après 3 secondes
+        setTimeout(() => {
+          statusElement.style.display = 'none';
+        }, 3000);
+      }
     } else {
       // En cas d'échec de connexion
-      document.getElementById('ollama-status').className = 'status disconnected';
-      document.getElementById('ollama-status-text').textContent = 'Ollama non connecté';
+      console.warn('Connexion à Ollama échouée:', connectivityResult.message);
+      
+      // Afficher un message d'erreur
+      const statusElement = document.getElementById('status-message');
+      if (statusElement) {
+        statusElement.textContent = connectivityResult.message || "Impossible de se connecter au serveur Ollama.";
+        statusElement.style.display = 'block';
+        statusElement.className = 'error-message';
+        
+        // Ajouter des suggestions si disponibles
+        if (connectivityResult.suggestions && connectivityResult.suggestions.length > 0) {
+          const suggestionsText = connectivityResult.suggestions
+            .map(s => s.startsWith('warnings.') ? getTranslation(s, document.documentElement.lang) : s)
+            .join(' | ');
+          
+          statusElement.textContent += ` Suggestions: ${suggestionsText}`;
+        }
+      }
     }
   } catch (error) {
     console.error("Erreur lors du chargement des modèles Ollama:", error);
-    document.getElementById('ollama-status').className = 'status error';
-    document.getElementById('ollama-status-text').textContent = 'Erreur Ollama';
+    
+    // Afficher un message d'erreur
+    const statusElement = document.getElementById('status-message');
+    if (statusElement) {
+      statusElement.textContent = `Erreur: ${error.message}`;
+      statusElement.style.display = 'block';
+      statusElement.className = 'error-message';
+    }
   }
 }
 

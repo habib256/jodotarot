@@ -1,0 +1,78 @@
+/**
+ * Styles pour les avertissements et messages d'erreur
+ */
+
+.warning-container {
+  margin-top: 10px;
+  max-width: 100%;
+  font-size: 0.9em;
+}
+
+.warning-box {
+  background-color: rgba(255, 247, 230, 0.9);
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.warning-box h3 {
+  color: #856404;
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 1em;
+  font-weight: bold;
+}
+
+.warning-box p {
+  margin: 5px 0;
+  color: #333;
+}
+
+.warning-box ul {
+  margin: 8px 0;
+  padding-left: 20px;
+  color: #555;
+}
+
+.warning-box button {
+  background-color: #f8f9fa;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 4px 8px;
+  margin-top: 8px;
+  font-size: 0.8em;
+  cursor: pointer;
+  color: #495057;
+  transition: background-color 0.2s;
+}
+
+.warning-box button:hover {
+  background-color: #e9ecef;
+}
+
+/* Styles pour les messages temporaires */
+#status-message {
+  padding: 5px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.success-message {
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+
+.error-message {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}
+
+.info-message {
+  background-color: #d1ecf1;
+  border: 1px solid #bee5eb;
+  color: #0c5460;
+} 

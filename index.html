@@ -73,26 +73,23 @@
       <div class="select-group">
         <span class="select-label">Mode de tirage :</span>
         <select id="spread-type" class="select-dropdown">
-          <option value="cross" selected>Croix</option>
-          <option value="horseshoe">Fer à Cheval</option>
-          <option value="love">Tarot de l'amour</option>
-          <option value="celticCross" disabled>Croix Celtique</option>
+          <option value="cross" selected>➕ Croix</option>
+          <option value="horseshoe">🧲 Fer à Cheval</option>
+          <option value="love">❤️ Tarot de l'amour</option>
+          <option value="celticCross" disabled>☘️ Croix Celtique</option>
         </select>
       </div>
       
       <div class="select-group">
         <span class="select-label">Modèle d'IA :</span>
         <select id="ia-model" class="select-dropdown">
-          <optgroup label="Ollama">
-            <!-- Les modèles Ollama seront chargés dynamiquement au démarrage -->
-            <option value="" disabled>Chargement des modèles...</option>
-          </optgroup>
-          <optgroup label="OpenAI">
+          <optgroup label="🧠 OpenAI">
             <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
             <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo</option>
             <option value="openai/gpt-4o">GPT-4o</option>
           </optgroup>
         </select>
+        <div id="status-message" style="display: none; margin-top: 5px; padding: 5px; border-radius: 4px; font-size: 0.9em;"></div>
       </div>
     </div>
     

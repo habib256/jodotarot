@@ -189,6 +189,33 @@ class ReadingController {
   }
   
   /**
+   * Sérialise une carte pour le stockage dans l'état
+   * @param {Card} card - Carte à sérialiser
+   * @returns {Object} Carte sérialisée
+   */
+  serializeCard(card) {
+    console.log('Sérialisation de la carte:', card);
+    
+    if (!card || typeof card !== 'object') {
+      console.error('Erreur: tentative de sérialiser une carte invalide:', card);
+      return null;
+    }
+    
+    // Utiliser directement la propriété number qui est toujours présente et déjà un nombre
+    const cardId = card.number;
+    
+    const serialized = {
+      id: cardId,
+      name: String(card.name || ''),
+      imageUrl: String(card.imageUrl || ''),
+      position: card.orientation || card.position || 'upright'
+    };
+    
+    console.log('Carte sérialisée:', serialized);
+    return serialized;
+  }
+  
+  /**
    * Effectue un tirage de cartes
    */
   async performReading() {
@@ -242,13 +269,26 @@ class ReadingController {
       this.currentReading = drawnCards;
       
       // Vérifier que toutes les cartes ont été tirées correctement
-      if (!drawnCards || drawnCards.length < requiredCards) {
+      if (!Array.isArray(drawnCards) || drawnCards.length < requiredCards) {
         throw new Error(`Échec du tirage: ${drawnCards ? drawnCards.length : 0} cartes tirées sur ${requiredCards} requises`);
       }
       
+      // Sérialiser les cartes avant de les stocker dans l'état
+      const serializedCards = Array.isArray(drawnCards) ? drawnCards.map(card => this.serializeCard(card)) : [];
+      
+      if (!Array.isArray(serializedCards) || serializedCards.length === 0) {
+        throw new Error('Erreur lors de la sérialisation des cartes');
+      }
+      
+      // Filtrer les cartes null qui auraient pu être introduites pendant la sérialisation
+      const filteredCards = serializedCards.filter(card => card !== null);
+      
+      console.log('Cartes avant mise à jour de l\'état:', filteredCards);
+      console.log('Est un tableau?', Array.isArray(filteredCards));
+      
       // Mettre à jour l'état avec les cartes tirées
       this.stateManager.setState({
-        cards: drawnCards,
+        cards: filteredCards,
         question: question,
         isLoading: true
       });
@@ -523,18 +563,6 @@ class ReadingController {
    */
   initScrollHandlers() {
     this.elements.responseContent.setAttribute('tabindex', '0');
-    
-    // Gérer le défilement avec la molette de souris
-    this.elements.responseContent.addEventListener('wheel', (event) => {
-      // Empêcher le défilement de la page
-      event.preventDefault();
-      
-      // Calculer la direction et la vitesse du défilement
-      const delta = event.deltaY || event.detail || event.wheelDelta;
-      
-      // Appliquer le défilement à l'élément
-      this.elements.responseContent.scrollTop += delta > 0 ? 60 : -60;
-    });
     
     // Permettre le focus au clic
     this.elements.responseContent.addEventListener('click', () => {

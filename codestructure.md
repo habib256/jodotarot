@@ -10,63 +10,51 @@ JodoTarot est une application web modulaire construite en JavaScript ES6. L'arch
 jodotarot/
 ├── assets/
 │   ├── js/
-│   │   ├── api.js           # Communication avec OpenAI et Ollama (658 lignes)
-│   │   ├── ui.js            # Gestion de l'interface utilisateur (281 lignes)
-│   │   ├── config.js        # Configuration globale (clés API, endpoints) (103 lignes)
-│   │   ├── main.js          # Point d'entrée de l'application (260 lignes)
-│   │   ├── app.js           # Gestion des événements et interactions (188 lignes)
-│   │   ├── prompt.js    # Gestion des prompts IA (72 lignes)
-│   │   ├── translations/    # Fichiers de traduction
-│   │   ├── services/        # Services métier
-│   │   │   ├── AIService.js     # Service d'intelligence artificielle (412 lignes)
-│   │   │   ├── UIService.js     # Service d'interface utilisateur (128 lignes)
-│   │   │   └── DeckService.js   # Service de gestion du jeu de cartes (436 lignes)
-│   │   ├── controllers/     # Contrôleurs
-│   │   │   ├── ConfigController.js    # Contrôleur de configuration (654 lignes)
-│   │   │   ├── ReadingController.js   # Contrôleur de lecture de tarot (639 lignes)
-│   │   │   └── AppController.js       # Contrôleur principal de l'application (216 lignes)
-│   │   ├── utils/           # Fonctions utilitaires
-│   │   └── models/          # Modèles de données
-│   │       ├── personas/    # Définitions des personas
-│   │       ├── spreads/     # Types de tirages
-│   │       │   ├── BaseSpread.js          # Classe de base pour tous les tirages (331 lignes)
-│   │       │   ├── CrossSpread.js         # Tirage en Croix (141 lignes)
-│   │       │   ├── HorseshoeSpread.js     # Tirage en Fer à Cheval (184 lignes)
-│   │       │   ├── LoveSpread.js          # Tirage de l'Amour (216 lignes)
-│   │       │   ├── CelticCrossSpread.js   # Tirage en Croix Celtique (295 lignes)
-│   │       │   └── index.js               # Point d'entrée pour les tirages (50 lignes)
-│   │       └── cards/       # Définitions des cartes
-│   ├── css/
-│   │   ├── main.css         # Point d'entrée CSS (47 lignes)
-│   │   ├── base/            # Styles de base
-│   │   │   ├── variables.css     # Variables CSS (165 lignes)
-│   │   │   ├── reset.css         # Réinitialisation des styles (222 lignes)
-│   │   │   └── typography.css    # Typographie (138 lignes)
-│   │   ├── components/      # Styles des composants
-│   │   ├── layouts/         # Structures de mise en page
-│   │   ├── modules/         # Modules CSS spécifiques
-│   │   │   ├── interpretations.css    # Styles pour les interprétations (365 lignes)
-│   │   │   │   ├── Système de défilement optimisé
-│   │   │   │   ├── Compatibilité tactile et molette
-│   │   │   │   ├── Styles pour machine à écrire
-│   │   │   │   └── Gestion des états post-génération
-│   │   │   ├── love-spread.css        # Styles pour le tirage de l'Amour (115 lignes)
-│   │   │   ├── horseshoe-spread.css   # Styles pour le tirage en Fer à Cheval (110 lignes)
-│   │   │   ├── cross-spread.css       # Styles pour le tirage en Croix (130 lignes)
-│   │   │   ├── celtic-cross-spread.css # Styles pour la Croix Celtique (157 lignes)
-│   │   │   ├── persona.css            # Styles pour les personas (1369 lignes)
-│   │   │   │   ├── Styles spécifiques par persona
-│   │   │   │   ├── Animations et transitions
-│   │   │   │   ├── Compatibilité avec le système de défilement
-│   │   │   │   └── Gestion des interactions utilisateur
-│   │   │   └── select.css             # Styles pour les éléments select (60 lignes)
-│   │   └── utils/           # Classes utilitaires
-│   └── images/              # Images et ressources graphiques
-├── index.html               # Page principale (161 lignes)
-├── favicon.ico              # Icône du site (23 lignes)
-├── screenshot.png           # Capture d'écran de l'application
-├── LICENSE                  # Licence du projet (675 lignes)
-└── README.md                # Documentation du projet (254 lignes)
+│   │   ├── main.js           # Point d'entrée et initialisation (259 lignes)
+│   │   ├── api.js            # Communication avec OpenAI et Ollama (658 lignes)
+│   │   ├── ui.js             # Gestion de l'interface utilisateur (281 lignes)
+│   │   ├── config.js         # Configuration globale (103 lignes)
+│   │   ├── app.js            # Gestion des événements et interactions (188 lignes)
+│   │   ├── prompt.js         # Gestion des prompts IA (72 lignes)
+│   │   ├── translations/     # Fichiers de traduction
+│   │   │   ├── fr.js        # Français (195 lignes)
+│   │   │   ├── en.js        # Anglais (195 lignes)
+│   │   │   ├── es.js        # Espagnol (165 lignes)
+│   │   │   ├── de.js        # Allemand (165 lignes)
+│   │   │   ├── it.js        # Italien (165 lignes)
+│   │   │   ├── zh.js        # Chinois (166 lignes)
+│   │   │   └── index.js     # Point d'entrée des traductions
+│   │   ├── services/
+│   │   │   ├── AIService.js     # Service d'intelligence artificielle (417 lignes)
+│   │   │   ├── UIService.js     # Service d'interface utilisateur (127 lignes)
+│   │   │   └── DeckService.js   # Service de gestion du jeu de cartes (435 lignes)
+│   │   ├── controllers/
+│   │   │   ├── AppController.js       # Contrôleur principal (215 lignes)
+│   │   │   ├── ConfigController.js    # Contrôleur de configuration (752 lignes)
+│   │   │   └── ReadingController.js   # Contrôleur de lecture (545 lignes)
+│   │   ├── utils/
+│   │   │   └── StateManager.js   # Gestionnaire d'état (200 lignes)
+│   │   └── models/
+│   │       ├── personas/         # Définitions des personas (21 personas)
+│   │       │   ├── BasePersona.js
+│   │       │   ├── TarologuePersona.js
+│   │       │   ├── OraclePersona.js
+│   │       │   └── ... (18 autres personas)
+│   │       ├── spreads/          # Types de tirages
+│   │       │   ├── BaseSpread.js         # Classe de base (331 lignes)
+│   │       │   ├── CrossSpread.js        # Tirage en Croix (140 lignes)
+│   │       │   ├── HorseshoeSpread.js    # Tirage en Fer à Cheval (183 lignes)
+│   │       │   ├── LoveSpread.js         # Tirage de l'Amour (216 lignes)
+│   │       │   ├── CelticCrossSpread.js  # Croix Celtique (295 lignes)
+│   │       │   └── index.js
+│   │       └── cards/            # Définitions des cartes
+│   ├── css/                      # Styles (voir structure CSS existante)
+│   └── images/                   # Images et ressources graphiques
+├── index.html                    # Page principale (151 lignes)
+├── favicon.ico                   # Icône du site (23 lignes)
+├── screenshot.png                # Capture d'écran de l'application
+├── LICENSE                       # Licence du projet (675 lignes)
+└── README.md                     # Documentation du projet (300 lignes)
 ```
 
 ## 🧩 Composants Principaux
@@ -758,3 +746,159 @@ cardElements.forEach(card =>
    - Gérer les timeouts
    - Mettre en cache les résultats
    - Notifier les changements
+
+### 🔄 StateManager: Gestionnaire d'État Global
+
+Le `StateManager` est un composant crucial qui gère l'état global de l'application de manière centralisée. Voici ses caractéristiques principales:
+
+#### 1. Structure de l'État
+
+L'état est défini par un schéma strict qui inclut:
+
+```javascript
+{
+  language: {type: 'string', enum: ['fr', 'en', 'es', 'de', 'it', 'zh']},
+  persona: {type: 'string', enum: ['tarologue', 'oracle', /* ... */]},
+  cardSet: {type: 'string', enum: ['set01', 'set02']},
+  deckId: {type: 'string', enum: ['set01', 'set02']},
+  spreadType: {type: 'string', enum: ['cross', 'horseshoe', 'love', 'celticCross']},
+  iaModel: {type: 'string', validate: /* validation personnalisée */},
+  cards: {type: 'array', validate: /* validation détaillée */},
+  question: {type: 'string', maxLength: 1000},
+  interpretation: {type: 'object', nullable: true},
+  isLoading: {type: 'boolean'},
+  error: {type: 'string', nullable: true},
+  isCardEnlarged: {type: 'boolean'},
+  enlargedCardId: {type: 'number', nullable: true},
+  availableModels: {type: 'set'},
+  currentSpreadType: {type: 'string', enum: ['cross', 'horseshoe', 'love', 'celticCross']},
+  currentCardsDrawn: {type: 'string'}
+}
+```
+
+#### 2. Fonctionnalités Principales
+
+1. **Validation Stricte**
+   - Validation de type pour chaque propriété
+   - Validation des énumérations
+   - Validations personnalisées pour les structures complexes
+   - Rapports d'erreurs détaillés
+
+2. **Persistance**
+   - Sauvegarde automatique dans localStorage
+   - Restauration au démarrage
+   - Migration des données entre versions
+   - Sérialisation/désérialisation des types complexes
+
+3. **Gestion des Événements**
+   - Système d'abonnement/désabonnement
+   - Notification des changements
+   - Émission d'événements personnalisés
+   - Propagation sélective des modifications
+
+4. **Sécurité et Intégrité**
+   - Validation avant chaque mise à jour
+   - Protection contre les mutations directes
+   - Gestion des erreurs robuste
+   - Limites de taille pour le stockage
+
+#### 3. Cycle de Vie des Données
+
+```mermaid
+sequenceDiagram
+    participant App
+    participant StateManager
+    participant Storage
+    participant Listeners
+
+    App->>StateManager: setState(updates)
+    StateManager->>StateManager: validateValue()
+    StateManager->>StateManager: updateState()
+    StateManager->>Storage: persistState()
+    StateManager->>Listeners: notifyListeners()
+    StateManager-->>App: État mis à jour
+```
+
+#### 4. Méthodes Clés
+
+1. **setState(updates)**
+   ```javascript
+   // Met à jour l'état avec validation
+   setState({language: 'fr', persona: 'tarologue'})
+   ```
+
+2. **validateValue(key, value)**
+   ```javascript
+   // Valide une valeur selon le schéma
+   validateValue('language', 'fr') // {isValid: true, value: 'fr'}
+   ```
+
+3. **persistState()**
+   ```javascript
+   // Sauvegarde l'état dans localStorage
+   persistState() // {version: '1.0.0', data: {...}}
+   ```
+
+4. **subscribe(listener)**
+   ```javascript
+   // Abonne un écouteur aux changements
+   const unsubscribe = subscribe((state, changes) => {})
+   ```
+
+#### 5. Bonnes Pratiques d'Utilisation
+
+1. **Modifications d'État**
+   ```javascript
+   // ✅ CORRECT
+   stateManager.setState({language: 'fr'})
+   
+   // ❌ INCORRECT
+   stateManager.state.language = 'fr'
+   ```
+
+2. **Écoute des Changements**
+   ```javascript
+   // ✅ CORRECT
+   stateManager.subscribe((state, changes) => {
+     if ('language' in changes) updateUI()
+   })
+   
+   // ❌ INCORRECT
+   setInterval(() => checkStateChanges(), 1000)
+   ```
+
+3. **Validation des Données**
+   ```javascript
+   // ✅ CORRECT
+   if (stateManager.validateValue('cards', newCards).isValid) {
+     stateManager.setState({cards: newCards})
+   }
+   
+   // ❌ INCORRECT
+   stateManager.setState({cards: newCards}) // Sans validation
+   ```
+
+#### 6. Gestion des Erreurs
+
+```javascript
+try {
+  stateManager.setState({invalidKey: 'value'})
+} catch (error) {
+  console.error('Erreur de mise à jour:', error.message)
+  // Gérer l'erreur de manière appropriée
+}
+```
+
+#### 7. Migration des Données
+
+Le StateManager inclut un système de migration pour gérer les changements de version:
+
+```javascript
+{
+  version: '1.0.0',
+  timestamp: Date.now(),
+  data: {
+    // État sérialisé
+  }
+}
+```

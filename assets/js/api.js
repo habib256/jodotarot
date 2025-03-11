@@ -34,8 +34,8 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
     const loadingAnimations = document.getElementById('loading-animations');
     
     // Si on utilise Ollama, vérifier d'abord la connexion
-    const isOllama = modele.startsWith('ollama/');
-    const ollamaModelName = isOllama ? modele.replace('ollama/', '') : '';
+    const isOllama = modele.startsWith('ollama:');
+    const ollamaModelName = isOllama ? modele.replace('ollama:', '') : '';
     
     if (isOllama) {
       // Afficher la promotion Ollama
@@ -290,49 +290,36 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
                 
                 // Détection intelligente du format (si pas encore détecté)
                 if (!detectedFormat) {
-                  if (parsedChunk.message?.content !== undefined) {
+                  // Utiliser prioritairement le format déterminé par getOllamaModelFormat
+                  if (modelFormat && modelFormat.responseKey) {
+                    detectedFormat = modelFormat.responseKey;
+                    if (DEBUG_LEVEL > 0) {
+                      console.log(`🔍 DEBUG - Utilisation du format déterminé par configuration: ${detectedFormat}`);
+                    }
+                  } 
+                  // Sinon, détecter automatiquement en inspectant la réponse
+                  else if (parsedChunk.message?.content !== undefined) {
                     detectedFormat = 'message.content';
+                    if (DEBUG_LEVEL > 0) {
+                      console.log(`🔍 DEBUG - Format détecté automatiquement: ${detectedFormat}`);
+                    }
                   } else if (parsedChunk.response !== undefined) {
                     detectedFormat = 'response';
-                  } else if (modelFormat && modelFormat.responseKey) {
-                    detectedFormat = modelFormat.responseKey;
+                    if (DEBUG_LEVEL > 0) {
+                      console.log(`🔍 DEBUG - Format détecté automatiquement: ${detectedFormat}`);
+                    }
                   } else {
                     detectedFormat = 'unknown';
+                    console.warn(`⚠️ ATTENTION - Format de réponse inconnu pour ${ollamaModelName}`);
                   }
-                  
-                  if (DEBUG_LEVEL > 0) console.log(`🔍 DEBUG - Format détecté pour ${ollamaModelName}: ${detectedFormat}`);
                 }
                 
-                // Extraction du texte selon le format détecté (approche améliorée)
+                // Extraction du texte selon le format détecté
                 let responseText = '';
                 
-                // Vérifier d'abord explicitement le format pour llama3.1
-                if (ollamaModelName.includes('llama3.1')) {
-                  // Pour llama3.1, essayer spécifiquement ces chemins
-                  if (parsedChunk.message?.content !== undefined) {
-                    responseText = parsedChunk.message.content;
-                  } else if (parsedChunk.content !== undefined) {
-                    responseText = parsedChunk.content;
-                  } else if (parsedChunk.response !== undefined) {
-                    responseText = parsedChunk.response;
-                  }
-                  
-                  if (DEBUG_LEVEL > 1 && responseText) {
-                    console.log(`🔍 DEBUG - Texte extrait pour llama3.1:`, responseText.substring(0, 20) + "...");
-                  }
-                } else {
-                  // Pour les autres modèles, suivre la logique normale
-                  if (detectedFormat === 'message.content' && parsedChunk.message?.content !== undefined) {
-                    responseText = parsedChunk.message.content;
-                  } else if (detectedFormat === 'response' && parsedChunk.response !== undefined) {
-                    responseText = parsedChunk.response;
-                  } else {
-                    // Fallback aux autres méthodes si le format détecté n'est pas disponible
-                    responseText = getValueByPath(parsedChunk, detectedFormat) || 
-                                  parsedChunk.response || 
-                                  parsedChunk.message?.content || 
-                                  '';
-                  }
+                // Utiliser la fonction getValueByPath pour extraire la valeur selon le chemin détecté
+                if (detectedFormat && detectedFormat !== 'unknown') {
+                  responseText = getValueByPath(parsedChunk, detectedFormat) || '';
                 }
                 
                 // Logging minimal des informations importantes
@@ -464,99 +451,302 @@ async function obtenirModelesOllama() {
 }
 
 /**
- * Fonction pour vérifier si Ollama est accessible
- * @returns {Promise<boolean>} - true si Ollama est accessible, false sinon
+ * Vérifie la connectivité avec le serveur Ollama
+ * @return {Promise<Object>} Objet contenant des détails sur l'état de la connexion
  */
 async function verifierConnexionOllama() {
   try {
-    const response = await fetch(API_URL_OLLAMA_TAGS, { 
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
+    const response = await fetchWithRetry(
+      API_URL_OLLAMA_TAGS,
+      {
+        method: 'GET',
+        timeout: 3000 // Augmenter le timeout à 3 secondes
       },
-      signal: AbortSignal.timeout(2000) // Timeout après 2 secondes
-    });
-    
-    return response.ok;
+      2 // Effectuer 2 tentatives
+    );
+
+    if (response.ok) {
+      try {
+        const data = await response.json();
+        // Vérifier que la réponse contient des modèles
+        if (data && Array.isArray(data.models) && data.models.length > 0) {
+          return {
+            connected: true,
+            status: 'ok',
+            message: 'Ollama est accessible et contient des modèles',
+            models: data.models.length,
+            details: data
+          };
+        } else {
+          return {
+            connected: true,
+            status: 'warning',
+            message: 'Ollama est accessible mais aucun modèle n\'est disponible',
+            models: 0,
+            details: data
+          };
+        }
+      } catch (jsonError) {
+        return {
+          connected: true,
+          status: 'warning',
+          message: 'Ollama est accessible mais la réponse n\'est pas au format JSON attendu',
+          error: jsonError.message,
+          details: await response.text()
+        };
+      }
+    } else {
+      return {
+        connected: false,
+        status: 'error',
+        message: `Ollama n'est pas accessible (${response.status}: ${response.statusText})`,
+        statusCode: response.status,
+        details: await response.text().catch(e => 'Impossible de lire la réponse')
+      };
+    }
   } catch (error) {
-    console.warn("Ollama n'est pas accessible:", error);
-    return false;
+    console.warn('Erreur lors de la vérification de la connexion Ollama:', error);
+    
+    // Fournir des informations plus détaillées sur l'erreur
+    return {
+      connected: false,
+      status: 'error',
+      message: error.timeout 
+        ? 'La connexion à Ollama a expiré' 
+        : (error.name === 'AbortError' 
+            ? 'La requête vers Ollama a été interrompue'
+            : `Impossible de se connecter à Ollama: ${error.message}`),
+      error: error.message,
+      type: error.timeout ? 'timeout' : (error.name === 'AbortError' ? 'abort' : 'connection'),
+      details: error
+    };
   }
 }
 
 /**
- * Fonction pour tester la connectivité avec Ollama
- * @param {string} modelName - Nom du modèle à tester
- * @returns {Promise<Object>} - Résultat du test avec statut et message
+ * Utilitaire pour les requêtes fetch avec timeout et réessai
+ * @param {string} url - URL de la requête
+ * @param {Object} options - Options de fetch
+ * @param {number} maxRetries - Nombre maximum de tentatives
+ * @param {number} timeoutMs - Délai d'expiration en millisecondes
+ * @return {Promise<Response>} - Promesse de réponse
+ */
+async function fetchWithRetry(url, options, maxRetries = 2, timeoutMs = 5000) {
+  let retries = 0;
+  let lastError = null;
+  
+  while (retries <= maxRetries) {
+    try {
+      // Créer un contrôleur d'abandon pour le timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+      
+      // Ajouter le signal au options
+      const optionsWithSignal = {
+        ...options,
+        signal: controller.signal
+      };
+      
+      try {
+        // Tenter la requête
+        const response = await fetch(url, optionsWithSignal);
+        clearTimeout(timeoutId);
+        
+        // Si la réponse est OK, la retourner
+        return response;
+      } catch (fetchError) {
+        clearTimeout(timeoutId);
+        throw fetchError;
+      }
+    } catch (error) {
+      lastError = error;
+      retries++;
+      
+      const isTimeout = error.name === 'AbortError';
+      const retriesLeft = maxRetries - retries + 1;
+      
+      if (retriesLeft > 0) {
+        // Délai exponentiel avec un peu d'aléatoire pour éviter les collisions
+        const delay = Math.pow(1.5, retries) * 500 + Math.random() * 300;
+        console.warn(`Tentative ${retries}/${maxRetries} échouée${isTimeout ? ' (timeout)' : ''}: ${error.message}. Nouvelle tentative dans ${delay/1000} secondes...`);
+        
+        // Attendre avant de réessayer
+        await new Promise(resolve => setTimeout(resolve, delay));
+      } else {
+        console.error(`Toutes les tentatives ont échoué (${retries}/${maxRetries}):`, error);
+        throw error;
+      }
+    }
+  }
+  
+  // Ce code ne devrait jamais être atteint, mais par précaution
+  throw lastError || new Error("Erreur inconnue pendant les tentatives de connexion");
+}
+
+/**
+ * Teste la connectivité avec Ollama et vérifie la disponibilité d'un modèle spécifique
+ * @param {string} modelName - Nom du modèle Ollama à tester
+ * @return {Promise<Object>} - Résultat détaillé du test de connectivité
  */
 async function testOllamaConnectivity(modelName) {
   console.log("🔍 DEBUG - Test de connectivité Ollama pour le modèle:", modelName);
   
   try {
-    // 1. Test simple de ping sur le serveur Ollama
+    // 1. Test de connectivité au serveur Ollama
     console.log("🔍 DEBUG - Test ping serveur Ollama");
-    const pingResponse = await fetch(`${API_URL_OLLAMA.replace('/api/chat', '')}/api/tags`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
-    });
+    const connectivityResult = await verifierConnexionOllama();
     
-    if (!pingResponse.ok) {
-      console.error("🔍 DEBUG - Serveur Ollama inaccessible:", pingResponse.status, pingResponse.statusText);
-      return { 
-        success: false, 
-        message: `Serveur Ollama inaccessible (${pingResponse.status}): ${pingResponse.statusText}` 
+    // Si le serveur n'est pas accessible, on renvoie l'erreur
+    if (!connectivityResult.connected) {
+      return {
+        status: 'error',
+        success: false,
+        message: connectivityResult.message,
+        details: connectivityResult,
+        suggestions: [
+          'warnings.checkOllamaRunning',
+          'warnings.checkNetworkConnection',
+          'warnings.installOllama'
+        ]
       };
     }
     
-    // 2. Vérifier si le modèle est disponible
-    console.log("🔍 DEBUG - Vérification disponibilité du modèle:", modelName);
-    const modelsData = await pingResponse.json();
+    // Si aucun modèle n'est fourni, on s'arrête là avec un succès partiel
+    if (!modelName) {
+      return {
+        status: 'warning',
+        success: true,
+        message: "Serveur Ollama accessible, mais aucun modèle spécifié pour le test",
+        details: connectivityResult,
+        suggestions: ['warnings.selectModel']
+      };
+    }
     
-    if (!modelsData.models) {
-      console.error("🔍 DEBUG - Format de réponse Ollama inattendu:", modelsData);
-      return { 
-        success: false, 
-        message: "Format de réponse Ollama inattendu" 
+    // 2. Vérifier si le modèle demandé est disponible
+    console.log("🔍 DEBUG - Vérification disponibilité du modèle:", modelName);
+    const modelsData = connectivityResult.details;
+    
+    if (!modelsData || !modelsData.models) {
+      return {
+        status: 'warning',
+        success: true,
+        message: "Serveur Ollama accessible, mais impossible de récupérer la liste des modèles",
+        details: connectivityResult,
+        suggestions: [
+          'warnings.checkOllamaVersion',
+          'warnings.pullModelManually'
+        ]
       };
     }
     
     const modelExists = modelsData.models.some(m => m.name === modelName);
     if (!modelExists) {
-      console.error("🔍 DEBUG - Modèle non trouvé:", modelName);
-      return { 
-        success: false, 
-        message: `Le modèle ${modelName} n'est pas disponible sur ce serveur Ollama` 
+      // Obtenir la liste des modèles disponibles pour suggérer des alternatives
+      const availableModels = modelsData.models.map(m => m.name).join(', ');
+      
+      return {
+        status: 'error',
+        success: false,
+        message: `Le modèle ${modelName} n'est pas disponible sur ce serveur Ollama`,
+        alternatives: modelsData.models.map(m => m.name),
+        details: {
+          requestedModel: modelName,
+          availableModels: modelsData.models
+        },
+        suggestions: [
+          'warnings.pullModel',
+          'warnings.selectDifferentModel'
+        ]
       };
     }
     
-    // 3. Test rapide du modèle
+    // 3. Test rapide du modèle avec retry et timeout
     console.log("🔍 DEBUG - Test rapide du modèle:", modelName);
-    const testResponse = await fetch(API_URL_OLLAMA, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: modelName,
-        messages: [{ role: "user", content: "Réponds simplement par 'OK' pour tester la connectivité." }],
-        stream: false
-      })
-    });
-    
-    if (!testResponse.ok) {
-      console.error("🔍 DEBUG - Test du modèle échoué:", testResponse.status, testResponse.statusText);
-      return { 
-        success: false, 
-        message: `Test du modèle échoué (${testResponse.status}): ${testResponse.statusText}` 
+    try {
+      const testResponse = await fetchWithRetry(
+        API_URL_OLLAMA, 
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: modelName,
+            messages: [{ role: "user", content: "Réponds simplement par 'OK' pour tester la connectivité." }],
+            stream: false
+          })
+        },
+        2,  // 2 tentatives
+        5000 // 5 secondes de timeout
+      );
+      
+      if (!testResponse.ok) {
+        return {
+          status: 'error',
+          success: false,
+          message: `Test du modèle échoué (${testResponse.status}): ${testResponse.statusText}`,
+          details: {
+            statusCode: testResponse.status,
+            statusText: testResponse.statusText,
+            responseText: await testResponse.text().catch(() => 'Impossible de lire la réponse')
+          },
+          suggestions: [
+            'warnings.modelMayBeLoading',
+            'warnings.checkOllamaMemory',
+            'warnings.tryAgain'
+          ]
+        };
+      }
+      
+      try {
+        // Vérifier le contenu de la réponse
+        const responseData = await testResponse.json();
+        
+        console.log("🔍 DEBUG - Connectivité Ollama OK pour:", modelName);
+        return {
+          status: 'success',
+          success: true,
+          message: "Connectivité Ollama OK",
+          details: {
+            model: modelName,
+            response: responseData
+          }
+        };
+      } catch (jsonError) {
+        return {
+          status: 'warning',
+          success: true,
+          message: "Modèle accessible mais la réponse n'est pas au format JSON attendu",
+          details: {
+            error: jsonError.message,
+            responseText: await testResponse.text().catch(() => 'Impossible de lire la réponse')
+          },
+          suggestions: ['warnings.checkOllamaVersion']
+        };
+      }
+    } catch (fetchError) {
+      return {
+        status: 'error',
+        success: false,
+        message: `Erreur lors du test du modèle: ${fetchError.message}`,
+        details: {
+          error: fetchError.message,
+          timeout: fetchError.timeout,
+          type: fetchError.name
+        },
+        suggestions: [
+          'warnings.modelTooLarge',
+          'warnings.checkOllamaMemory',
+          'warnings.tryAgain'
+        ]
       };
     }
-    
-    console.log("🔍 DEBUG - Connectivité Ollama OK pour:", modelName);
-    return { success: true, message: "Connectivité Ollama OK" };
-    
   } catch (error) {
     console.error("🔍 DEBUG - Erreur lors du test de connectivité Ollama:", error);
-    return { 
-      success: false, 
-      message: `Erreur de connectivité: ${error.message}` 
+    return {
+      status: 'error',
+      success: false,
+      message: `Erreur de connectivité: ${error.message}`,
+      details: error,
+      suggestions: ['warnings.unexpectedError', 'warnings.tryAgain']
     };
   }
 }
@@ -613,23 +803,43 @@ function formatStreamingResponse(text) {
 }
 
 /**
- * Extrait une valeur depuis un objet en utilisant une notation par points
- * @param {Object} obj - L'objet source
+ * Extrait la valeur d'un objet selon un chemin d'accès
+ * Fonction améliorée avec fallbacks pour différents formats de réponse Ollama
+ * @param {Object} obj - Objet à interroger
  * @param {string} path - Chemin de la propriété (ex: "message.content")
  * @returns {*} - La valeur ou undefined si non trouvée
  */
 function getValueByPath(obj, path) {
   if (!obj || !path) return undefined;
   
-  const parts = path.split('.');
-  let value = obj;
-  
-  for (const part of parts) {
-    if (value === undefined || value === null) return undefined;
-    value = value[part];
+  // 1. Essayer d'extraire selon le chemin spécifié
+  try {
+    const parts = path.split('.');
+    let value = obj;
+    
+    for (const part of parts) {
+      if (value === undefined || value === null) return undefined;
+      value = value[part];
+    }
+    
+    return value;
+  } catch (e) {
+    console.warn('Erreur lors de l\'extraction via chemin:', e.message);
   }
   
-  return value;
+  // 2. Fallbacks pour les formats les plus communs
+  if (path === 'message.content' && !obj.message) {
+    // Essayer d'autres formats connus
+    return obj.response || obj.content || undefined;
+  }
+  
+  if (path === 'response' && !obj.response) {
+    // Essayer d'autres formats connus
+    return obj.message?.content || obj.content || undefined;
+  }
+  
+  // En dernier recours, retourner undefined
+  return undefined;
 }
 
 // Exporter les fonctions

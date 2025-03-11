@@ -4,100 +4,362 @@
  */
 class StateManager {
   constructor() {
+    // Schéma de validation pour l'état
+    this.schema = {
+      language: {
+        type: 'string',
+        enum: ['fr', 'en', 'es', 'de', 'it', 'zh'],
+        default: 'fr'
+      },
+      persona: {
+        type: 'string',
+        enum: [
+          'tarologue', 'oracle', 'voyante', 'pretre', 'rabbin', 'imam',
+          'dalailama', 'sorciere', 'alchimiste', 'mage', 'francmacon',
+          'freud', 'jung', 'lacan', 'dolto', 'socrate', 'salomon',
+          'montaigne', 'quichotte', 'demon', 'noegoman'
+        ],
+        default: 'tarologue'
+      },
+      cardSet: {
+        type: 'string',
+        enum: ['set01', 'set02'],
+        default: 'set01'
+      },
+      deckId: {
+        type: 'string',
+        enum: ['set01', 'set02'],
+        default: 'set01'
+      },
+      spreadType: {
+        type: 'string',
+        enum: ['cross', 'horseshoe', 'love', 'celticCross'],
+        default: 'cross'
+      },
+      iaModel: {
+        type: 'string',
+        description: 'Modèle d\'IA à utiliser (format: "openai/MODEL_NAME" ou "ollama:MODEL_NAME")',
+        validate: (value) => {
+          if (!value) return false;
+          const normalizedValue = value.trim();
+          
+          // Vérification simple de format
+          if (!normalizedValue.startsWith('openai/') && !normalizedValue.startsWith('ollama:')) {
+            console.warn(`Format de modèle invalide: ${normalizedValue}`);
+            return false;
+          }
+          
+          return true;
+        },
+        default: 'openai/gpt-3.5-turbo'
+      },
+      cards: {
+        type: 'array',
+        validate: (value) => {
+          // Vérification détaillée avec rapports d'erreurs
+          console.log('🔍 Validation de cards:', value);
+          
+          // 1. Vérifier si c'est un tableau
+          if (!Array.isArray(value)) {
+            console.error('❌ Cards n\'est pas un tableau:', value);
+            console.error('❌ Type de cards:', typeof value);
+            console.error('❌ Chaîne stringifiée:', JSON.stringify(value));
+            return false;
+          }
+          
+          console.log('✅ Cards est bien un tableau de longueur', value.length);
+          
+          // 2. Vérifier chaque carte
+          let allValid = true;
+          value.forEach((card, index) => {
+            console.log(`🔍 Vérification de la carte ${index}:`, card);
+            
+            if (!card || typeof card !== 'object') {
+              console.error(`❌ Carte ${index} n'est pas un objet:`, card);
+              allValid = false;
+              return;
+            }
+            
+            // Vérifier les propriétés requises
+            if (card.id === undefined) {
+              console.error(`❌ Carte ${index} n'a pas d'id:`, card);
+              allValid = false;
+            }
+            
+            if (typeof card.name !== 'string') {
+              console.error(`❌ Carte ${index} n'a pas de nom valide:`, card.name);
+              allValid = false;
+            }
+            
+            if (typeof card.imageUrl !== 'string') {
+              console.error(`❌ Carte ${index} n'a pas d'imageUrl valide:`, card.imageUrl);
+              allValid = false;
+            }
+          });
+          
+          // 3. Retourner le résultat (toujours vrai pour éviter le blocage complet)
+          if (!allValid) {
+            console.warn('⚠️ Des problèmes ont été détectés avec les cartes, mais nous continuons');
+          }
+          
+          return true; // Toujours retourner true pour éviter les blocages
+        },
+        default: []
+      },
+      question: {
+        type: 'string',
+        maxLength: 1000,
+        default: ''
+      },
+      interpretation: {
+        type: 'object',
+        nullable: true,
+        default: null
+      },
+      isLoading: {
+        type: 'boolean',
+        default: false
+      },
+      error: {
+        type: 'string',
+        nullable: true,
+        default: null
+      },
+      isCardEnlarged: {
+        type: 'boolean',
+        default: false
+      },
+      enlargedCardId: {
+        type: 'number',
+        nullable: true,
+        default: null
+      },
+      availableModels: {
+        type: 'set',
+        description: 'Ensemble des modèles Ollama disponibles (pour information uniquement, pas utilisé pour la validation)',
+        default: () => new Set()
+      },
+      currentSpreadType: {
+        type: 'string',
+        enum: ['cross', 'horseshoe', 'love', 'celticCross'],
+        default: 'cross'
+      },
+      currentCardsDrawn: {
+        type: 'string',
+        default: '[]'
+      }
+    };
+
     // État par défaut
-    this.state = {
-      // Configuration de l'application
-      language: 'fr',
-      persona: 'tarologue',
-      cardSet: 'set01',
-      spreadType: 'cross',
-      iaModel: 'openai/gpt-3.5-turbo',
-      
-      // État du tirage
-      cards: [],
-      question: '',
-      interpretation: null,
-      
-      // États UI
-      isLoading: false,
-      error: null,
-      isCardEnlarged: false,
-      enlargedCardId: null
-    };
+    this.state = this.getDefaultState();
     
-    // Valeurs par défaut pour chaque clé d'état
-    this.defaults = {
-      language: 'fr',
-      persona: 'tarologue',
-      cardSet: 'set01',
-      spreadType: 'cross',
-      iaModel: 'openai/gpt-3.5-turbo'
-    };
+    // Liste des écouteurs
+    this.listeners = new Set();
     
-    this.listeners = [];
+    // Version de l'état pour la migration
+    this.STATE_VERSION = '1.0.0';
     
     // Restaurer l'état depuis le localStorage au démarrage
     this.restoreState();
   }
-  
+
+  /**
+   * Obtient l'état par défaut basé sur le schéma
+   * @returns {Object} État par défaut
+   */
+  getDefaultState() {
+    const defaultState = {};
+    for (const [key, config] of Object.entries(this.schema)) {
+      defaultState[key] = typeof config.default === 'function' 
+        ? config.default()
+        : config.default;
+    }
+    return defaultState;
+  }
+
+  /**
+   * Valide une valeur selon les règles du schéma
+   * @param {string} key - Clé de la propriété
+   * @param {any} value - Valeur à valider
+   * @returns {Object} Résultat de la validation
+   */
+  validateValue(key, value) {
+    const config = this.schema[key];
+    if (!config) {
+      return { isValid: false, error: `Propriété inconnue: ${key}` };
+    }
+
+    // Vérifier si la valeur peut être null
+    if (value === null && config.nullable) {
+      return { isValid: true, value: null };
+    }
+
+    // Vérifier le type
+    if (config.type === 'set') {
+      if (!(value instanceof Set)) {
+        try {
+          value = new Set(Array.isArray(value) ? value : []);
+        } catch {
+          return { isValid: false, error: `Type invalide pour ${key}, Set attendu` };
+        }
+      }
+    } else if (config.type === 'array') {
+      // Traitement spécial pour les tableaux car typeof [] est 'object'
+      if (!Array.isArray(value)) {
+        console.error(`Validation de type échouée pour ${key}: attendu array, reçu`, value);
+        return { isValid: false, error: `Type invalide pour ${key}, array attendu` };
+      }
+    } else if (typeof value !== config.type && value !== null) {
+      return { isValid: false, error: `Type invalide pour ${key}, ${config.type} attendu` };
+    }
+
+    // Vérifier les énumérations
+    if (config.enum && !config.enum.includes(value)) {
+      return { 
+        isValid: false, 
+        error: `Valeur invalide pour ${key}, doit être une des suivantes: ${config.enum.join(', ')}` 
+      };
+    }
+
+    // Vérifier la longueur maximale pour les chaînes
+    if (config.type === 'string' && config.maxLength && value.length > config.maxLength) {
+      return { 
+        isValid: false, 
+        error: `${key} dépasse la longueur maximale de ${config.maxLength} caractères` 
+      };
+    }
+
+    // Validation personnalisée
+    if (config.validate && !config.validate(value)) {
+      return { isValid: false, error: `Validation échouée pour ${key}` };
+    }
+
+    return { isValid: true, value };
+  }
+
   /**
    * Met à jour l'état et notifie tous les écouteurs
    * @param {Object} updates - Objet contenant les mises à jour d'état
    */
   setState(updates) {
-    // Valider les mises à jour avant de les appliquer
-    const validatedUpdates = this.validateUpdates(updates);
-    
-    // Créer un objet contenant uniquement les valeurs qui ont changé
-    const changedValues = {};
-    
-    // Identifier les valeurs qui ont changé
-    for (const [key, value] of Object.entries(validatedUpdates)) {
-      if (this.state[key] !== value) {
-        changedValues[key] = value;
-      }
-    }
-    
-    // Mettre à jour l'état avec les valeurs validées
-    this.state = {...this.state, ...validatedUpdates};
-    
-    // Notifier les écouteurs
-    this.notifyListeners();
-    
-    // Émettre des événements personnalisés pour chaque valeur modifiée
-    this.emitChangeEvents(changedValues);
-    
-    // Sauvegarder l'état
-    this.persistState();
-  }
-  
-  /**
-   * Valide les mises à jour avant de les appliquer à l'état
-   * @param {Object} updates - Les mises à jour à valider
-   * @return {Object} - Les mises à jour validées
-   */
-  validateUpdates(updates) {
-    const validatedUpdates = {...updates};
-    
-    // Vérifier si des valeurs sont invalides et les remplacer par les valeurs par défaut
-    for (const [key, value] of Object.entries(validatedUpdates)) {
-      // Si la valeur est undefined, null, ou une chaîne vide, utiliser la valeur par défaut
-      if ((value === undefined || value === null || value === '') && key in this.defaults) {
-        console.warn(`Valeur invalide pour ${key}, utilisation de la valeur par défaut ${this.defaults[key]}`);
-        validatedUpdates[key] = this.defaults[key];
-      }
+    try {
+      const validatedUpdates = {};
+      const errors = [];
+
+      // Ajouter un log pour déboguer
+      console.log('🔄 StateManager.setState appelé avec:', JSON.stringify(updates));
       
-      // Validation spécifique pour iaModel
-      if (key === 'iaModel' && value) {
-        // Vérifier si le modèle commence par 'openai/' ou est un modèle Ollama valide
-        if (!value.startsWith('openai/') && !value.match(/^[a-zA-Z0-9-_.:]+$/)) {
-          console.warn(`Modèle IA invalide: ${value}, utilisation du modèle par défaut ${this.defaults.iaModel}`);
-          validatedUpdates[key] = this.defaults.iaModel;
+      // Valider chaque mise à jour
+      for (const [key, value] of Object.entries(updates)) {
+        console.log(`📋 Validation de ${key}:`, value);
+        if (key === 'cards') {
+          console.log(`🃏 Type de cards:`, typeof value);
+          console.log(`🃏 Est un tableau?`, Array.isArray(value));
+          console.log(`🃏 Contenu de cards:`, JSON.stringify(value));
+        }
+        
+        const validation = this.validateValue(key, value);
+        if (validation.isValid) {
+          validatedUpdates[key] = validation.value;
+          console.log(`✅ Validation réussie pour ${key}`);
+        } else {
+          errors.push(validation.error);
+          console.error(`❌ Validation échouée pour ${key}:`, validation.error);
         }
       }
+
+      // S'il y a des erreurs, les regrouper et les lancer
+      if (errors.length > 0) {
+        console.error('❌ Erreurs de validation détectées:', errors);
+        throw new Error(`Erreurs de validation:\n${errors.join('\n')}`);
+      }
+
+      // Créer un objet avec les changements
+      const changedValues = {};
+      for (const [key, value] of Object.entries(validatedUpdates)) {
+        if (!this.isEqual(this.state[key], value)) {
+          changedValues[key] = value;
+        }
+      }
+
+      // Mettre à jour l'état
+      this.state = {
+        ...this.state,
+        ...validatedUpdates
+      };
+
+      // Notifier les écouteurs et émettre les événements
+      if (Object.keys(changedValues).length > 0) {
+        this.notifyListeners(changedValues);
+        this.emitChangeEvents(changedValues);
+        this.persistState();
+      }
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de l\'état:', error);
+      this.state.error = error.message;
+      throw error;
+    }
+  }
+
+  /**
+   * Compare deux valeurs de manière profonde
+   * @param {any} a - Première valeur
+   * @param {any} b - Deuxième valeur
+   * @returns {boolean} True si les valeurs sont égales
+   */
+  isEqual(a, b) {
+    if (a instanceof Set && b instanceof Set) {
+      return a.size === b.size && [...a].every(value => b.has(value));
+    }
+    if (Array.isArray(a) && Array.isArray(b)) {
+      return a.length === b.length && a.every((value, index) => this.isEqual(value, b[index]));
+    }
+    if (a && b && typeof a === 'object' && typeof b === 'object') {
+      return Object.keys(a).length === Object.keys(b).length &&
+        Object.keys(a).every(key => this.isEqual(a[key], b[key]));
+    }
+    return a === b;
+  }
+
+  /**
+   * Valide et nettoie un modèle IA
+   * @param {string} model - Le modèle à valider
+   * @return {string|null} - Le modèle validé ou null si invalide
+   */
+  validateIAModel(model) {
+    if (!model) return null;
+    
+    // Normaliser le format du modèle
+    let normalizedModel = model.trim();
+    
+    // Vérification basique du format
+    if (!normalizedModel.startsWith('openai/') && !normalizedModel.startsWith('ollama:')) {
+      console.warn(`Format de modèle invalide: ${normalizedModel} - doit commencer par 'openai/' ou 'ollama:'`);
+      return null;
     }
     
-    return validatedUpdates;
+    // Validation spécifique aux modèles OpenAI
+    if (normalizedModel.startsWith('openai/')) {
+      // Liste des modèles OpenAI valides (à mettre à jour selon les besoins)
+      const validOpenAIModels = [
+        'openai/gpt-3.5-turbo',
+        'openai/gpt-4',
+        'openai/gpt-4o',
+        'openai/gpt-4o-mini'
+      ];
+      
+      // Vérifier si le modèle est dans la liste des modèles valides
+      // Ce n'est pas une vérification stricte - permet d'ajouter des modèles dynamiquement
+      if (!validOpenAIModels.includes(normalizedModel)) {
+        console.warn(`Modèle OpenAI non standard: ${normalizedModel}`);
+      }
+    }
+    
+    // Pour les modèles Ollama, nous ne validons pas strictement ici
+    // car ils sont détectés dynamiquement et peuvent changer
+    // selon l'installation de l'utilisateur
+    
+    return normalizedModel;
   }
   
   /**
@@ -148,17 +410,18 @@ class StateManager {
    * @return {Function} Fonction de désabonnement
    */
   subscribe(listener) {
-    this.listeners.push(listener);
+    this.listeners.add(listener);
     return () => {
-      this.listeners = this.listeners.filter(l => l !== listener);
+      this.listeners.delete(listener);
     };
   }
   
   /**
    * Notifie tous les écouteurs des changements d'état
+   * @param {Object} changes - Les changements effectués
    */
-  notifyListeners() {
-    this.listeners.forEach(listener => listener(this.state));
+  notifyListeners(changes = {}) {
+    this.listeners.forEach(listener => listener(this.state, changes));
   }
 
   /**
@@ -168,14 +431,33 @@ class StateManager {
     try {
       // Ne pas persister les états temporaires
       const stateToPersist = {...this.state};
-      delete stateToPersist.isLoading;
-      delete stateToPersist.error;
-      delete stateToPersist.isCardEnlarged;
-      delete stateToPersist.enlargedCardId;
+      const temporaryKeys = ['isLoading', 'error', 'isCardEnlarged', 'enlargedCardId'];
+      temporaryKeys.forEach(key => delete stateToPersist[key]);
       
-      localStorage.setItem('jodotarot_state', JSON.stringify(stateToPersist));
+      // Convertir les types spéciaux pour la sérialisation
+      const serializedState = {
+        version: this.STATE_VERSION,
+        timestamp: Date.now(),
+        data: this.serializeState(stateToPersist)
+      };
+      
+      // Vérifier la taille avant la sauvegarde
+      const stateString = JSON.stringify(serializedState);
+      const stateSize = new Blob([stateString]).size;
+      
+      // Limite de taille (5MB pour localStorage)
+      const SIZE_LIMIT = 5 * 1024 * 1024;
+      if (stateSize > SIZE_LIMIT) {
+        throw new Error(`L'état est trop volumineux pour être sauvegardé (${Math.round(stateSize / 1024)}KB > ${Math.round(SIZE_LIMIT / 1024)}KB)`);
+      }
+      
+      localStorage.setItem('jodotarot_state', stateString);
     } catch (error) {
       console.error('Erreur lors de la sauvegarde de l\'état:', error);
+      // Émettre un événement d'erreur
+      document.dispatchEvent(new CustomEvent('stateManager:error', {
+        detail: { error: error.message }
+      }));
     }
   }
 
@@ -185,16 +467,169 @@ class StateManager {
   restoreState() {
     try {
       const savedState = localStorage.getItem('jodotarot_state');
-      if (savedState) {
-        const parsedState = JSON.parse(savedState);
-        // Utiliser setState pour bénéficier de la validation
-        this.setState(parsedState);
-        
-        // Événement émis maintenant depuis setState via emitChangeEvents
+      if (!savedState) return;
+      
+      const { version, data } = JSON.parse(savedState);
+      
+      // Vérifier la version et migrer si nécessaire
+      const migratedData = this.migrateState(version, data);
+      
+      // Désérialiser l'état
+      const restoredState = this.deserializeState(migratedData);
+      
+      // Fusionner l'état restauré avec l'état par défaut pour s'assurer que toutes les propriétés requises sont présentes
+      const defaultState = this.getDefaultState();
+      const mergedState = { ...defaultState, ...restoredState };
+
+      // Valider l'état fusionné
+      const validationErrors = this.validateState(mergedState);
+      if (validationErrors.length > 0) {
+        throw new Error(`État invalide:\n${validationErrors.join('\n')}`);
       }
+
+      // Utiliser setState pour appliquer l'état fusionné
+      this.setState(mergedState);
     } catch (error) {
       console.error('Erreur lors de la restauration de l\'état:', error);
+      // Réinitialiser à l'état par défaut
+      this.state = this.getDefaultState();
     }
+  }
+
+  /**
+   * Sérialise l'état pour le stockage
+   * @param {Object} state - État à sérialiser
+   * @returns {Object} État sérialisé
+   */
+  serializeState(state) {
+    const serialized = {};
+    
+    for (const [key, value] of Object.entries(state)) {
+      if (value instanceof Set) {
+        serialized[key] = {
+          __type: 'Set',
+          value: Array.from(value)
+        };
+      } else if (Array.isArray(value)) {
+        serialized[key] = {
+          __type: 'Array',
+          value: value
+        };
+      } else if (value instanceof Date) {
+        serialized[key] = {
+          __type: 'Date',
+          value: value.toISOString()
+        };
+      } else if (value === undefined) {
+        // Ignorer les valeurs undefined
+        continue;
+      } else {
+        serialized[key] = value;
+      }
+    }
+    
+    return serialized;
+  }
+
+  /**
+   * Désérialise l'état stocké
+   * @param {Object} serialized - État sérialisé
+   * @returns {Object} État désérialisé
+   */
+  deserializeState(serialized) {
+    const deserialized = {};
+    
+    for (const [key, value] of Object.entries(serialized)) {
+      if (value && typeof value === 'object' && '__type' in value) {
+        switch (value.__type) {
+          case 'Set':
+            deserialized[key] = new Set(value.value);
+            break;
+          case 'Array':
+            deserialized[key] = value.value;
+            break;
+          case 'Date':
+            deserialized[key] = new Date(value.value);
+            break;
+          default:
+            deserialized[key] = value;
+        }
+      } else {
+        deserialized[key] = value;
+      }
+    }
+    
+    return deserialized;
+  }
+
+  /**
+   * Valide l'état complet
+   * @param {Object} state - État à valider
+   * @returns {string[]} Tableau des erreurs de validation
+   */
+  validateState(state) {
+    const errors = [];
+    
+    // Vérifier les propriétés requises
+    for (const [key, config] of Object.entries(this.schema)) {
+      if (!(key in state) && !config.nullable) {
+        errors.push(`Propriété manquante: ${key}`);
+        continue;
+      }
+      
+      const validation = this.validateValue(key, state[key]);
+      if (!validation.isValid) {
+        errors.push(validation.error);
+      }
+    }
+    
+    // Vérifier les propriétés non définies dans le schéma
+    for (const key of Object.keys(state)) {
+      if (!this.schema[key]) {
+        errors.push(`Propriété inconnue: ${key}`);
+      }
+    }
+    
+    return errors;
+  }
+
+  /**
+   * Migre l'état vers la version actuelle si nécessaire
+   * @param {string} version - Version de l'état sauvegardé
+   * @param {Object} data - Données de l'état
+   * @returns {Object} État migré
+   */
+  migrateState(version, data) {
+    if (version === this.STATE_VERSION) {
+      return data;
+    }
+    
+    // Exemple de migration de version
+    switch (version) {
+      case '0.9.0':
+        // Migration de 0.9.0 vers 1.0.0
+        data = this.migrate_0_9_0_to_1_0_0(data);
+        break;
+      default:
+        console.warn(`Version inconnue ${version}, utilisation des données telles quelles`);
+    }
+    
+    return data;
+  }
+
+  /**
+   * Exemple de fonction de migration
+   * @param {Object} oldData - Anciennes données
+   * @returns {Object} Nouvelles données
+   */
+  migrate_0_9_0_to_1_0_0(oldData) {
+    // Exemple de migration : renommer une propriété
+    const newData = {...oldData};
+    if ('oldProperty' in newData) {
+      newData.newProperty = newData.oldProperty;
+      delete newData.oldProperty;
+    }
+    return newData;
   }
 }
 

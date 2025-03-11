@@ -21,6 +21,7 @@
 @import 'components/loading.css';
 @import 'components/modal.css';
 @import 'components/select.css';
+@import 'components/warnings.css';
 
 /* Layouts */
 @import 'layouts/container.css';

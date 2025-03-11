@@ -202,7 +202,7 @@ Développé avec ❤️ pour les amateurs de tarot et d'exploration intérieure.
 
 - Application entièrement modulaire en JavaScript ES6
 - Architecture orientée composants avec séparation claire des responsabilités:
-  - `main.js` (231 lignes): Point d'entrée principal qui initialise l'application
+  - `main.js` (259 lignes): Point d'entrée et initialisation de l'application
   - `app.js` (188 lignes): Gestion des événements et de l'interaction utilisateur
   - `api.js` (658 lignes): Communication avec les API d'IA (OpenAI et Ollama)
   - `ui.js` (281 lignes): Gestion de l'interface utilisateur
@@ -211,47 +211,36 @@ Développé avec ❤️ pour les amateurs de tarot et d'exploration intérieure.
 
 - Architecture MVC claire avec:
   - **Contrôleurs** pour la logique métier:
-    - `AppController.js` (216 lignes): Contrôleur principal de l'application
-    - `ReadingController.js` (604 lignes): Contrôleur de lecture de tarot
-    - `ConfigController.js` (654 lignes): Contrôleur de configuration
+    - `AppController.js` (215 lignes): Contrôleur principal de l'application
+    - `ReadingController.js` (545 lignes): Contrôleur de lecture de tarot
+    - `ConfigController.js` (752 lignes): Contrôleur de configuration
   - **Services** pour la gestion des ressources:
-    - `AIService.js` (412 lignes): Service d'intelligence artificielle
-    - `DeckService.js` (436 lignes): Service de gestion du jeu de cartes
-    - `UIService.js` (128 lignes): Service d'interface utilisateur
+    - `AIService.js` (417 lignes): Service d'intelligence artificielle
+    - `DeckService.js` (435 lignes): Service de gestion du jeu de cartes
+    - `UIService.js` (127 lignes): Service d'interface utilisateur
   - **Modèles** pour les données:
     - `spreads/`: Types de tirages disponibles
       - `BaseSpread.js` (331 lignes): Classe de base pour tous les tirages
-      - `CrossSpread.js` (141 lignes): Tirage en Croix
-      - `HorseshoeSpread.js` (184 lignes): Tirage en Fer à Cheval
+      - `CrossSpread.js` (140 lignes): Tirage en Croix
+      - `HorseshoeSpread.js` (183 lignes): Tirage en Fer à Cheval
       - `LoveSpread.js` (216 lignes): Tirage de l'Amour
       - `CelticCrossSpread.js` (295 lignes): Croix Celtique
-    - `personas/`: Définitions des différents personnages interprètes
+    - `personas/`: 21 personas différents avec leurs styles d'interprétation uniques
     - `cards/`: Définition des cartes et de leurs significations
 
-- Organisation CSS modulaire et sophistiquée:
-  - `main.css` (47 lignes): Point d'entrée CSS
-  - **Base**:
-    - `variables.css` (165 lignes): Définition des variables CSS, notamment pour les positions des cartes
-    - `reset.css` (222 lignes): Réinitialisation des styles
-    - `typography.css` (138 lignes): Styles typographiques
-  - **Modules**:
-    - `interpretations.css` (352 lignes): Styles pour les interprétations
-    - `cross-spread.css` (130 lignes): Styles pour le tirage en Croix
-    - `horseshoe-spread.css` (110 lignes): Styles pour le tirage en Fer à Cheval  
-    - `love-spread.css` (115 lignes): Styles pour le tirage de l'Amour
-    - `celtic-cross-spread.css` (157 lignes): Styles pour la Croix Celtique
-    - `persona.css` (1369 lignes): Styles pour les personas
+- Support multilingue complet:
+  - 6 langues supportées avec fichiers de traduction dédiés:
+    - Français (195 lignes)
+    - Anglais (195 lignes)
+    - Espagnol (165 lignes)
+    - Allemand (165 lignes)
+    - Italien (165 lignes)
+    - Chinois (166 lignes)
 
-- Approche innovante de positionnement des cartes:
-  - CSS comme "source unique de vérité" pour le positionnement
-  - Séparation claire entre la logique de tirage (JavaScript) et la présentation (CSS)
-  - Variables CSS pour définir toutes les positions des cartes
-  - Facilité de maintenance et d'extension pour de nouveaux tirages
-
-- Système de cache pour optimiser les performances et réduire les appels API
-- Formatage des réponses avec des balises HTML pour une présentation élégante
-- Gestion des erreurs robuste pour les problèmes de connexion API
-- Stockage des préférences utilisateur dans le localStorage
+- Gestionnaire d'état centralisé:
+  - `StateManager.js` (200 lignes): Gestion de l'état global de l'application
+  - Persistance des préférences utilisateur
+  - Système d'événements pour la synchronisation UI/État
 
 ## 📝 Licence
 

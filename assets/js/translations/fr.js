@@ -157,19 +157,19 @@ const fr = {
   
   // Types de tirages
   spreadTypes: {
-    cross: "Croix",
-    horseshoe: "Fer à Cheval",
-    love: "Tarot de l'amour",
-    celticCross: "Croix Celtique"
+    cross: "➕ Croix",
+    horseshoe: "🧲 Fer à Cheval",
+    love: "❤️ Tarot de l'amour",
+    celticCross: "☘️ Croix Celtique"
   },
   
   // Divers
   misc: {
     loadingModels: "Chargement des modèles...",
-    crossSpread: "Tirage en Croix",
-    horseshoeSpread: "Tirage en Fer à Cheval",
-    loveSpread: "Tarot de l'Amour",
-    celticCross: "Croix Celtique"
+    crossSpread: "➕ Tirage en Croix",
+    horseshoeSpread: "🧲 Tirage en Fer à Cheval",
+    loveSpread: "❤️ Tarot de l'Amour",
+    celticCross: "☘️ Croix Celtique"
   },
   
   // Meta prompt pour l'IA
@@ -190,6 +190,56 @@ const fr = {
 Concentre-toi sur ce que la question demande précisément et adapte ton interprétation 
 en fonction des éléments mentionnés dans la question. Ne donne pas une réponse générique.
 Chaque aspect de ton interprétation doit répondre à un aspect de cette question.`
+  },
+  
+  // Configuration
+  config: {
+    apiKeyTitle: "Configuration de la clé API OpenAI",
+    apiKeyDescription: "Entrez votre clé API OpenAI pour accéder aux modèles OpenAI. Votre clé API est stockée localement dans votre navigateur et n'est jamais partagée.",
+    configureAPIKey: "Configurer la clé API",
+    save: "Enregistrer",
+    cancel: "Annuler",
+    apiKeySaved: "Clé API enregistrée avec succès",
+    apiKeyEmpty: "La clé API ne peut pas être vide"
+  },
+  
+  // Messages
+  messages: {
+    ollamaConnected: "Ollama connecté avec succès",
+    modelAvailable: "Modèle disponible",
+    modelUnavailable: "Modèle non disponible"
+  },
+  
+  // Avertissements
+  warnings: {
+    modelUnavailable: "Modèle non disponible",
+    modelUnavailableDetails: "Le modèle {modelName} n'est pas disponible",
+    error: "Erreur",
+    checkConnection: "Vérifiez votre connexion internet",
+    checkOllamaRunning: "Vérifiez qu'Ollama est en cours d'exécution",
+    checkNetworkConnection: "Vérifiez votre connexion réseau",
+    installOllama: "Installez Ollama depuis ollama.ai",
+    checkOllama: "Vérifiez qu'Ollama est installé et en cours d'exécution",
+    checkAPIKey: "Vérifiez votre clé API",
+    configureOpenAI: "Configurez votre clé API OpenAI",
+    apiKeyMissing: "Clé API OpenAI manquante",
+    apiKeyMissingDetails: "Pour utiliser {modelName}, vous devez configurer une clé API OpenAI valide",
+    configureAPIKey: "Configurer une clé API dans config.js",
+    useLocalModel: "Utiliser un modèle local (Ollama)",
+    refreshOllamaModels: "Rafraîchir la liste des modèles Ollama",
+    tryAgain: "Essayez à nouveau",
+    unexpectedError: "Une erreur inattendue s'est produite",
+    pullModel: "Téléchargez le modèle avec 'ollama pull [nom-du-modèle]'",
+    selectDifferentModel: "Sélectionnez un modèle différent",
+    modelMayBeLoading: "Le modèle est peut-être en cours de chargement",
+    checkOllamaMemory: "Vérifiez que votre système a suffisamment de mémoire",
+    pullModelManually: "Téléchargez un modèle manuellement avec 'ollama pull [nom-du-modèle]'",
+    checkOllamaVersion: "Vérifiez que vous utilisez la dernière version d'Ollama",
+    modelTooLarge: "Le modèle est peut-être trop volumineux pour votre système",
+    ollamaUnavailable: "Ollama non disponible",
+    noOllamaModels: "Aucun modèle Ollama disponible",
+    noOllamaModelsDetails: "Ollama est accessible mais aucun modèle n'est disponible",
+    selectModel: "Sélectionnez un modèle"
   }
 };
 

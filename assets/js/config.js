@@ -24,7 +24,7 @@ const SETTINGS = {
   DEFAULT_LANGUAGE: "fr",        // Langue par défaut
   DEFAULT_DECK: "set01",         // Jeu de cartes par défaut
   DEFAULT_SPREAD: "cross",       // Type de tirage par défaut
-  DEFAULT_MODEL: "mistral-small:latest", // Modèle d'IA par défaut (utilisation du modèle Ollama disponible)
+  DEFAULT_MODEL: "ollama:latest", // Modèle d'IA par défaut (utilise le dernier modèle disponible)
   
   // Paramètres d'interface
   HIDE_PROMPT: false,      // Masquer le prompt envoyé à l'IA
@@ -43,24 +43,55 @@ const API_URL_OLLAMA_TAGS = `${SETTINGS.OLLAMA_URL}/api/tags`;
 // Configuration des modèles Ollama
 const OLLAMA_MODEL_FORMATS = {
   // Format de réponse pour chaque famille de modèle
-  "llama": {
-    responseKey: "response"
-  },
+  // Chaque entrée contient:
+  // - pattern: expression régulière pour identifier le modèle
+  // - responseKey: chemin vers la réponse dans l'objet JSON
+  // - description: description du format pour le débogage
   "llama3.1": {
-    responseKey: "message.content"
+    pattern: /\bllama3\.1\b/i,
+    responseKey: "choices.0.message.content",
+    description: "Llama 3.1 (retourne choices[0].message.content)"
+  },
+  "llama3": {
+    pattern: /\bllama3\b(?!\.1)/i, // llama3 mais pas llama3.1
+    responseKey: "message.content",
+    description: "Llama 3 (retourne message.content)"
+  },
+  "llama2": {
+    pattern: /\bllama2\b/i,
+    responseKey: "response",
+    description: "Llama 2 (retourne response)"
+  },
+  "llama": {
+    pattern: /\bllama\b(?!2|3)/i, // llama mais pas llama2 ou llama3
+    responseKey: "response",
+    description: "Llama original (retourne response)"
   },
   "mistral": {
-    responseKey: "message.content"
+    pattern: /\bmistral\b/i,
+    responseKey: "message.content",
+    description: "Mistral (retourne message.content)"
+  },
+  "mixtral": {
+    pattern: /\bmixtral\b/i,
+    responseKey: "message.content",
+    description: "Mixtral (retourne message.content)"
   },
   "phi": {
-    responseKey: "response"
+    pattern: /\bphi\b/i,
+    responseKey: "response",
+    description: "Phi (retourne response)"
   },
   "gemma": {
-    responseKey: "response"
+    pattern: /\bgemma\b/i,
+    responseKey: "response",
+    description: "Gemma (retourne response)"
   },
   // Format par défaut si aucun match n'est trouvé
   "default": {
-    responseKey: "response"
+    pattern: null,
+    responseKey: "response",
+    description: "Format par défaut (retourne response)"
   }
 };
 
@@ -72,18 +103,27 @@ const OLLAMA_MODEL_FORMATS = {
 function getOllamaModelFormat(modelName) {
   if (!modelName) return OLLAMA_MODEL_FORMATS.default;
   
-  // Vérifier quelle famille de modèle correspond
-  const lowerModelName = modelName.toLowerCase();
+  // Normaliser le nom du modèle
+  const normalizedModelName = modelName.toLowerCase().trim();
   
+  // Vérifier chaque format dans l'ordre de priorité
   for (const [family, config] of Object.entries(OLLAMA_MODEL_FORMATS)) {
-    if (lowerModelName.includes(family)) {
-      if (DEBUG_LEVEL > 0) console.log(`🔍 DEBUG - Format détecté pour ${modelName}: ${family}`);
+    // Ignorer le format par défaut lors de la recherche
+    if (family === 'default') continue;
+    
+    // Vérifier si le pattern correspond
+    if (config.pattern && config.pattern.test(normalizedModelName)) {
+      if (DEBUG_LEVEL > 0) {
+        console.log(`🔍 DEBUG - Modèle "${modelName}" identifié comme "${family}" (${config.description})`);
+      }
       return config;
     }
   }
   
   // Si aucun match, retourner le format par défaut
-  if (DEBUG_LEVEL > 0) console.log(`🔍 DEBUG - Aucun format spécifique trouvé pour ${modelName}, utilisation du format par défaut`);
+  if (DEBUG_LEVEL > 0) {
+    console.log(`🔍 DEBUG - Aucun format spécifique trouvé pour "${modelName}", utilisation du format par défaut`);
+  }
   return OLLAMA_MODEL_FORMATS.default;
 }
 

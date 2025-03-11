@@ -4,8 +4,8 @@
 
 /* Variables spécifiques aux panneaux */
 :root {
-  --panel-height: 800px;
   --spread-width: 650px;
+  --spread-height: 800px;
 }
 
 /* Conteneur principal */
@@ -16,7 +16,7 @@
   margin: 0;
   padding: 0;
   gap: var(--spacing-lg);
-  align-items: stretch;
+  align-items: flex-start;
 }
 
 /* Zone de tirage - Panneau fixe à gauche */
@@ -24,8 +24,8 @@
   flex: 0 0 var(--spread-width);
   width: var(--spread-width);
   min-width: var(--spread-width);
-  height: var(--panel-height);
-  max-height: var(--panel-height);
+  height: var(--spread-height);
+  max-height: var(--spread-height);
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
@@ -43,8 +43,8 @@
 .interpretation-panel {
   flex: 1;
   min-width: 400px;
-  height: var(--panel-height);
-  max-height: var(--panel-height);
+  min-height: var(--spread-height);
+  height: auto;
   padding: var(--spacing-md);
   background-color: white;
   border-radius: var(--border-radius-md);
@@ -55,7 +55,6 @@
   margin: var(--spacing-lg) var(--spacing-lg) var(--spacing-xl) 0;
   z-index: 10;
   box-sizing: border-box;
-  overflow: hidden;
 }
 
 /* Titre de l'interprétation */
@@ -73,15 +72,20 @@
 /* Contenu de l'interprétation */
 .response-content {
   flex: 1;
-  overflow-y: auto;
   padding: var(--spacing-md);
   font-family: var(--font-family-special);
   line-height: var(--line-height-loose);
   position: relative;
   background-color: rgba(107, 91, 149, 0.02);
   margin: 0;
-  height: calc(100% - 60px); /* Hauteur totale moins la hauteur du titre */
+  height: 100%;
   box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Style pour la zone de défilement - activation uniquement si le contenu dépasse */
+.response-content.has-overflow {
+  overflow-y: auto;
 }
 
 /* Styles responsifs */
@@ -98,39 +102,30 @@
     max-width: var(--spread-width);
     min-width: var(--spread-width);
     margin: var(--spacing-lg) auto;
-    height: var(--panel-height);
-    max-height: var(--panel-height);
+    height: var(--spread-height);
+    max-height: var(--spread-height);
   }
   
   .interpretation-panel {
     width: 100%;
     min-width: 320px;
     margin: 0 auto var(--spacing-xl);
-    height: var(--panel-height);
-    max-height: var(--panel-height);
+    min-height: var(--spread-height);
+    height: auto;
   }
 }
 
 @media (max-width: 768px) {
   :root {
-    --panel-height: 700px;
+    --spread-height: 700px;
   }
   
   .spread-panel {
     width: 100%;
     max-width: 600px;
     min-width: 320px;
-    height: var(--panel-height);
-    max-height: var(--panel-height);
+    height: var(--spread-height);
+    max-height: var(--spread-height);
     margin: var(--spacing-lg) auto;
-  }
-  
-  .interpretation-panel {
-    padding: 0;
-    height: var(--panel-height);
-    max-height: var(--panel-height);
-    width: 100%;
-    min-width: 320px;
-    margin: 0 auto var(--spacing-xl);
   }
 } 
