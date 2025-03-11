@@ -285,7 +285,41 @@ class ReadingController {
       // Récupérer et valider la question
       const question = this.elements.questionInput.value.trim();
       if (!question) {
-        throw new Error(getTranslation('interpretation.error.noQuestion', currentLanguage));
+        // Rétablir l'état du bouton
+        this.elements.tirerButton.disabled = false;
+        this.elements.tirerButton.textContent = getTranslation('header.drawButton', currentLanguage);
+        this.elements.tirerButton.classList.remove('disabled');
+        
+        // Afficher un indicateur visuel sur le champ de question
+        this.elements.questionInput.classList.add('error-input');
+        this.elements.questionInput.focus();
+        
+        // Ajouter une animation de secousse au champ
+        this.elements.questionInput.animate([
+          { transform: 'translateX(0)' },
+          { transform: 'translateX(-5px)' },
+          { transform: 'translateX(5px)' },
+          { transform: 'translateX(-5px)' },
+          { transform: 'translateX(5px)' },
+          { transform: 'translateX(0)' }
+        ], {
+          duration: 500,
+          iterations: 1
+        });
+        
+        // Ajouter un placeholder temporaire qui indique l'erreur
+        const originalPlaceholder = this.elements.questionInput.placeholder;
+        this.elements.questionInput.placeholder = getTranslation('interpretation.error.noQuestion', currentLanguage);
+        
+        // Restaurer le placeholder après 3 secondes
+        setTimeout(() => {
+          this.elements.questionInput.classList.remove('error-input');
+          this.elements.questionInput.placeholder = originalPlaceholder;
+        }, 3000);
+        
+        // Toujours lancer l'erreur mais sans bloquer l'interface
+        console.error(getTranslation('interpretation.error.noQuestion', currentLanguage));
+        return; // Sortir sans lancer d'exception pour éviter le crash
       }
       
       // Mémoriser la question

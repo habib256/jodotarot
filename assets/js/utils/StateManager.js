@@ -150,7 +150,7 @@ class StateManager {
       }
     };
 
-    // État par défaut
+    // État par défaut initialisé mais sera remplacé par l'état restauré si disponible
     this.state = this.getDefaultState();
     
     // Écouteurs pour les changements d'état
@@ -159,12 +159,8 @@ class StateManager {
     // Version actuelle du schema d'état (pour migrations)
     this.STATE_VERSION = '1.0.0';
     
-    // Initialiser immédiatement l'état avec les valeurs par défaut
-    for (const [key, config] of Object.entries(this.schema)) {
-      if ('default' in config) {
-        this.state[key] = config.default;
-      }
-    }
+    // Ne pas initialiser immédiatement l'état ici, car cela sera fait dans initialize()
+    // qui restaurera d'abord l'état depuis localStorage si disponible
   }
 
   /**
@@ -175,7 +171,13 @@ class StateManager {
     return new Promise((resolve) => {
       try {
         // Restaurer l'état depuis localStorage
-        this.restoreState();
+        const restored = this.restoreState();
+        
+        // Si la restauration a échoué, s'assurer que les valeurs par défaut sont appliquées
+        if (!restored) {
+          console.log('🔄 Utilisation des valeurs par défaut pour l\'état');
+          // Pas besoin de réinitialiser this.state car il est déjà initialisé dans le constructeur
+        }
         
         // Émettre un événement indiquant que l'état est prêt
         document.dispatchEvent(new CustomEvent('stateManager:ready', {
@@ -187,7 +189,7 @@ class StateManager {
       } catch (error) {
         console.error('❌ Erreur d\'initialisation du StateManager:', error);
         // Résoudre quand même pour ne pas bloquer l'application
-        resolve(this.getDefaultState());
+        resolve(this.getState());
       }
     });
   }
@@ -485,6 +487,7 @@ class StateManager {
 
   /**
    * Persiste l'état actuel dans le localStorage
+   * @returns {boolean} Indique si la sauvegarde a réussi
    */
   persistState() {
     try {
@@ -499,10 +502,21 @@ class StateManager {
       const keysMissing = importantKeys.filter(key => !(key in stateToPersist));
       
       console.log('🔐 Persistance de l\'état dans localStorage:');
-      console.log('✅ Clés importantes sauvegardées:', keysPresent.map(key => `${key}: ${stateToPersist[key]}`));
+      
+      if (keysPresent.length > 0) {
+        const presentValues = keysPresent.map(key => `${key}: ${stateToPersist[key]}`);
+        console.log('✅ Clés importantes sauvegardées:', presentValues.join(', '));
+      }
       
       if (keysMissing.length > 0) {
-        console.warn('⚠️ Clés importantes manquantes:', keysMissing);
+        console.warn('⚠️ Clés importantes manquantes:', keysMissing.join(', '));
+        // Ne pas interrompre la sauvegarde pour des clés manquantes
+      }
+      
+      // Vérifier que l'état n'est pas vide
+      if (Object.keys(stateToPersist).length === 0) {
+        console.warn('⚠️ Tentative de sauvegarde d\'un état vide');
+        return false;
       }
       
       // Convertir les types spéciaux pour la sérialisation
@@ -522,14 +536,30 @@ class StateManager {
         throw new Error(`L'état est trop volumineux pour être sauvegardé (${Math.round(stateSize / 1024)}KB > ${Math.round(SIZE_LIMIT / 1024)}KB)`);
       }
       
+      // Sauvegarde dans localStorage
       localStorage.setItem('jodotarot_state', stateString);
+      
+      // Vérification que les données ont bien été sauvegardées
+      const savedState = localStorage.getItem('jodotarot_state');
+      if (!savedState) {
+        console.error('❌ Erreur: État non trouvé dans localStorage après sauvegarde');
+        return false;
+      }
+      
       console.log('✅ État sauvegardé dans localStorage avec succès');
+      
+      // Vérifier la taille sauvegardée
+      const savedSize = new Blob([savedState]).size;
+      console.log(`📊 Taille de l'état sauvegardé: ${Math.round(savedSize / 1024)}KB`);
+      
+      return true;
     } catch (error) {
       console.error('❌ Erreur lors de la sauvegarde de l\'état:', error);
       // Émettre un événement d'erreur
       document.dispatchEvent(new CustomEvent('stateManager:error', {
         detail: { error: error.message }
       }));
+      return false;
     }
   }
 
@@ -547,20 +577,38 @@ class StateManager {
       
       console.log('🔄 Restauration de l\'état depuis localStorage...');
       
-      const parsed = JSON.parse(savedState);
-      const version = parsed.version || '0.0.0';
-      
-      // Vérifier la version pour les migrations
-      if (version !== this.STATE_VERSION) {
-        console.log(`⚠️ Migration d'état nécessaire: ${version} -> ${this.STATE_VERSION}`);
-        const migratedData = this.migrateState(version, parsed.data);
-        this.applyRestoredState(migratedData);
-      } else {
-        console.log('✅ Version de l\'état compatible, restauration directe');
-        this.applyRestoredState(parsed.data);
+      try {
+        const parsed = JSON.parse(savedState);
+        if (!parsed || !parsed.data) {
+          console.warn('⚠️ Format d\'état invalide dans localStorage:', savedState);
+          return false;
+        }
+        
+        const version = parsed.version || '0.0.0';
+        
+        // Vérifier la version pour les migrations
+        if (version !== this.STATE_VERSION) {
+          console.log(`⚠️ Migration d'état nécessaire: ${version} -> ${this.STATE_VERSION}`);
+          const migratedData = this.migrateState(version, parsed.data);
+          this.applyRestoredState(migratedData);
+          
+          // Log des données après migration pour débogage
+          console.log('📊 État après migration:', this.state);
+        } else {
+          console.log('✅ Version de l\'état compatible, restauration directe');
+          this.applyRestoredState(parsed.data);
+          
+          // Log des données restaurées pour débogage
+          console.log('📊 État restauré:', this.state);
+        }
+        
+        return true;
+      } catch (parseError) {
+        console.error('❌ Erreur lors du parsing de l\'état sauvegardé:', parseError);
+        // Supprimer l'état corrompu du localStorage
+        localStorage.removeItem('jodotarot_state');
+        return false;
       }
-      
-      return true;
     } catch (error) {
       console.error('❌ Erreur lors de la restauration de l\'état:', error);
       // En cas d'erreur, continuer avec l'état par défaut
@@ -588,24 +636,41 @@ class StateManager {
       const missingKeys = importantKeys.filter(key => !(key in deserialized));
       
       console.log('🔄 Restauration des clés importantes:');
-      console.log('✅ Clés restaurées:', restoredKeys.map(key => `${key}: ${deserialized[key]}`));
+      
+      if (restoredKeys.length > 0) {
+        const restoredValues = restoredKeys.map(key => `${key}: ${deserialized[key]}`);
+        console.log('✅ Clés restaurées:', restoredValues.join(', '));
+      } else {
+        console.warn('⚠️ Aucune clé importante trouvée dans les données restaurées');
+      }
       
       if (missingKeys.length > 0) {
-        console.warn('⚠️ Clés importantes non restaurées (valeurs par défaut):', missingKeys);
+        console.warn('⚠️ Clés importantes non restaurées (valeurs par défaut):', missingKeys.join(', '));
       }
+      
+      // Créer un nouvel état qui combine les valeurs par défaut avec les valeurs restaurées
+      const newState = this.getDefaultState();
+      let appliedCount = 0;
       
       // Appliquer l'état désérialisé
       for (const [key, value] of Object.entries(deserialized)) {
         // Valider chaque valeur avant de l'appliquer
         const validation = this.validateValue(key, value);
         if (validation.isValid) {
-          this.state[key] = validation.value;
+          newState[key] = validation.value;
+          appliedCount++;
         } else {
           console.warn(`⚠️ Valeur invalide pour ${key}, utilisation de la valeur par défaut`);
         }
       }
       
-      console.log('✅ État restauré avec succès');
+      // Remplacer complètement l'état actuel par le nouvel état
+      this.state = newState;
+      
+      console.log(`✅ État restauré avec succès: ${appliedCount} valeurs appliquées`);
+      
+      // Forcer la persistance pour s'assurer que l'état est correctement sauvegardé
+      setTimeout(() => this.persistState(), 100);
     } catch (error) {
       console.error('❌ Erreur lors de l\'application de l\'état restauré:', error);
     }

@@ -79,13 +79,10 @@
 
 /* Style pour l'indicateur de modèle actif */
 .status-indicator {
-  background-color: #e2e3ff;
-  border: 1px solid #d1d1ff;
-  color: #4b4ba3;
-  text-align: center;
-  font-weight: 500;
-  margin-top: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 8px 12px;
+  margin: 8px 0;
+  border-radius: 4px;
+  display: none;
 }
 
 /* Style pour l'indicateur de génération en cours */
@@ -108,7 +105,50 @@
 }
 
 @keyframes pulse {
-  0% { opacity: 0.7; }
+  0% { opacity: 0.6; }
   50% { opacity: 1; }
-  100% { opacity: 0.7; }
+  100% { opacity: 0.6; }
+}
+
+#generation-indicator::before {
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #2196F3;
+  margin-right: 8px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+/* Style d'erreur pour les champs d'entrée */
+.error-input {
+  border: 1px solid #F44336 !important;
+  box-shadow: 0 0 4px rgba(244, 67, 54, 0.5) !important;
+  background-color: rgba(244, 67, 54, 0.05) !important;
+}
+
+/* Style pour messages de différents types */
+.success-message {
+  border-left: 3px solid #4CAF50;
+  background-color: rgba(76, 175, 80, 0.1);
+  color: #2E7D32;
+}
+
+.info-message {
+  border-left: 3px solid #2196F3;
+  background-color: rgba(33, 150, 243, 0.1);
+  color: #1565C0;
+}
+
+.warning-message {
+  border-left: 3px solid #FFC107;
+  background-color: rgba(255, 193, 7, 0.1);
+  color: #F57F17;
+}
+
+.error-message {
+  border-left: 3px solid #F44336;
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #C62828;
 } 
