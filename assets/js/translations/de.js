@@ -18,7 +18,8 @@ const de = {
     questionPlaceholder: "Gib deine Frage für diese Lesung ein...",
     drawButton: "Karten ziehen",
     drawButtonGenerating: "Generierung läuft... Bitte warten",
-    streamingOption: "Live-Antwort:"
+    streamingOption: "Live-Antwort:",
+    stopGeneration: "Generierung stoppen"
   },
   
   // Messages d'interprétation

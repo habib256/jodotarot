@@ -18,7 +18,8 @@ const it = {
     questionPlaceholder: "Inserisci la tua domanda per questa lettura...",
     drawButton: "Pesca le carte",
     drawButtonGenerating: "Generazione in corso... Attendere prego",
-    streamingOption: "Risposta in diretta:"
+    streamingOption: "Risposta in diretta:",
+    stopGeneration: "Ferma generazione"
   },
   
   // Messages d'interprétation

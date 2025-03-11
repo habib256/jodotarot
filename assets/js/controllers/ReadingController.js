@@ -98,11 +98,17 @@ class ReadingController {
       this.updateSpreadDisplay(spreadType);
     });
     
-    // Écouter les changements de langue pour mettre à jour les positions des cartes
+    // Écouter les changements de langue pour mettre à jour les positions des cartes et le texte du bouton d'arrêt de génération
     document.addEventListener('language:changed', (event) => {
       console.log(`🔤 Changement de langue détecté: ${event.detail.language}`);
       // Réinitialiser tous les tirages avec la nouvelle langue
       this.initializeAllSpreads();
+      
+      // Mettre à jour le texte du bouton d'arrêt de génération
+      const stopGenerationText = document.getElementById('stop-generation-text');
+      if (stopGenerationText) {
+        stopGenerationText.textContent = getTranslation('header.stopGeneration', event.detail.language);
+      }
     });
     
     // Autres écouteurs d'événements existants
@@ -503,6 +509,13 @@ class ReadingController {
         // Extraire et afficher le nom du modèle
         const modelDisplayName = model.replace('ollama:', '').replace('openai/', '');
         modelNameSpan.textContent = modelDisplayName;
+        
+        // Mettre à jour le texte du bouton d'arrêt avec la traduction
+        const stopGenerationText = generationIndicator.querySelector('#stop-generation-text');
+        if (stopGenerationText) {
+          stopGenerationText.textContent = getTranslation('header.stopGeneration', language);
+        }
+        
         generationIndicator.style.display = 'block';
       }
       

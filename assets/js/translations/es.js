@@ -18,7 +18,8 @@ const es = {
     questionPlaceholder: "Introduce tu pregunta para esta lectura...",
     drawButton: "Tirar las cartas",
     drawButtonGenerating: "Generando... Por favor espera",
-    streamingOption: "Respuesta en vivo:"
+    streamingOption: "Respuesta en vivo:",
+    stopGeneration: "Detener generación"
   },
   
   // Messages d'interprétation

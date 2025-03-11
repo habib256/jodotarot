@@ -18,7 +18,8 @@ const zh = {
     questionPlaceholder: "输入您对此次塔罗牌阅读的问题...",
     drawButton: "抽牌",
     drawButtonGenerating: "生成中...请稍候",
-    streamingOption: "实时回应:"
+    streamingOption: "实时回应:",
+    stopGeneration: "停止生成"
   },
   
   // Messages d'interprétation

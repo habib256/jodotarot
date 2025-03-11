@@ -18,7 +18,8 @@ const en = {
     questionPlaceholder: "Enter your question for this reading...",
     drawButton: "Draw Cards",
     drawButtonGenerating: "Generation in progress... Please wait",
-    streamingOption: "Live Response:"
+    streamingOption: "Live Response:",
+    stopGeneration: "Stop Generation"
   },
   
   // Interpretation messages
