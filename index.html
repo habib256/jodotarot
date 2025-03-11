@@ -89,7 +89,6 @@
             <option value="openai/gpt-4o">GPT-4o</option>
           </optgroup>
         </select>
-        <div id="status-message" style="display: none; margin-top: 5px; padding: 5px; border-radius: 4px; font-size: 0.9em;"></div>
       </div>
     </div>
     
@@ -108,6 +107,12 @@
       </div>
       <div class="controls-container">
         <button id="tirer" class="primary-button">Tirer les cartes</button>
+        <div id="status-message" style="display: none; margin-top: 5px; padding: 5px; border-radius: 4px; font-size: 0.9em;"></div>
+      </div>
+      <!-- Nouvel indicateur de génération en cours -->
+      <div id="generation-indicator" class="generation-indicator" style="display: none;">
+        <span class="generation-text">Génération en cours avec le modèle</span>
+        <span class="model-name"></span>
       </div>
     </div>
   </div>

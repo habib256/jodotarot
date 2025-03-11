@@ -271,6 +271,15 @@ class ReadingController {
       this.elements.tirerButton.textContent = getTranslation('header.drawButtonGenerating', currentLanguage);
       this.elements.tirerButton.classList.add('disabled');
       
+      // Ne plus afficher le message de statut du modèle actif
+      // Le statut est maintenant géré différemment
+      
+      // S'assurer que l'indicateur de génération est masqué au début du tirage
+      const generationIndicator = document.getElementById('generation-indicator');
+      if (generationIndicator) {
+        generationIndicator.style.display = 'none';
+      }
+      
       let deck = this.deckService.getCurrentDeck();
       
       // Récupérer et valider la question
@@ -377,6 +386,12 @@ class ReadingController {
       this.elements.tirerButton.textContent = getTranslation('header.drawButton', currentLanguage);
       this.elements.tirerButton.classList.remove('disabled');
       
+      // Masquer le message de statut en cas d'erreur
+      const statusMessage = document.getElementById('status-message');
+      if (statusMessage) {
+        statusMessage.style.display = 'none';
+      }
+      
       // Afficher l'erreur à l'utilisateur
       this.elements.responseContent.innerHTML = `<p class="error">${error.message}</p>`;
     }
@@ -416,6 +431,18 @@ class ReadingController {
       
       // Variables pour l'effet de machine à écrire
       this.fullText = '';
+      this.currentCharIndex = 0;
+      this.isTyping = false;
+      
+      // Afficher l'indicateur de génération en cours
+      const generationIndicator = document.getElementById('generation-indicator');
+      const modelNameSpan = generationIndicator.querySelector('.model-name');
+      if (generationIndicator && modelNameSpan) {
+        // Extraire et afficher le nom du modèle
+        const modelDisplayName = model.replace('ollama:', '').replace('openai/', '');
+        modelNameSpan.textContent = modelDisplayName;
+        generationIndicator.style.display = 'block';
+      }
       
       // Obtenir une interprétation avec streaming et effet de machine à écrire
       const handleChunk = (chunk) => {
@@ -468,9 +495,20 @@ class ReadingController {
       if (typewriterElement) {
         typewriterElement.classList.add('generation-complete');
       }
+      
+      // Masquer l'indicateur de génération une fois l'interprétation terminée
+      if (generationIndicator) {
+        generationIndicator.style.display = 'none';
+      }
     } catch (error) {
       console.error("Erreur lors de l'obtention de l'interprétation:", error);
       this.elements.responseContent.innerHTML = `<p class="error">Erreur lors de l'interprétation: ${error.message}</p>`;
+      
+      // Masquer l'indicateur de génération en cas d'erreur
+      const generationIndicator = document.getElementById('generation-indicator');
+      if (generationIndicator) {
+        generationIndicator.style.display = 'none';
+      }
     }
   }
   

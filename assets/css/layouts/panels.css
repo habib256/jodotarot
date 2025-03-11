@@ -116,9 +116,7 @@
 }
 
 @media (max-width: 768px) {
-  :root {
-    --spread-height: 700px;
-  }
+  /* Nous utilisons les variables définies dans variables.css */
   
   .spread-panel {
     width: 100%;

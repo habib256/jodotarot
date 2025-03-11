@@ -68,14 +68,14 @@ class UIService {
    * @param {Object} state - État actuel
    */
   updateStatusIndicators(state) {
-    // Mettre à jour les indicateurs de statut (connexion IA, etc.)
-    const statusMessage = document.getElementById('status-message');
-    if (statusMessage && state.iaModel) {
-      // Afficher l'indicateur du modèle actif
-      const modelType = state.iaModel.startsWith('openai/') ? 'OpenAI' : 'Ollama';
-      statusMessage.textContent = `Modèle actif: ${modelType}`;
-      statusMessage.style.display = 'block';
-      statusMessage.className = 'status-indicator';
+    // Nous ne voulons plus afficher l'indicateur de modèle actif
+    // Le message "status-message" a été supprimé de la vue
+    
+    // Nous conservons uniquement la référence au message pour d'autres usages potentiels
+    let statusMessage = document.getElementById('status-message');
+    if (statusMessage) {
+      // Masquer complètement le message de statut
+      statusMessage.style.display = 'none';
     }
   }
   

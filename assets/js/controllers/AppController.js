@@ -78,7 +78,8 @@ class AppController {
     
     this.configController = new ConfigController(
       this.stateManager,
-      this.aiService
+      this.aiService,
+      this.uiService
     );
   }
   

@@ -1,7 +1,11 @@
 /**
  * Variables globales pour JodoTarot
  * Définit les couleurs, tailles, espacements et autres valeurs réutilisables
- * Source unique de vérité pour toutes les constantes de design
+ * SOURCE UNIQUE DE VÉRITÉ pour toutes les constantes de design
+ * 
+ * IMPORTANT: Ne pas redéfinir ces variables dans d'autres fichiers CSS !
+ * Toutes modifications de dimensions, couleurs ou autres constantes
+ * doivent être faites uniquement dans ce fichier.
  */
 
 :root {
@@ -79,8 +83,8 @@
   /* Dimensions des cartes */
   --card-width: 100px;        /* Largeur standard des cartes de tarot */
   --card-height: 170px;       /* Hauteur standard (ratio ~1:1.7) */
-  --card-width-large: 160px;  /* Largeur des cartes agrandies */
-  --card-height-large: 300px; /* Hauteur des cartes agrandies */
+  --card-width-large: 180px;  /* Largeur des cartes agrandies */
+  --card-height-large: 306px; /* Hauteur des cartes agrandies */
   
   /* Dimensions du conteneur de tirage */
   --spread-width: 650px;      /* Largeur de l'espace de tirage */

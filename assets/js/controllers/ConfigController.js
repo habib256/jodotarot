@@ -12,10 +12,12 @@ class ConfigController {
   /**
    * @param {StateManager} stateManager - Instance du gestionnaire d'état
    * @param {AIService} aiService - Service IA pour tester la connectivité
+   * @param {UIService} uiService - Service UI pour les mises à jour d'interface
    */
-  constructor(stateManager, aiService) {
+  constructor(stateManager, aiService, uiService) {
     this.stateManager = stateManager;
     this.aiService = aiService;
+    this.uiService = uiService;
     
     // Éléments DOM
     this.elements = {
@@ -125,70 +127,96 @@ class ConfigController {
   }
   
   /**
-   * Gère le changement de langue
+   * Change la langue de l'application
    * @param {Event} event - Événement de changement
    */
   handleLanguageChange(event) {
     const language = event.target.value;
-    
-    // Mettre à jour l'état via StateManager uniquement
-    this.stateManager.setState({ language });
-    
-    // Mettre à jour l'interface avec les traductions
-    this.updateUILanguage(language);
-    
-    // Re-tester la connectivité avec les nouveaux textes
-    this.testModelConnectivity();
+    try {
+      // Annuler toute génération en cours
+      if (this.aiService && this.aiService.cancelCurrentInterpretation()) {
+        console.log('Génération annulée suite au changement de langue');
+      }
+      
+      // Mettre à jour l'état
+      this.stateManager.setState({ language });
+      
+      // Mettre à jour l'interface
+      this.updateUILanguage(language);
+      
+      console.log(`✅ Langue changée pour: ${language}`);
+    } catch (error) {
+      console.error("Erreur lors du changement de langue:", error);
+    }
   }
   
   /**
-   * Gère le changement de persona
+   * Change le persona utilisé pour les interprétations
    * @param {Event} event - Événement de changement
    */
   handlePersonaChange(event) {
     const persona = event.target.value;
-    
-    // Mettre à jour l'état via StateManager uniquement
-    this.stateManager.setState({ persona });
-    
-    // Les mises à jour visuelles seront gérées par les écouteurs d'événements
+    try {
+      // Annuler toute génération en cours
+      if (this.aiService && this.aiService.cancelCurrentInterpretation()) {
+        console.log('Génération annulée suite au changement de persona');
+      }
+      
+      // Mettre à jour l'état
+      this.stateManager.setState({ persona });
+      
+      // Mettre à jour l'interface
+      this.updatePersonaLogo(persona);
+      
+      console.log(`✅ Persona changé pour: ${persona}`);
+    } catch (error) {
+      console.error("Erreur lors du changement de persona:", error);
+    }
   }
   
   /**
-   * Gère le changement de jeu de cartes
+   * Change le jeu de cartes utilisé
    * @param {Event} event - Événement de changement
    */
   handleCardSetChange(event) {
     const cardSet = event.target.value;
-    
-    // Ajouter du débogage
-    console.log(`🃏 Changement de jeu de cartes: ${cardSet}`);
-    
-    // Mettre à jour l'état via StateManager uniquement
-    this.stateManager.setState({ cardSet });
-    
-    // Vérifier si CardSet et DeckId sont synchronisés
-    console.log(`🔄 État après mise à jour - cardSet: ${this.stateManager.state.cardSet}, deckId: ${this.stateManager.state.deckId}`);
-    
-    // Nous devrions aussi mettre à jour deckId pour être cohérent
-    if (this.stateManager.state.deckId !== cardSet) {
-      console.log(`⚠️ Synchronisation deckId avec cardSet: ${cardSet}`);
-      this.stateManager.setState({ deckId: cardSet });
+    try {
+      // Annuler toute génération en cours
+      if (this.aiService && this.aiService.cancelCurrentInterpretation()) {
+        console.log('Génération annulée suite au changement de jeu de cartes');
+      }
+      
+      // Mettre à jour l'état
+      this.stateManager.setState({ cardSet });
+      
+      console.log(`✅ Jeu de cartes changé pour: ${cardSet}`);
+      
+      // Émettre un événement pour notifier le changement de jeu
+      document.dispatchEvent(new CustomEvent('deckId:changed', { detail: { deckId: cardSet } }));
+    } catch (error) {
+      console.error("Erreur lors du changement de jeu de cartes:", error);
     }
-    
-    // Réinitialiser l'affichage du tirage aux positions par défaut
-    resetAllDisplays();
   }
   
   /**
-   * Gère le changement de type de tirage
+   * Change le type de tirage
    * @param {Event} event - Événement de changement
    */
   handleSpreadTypeChange(event) {
     const spreadType = event.target.value;
-    
-    // Mettre à jour l'état via StateManager uniquement
-    this.stateManager.setState({ spreadType });
+    try {
+      // Annuler toute génération en cours
+      if (this.aiService && this.aiService.cancelCurrentInterpretation()) {
+        console.log('Génération annulée suite au changement de type de tirage');
+      }
+      
+      // Mettre à jour l'état
+      this.stateManager.setState({ spreadType });
+      
+      console.log(`✅ Type de tirage changé pour: ${spreadType}`);
+    } catch (error) {
+      console.error("Erreur lors du changement de type de tirage:", error);
+    }
   }
   
   /**
@@ -201,6 +229,11 @@ class ConfigController {
     
     if (iaModel === previousModel) {
       return; // Pas de changement, ne rien faire
+    }
+    
+    // Annuler toute génération en cours
+    if (this.aiService && this.aiService.cancelCurrentInterpretation()) {
+      console.log('Génération annulée suite au changement de modèle d\'IA');
     }
     
     // Nettoyer les avertissements précédents
@@ -223,7 +256,14 @@ class ConfigController {
       if (modelTest.available) {
         // Le modèle est disponible, mettre à jour l'état
         this.stateManager.setState({ iaModel });
-        this.showTemporaryMessage(`Modèle ${iaModel} activé avec succès`, 'success');
+        
+        // Ne plus afficher le message de modèle actif
+        // Mais nous gardons la mise à jour du statut qui peut avoir d'autres effets
+        if (this.uiService) {
+          this.uiService.updateStatusIndicators(this.stateManager.getState());
+        } else {
+          console.warn("uiService n'est pas défini lors de la mise à jour des indicateurs de statut");
+        }
       } else {
         // Le modèle n'est pas disponible, annuler le changement
         console.warn(`Modèle ${iaModel} non disponible:`, modelTest);
@@ -237,7 +277,7 @@ class ConfigController {
       console.error(`Erreur lors du test du modèle ${iaModel}:`, error);
       this.elements.iaModelSelect.value = previousModel;
       
-      // Afficher l'erreur dans le conteneur d'avertissement au lieu d'un message temporaire
+      // Afficher l'erreur dans le conteneur d'avertissement
       this.showModelWarning({
         title: 'Erreur de changement de modèle',
         message: `${error.message}`,
@@ -1103,16 +1143,11 @@ class ConfigController {
     if (!messageElement) {
       messageElement = document.createElement('div');
       messageElement.id = 'status-message';
-      messageElement.style.display = 'none';
-      messageElement.style.marginTop = '5px';
-      messageElement.style.padding = '5px';
-      messageElement.style.borderRadius = '4px';
-      messageElement.style.fontSize = '0.9em';
       
-      // Ajouter l'élément après le sélecteur de modèle
-      const modelSelect = document.getElementById('ia-model');
-      if (modelSelect && modelSelect.parentNode) {
-        modelSelect.parentNode.appendChild(messageElement);
+      // Placer le message sous le bouton "Tirer les cartes" dans le controls-container
+      const controlsContainer = document.querySelector('.controls-container');
+      if (controlsContainer) {
+        controlsContainer.appendChild(messageElement);
       } else {
         // Fallback: ajouter au corps du document
         document.body.appendChild(messageElement);
@@ -1121,13 +1156,15 @@ class ConfigController {
     
     // Définir le contenu et le style
     messageElement.textContent = message;
-    messageElement.className = `${type}-message`;
+    messageElement.className = `${type}-message status-indicator`;
     messageElement.style.display = 'block';
     
-    // Masquer après la durée spécifiée
-    setTimeout(() => {
-      messageElement.style.display = 'none';
-    }, duration);
+    // Ne plus masquer automatiquement après la durée spécifiée pour les messages de succès du modèle
+    if (type !== 'success' || !message.includes('Modèle') || !message.includes('activé avec succès')) {
+      setTimeout(() => {
+        messageElement.style.display = 'none';
+      }, duration);
+    }
   }
   
   /**

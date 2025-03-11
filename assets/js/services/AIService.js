@@ -27,6 +27,26 @@ class AIService {
     
     // Cache pour les résultats d'interprétation
     this.interpreterCache = {};
+    
+    // AbortController pour pouvoir annuler les requêtes en cours
+    this.currentController = null;
+    
+    // Flag indiquant si une génération est en cours
+    this.isGenerating = false;
+  }
+  
+  /**
+   * Annule l'interprétation en cours si elle existe
+   */
+  cancelCurrentInterpretation() {
+    if (this.currentController && this.isGenerating) {
+      console.log('Annulation de l\'interprétation en cours...');
+      this.currentController.abort();
+      this.currentController = null;
+      this.isGenerating = false;
+      return true;
+    }
+    return false;
   }
   
   /**
@@ -278,46 +298,69 @@ class AIService {
    * @return {Promise<string>} L'interprétation du tirage
    */
   async getInterpretation(reading, question, persona, model, language = 'fr', spreadType = 'cross', onChunk = null) {
-    // Vérifier les paramètres essentiels
-    if (!reading || !reading.length || !question.trim()) {
-      throw new Error('Les cartes et la question sont requises pour l\'interprétation');
-    }
-    
-    const systemPrompts = this.buildSystemPrompts(persona, language, spreadType);
-    const prompt = this.buildPrompt(reading, question, language, spreadType);
-    
-    // Afficher uniquement le prompt final
-    if (this.debugMode) {
-      // Construire le prompt complet comme il sera envoyé à l'IA
-      const fullPrompt = `${systemPrompts.join('\n\n')}\n\n${prompt}`;
+    try {
+      // Annuler toute interprétation en cours
+      this.cancelCurrentInterpretation();
       
-      console.log('📨 PROMPT FINAL ENVOYÉ À L\'IA:');
-      console.log(fullPrompt);
+      // Créer un nouvel AbortController
+      this.currentController = new AbortController();
+      this.isGenerating = true;
       
-      // Afficher des informations supplémentaires sur le persona si possible
-      if (PERSONAS[persona]) {
-        const personaInstance = new PERSONAS[persona](language);
-        console.log(`🧙‍♂️ Persona: ${personaInstance.getName()}`);
-        console.log(`📝 Description: ${personaInstance.getDescription()}`);
-        console.log(`🔮 Spécialisations: ${personaInstance.getSpecializations().join(', ')}`);
+      // Vérifier les paramètres essentiels
+      if (!reading || !reading.length || !question.trim()) {
+        throw new Error('Les cartes et la question sont requises pour l\'interprétation');
       }
-    }
-    
-    // Si un callback de streaming est fourni, utiliser le mode streaming
-    if (onChunk && typeof onChunk === 'function') {
+      
+      const systemPrompts = this.buildSystemPrompts(persona, language, spreadType);
+      const prompt = this.buildPrompt(reading, question, language, spreadType);
+      
+      // Afficher uniquement le prompt final
+      if (this.debugMode) {
+        // Construire le prompt complet comme il sera envoyé à l'IA
+        const fullPrompt = `${systemPrompts.join('\n\n')}\n\n${prompt}`;
+        
+        console.log('📨 PROMPT FINAL ENVOYÉ À L\'IA:');
+        console.log(fullPrompt);
+        
+        // Afficher des informations supplémentaires sur le persona si possible
+        if (PERSONAS[persona]) {
+          const personaInstance = new PERSONAS[persona](language);
+          console.log(`🧙‍♂️ Persona: ${personaInstance.getName()}`);
+          console.log(`📝 Description: ${personaInstance.getDescription()}`);
+          console.log(`🔮 Spécialisations: ${personaInstance.getSpecializations().join(', ')}`);
+        }
+      }
+      
+      // Obtenir la réponse selon le type de modèle (OpenAI ou Ollama)
+      let response;
       if (model.startsWith('openai/')) {
-        // OpenAI ne supporte pas facilement le streaming dans cette implémentation
-        return this.getOpenAIResponse(prompt, systemPrompts, model.replace('openai/', ''));
+        response = await this.getOpenAIResponse(prompt, systemPrompts, model.replace('openai/', ''));
       } else {
-        return this.getOllamaStreamingResponse(prompt, systemPrompts, model, onChunk);
+        // Si un callback de streaming est fourni, utiliser le streaming pour Ollama
+        if (onChunk && typeof onChunk === 'function') {
+          try {
+            response = await this.getOllamaStreamingResponse(prompt, systemPrompts, model, onChunk, this.currentController.signal);
+          } catch (error) {
+            // Si l'erreur est due à une annulation, ne pas rejeter mais retourner
+            if (error.name === 'AbortError') {
+              console.log('Interprétation annulée par l\'utilisateur');
+              this.isGenerating = false;
+              return "";
+            }
+            throw error;
+          }
+        } else {
+          response = await this.getOllamaResponse(prompt, systemPrompts, model);
+        }
       }
-    } else {
-      // Mode standard sans streaming
-      if (model.startsWith('openai/')) {
-        return this.getOpenAIResponse(prompt, systemPrompts, model.replace('openai/', ''));
-      } else {
-        return this.getOllamaResponse(prompt, systemPrompts, model);
-      }
+      
+      // Marquer la génération comme terminée
+      this.isGenerating = false;
+      return response;
+    } catch (error) {
+      this.isGenerating = false;
+      console.error("Erreur lors de l'obtention de l'interprétation:", error);
+      throw error;
     }
   }
   
@@ -557,83 +600,128 @@ class AIService {
   }
   
   /**
-   * Obtient une réponse en streaming d'Ollama
-   * @param {string} prompt - Le prompt principal
-   * @param {Array} systemPrompts - Les prompts système
-   * @param {string} model - Le modèle Ollama à utiliser
-   * @param {Function} onChunk - Callback appelé pour chaque fragment de réponse
-   * @return {Promise<string>} La réponse complète
+   * Obtient une réponse en streaming du modèle Ollama
+   * @param {string} prompt - Prompt à envoyer
+   * @param {Array} systemPrompts - Prompts système
+   * @param {string} model - Modèle Ollama à utiliser
+   * @param {Function} onChunk - Fonction de callback pour chaque morceau de réponse
+   * @param {AbortSignal} signal - Signal d'annulation
+   * @returns {Promise<string>} Réponse complète
    */
-  async getOllamaStreamingResponse(prompt, systemPrompts, model, onChunk) {
-    // Construction du payload pour l'API chat
-    const systemContent = systemPrompts.join('\n');
-    const payload = {
-      model: model.replace('ollama:', ''), // Supprimer le préfixe "ollama:" si présent
+  async getOllamaStreamingResponse(prompt, systemPrompts, model, onChunk, signal) {
+    // Utilisation du modèle sans préfixe
+    const modelName = model.replace('ollama:', '');
+    // Obtenir les informations de format mais n'utiliser que le nom du modèle pour la requête
+    const modelFormat = getOllamaModelFormat(modelName);
+    
+    // Construire le corps de la requête selon le format attendu par Ollama
+    const body = {
+      // CORRECTION: Utiliser simplement le nom du modèle comme chaîne de caractères
+      model: modelName,
       messages: [
-        { role: 'system', content: systemContent },
-        { role: 'user', content: prompt }
+        // Ajouter les prompts système comme messages de l'assistant
+        ...systemPrompts.map(systemPrompt => ({
+          role: "system",
+          content: systemPrompt
+        })),
+        // Ajouter le prompt principal comme message de l'utilisateur
+        {
+          role: "user",
+          content: prompt
+        }
       ],
       stream: true
     };
     
-    console.log("🔍 DEBUG getOllamaStreamingResponse - Payload:", JSON.stringify(payload, null, 2));
-    
     try {
-      // Obtenir le format de réponse pour ce modèle
-      const modelNameWithoutPrefix = model.replace('ollama:', '');
-      const modelFormat = getOllamaModelFormat(modelNameWithoutPrefix);
-      const responseKey = modelFormat.responseKey || "message.content";
-      
       if (this.debugMode) {
-        console.log(`🔍 DEBUG getOllamaStreamingResponse - Format détecté pour ${modelNameWithoutPrefix}: ${modelFormat.description || responseKey}`);
+        console.log(`🔄 Envoi de la requête en streaming à Ollama (${modelName})`);
       }
       
-      // Utiliser fetchWithRetry pour une meilleure résilience
-      const response = await this.fetchWithRetry(
-        API_URL_OLLAMA, 
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+      // Vérifier que le callback est bien une fonction
+      if (typeof onChunk !== 'function') {
+        throw new Error("Le callback onChunk doit être une fonction");
+      }
+      
+      // Options de la requête
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
         },
-        2,  // maxRetries
-        20000  // timeoutMs: 20 secondes
-      );
+        body: JSON.stringify(body),
+        signal // Utiliser le signal d'annulation
+      };
       
-      console.log("🔍 DEBUG getOllamaStreamingResponse - Statut réponse:", response.status);
+      // Effectuer la requête
+      const response = await fetch(API_URL_OLLAMA, options);
       
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(`Erreur Ollama [${response.status}]: ${errorData}`);
+      }
+      
+      // Initialiser le lecteur de flux
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
-      let fullResponse = '';
+      let completeResponse = '';
       
+      // Lire le flux de réponse
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         
-        const chunk = decoder.decode(value);
+        // Convertir les données binaires en texte
+        const chunk = decoder.decode(value, { stream: true });
+        
+        // Traiter les lignes JSON individuelles
         const lines = chunk.split('\n').filter(line => line.trim() !== '');
         
         for (const line of lines) {
           try {
+            // Analyser chaque ligne comme un objet JSON
             const data = JSON.parse(line);
             
-            // Utiliser la méthode centralisée pour extraire le contenu
-            const responseContent = this.extractResponseContent(data, responseKey, modelNameWithoutPrefix);
+            // Extraire le contenu selon le format du modèle
+            let content = '';
             
-            if (responseContent) {
-              onChunk(responseContent);
-              fullResponse += responseContent;
+            // Essayer d'abord le format détecté pour le modèle
+            if (modelFormat && modelFormat.responseKey) {
+              // Utiliser la méthode extractResponseContent avec le format approprié
+              content = this.extractResponseContent(data, modelFormat.responseKey, modelName);
             }
-          } catch (e) {
-            console.warn('Erreur de parsing JSON:', e);
+            
+            // Si rien n'a été trouvé avec le format spécifique, essayer les formats courants
+            if (!content && data.message && data.message.content) {
+              content = data.message.content;
+            } else if (!content && data.response) {
+              content = data.response;
+            }
+            
+            // Si du contenu a été trouvé, le traiter
+            if (content) {
+              // Ajouter ce morceau à la réponse complète
+              completeResponse += content;
+              
+              // Appeler le callback avec ce morceau
+              onChunk(content);
+            }
+          } catch (error) {
+            console.error("Erreur lors de l'analyse du chunk JSON:", error);
+            // Ne pas interrompre le traitement en cas d'erreur sur un chunk
           }
         }
       }
       
-      return fullResponse;
+      return completeResponse;
     } catch (error) {
-      console.error('Erreur lors du streaming Ollama après plusieurs tentatives:', error);
-      throw error;
+      // Propager l'erreur d'annulation
+      if (error.name === 'AbortError') {
+        throw error;
+      }
+      
+      console.error("Erreur lors de l'obtention de la réponse streaming Ollama:", error);
+      throw new Error(`Erreur lors de la communication avec Ollama: ${error.message}`);
     }
   }
   

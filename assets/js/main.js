@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     uiService = new UIService();
     
     // Créer et initialiser les contrôleurs
-    configController = new ConfigController(stateManager, aiService);
+    configController = new ConfigController(stateManager, aiService, uiService);
     readingController = new ReadingController(stateManager, deckService, aiService);
     appController = new AppController(stateManager, configController, readingController);
     
