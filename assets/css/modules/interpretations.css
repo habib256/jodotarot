@@ -164,13 +164,25 @@
 }
 
 /* Style des titres dans l'interprétation */
+#interpretations-response h1,
 #interpretations-response h2,
 #interpretations-response h3,
-#interpretations-response h4 {
-  margin-top: 1.5em;
-  margin-bottom: 0.8em;
+#interpretations-response h4,
+.response-content h1,
+.response-content h2,
+.response-content h3,
+.response-content h4 {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
   color: var(--color-primary);
   font-weight: bold;
+}
+
+#interpretations-response h1,
+.response-content h1 {
+  font-size: 1.7em;
+  border-bottom: 1px solid rgba(107, 91, 149, 0.2);
+  padding-bottom: var(--spacing-xs);
 }
 
 #interpretations-response h2 {
@@ -199,11 +211,11 @@
 
 /* Paragraphes dans le contenu de la réponse */
 .response-content p {
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
   text-align: justify;
   line-height: 1.6;
   background-color: rgba(255, 255, 255, 0.95);
-  padding: var(--spacing-md);
+  padding: var(--spacing-sm);
   border-radius: var(--border-radius-sm);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
@@ -250,14 +262,14 @@
   font-size: var(--font-size-lg);
   font-weight: bold;
   color: var(--color-primary);
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
   border-bottom: 1px solid rgba(107, 91, 149, 0.2);
-  padding-bottom: var(--spacing-sm);
+  padding-bottom: var(--spacing-xs);
 }
 
 /* Paragraphes de l'interprétation */
 .interpretation-text p {
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
   text-align: justify;
 }
 
@@ -270,7 +282,7 @@
   font-size: var(--font-size-md);
   font-weight: bold;
   color: var(--color-primary);
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: 0.5rem;
 }
 
 /* Synthèse de l'interprétation */

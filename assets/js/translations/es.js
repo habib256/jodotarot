@@ -132,7 +132,7 @@ const es = {
     base: `Formato requerido (400-450 palabras):
 1) Respuesta concisa y completa en un solo mensaje
 2) Utiliza emojis relacionados con el tarot para ilustrar conceptos
-3) Formateo HTML únicamente: <h2>/<h3> títulos, <em>/<strong> importancia, <blockquote> citas, <ul>/<li> listas
+3) Formateo HTML únicamente: <h1>/<h2>/<h3> títulos, <em>/<strong> importancia, <blockquote> citas, <ul>/<li> listas
 4) Incorpora aspectos psicológicos y simbólicos de las cartas
 5) Establece conexiones entre cartas que se complementan o se oponen
 6) Evita el lenguaje excesivamente esotérico para ser accesible

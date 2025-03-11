@@ -1,137 +1,138 @@
 /**
  * Variables globales pour JodoTarot
  * Définit les couleurs, tailles, espacements et autres valeurs réutilisables
+ * Source unique de vérité pour toutes les constantes de design
  */
 
 :root {
   /* Palette de couleurs */
-  --color-primary: #6b5b95;
-  --color-primary-dark: #534672;
-  --color-primary-light: #8775af;
-  --color-secondary: #b5a9d4;
-  --color-tertiary: #282639;
+  --color-primary: #6b5b95;         /* Violet principal - Utilisé pour les éléments importants */
+  --color-primary-dark: #534672;    /* Violet foncé - Pour les états hover/focus */
+  --color-primary-light: #8775af;   /* Violet clair - Pour les arrière-plans secondaires */
+  --color-secondary: #b5a9d4;       /* Violet pastel - Pour les éléments décoratifs */
+  --color-tertiary: #282639;        /* Violet très foncé - Pour le contraste */
   
-  --color-background: #f5f5f7;
-  --color-card-background: #fff;
-  --color-text: #333;
-  --color-text-light: #666;
-  --color-text-lightest: #999;
+  --color-background: #f5f5f7;      /* Arrière-plan principal de l'application */
+  --color-card-background: #fff;    /* Arrière-plan des cartes et panneaux */
+  --color-text: #333;               /* Couleur principale du texte */
+  --color-text-light: #666;         /* Texte secondaire et descriptions */
+  --color-text-lightest: #999;      /* Texte tertiaire, placeholders et notes */
   
-  --color-success: #28a745;
-  --color-warning: #ffc107;
-  --color-error: #dc3545;
-  --color-info: #17a2b8;
+  --color-success: #28a745;         /* Vert - Pour les confirmations et succès */
+  --color-warning: #ffc107;         /* Jaune - Pour les avertissements */
+  --color-error: #dc3545;           /* Rouge - Pour les erreurs et alertes */
+  --color-info: #17a2b8;            /* Bleu - Pour les messages informatifs */
   
   /* Typographie */
-  --font-family-base: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  --font-family-headings: 'Georgia', serif;
-  --font-family-special: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+  --font-family-base: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;    /* Police principale de l'interface */
+  --font-family-headings: 'Georgia', serif;                               /* Police des titres */
+  --font-family-special: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;  /* Police pour les interprétations */
   
-  --font-size-xs: 0.75rem;   /* 12px */
-  --font-size-sm: 0.875rem;  /* 14px */
-  --font-size-base: 1rem;    /* 16px */
-  --font-size-md: 1.125rem;  /* 18px */
-  --font-size-lg: 1.25rem;   /* 20px */
-  --font-size-xl: 1.5rem;    /* 24px */
-  --font-size-xxl: 2rem;     /* 32px */
+  --font-size-xs: 0.75rem;   /* 12px - Pour les petits textes et notes */
+  --font-size-sm: 0.875rem;  /* 14px - Pour les textes secondaires */
+  --font-size-base: 1rem;    /* 16px - Taille de base pour le texte principal */
+  --font-size-md: 1.125rem;  /* 18px - Pour le contenu important */
+  --font-size-lg: 1.25rem;   /* 20px - Pour les sous-titres */
+  --font-size-xl: 1.5rem;    /* 24px - Pour les titres de sections */
+  --font-size-xxl: 2rem;     /* 32px - Pour les titres principaux */
   
-  --line-height-tight: 1.25;
-  --line-height-base: 1.5;
-  --line-height-loose: 1.75;
+  --line-height-tight: 1.25;  /* Interligne serré pour les titres */
+  --line-height-base: 1.5;    /* Interligne standard pour le texte courant */
+  --line-height-loose: 1.75;  /* Interligne large pour les interprétations */
   
   /* Espacement */
-  --spacing-xs: 0.25rem;   /* 4px */
-  --spacing-sm: 0.5rem;    /* 8px */
-  --spacing-md: 1rem;      /* 16px */
-  --spacing-lg: 1.5rem;    /* 24px */
-  --spacing-xl: 2rem;      /* 32px */
-  --spacing-xxl: 3rem;     /* 48px */
+  --spacing-xs: 0.25rem;   /* 4px - Espacement minimal */
+  --spacing-sm: 0.5rem;    /* 8px - Espacement des éléments internes */
+  --spacing-md: 1rem;      /* 16px - Espacement standard */
+  --spacing-lg: 1.5rem;    /* 24px - Espacement entre sections */
+  --spacing-xl: 2rem;      /* 32px - Grands espacements */
+  --spacing-xxl: 3rem;     /* 48px - Espacement maximal */
   
   /* Bordures et ombres */
-  --border-radius-sm: 0.25rem;  /* 4px */
-  --border-radius-md: 0.5rem;   /* 8px */
-  --border-radius-lg: 1rem;     /* 16px */
+  --border-radius-sm: 0.25rem;  /* 4px - Arrondis subtils */
+  --border-radius-md: 0.5rem;   /* 8px - Arrondis standards */
+  --border-radius-lg: 1rem;     /* 16px - Grands arrondis */
   
-  --border-width-thin: 1px;
-  --border-width-medium: 2px;
-  --border-width-thick: 4px;
+  --border-width-thin: 1px;     /* Bordures fines pour séparateurs */
+  --border-width-medium: 2px;   /* Bordures standard */
+  --border-width-thick: 4px;    /* Bordures épaisses pour accent */
   
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1);
-  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);  /* Ombre légère */
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);   /* Ombre moyenne */
+  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1);  /* Ombre prononcée */
+  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.06);  /* Ombre intérieure */
   
   /* Transitions */
-  --transition-fast: 0.15s ease;
-  --transition-base: 0.3s ease;
-  --transition-slow: 0.5s ease;
+  --transition-fast: 0.15s ease;  /* Transitions rapides pour feedback immédiat */
+  --transition-base: 0.3s ease;   /* Transitions standard */
+  --transition-slow: 0.5s ease;   /* Transitions lentes pour effets dramatiques */
   
   /* Z-index */
-  --z-index-below: -1;
-  --z-index-base: 1;
-  --z-index-above: 10;
-  --z-index-modal: 100;
-  --z-index-toast: 1000;
+  --z-index-below: -1;     /* Éléments sous le flux normal */
+  --z-index-base: 1;       /* Niveau de base */
+  --z-index-above: 10;     /* Au-dessus du flux normal */
+  --z-index-modal: 100;    /* Fenêtres modales */
+  --z-index-toast: 1000;   /* Notifications */
   
   /* Dimensions des cartes */
-  --card-width: 100px;
-  --card-height: 170px;
-  --card-width-large: 160px;
-  --card-height-large: 272px;
+  --card-width: 100px;        /* Largeur standard des cartes de tarot */
+  --card-height: 170px;       /* Hauteur standard (ratio ~1:1.7) */
+  --card-width-large: 160px;  /* Largeur des cartes agrandies */
+  --card-height-large: 272px; /* Hauteur des cartes agrandies */
   
   /* Dimensions du conteneur de tirage */
-  --spread-width: 600px;
-  --spread-height: 550px;
+  --spread-width: 600px;      /* Largeur de l'espace de tirage */
+  --spread-height: 550px;     /* Hauteur de l'espace de tirage */
 
   /* Variables pour les positions des cartes */
 
   /* Tirage en croix */
-  --cross-center-x: 50%;
+  --cross-center-x: 50%;      /* Position centrale - Situation actuelle */
   --cross-center-y: 50%;
-  --cross-top-x: 50%;
+  --cross-top-x: 50%;         /* Position haute - Ce qui influence */
   --cross-top-y: 18%;
-  --cross-left-x: 30%;
+  --cross-left-x: 30%;        /* Position gauche - Passé */
   --cross-left-y: 50%;
-  --cross-right-x: 70%;
+  --cross-right-x: 70%;       /* Position droite - Futur */
   --cross-right-y: 50%;
-  --cross-bottom-x: 50%;
+  --cross-bottom-x: 50%;      /* Position basse - Résultat */
   --cross-bottom-y: 82%;
 
   /* Positions en fer à cheval */
-  --horseshoe-past-x: 40%;
+  --horseshoe-past-x: 40%;         /* Position du passé lointain */
   --horseshoe-past-y: 20%;
-  --horseshoe-recent-x: 50%;
+  --horseshoe-recent-x: 50%;       /* Position du passé récent */
   --horseshoe-recent-y: 90%;
-  --horseshoe-present-x: 20%;
+  --horseshoe-present-x: 20%;      /* Position du présent */
   --horseshoe-present-y: 45%;
-  --horseshoe-future-x: 32%;
+  --horseshoe-future-x: 32%;       /* Position du futur proche */
   --horseshoe-future-y: 80%;
-  --horseshoe-outcome-x: 60%;
+  --horseshoe-outcome-x: 60%;      /* Position du résultat */
   --horseshoe-outcome-y: 20%;
-  --horseshoe-influences-x: 68%;
+  --horseshoe-influences-x: 68%;   /* Position des influences externes */
   --horseshoe-influences-y: 80%;
-  --horseshoe-advice-x: 80%;
+  --horseshoe-advice-x: 80%;       /* Position du conseil final */
   --horseshoe-advice-y: 45%;
 
   /* Positions du tirage de l'amour */
   /* Première ligne - Vous et Partenaire */
-  --love-you-x: 50%;          /* card-1: self */
+  --love-you-x: 50%;          /* card-1: self - Vous dans la relation */
   --love-you-y: 55%;
-  --love-partner-x: 50%;      /* card-2: partner */
+  --love-partner-x: 50%;      /* card-2: partner - Votre partenaire */
   --love-partner-y: 20%;
   
   /* Deuxième ligne - Relation et Obstacles */
-  --love-relationship-x: 30%; /* card-3: relationship */
+  --love-relationship-x: 30%; /* card-3: relationship - Dynamique relationnelle */
   --love-relationship-y: 40%;
-  --love-foundation-x: 70%;   /* card-4: obstacles */
+  --love-foundation-x: 70%;   /* card-4: obstacles - Défis à surmonter */
   --love-foundation-y: 40%;
   
   /* Troisième ligne - Passé (Désirs), Présent (Résultat), Futur (Conseil) */
-  --love-past-x: 30%;         /* card-5: desires */
+  --love-past-x: 30%;         /* card-5: desires - Vos désirs et motivations */
   --love-past-y: 75%;
-  --love-present-x: 50%;      /* card-6: outcome */
+  --love-present-x: 50%;      /* card-6: outcome - Situation présente */
   --love-present-y: 90%;
-  --love-future-x: 70%;       /* card-7: advice */
+  --love-future-x: 70%;       /* card-7: advice - Conseils pour l'avenir */
   --love-future-y: 75%;
 
   /* Positions de la croix celtique */

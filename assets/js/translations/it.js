@@ -147,7 +147,7 @@ const it = {
     base: `Formato richiesto (400-450 parole):
 1) Risposta concisa e completa in un unico messaggio
 2) Utilizza emoji a tema tarocchi per illustrare i concetti
-3) Solo formattazione HTML: <h2>/<h3> titoli, <em>/<strong> importanza, <blockquote> citazioni, <ul>/<li> liste
+3) Solo formattazione HTML: <h1>/<h2>/<h3> titoli, <em>/<strong> importanza, <blockquote> citazioni, <ul>/<li> liste
 4) Incorpora aspetti psicologici e simbolici delle carte
 5) Crea connessioni tra carte che si completano o si oppongono
 6) Evita un gergo troppo esoterico per rimanere accessibile

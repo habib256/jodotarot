@@ -177,13 +177,13 @@ const fr = {
     base: `Format obligatoire (400-450 mots):
 1) Réponse concise et complète en un message
 2) Utilise des émojis pertinents pour illustrer les concepts de tarot
-3) Formatage HTML uniquement: <h2>/<h3> titres, <em>/<strong> importance, <blockquote> citations, <ul>/<li> listes
+3) Formatage HTML uniquement: <h1>/<h2>/<h3> titres, <em>/<strong> importance, <blockquote> citations, <ul>/<li> listes
 4) Intègre l'aspect psychologique et symbolique des cartes
 5) Fais des connexions entre les cartes qui se complètent ou s'opposent
 6) Évite le jargon trop ésotérique pour rester accessible
 7) Termine par un conseil pratique et une suggestion d'action
-8) Pas de Markdown ni de titres en texte brut. Pas de titres dans ce type de formatage : ** **
-9) En français
+8) PAS DE CODE MARKDOWN (**titre**,# Titre) Pas de passage à la ligne.
+9) Exprime toi intégralement en français
 10) Tu dois absolument répondre en incarnant le persona choisi, avec son style, son vocabulaire et sa vision du monde spécifiques`,
     
     emphasis: `IMPORTANT: Ta réponse doit être DIRECTEMENT et SPÉCIFIQUEMENT liée à cette question.

@@ -177,7 +177,7 @@ const en = {
     base: `Required format (400-450 words):
 1) Concise and complete response in one message
 2) Use relevant tarot-themed emojis to illustrate concepts
-3) HTML formatting only: <h2>/<h3> headings, <em>/<strong> importance, <blockquote> quotes, <ul>/<li> lists
+3) HTML formatting only: <h1>/<h2>/<h3> headings, <em>/<strong> importance, <blockquote> quotes, <ul>/<li> lists
 4) Incorporate psychological and symbolic aspects of the cards
 5) Make connections between cards that complement or oppose each other
 6) Avoid overly esoteric jargon to remain accessible

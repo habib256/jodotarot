@@ -132,7 +132,7 @@ const de = {
     base: `Erforderliches Format (400-450 Wörter):
 1) Präzise und vollständige Antwort in einer Nachricht
 2) Verwende relevante Tarot-Emojis zur Veranschaulichung von Konzepten
-3) Nur HTML-Formatierung: <h2>/<h3> Überschriften, <em>/<strong> Betonung, <blockquote> Zitate, <ul>/<li> Listen
+3) Nur HTML-Formatierung: <h1>/<h2>/<h3> Überschriften, <em>/<strong> Betonung, <blockquote> Zitate, <ul>/<li> Listen
 4) Integriere psychologische und symbolische Aspekte der Karten
 5) Stelle Verbindungen zwischen Karten her, die sich ergänzen oder entgegenstehen
 6) Vermeide übermäßig esoterischen Fachjargon, um verständlich zu bleiben
