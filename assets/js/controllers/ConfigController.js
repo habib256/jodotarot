@@ -568,26 +568,67 @@ class ConfigController {
           message: getTranslation('warnings.apiKeyMissingDetails', state.language, { modelName }),
           suggestions: [
             getTranslation('warnings.configureAPIKey', state.language),
-            getTranslation('warnings.useLocalModel', state.language)
+            getTranslation('warnings.useLocalModel', state.language),
+            "Utiliser le mode Prompt (sans IA)"
           ]
         });
         
-        // Ajouter un bouton pour configurer la clé API
-        const configButton = document.createElement('button');
-        configButton.textContent = getTranslation('config.configureAPIKey', state.language);
-        configButton.className = 'config-button';
-        configButton.style.marginTop = '10px';
-        configButton.style.padding = '8px 12px';
-        configButton.style.backgroundColor = '#4CAF50';
-        configButton.style.color = 'white';
-        configButton.style.border = 'none';
-        configButton.style.borderRadius = '4px';
-        configButton.style.cursor = 'pointer';
-        configButton.onclick = () => this.showAPIKeyConfigDialog();
-        
-        const warningElement = document.querySelector('.warning-message');
-        if (warningElement) {
-          warningElement.appendChild(configButton);
+        // Ajouter des boutons pour les actions possibles
+        const warningContainer = document.querySelector('.warning-container');
+        if (warningContainer) {
+          const buttonContainer = document.createElement('div');
+          buttonContainer.style.display = 'flex';
+          buttonContainer.style.gap = '10px';
+          buttonContainer.style.marginTop = '10px';
+          
+          // Bouton pour configurer la clé API
+          const configButton = document.createElement('button');
+          configButton.textContent = getTranslation('config.configureAPIKey', state.language);
+          configButton.className = 'config-button';
+          configButton.style.padding = '8px 12px';
+          configButton.style.backgroundColor = '#4CAF50';
+          configButton.style.color = 'white';
+          configButton.style.border = 'none';
+          configButton.style.borderRadius = '4px';
+          configButton.style.cursor = 'pointer';
+          configButton.addEventListener('click', () => this.showAPIKeyConfigDialog());
+          
+          // Bouton pour le mode Prompt
+          const promptButton = document.createElement('button');
+          promptButton.textContent = "Utiliser le mode Prompt";
+          promptButton.className = 'config-button';
+          promptButton.style.padding = '8px 12px';
+          promptButton.style.backgroundColor = '#f39c12';
+          promptButton.style.color = 'white';
+          promptButton.style.border = 'none';
+          promptButton.style.borderRadius = '4px';
+          promptButton.style.cursor = 'pointer';
+          promptButton.addEventListener('click', () => this.selectPromptMode());
+          
+          buttonContainer.appendChild(configButton);
+          buttonContainer.appendChild(promptButton);
+          warningContainer.appendChild(buttonContainer);
+        } else {
+          // Ancien code pour le bouton de configuration (si le conteneur d'avertissement n'existe pas)
+          const configButton = document.createElement('button');
+          configButton.textContent = getTranslation('config.configureAPIKey', state.language);
+          configButton.className = 'config-button';
+          configButton.style.marginTop = '10px';
+          configButton.style.padding = '8px 12px';
+          configButton.style.backgroundColor = '#4CAF50';
+          configButton.style.color = 'white';
+          configButton.style.border = 'none';
+          configButton.style.borderRadius = '4px';
+          configButton.style.cursor = 'pointer';
+          configButton.addEventListener('click', () => this.showAPIKeyConfigDialog());
+          
+          // Ajouter après l'affichage de l'avertissement
+          setTimeout(() => {
+            const warningElement = document.querySelector('.warning-message');
+            if (warningElement) {
+              warningElement.appendChild(configButton);
+            }
+          }, 100);
         }
         
         // On ne recharge pas automatiquement les modèles Ollama ici pour éviter les doublons
@@ -680,7 +721,16 @@ class ConfigController {
             }, 100);
           }
           
-          this.selectDefaultOpenAIModel();
+          // Si un modèle Ollama était sélectionné, mais pas de modèles, fallback sur OpenAI
+          if (isOllamaModelSelected) {
+            // Tester si OpenAI est disponible (a une clé API valide)
+            if (this.aiService.apiKey && this.aiService.apiKey !== "YOUR API KEY") {
+              this.selectDefaultOpenAIModel();
+            } else {
+              // Si OpenAI n'est pas disponible, utiliser le mode Prompt
+              this.selectPromptMode();
+            }
+          }
         }
         
         // Utiliser les suggestions fournies par le test de disponibilité
@@ -884,7 +934,13 @@ class ConfigController {
           
           // Si un modèle Ollama était sélectionné, mais pas de modèles, fallback sur OpenAI
           if (isOllamaModelSelected) {
-            this.selectDefaultOpenAIModel();
+            // Tester si OpenAI est disponible (a une clé API valide)
+            if (this.aiService.apiKey && this.aiService.apiKey !== "YOUR API KEY") {
+              this.selectDefaultOpenAIModel();
+            } else {
+              // Si OpenAI n'est pas disponible, utiliser le mode Prompt
+              this.selectPromptMode();
+            }
           }
           
           return false;
@@ -907,7 +963,13 @@ class ConfigController {
         
         // Si un modèle Ollama était sélectionné, fallback sur OpenAI
         if (isOllamaModelSelected) {
-          this.selectDefaultOpenAIModel();
+          // Tester si OpenAI est disponible (a une clé API valide)
+          if (this.aiService.apiKey && this.aiService.apiKey !== "YOUR API KEY") {
+            this.selectDefaultOpenAIModel();
+          } else {
+            // Si OpenAI n'est pas disponible, utiliser le mode Prompt
+            this.selectPromptMode();
+          }
         }
         
         return false;
@@ -969,7 +1031,13 @@ class ConfigController {
       
       const currentModelName = this.elements.iaModelSelect.value;
       if (currentModelName && currentModelName.startsWith('ollama:')) {
-        this.selectDefaultOpenAIModel();
+        // Tester si OpenAI est disponible (a une clé API valide)
+        if (this.aiService.apiKey && this.aiService.apiKey !== "YOUR API KEY") {
+          this.selectDefaultOpenAIModel();
+        } else {
+          // Si OpenAI n'est pas disponible, utiliser le mode Prompt
+          this.selectPromptMode();
+        }
       }
       return false;
     }
@@ -989,6 +1057,25 @@ class ConfigController {
     
     // Ensuite mettre à jour l'état
     this.stateManager.setState({ iaModel: defaultOpenAI });
+  }
+  
+  /**
+   * Sélectionne l'option "Prompt" comme mode par défaut quand aucun modèle d'IA n'est disponible
+   */
+  selectPromptMode() {
+    const promptMode = 'prompt';
+    console.log(`Aucun modèle d'IA disponible. Sélection du mode Prompt: ${promptMode}`);
+    
+    // D'abord mettre à jour le select
+    if (this.elements.iaModelSelect) {
+      this.elements.iaModelSelect.value = promptMode;
+    }
+    
+    // Ensuite mettre à jour l'état
+    this.stateManager.setState({ iaModel: promptMode });
+    
+    // Afficher un message d'information
+    this.showTemporaryMessage("Mode Prompt activé : aucun modèle d'IA n'est disponible", "warning", 5000);
   }
   
   /**
@@ -1061,10 +1148,38 @@ class ConfigController {
     if (!previousState || previousState.iaModel !== state.iaModel) {
       console.log(`🤖 Mise à jour du sélecteur de modèle IA: ${state.iaModel}`);
       
-      if (this.isValidOption(this.elements.iaModelSelect, state.iaModel)) {
+      // Cas spécial pour le mode "prompt"
+      if (state.iaModel === 'prompt') {
+        // S'assurer que l'option prompt existe ou la créer si nécessaire
+        let promptOption = Array.from(this.elements.iaModelSelect.options)
+          .find(option => option.value === 'prompt');
+        
+        if (!promptOption) {
+          console.log("Création de l'option Prompt");
+          promptOption = document.createElement('option');
+          promptOption.value = 'prompt';
+          promptOption.text = '📝 Prompt (Sans IA)';
+          
+          // L'insérer en première position
+          this.elements.iaModelSelect.insertBefore(
+            promptOption, 
+            this.elements.iaModelSelect.firstChild
+          );
+        }
+        
+        this.elements.iaModelSelect.value = 'prompt';
+      }
+      else if (this.isValidOption(this.elements.iaModelSelect, state.iaModel)) {
         this.elements.iaModelSelect.value = state.iaModel;
       } else {
         console.warn(`⚠️ Modèle IA invalide dans l'état: ${state.iaModel}`);
+        
+        // Si le modèle est invalide, basculer sur l'option "prompt" par défaut
+        if (this.isValidOption(this.elements.iaModelSelect, 'prompt')) {
+          console.log("Basculement sur le mode Prompt en raison d'un modèle invalide");
+          this.elements.iaModelSelect.value = 'prompt';
+          this.stateManager.setState({ iaModel: 'prompt' });
+        }
       }
     }
     
@@ -1079,6 +1194,11 @@ class ConfigController {
    */
   isValidOption(selectElement, value) {
     if (!selectElement) return false;
+    
+    // Cas spécial pour prompt - toujours considéré comme valide
+    if (value === 'prompt') {
+      return true;
+    }
     
     // Pour les modèles Ollama, vérifier avec et sans le préfixe
     const valueToCheck = value.startsWith('ollama:') ? [value, value.replace('ollama:', '')] : [value];

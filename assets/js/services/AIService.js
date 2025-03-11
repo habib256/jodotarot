@@ -117,6 +117,14 @@ class AIService {
         return result;
       }
       
+      // Cas spécial pour le mode "prompt" : toujours disponible
+      if (modelName === 'prompt') {
+        result.available = true;
+        result.status = 'success';
+        result.message = 'Mode Prompt disponible';
+        return result;
+      }
+      
       // Définir un timeout pour le test de connectivité
       // Timeout plus long pour les modèles plus complexes comme llama3.1
       const timeout = modelName.includes('llama3.1') ? 20000 : 10000; // 20 secondes pour llama3.1, 10 secondes pour les autres
@@ -341,7 +349,27 @@ class AIService {
       
       // Obtenir la réponse selon le type de modèle (OpenAI ou Ollama)
       let response;
-      if (model.startsWith('openai/')) {
+      
+      // Mode spécial "prompt" : afficher le prompt au lieu de faire un appel API
+      if (model === 'prompt') {
+        console.log('📝 Mode Prompt activé : affichage du prompt sans appel à l\'IA');
+        
+        // Formater le prompt pour l'affichage
+        response = `<div class="prompt-display">
+          <h3>📝 Mode Prompt (Aucun modèle d'IA utilisé)</h3>
+          <p>Voici le prompt qui aurait été envoyé à l'IA :</p>
+          <div class="system-prompts">
+            <h4>Prompts système :</h4>
+            <pre>${systemPrompts.map(p => p).join('\n\n---\n\n')}</pre>
+          </div>
+          <div class="user-prompt">
+            <h4>Prompt utilisateur :</h4>
+            <pre>${prompt}</pre>
+          </div>
+          <p class="prompt-note">Note : Aucune connexion à l'IA n'a été effectuée. Pour obtenir une interprétation générée, veuillez configurer une clé API ou sélectionner un modèle disponible.</p>
+        </div>`;
+      }
+      else if (model.startsWith('openai/')) {
         response = await this.getOpenAIResponse(prompt, systemPrompts, model.replace('openai/', ''));
       } else {
         // Si un callback de streaming est fourni, utiliser le streaming pour Ollama

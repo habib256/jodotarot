@@ -27,6 +27,12 @@ const es = {
     loading: "Analizando la tirada...",
     loadingWithModel: "Analizando la tirada en cruz con {model} interpretado por un/una {persona}...",
     default: "Las interpretaciones aparecerán aquí después de tirar las cartas.",
+    loadingError: "Error al cargar la interpretación",
+    retry: "Reintentar",
+    cardTitle: "Carta",
+    questionTitle: "Pregunta",
+    noModelAvailable: "Ningún modelo de IA disponible",
+    promptDisplay: "Aquí está el prompt que se habría enviado a la IA:",
     error: {
       general: "Ha ocurrido un error durante la interpretación. Por favor, inténtalo de nuevo.",
       noQuestion: "Por favor, introduce una pregunta antes de tirar las cartas",

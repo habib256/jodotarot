@@ -24,9 +24,15 @@ const zh = {
   
   // Messages d'interprétation
   interpretation: {
-    loading: "正在分析牌阵...",
-    loadingWithModel: "正在使用{model}由{persona}解析十字牌阵...",
-    default: "解读将在抽牌后显示在这里。",
+    loading: "正在分析牌局...",
+    loadingWithModel: "正在使用{model}分析牌局，由{persona}解读...",
+    default: "抽牌后解读将显示在这里。",
+    loadingError: "加载解读时出错",
+    retry: "重试",
+    cardTitle: "卡牌",
+    questionTitle: "问题",
+    noModelAvailable: "没有可用的AI模型",
+    promptDisplay: "这是本应发送给AI的提示：",
     error: {
       general: "解读过程中发生错误。请重试。",
       noQuestion: "请在抽牌前输入问题",

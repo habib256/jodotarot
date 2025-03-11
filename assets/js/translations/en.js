@@ -27,6 +27,12 @@ const en = {
     loading: "Analyzing the spread...",
     loadingWithModel: "Analyzing the cross spread with {model} interpreted by a {persona}...",
     default: "Interpretations will appear here after the cards are drawn.",
+    loadingError: "Error loading interpretation",
+    retry: "Retry",
+    cardTitle: "Card",
+    questionTitle: "Question",
+    noModelAvailable: "No AI model available",
+    promptDisplay: "Here is the prompt that would have been sent to the AI:",
     error: {
       general: "An error occurred during interpretation. Please try again.",
       noQuestion: "Please enter a question before drawing cards",

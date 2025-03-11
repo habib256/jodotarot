@@ -501,4 +501,61 @@
   padding: var(--spacing-sm);
   background-color: rgba(220, 53, 69, 0.05);
   border-radius: var(--border-radius-sm);
-} 
+}
+
+/* Styles pour l'affichage du prompt en mode "Prompt" */
+.prompt-display {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  font-family: var(--font-family-sans);
+}
+
+.prompt-display h3 {
+  color: #6c5ce7;
+  margin-top: 0;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 10px;
+}
+
+.prompt-display h4 {
+  color: #4a4a4a;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.prompt-display pre {
+  background-color: #f1f3f5;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 15px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.prompt-display .system-prompts pre {
+  background-color: #e9f5ff;
+  border-color: #c5e1ff;
+}
+
+.prompt-display .user-prompt pre {
+  background-color: #f0fff4;
+  border-color: #c6f6d5;
+}
+
+.prompt-note {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-radius: 4px;
+  color: #856404;
+  font-style: italic;
+} /* Styles pour le mode Prompt */

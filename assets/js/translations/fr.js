@@ -31,6 +31,8 @@ const fr = {
     retry: "Réessayer",
     cardTitle: "Carte",
     questionTitle: "Question",
+    noModelAvailable: "Aucun modèle d'IA disponible",
+    promptDisplay: "Voici le prompt qui aurait été envoyé à l'IA :",
     error: {
       general: "Une erreur est survenue lors de l'interprétation. Veuillez réessayer.",
       noQuestion: "Veuillez entrer une question avant de tirer les cartes",
@@ -139,7 +141,8 @@ const fr = {
   // Groupes de modèles d'IA
   iaGroups: {
     ollama: "🧠 Ollama",
-    openai: "🤖 OpenAI"
+    openai: "🤖 OpenAI",
+    prompt: "📝 Prompt (Sans IA)"
   },
   
   // Noms des personas

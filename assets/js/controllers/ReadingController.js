@@ -502,6 +502,23 @@ class ReadingController {
       this.currentCharIndex = 0;
       this.isTyping = false;
       
+      // Vérifier si un modèle IA est disponible
+      if (!model || model === 'none') {
+        // Aucun modèle disponible, afficher le prompt dans la zone d'interprétation
+        this.elements.responseContent.innerHTML = `
+          <div class="prompt-display">
+            <h3>${getTranslation('interpretation.noModelAvailable', language) || 'Aucun modèle IA disponible'}</h3>
+            <p>${getTranslation('interpretation.promptDisplay', language) || "Voici le prompt qui aurait été envoyé à l'IA :"}</p>
+            <pre class="prompt-code">${prompt.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
+          </div>
+        `;
+        
+        // Initialiser les gestionnaires de défilement
+        this.initScrollHandlers();
+        
+        return prompt;
+      }
+      
       // Afficher l'indicateur de génération en cours
       const generationIndicator = document.getElementById('generation-indicator');
       const modelNameSpan = generationIndicator.querySelector('.model-name');

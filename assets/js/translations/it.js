@@ -24,9 +24,15 @@ const it = {
   
   // Messages d'interprétation
   interpretation: {
-    loading: "Analisi della stesa in corso...",
-    loadingWithModel: "Analisi della stesa a croce in corso con {model} interpretato da un/una {persona}...",
+    loading: "Analisi della lettura in corso...",
+    loadingWithModel: "Analisi della lettura in corso con {model} interpretato da un/una {persona}...",
     default: "Le interpretazioni appariranno qui dopo aver pescato le carte.",
+    loadingError: "Errore durante il caricamento dell'interpretazione",
+    retry: "Riprova",
+    cardTitle: "Carta",
+    questionTitle: "Domanda",
+    noModelAvailable: "Nessun modello AI disponibile",
+    promptDisplay: "Ecco il prompt che sarebbe stato inviato all'AI:",
     error: {
       general: "Si è verificato un errore durante l'interpretazione. Si prega di riprovare.",
       noQuestion: "Inserisci una domanda prima di pescare le carte",

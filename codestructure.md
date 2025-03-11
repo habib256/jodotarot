@@ -218,6 +218,7 @@ Models (Personas, Spreads, Cards, Translations)
   - Implémente un système robuste de gestion des erreurs
   - Maintient la cohérence entre l'UI et l'état global
   - Gère les modèles Ollama et OpenAI de manière dynamique
+  - Sélectionne l'option "Prompt" par défaut si aucune IA n'est disponible
 
 #### 2. Services
 
@@ -305,6 +306,8 @@ Models (Personas, Spreads, Cards, Translations)
    - GÉRER les fallbacks de manière appropriée
    - MAINTENIR la cohérence entre UI et état
    - SUPPORTER l'ajout dynamique de modèles Ollama
+   - UTILISER l'option "Prompt" comme fallback si aucun modèle n'est disponible ou connecté
+   - PERMETTRE à l'utilisateur de sélectionner manuellement l'option "Prompt" pour le débogage
 
 3. **État Application**:
    - TOUJOURS utiliser StateManager
@@ -643,6 +646,12 @@ assets/
 - Optimisation pour différentes familles (llama, mistral, phi, gemma)
 - Système robuste de vérification de la connectivité
 
+#### Prompt (Mode sans IA)
+- Option sélectionnée par défaut si aucune IA n'est disponible
+- Affiche uniquement le prompt système sans génération
+- Permet de voir la structure de la requête envoyée aux modèles
+- Utile pour le débogage et la personnalisation des prompts
+
 ### Système de Prompts
 - Construction dynamique selon le contexte
 - Adaptation au persona sélectionné
@@ -739,7 +748,19 @@ languageSelect.change
         → Événement 'language:changed'
 ```
 
-2. **Tirage de Cartes**
+2. **Changement de Modèle IA**
+```
+iaModelSelect.change
+  → ConfigController.handleModelChange()
+    → StateManager.setIAModel()
+      → Vérification de connectivité du modèle
+        → Si échec, fallback sur "Prompt"
+          → UIService.updateIAModelDisplay()
+            → Événement 'iamodel:changed'
+              → ReadingController.resetDisplays()
+```
+
+3. **Tirage de Cartes**
 ```
 drawButton.click
   → ReadingController.performReading()
@@ -751,7 +772,7 @@ drawButton.click
               → UIService.displayInterpretation()
 ```
 
-3. **Changement de Persona**
+4. **Changement de Persona**
 ```
 personaSelect.change
   → ConfigController.handlePersonaChange()
@@ -805,6 +826,8 @@ cardElements.forEach(card =>
    - TOUJOURS avoir un gestionnaire d'erreurs global
    - LOGGER les erreurs importantes
    - INFORMER l'utilisateur de manière appropriée
+   - BASCULER sur l'option "Prompt" en cas d'erreurs de connectivité IA
+   - PERMETTRE la poursuite de l'utilisation sans modèle IA disponible
 
 ### Points de Synchronisation
 
@@ -848,7 +871,7 @@ L'état est défini par un schéma strict qui inclut:
   cardSet: {type: 'string', enum: ['set01', 'set02'], default: 'set01'},
   deckId: {type: 'string', enum: ['set01', 'set02']},
   spreadType: {type: 'string', enum: ['cross', 'horseshoe', 'love', 'celticCross']},
-  iaModel: {type: 'string', validate: /* validation personnalisée */},
+  iaModel: {type: 'string', validate: /* validation personnalisée pour inclure les modèles dynamiques d'OpenAI, Ollama et l'option "Prompt" */},
   cards: {type: 'array', validate: /* validation détaillée */},
   question: {type: 'string', maxLength: 1000},
   interpretation: {type: 'object', nullable: true},

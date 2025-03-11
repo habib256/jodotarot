@@ -43,6 +43,11 @@ class StateManager {
           if (!value) return false;
           const normalizedValue = value.trim();
           
+          // Cas spécial pour le mode "prompt"
+          if (normalizedValue === 'prompt') {
+            return true;
+          }
+          
           // Vérification simple de format
           if (!normalizedValue.startsWith('openai/') && !normalizedValue.startsWith('ollama:')) {
             console.warn(`Format de modèle invalide: ${normalizedValue}`);
@@ -375,9 +380,14 @@ class StateManager {
     // Normaliser le format du modèle
     let normalizedModel = model.trim();
     
+    // Accepter explicitement l'option "prompt"
+    if (normalizedModel === 'prompt') {
+      return normalizedModel;
+    }
+    
     // Vérification basique du format
     if (!normalizedModel.startsWith('openai/') && !normalizedModel.startsWith('ollama:')) {
-      console.warn(`Format de modèle invalide: ${normalizedModel} - doit commencer par 'openai/' ou 'ollama:'`);
+      console.warn(`Format de modèle invalide: ${normalizedModel} - doit commencer par 'openai/' ou 'ollama:' ou être 'prompt'`);
       return null;
     }
     

@@ -138,9 +138,20 @@ async function loadInitialResources() {
     // Charger les modèles d'IA disponibles
     const ollamaModelsLoaded = await configController.loadOllamaModels();
     
-    // Si aucun modèle Ollama n'est disponible, utiliser OpenAI par défaut
+    // Si aucun modèle Ollama n'est disponible, vérifier OpenAI
     if (!ollamaModelsLoaded) {
-      document.getElementById('ia-model').value = 'openai/gpt-3.5-turbo';
+      console.log("⚠️ Aucun modèle Ollama disponible, vérification des options alternatives");
+      
+      // Vérifier si OpenAI est configuré
+      if (configController.aiService.apiKey && 
+          configController.aiService.apiKey !== "YOUR API KEY") {
+        console.log("➡️ Utilisation d'OpenAI comme modèle par défaut");
+        document.getElementById('ia-model').value = 'openai/gpt-3.5-turbo';
+      } else {
+        // Ni Ollama ni OpenAI ne sont disponibles, utiliser le mode Prompt
+        console.log("➡️ Ni Ollama ni OpenAI ne sont disponibles, utilisation du mode Prompt");
+        configController.selectPromptMode();
+      }
     }
   } catch (error) {
     console.error('Erreur lors du chargement des ressources:', error);

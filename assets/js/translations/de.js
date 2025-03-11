@@ -24,9 +24,15 @@ const de = {
   
   // Messages d'interprétation
   interpretation: {
-    loading: "Analysiere die Legung...",
-    loadingWithModel: "Analysiere die Kreuzlegung mit {model} interpretiert von einem/einer {persona}...",
-    default: "Die Interpretationen werden nach dem Ziehen der Karten hier angezeigt.",
+    loading: "Analyse der Kartenlegung...",
+    loadingWithModel: "Analyse der Kartenlegung mit {model}, interpretiert von einem/einer {persona}...",
+    default: "Die Interpretationen erscheinen hier, nachdem Sie die Karten gezogen haben.",
+    loadingError: "Fehler beim Laden der Interpretation",
+    retry: "Erneut versuchen",
+    cardTitle: "Karte",
+    questionTitle: "Frage",
+    noModelAvailable: "Kein KI-Modell verfügbar",
+    promptDisplay: "Hier ist der Prompt, der an die KI gesendet worden wäre:",
     error: {
       general: "Bei der Interpretation ist ein Fehler aufgetreten. Bitte versuche es erneut.",
       noQuestion: "Bitte gib eine Frage ein, bevor du die Karten ziehst",
