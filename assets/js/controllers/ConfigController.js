@@ -136,6 +136,7 @@ class ConfigController {
       // Annuler toute génération en cours
       if (this.aiService && this.aiService.cancelCurrentInterpretation()) {
         console.log('Génération annulée suite au changement de langue');
+        // Suppression de l'affichage du message
       }
       
       // Mettre à jour l'état
@@ -160,6 +161,7 @@ class ConfigController {
       // Annuler toute génération en cours
       if (this.aiService && this.aiService.cancelCurrentInterpretation()) {
         console.log('Génération annulée suite au changement de persona');
+        // Suppression de l'affichage du message
       }
       
       // Mettre à jour l'état
@@ -184,6 +186,7 @@ class ConfigController {
       // Annuler toute génération en cours
       if (this.aiService && this.aiService.cancelCurrentInterpretation()) {
         console.log('Génération annulée suite au changement de jeu de cartes');
+        // Suppression de l'affichage du message
       }
       
       // Mettre à jour l'état
@@ -208,6 +211,7 @@ class ConfigController {
       // Annuler toute génération en cours
       if (this.aiService && this.aiService.cancelCurrentInterpretation()) {
         console.log('Génération annulée suite au changement de type de tirage');
+        // Suppression de l'affichage du message
       }
       
       // Mettre à jour l'état
@@ -234,6 +238,7 @@ class ConfigController {
     // Annuler toute génération en cours
     if (this.aiService && this.aiService.cancelCurrentInterpretation()) {
       console.log('Génération annulée suite au changement de modèle d\'IA');
+      // Suppression de l'affichage du message
     }
     
     // Nettoyer les avertissements précédents
@@ -1137,6 +1142,11 @@ class ConfigController {
    * @param {number} duration - La durée d'affichage en millisecondes
    */
   showTemporaryMessage(message, type = 'info', duration = 3000) {
+    // Ne pas afficher le message "Génération arrêtée"
+    if (message === 'Génération arrêtée' || message.includes('Génération arrêt')) {
+      return;
+    }
+    
     // Créer ou récupérer l'élément de message
     let messageElement = document.getElementById('status-message');
     

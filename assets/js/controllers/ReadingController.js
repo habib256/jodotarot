@@ -56,8 +56,28 @@ class ReadingController {
    * Initialise les écouteurs d'événements
    */
   initEventListeners() {
-    // Bouton de tirage
-    this.elements.tirerButton.addEventListener('click', this.performReading.bind(this));
+    // Événements de clic sur les boutons
+    this.elements.tirerButton.addEventListener('click', () => this.performReading());
+    
+    // Écouteur pour stopper la génération en cours
+    const generationIndicator = document.getElementById('generation-indicator');
+    if (generationIndicator) {
+      generationIndicator.addEventListener('click', () => {
+        // Annuler la génération en cours
+        if (this.aiService && this.aiService.cancelCurrentInterpretation()) {
+          console.log('Génération annulée par l\'utilisateur');
+          
+          // Masquer l'indicateur de génération
+          generationIndicator.style.display = 'none';
+          
+          // Rétablir l'état du bouton
+          const currentLanguage = this.stateManager.getState().language || 'fr';
+          this.elements.tirerButton.disabled = false;
+          this.elements.tirerButton.textContent = getTranslation('header.drawButton', currentLanguage);
+          this.elements.tirerButton.classList.remove('disabled');
+        }
+      });
+    }
     
     // Écouter les changements de jeu de cartes
     document.addEventListener('deckId:changed', async (event) => {
@@ -83,6 +103,14 @@ class ReadingController {
       console.log(`🔤 Changement de langue détecté: ${event.detail.language}`);
       // Réinitialiser tous les tirages avec la nouvelle langue
       this.initializeAllSpreads();
+    });
+    
+    // Autres écouteurs d'événements existants
+    this.elements.questionInput.addEventListener('keypress', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        this.performReading();
+      }
     });
   }
   
@@ -478,10 +506,27 @@ class ReadingController {
         generationIndicator.style.display = 'block';
       }
       
+      // Préparer l'affichage des animations de chargement
+      this.elements.responseContent.innerHTML = `
+        <div class="loading-message">
+          <p>Génération de l'interprétation en cours...</p>
+          <div class="loading-spinner"></div>
+        </div>
+      `;
+      
+      // Variable pour suivre si nous avons reçu le premier chunk
+      let firstChunkReceived = false;
+      
       // Obtenir une interprétation avec streaming et effet de machine à écrire
       const handleChunk = (chunk) => {
         // Supprimer les timestamps qui pourraient apparaître à la fin (comme "2025-03-11T17:58:05.280771997Z")
         const cleanedChunk = chunk.replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z$/g, '');
+        
+        // Si c'est le premier chunk, remplacer le message de chargement par la div de machine à écrire
+        if (!firstChunkReceived) {
+          this.elements.responseContent.innerHTML = '<div class="typewriter-text"></div>';
+          firstChunkReceived = true;
+        }
         
         // Ajouter le nouveau chunk au texte complet
         this.fullText += cleanedChunk;
@@ -495,19 +540,8 @@ class ReadingController {
         this.startTypewriterEffect();
       };
       
-      // Préparer l'affichage des animations de chargement
-      this.elements.responseContent.innerHTML = `
-        <div class="loading-message">
-          <p>Génération de l'interprétation en cours...</p>
-          <div class="loading-spinner"></div>
-        </div>
-      `;
-      
-      // Utiliser une div au lieu d'un paragraphe pour permettre le HTML
-      this.elements.responseContent.innerHTML = '<div class="typewriter-text"></div>';
-      
       // Appeler le service IA pour obtenir l'interprétation
-      await this.aiService.getInterpretation(
+      const response = await this.aiService.getInterpretation(
         reading,
         question,
         persona,
@@ -516,6 +550,13 @@ class ReadingController {
         spreadType,
         handleChunk
       );
+      
+      // Si aucun chunk n'a été reçu (par exemple, si le streaming n'est pas supporté),
+      // nous devons mettre à jour l'affichage manuellement
+      if (!firstChunkReceived) {
+        this.elements.responseContent.innerHTML = '<div class="typewriter-text"></div>';
+        this.fullText = response;
+      }
       
       // Extraire le nom du modèle sans préfixe
       const modelName = model.replace('ollama:', '').replace('openai/', '');
@@ -530,19 +571,39 @@ class ReadingController {
         typewriterElement.classList.add('generation-complete');
       }
       
-      // Masquer l'indicateur de génération une fois l'interprétation terminée
+      // Masquer l'indicateur de génération une fois terminé
       if (generationIndicator) {
         generationIndicator.style.display = 'none';
       }
+      
+      return response;
     } catch (error) {
-      console.error("Erreur lors de l'obtention de l'interprétation:", error);
-      this.elements.responseContent.innerHTML = `<p class="error">Erreur lors de l'interprétation: ${error.message}</p>`;
+      console.error("Erreur lors de l'interprétation:", error);
       
       // Masquer l'indicateur de génération en cas d'erreur
       const generationIndicator = document.getElementById('generation-indicator');
       if (generationIndicator) {
         generationIndicator.style.display = 'none';
       }
+      
+      // Afficher un message d'erreur approprié à l'utilisateur
+      if (error.message && error.message.includes('aborted')) {
+        // Si l'erreur est due à une annulation, afficher un message spécifique
+        this.elements.responseContent.innerHTML = `
+          <div class="error-message">
+            <p>${getTranslation('interpretation.error.generationStopped', language)}</p>
+          </div>
+        `;
+      } else {
+        // Sinon, afficher le message d'erreur général
+        this.elements.responseContent.innerHTML = `
+          <div class="error-message">
+            <p>${getTranslation('interpretation.error.interpretationError', language)}: ${error.message}</p>
+          </div>
+        `;
+      }
+      
+      throw error;
     }
   }
   
@@ -754,6 +815,41 @@ class ReadingController {
     this.elements.responseContent.addEventListener('click', () => {
       this.elements.responseContent.focus();
     });
+  }
+
+  /**
+   * Affiche un message temporaire
+   * @param {string} message - Le message à afficher
+   * @param {string} type - Le type de message (success, warning, error, info)
+   * @param {number} duration - La durée d'affichage en millisecondes
+   */
+  showTemporaryMessage(message, type = 'info', duration = 3000) {
+    // Créer ou récupérer l'élément de message
+    let messageElement = document.getElementById('status-message');
+    
+    if (!messageElement) {
+      messageElement = document.createElement('div');
+      messageElement.id = 'status-message';
+      
+      // Placer le message sous le bouton "Tirer les cartes" dans le controls-container
+      const controlsContainer = document.querySelector('.controls-container');
+      if (controlsContainer) {
+        controlsContainer.appendChild(messageElement);
+      } else {
+        // Fallback: ajouter au corps du document
+        document.body.appendChild(messageElement);
+      }
+    }
+    
+    // Définir le contenu et le style
+    messageElement.textContent = message;
+    messageElement.className = `${type}-message status-indicator`;
+    messageElement.style.display = 'block';
+    
+    // Masquer le message après la durée spécifiée
+    setTimeout(() => {
+      messageElement.style.display = 'none';
+    }, duration);
   }
 }
 

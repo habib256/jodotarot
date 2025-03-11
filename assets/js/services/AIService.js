@@ -37,13 +37,21 @@ class AIService {
   
   /**
    * Annule l'interprétation en cours si elle existe
+   * @returns {boolean} Indique si une interprétation a été annulée
    */
   cancelCurrentInterpretation() {
     if (this.currentController && this.isGenerating) {
       console.log('Annulation de l\'interprétation en cours...');
+      
+      // Créer une erreur d'annulation
+      const abortError = new Error('Generation aborted by user');
+      abortError.name = 'AbortError';
+      
+      // Annuler la requête en cours
       this.currentController.abort();
       this.currentController = null;
       this.isGenerating = false;
+      
       return true;
     }
     return false;

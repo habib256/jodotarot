@@ -26,10 +26,17 @@ const fr = {
     loading: "Analyse du tirage en cours...",
     loadingWithModel: "Analyse du tirage en croix en cours avec {model} interprété par un(e) {persona}...",
     default: "Les interprétations s'afficheront ici après le tirage.",
+    loadingError: "Erreur lors du chargement de l'interprétation",
+    retry: "Réessayer",
+    cardTitle: "Carte",
+    questionTitle: "Question",
     error: {
       general: "Une erreur est survenue lors de l'interprétation. Veuillez réessayer.",
       noQuestion: "Veuillez entrer une question avant de tirer les cartes",
-      api: "Erreur de l'API: {0}"
+      api: "Erreur de l'API: {0}",
+      aiModelNotConfigured: "Aucun modèle d'IA n'est configuré. Veuillez configurer un modèle dans les paramètres.",
+      generationStopped: "Génération arrêtée par l'utilisateur",
+      interpretationError: "Erreur pendant l'interprétation"
     },
     apiWarning: "L'interprétation s'est terminée de façon inattendue. Voici le résultat partiel:",
     userQuestion: "La question posée par l'utilisateur est:",

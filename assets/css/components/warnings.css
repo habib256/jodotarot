@@ -97,6 +97,19 @@
   border-radius: 4px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   animation: pulse 1.5s infinite ease-in-out;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.generation-indicator:hover {
+  background-color: #ffecb3;
+  color: #e65100;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.generation-indicator:active {
+  background-color: #ffe082;
+  transform: scale(0.98);
 }
 
 .generation-indicator .model-name {
