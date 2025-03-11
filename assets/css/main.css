@@ -4,8 +4,8 @@
  */
 
 /* Base */
-@import 'base/reset.css';
 @import 'base/variables.css';
+@import 'base/reset.css';
 @import 'base/typography.css';
 
 /* Composants */
@@ -44,4 +44,27 @@
  * 3. Layouts et structures de page
  * 4. Modules spécifiques à l'application
  * 5. Utilitaires et helpers
- */ 
+ */
+
+/* Règles globales */
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+* {
+  /* Garantir que le défilement est permis partout */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Assurer que les conteneurs défilables fonctionnent correctement */
+.interpretation-section, 
+#interpretations-response,
+.response-content,
+.interpretation-panel {
+  -webkit-overflow-scrolling: touch;
+} 

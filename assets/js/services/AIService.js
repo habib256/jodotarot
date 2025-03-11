@@ -5,6 +5,7 @@
 import PERSONAS, { getPersonaPrompt } from '../models/personas/index.js';
 import { createSpread } from '../models/spreads/index.js';
 import { API_KEY, API_URL_OPENAI, API_URL_OLLAMA, API_URL_OLLAMA_TAGS, getOllamaModelFormat } from '../config.js';
+import { getMetaPrompt, getEmphasisText, enrichirPromptContextuel } from '../prompt.js';
 
 class AIService {
   constructor() {
@@ -170,8 +171,8 @@ class AIService {
   }
   
   /**
-   * Construit la liste des prompts système pour l'interprétation
-   * @param {string} persona - Persona sélectionné
+   * Construit les prompts système pour l'IA
+   * @param {string} persona - Persona choisi
    * @param {string} language - Langue
    * @param {string} spreadType - Type de tirage
    * @return {Array} Liste des prompts système
@@ -181,8 +182,13 @@ class AIService {
     // (maintenant enrichi avec les spécialisations grâce à notre amélioration de BasePersona)
     const personaPrompt = getPersonaPrompt(persona, language, spreadType);
     
-    // Prompts de base - uniquement le prompt du persona sans instruction de structure imposée
+    // Récupérer le métaprompt adapté à la langue
+    const metaPrompt = getMetaPrompt(language);
+    
+    // Prompts de base - le prompt du persona et le métaprompt
     const basePrompts = [
+      // Le métaprompt pour définir les règles générales
+      metaPrompt,
       // Le prompt principal du persona, déjà enrichi
       personaPrompt
     ];
@@ -214,11 +220,11 @@ class AIService {
     // Générer une description détaillée du tirage avec les cartes
     const spreadDescription = spreadInstance.generateReadingDescription(true);
     
-    return `
-Question: ${question}
-
-${spreadDescription}
-`;
+    // Construction du prompt de base
+    let promptBase = `${spreadDescription}`;
+    
+    // Enrichir le prompt avec la question et le texte d'emphase
+    return enrichirPromptContextuel(question, promptBase, language);
   }
   
   /**

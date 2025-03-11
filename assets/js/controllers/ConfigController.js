@@ -46,6 +46,12 @@ class ConfigController {
     document.addEventListener('language:changed', () => this.updateUILanguage(this.stateManager.getState().language));
     document.addEventListener('spreadType:changed', () => this.updateAppTitle());
     
+    // Écouter l'événement spécifique pour la mise à jour du menu déroulant des modèles IA
+    document.addEventListener('iaModelUI:update', (event) => {
+      console.log('ConfigController: Réception de iaModelUI:update avec le modèle:', event.detail.model);
+      this.updateModelSelectUI(event.detail.model);
+    });
+    
     // Écouter l'événement global pour les changements d'état
     document.addEventListener('state:changed', (event) => {
       // S'il y a eu des changements liés à la connectivité ou au modèle IA
@@ -75,6 +81,14 @@ class ConfigController {
    * Initialise les écouteurs d'événements
    */
   initEventListeners() {
+    // Vérifier que tous les éléments existent avant d'ajouter les écouteurs
+    if (!this.elements.languageSelect || !this.elements.personaSelect || 
+        !this.elements.cardSetSelect || !this.elements.spreadTypeSelect || 
+        !this.elements.iaModelSelect) {
+      console.error("Certains éléments du formulaire sont manquants");
+      return;
+    }
+
     // Langue
     this.elements.languageSelect.addEventListener('change', this.handleLanguageChange.bind(this));
     
@@ -89,6 +103,8 @@ class ConfigController {
     
     // Modèle IA
     this.elements.iaModelSelect.addEventListener('change', this.handleModelChange.bind(this));
+    
+    console.log("Écouteurs d'événements initialisés avec succès");
   }
   
   /**
@@ -152,11 +168,22 @@ class ConfigController {
    */
   handleModelChange(event) {
     const iaModel = event.target.value;
+    const previousModel = this.stateManager.getState().iaModel;
+    
+    // Vérifier que la valeur est valide
+    if (!this.isValidOption(this.elements.iaModelSelect, iaModel)) {
+      console.error("Modèle IA invalide sélectionné:", iaModel);
+      // Restaurer la sélection précédente
+      this.elements.iaModelSelect.value = previousModel;
+      return;
+    }
+    
+    console.log(`Changement de modèle IA: ${previousModel} -> ${iaModel}`);
     
     // Mettre à jour l'état
     this.stateManager.setState({ iaModel });
     
-    // Tester la connectivité avec le nouveau modèle
+    // Tester la connectivité sans fallback automatique
     this.testModelConnectivity();
   }
   
@@ -419,7 +446,7 @@ class ConfigController {
       const isConnected = await this.aiService.testConnectivity(model);
       
       if (!isConnected) {
-        // Afficher un avertissement
+        // Afficher un avertissement sans changer le modèle
         this.showWarning(
           getTranslation('connectivity.warning', language),
           getTranslation('connectivity.modelUnavailable', language),
@@ -428,6 +455,9 @@ class ConfigController {
             getTranslation('connectivity.tryOtherModel', language)
           ]
         );
+        
+        // Garder le modèle sélectionné même s'il n'est pas connecté
+        this.elements.iaModelSelect.value = model;
         return false;
       } else {
         // Effacer les avertissements
@@ -435,12 +465,15 @@ class ConfigController {
         return true;
       }
     } catch (error) {
-      // Afficher l'erreur
+      // Afficher l'erreur sans changer le modèle
       this.showWarning(
         getTranslation('connectivity.error', language),
         error.message,
         [getTranslation('connectivity.tryOtherModel', language)]
       );
+      
+      // Garder le modèle sélectionné même en cas d'erreur
+      this.elements.iaModelSelect.value = model;
       return false;
     }
   }
@@ -496,12 +529,16 @@ class ConfigController {
   }
   
   /**
-   * Charge les modèles Ollama disponibles
+   * Charge et configure les modèles Ollama disponibles
    * @return {Promise<boolean>} True si un modèle Ollama a été sélectionné
    */
   async loadOllamaModels() {
     try {
       const ollamaOptgroup = this.elements.iaModelSelect.querySelector('optgroup[label="Ollama"]');
+      if (!ollamaOptgroup) {
+        console.error("Groupe Ollama non trouvé dans le sélecteur de modèles");
+        return false;
+      }
       
       // Afficher un message de chargement
       ollamaOptgroup.innerHTML = '<option disabled>Chargement des modèles...</option>';
@@ -512,142 +549,203 @@ class ConfigController {
       // Vider le groupe
       ollamaOptgroup.innerHTML = '';
       
-      if (models.length === 0) {
+      if (!models || models.length === 0) {
         // Aucun modèle disponible
         ollamaOptgroup.innerHTML = '<option disabled>Aucun modèle disponible</option>';
+        console.log("Aucun modèle Ollama disponible, utilisation du modèle OpenAI par défaut");
+        this.selectDefaultOpenAIModel();
         return false;
       }
       
-      // Ajouter les modèles au select
-      models.forEach((model, index) => {
+      // Ajouter d'abord tous les modèles au select
+      models.forEach(model => {
         const option = document.createElement('option');
         option.value = model.name;
         option.textContent = model.name;
         ollamaOptgroup.appendChild(option);
       });
       
-      // Chercher un modèle Llama3 pour le sélectionner par défaut
+      // Attendre que le DOM soit mis à jour
+      await new Promise(resolve => setTimeout(resolve, 0));
+      
+      // Chercher un modèle Llama3
       const llama3Model = this.aiService.findLlama3Model(models);
       
       if (llama3Model) {
-        // Si un modèle Llama3 est trouvé, le sélectionner par défaut
+        // Si un modèle Llama3 est trouvé, le sélectionner
+        console.log(`Sélection du modèle Llama3: ${llama3Model.name}`);
         this.elements.iaModelSelect.value = llama3Model.name;
         this.stateManager.setState({ iaModel: llama3Model.name });
-        console.log(`Modèle Llama3 sélectionné par défaut: ${llama3Model.name}`);
-      } else {
-        // Sinon, sélectionner le premier modèle
-        this.elements.iaModelSelect.value = models[0].name;
-        this.stateManager.setState({ iaModel: models[0].name });
-        console.log(`Premier modèle sélectionné par défaut: ${models[0].name}`);
+        return true;
       }
       
-      return true;
+      if (models.length > 0) {
+        // Si pas de Llama3 mais d'autres modèles Ollama existent, prendre le premier
+        console.log(`Sélection du premier modèle Ollama: ${models[0].name}`);
+        this.elements.iaModelSelect.value = models[0].name;
+        this.stateManager.setState({ iaModel: models[0].name });
+        return true;
+      }
+      
+      // En dernier recours, utiliser OpenAI
+      this.selectDefaultOpenAIModel();
+      return false;
+      
     } catch (error) {
       console.error("Erreur lors du chargement des modèles Ollama:", error);
-      
-      // Afficher un message d'erreur
-      const ollamaOptgroup = this.elements.iaModelSelect.querySelector('optgroup[label="Ollama"]');
-      ollamaOptgroup.innerHTML = '<option disabled>Erreur de connexion à Ollama</option>';
-      
+      if (ollamaOptgroup) {
+        ollamaOptgroup.innerHTML = '<option disabled>Erreur de connexion à Ollama</option>';
+      }
+      this.selectDefaultOpenAIModel();
       return false;
     }
   }
   
   /**
+   * Sélectionne le modèle OpenAI par défaut
+   */
+  selectDefaultOpenAIModel() {
+    const defaultOpenAI = 'openai/gpt-3.5-turbo';
+    console.log(`Sélection du modèle OpenAI par défaut: ${defaultOpenAI}`);
+    
+    // D'abord mettre à jour le select
+    if (this.elements.iaModelSelect) {
+      this.elements.iaModelSelect.value = defaultOpenAI;
+    }
+    
+    // Ensuite mettre à jour l'état
+    this.stateManager.setState({ iaModel: defaultOpenAI });
+  }
+  
+  /**
    * Synchronise l'interface utilisateur avec l'état actuel du StateManager
-   * Garantit que les menus déroulants reflètent toujours l'état unique de vérité
    */
   syncUIWithState() {
     const state = this.stateManager.getState();
     let stateUpdated = false;
     const updates = {};
     
-    // Synchroniser chaque menu avec l'état correspondant, avec fallback pour valeurs invalides
+    // Vérifier que tous les éléments existent
+    if (!this.elements.iaModelSelect || !this.elements.languageSelect || 
+        !this.elements.personaSelect || !this.elements.cardSetSelect || 
+        !this.elements.spreadTypeSelect) {
+      console.error("Éléments manquants pour la synchronisation UI");
+      return;
+    }
+
+    // Synchroniser chaque menu avec l'état correspondant
     
     // Langue
-    if (this.elements.languageSelect) {
-      if (this.isValidOption(this.elements.languageSelect, state.language)) {
-        this.elements.languageSelect.value = state.language;
-      } else {
-        // Fallback: utiliser la première option valide
-        const defaultLanguage = this.elements.languageSelect.options[0].value;
-        this.elements.languageSelect.value = defaultLanguage;
-        updates.language = defaultLanguage;
-        stateUpdated = true;
-      }
+    if (!this.isValidOption(this.elements.languageSelect, state.language)) {
+      updates.language = this.elements.languageSelect.options[0].value;
+      stateUpdated = true;
     }
+    this.elements.languageSelect.value = updates.language || state.language;
     
     // Persona
-    if (this.elements.personaSelect) {
-      if (this.isValidOption(this.elements.personaSelect, state.persona)) {
-        this.elements.personaSelect.value = state.persona;
-      } else {
-        // Fallback: utiliser la première option valide
-        const defaultPersona = this.elements.personaSelect.options[0].value;
-        this.elements.personaSelect.value = defaultPersona;
-        updates.persona = defaultPersona;
-        stateUpdated = true;
-      }
+    if (!this.isValidOption(this.elements.personaSelect, state.persona)) {
+      updates.persona = this.elements.personaSelect.options[0].value;
+      stateUpdated = true;
     }
+    this.elements.personaSelect.value = updates.persona || state.persona;
     
     // Jeu de cartes
-    if (this.elements.cardSetSelect) {
-      if (this.isValidOption(this.elements.cardSetSelect, state.cardSet)) {
-        this.elements.cardSetSelect.value = state.cardSet;
-      } else {
-        // Fallback: utiliser la première option valide
-        const defaultCardSet = this.elements.cardSetSelect.options[0].value;
-        this.elements.cardSetSelect.value = defaultCardSet;
-        updates.cardSet = defaultCardSet;
-        stateUpdated = true;
-      }
+    if (!this.isValidOption(this.elements.cardSetSelect, state.cardSet)) {
+      updates.cardSet = this.elements.cardSetSelect.options[0].value;
+      stateUpdated = true;
     }
+    this.elements.cardSetSelect.value = updates.cardSet || state.cardSet;
     
     // Type de tirage
-    if (this.elements.spreadTypeSelect) {
-      if (this.isValidOption(this.elements.spreadTypeSelect, state.spreadType)) {
-        this.elements.spreadTypeSelect.value = state.spreadType;
-      } else {
-        // Fallback: utiliser la première option valide
-        const defaultSpreadType = this.elements.spreadTypeSelect.options[0].value;
-        this.elements.spreadTypeSelect.value = defaultSpreadType;
-        updates.spreadType = defaultSpreadType;
-        stateUpdated = true;
-      }
+    if (!this.isValidOption(this.elements.spreadTypeSelect, state.spreadType)) {
+      updates.spreadType = this.elements.spreadTypeSelect.options[0].value;
+      stateUpdated = true;
     }
+    this.elements.spreadTypeSelect.value = updates.spreadType || state.spreadType;
     
     // Modèle IA
-    if (this.elements.iaModelSelect) {
-      if (this.isValidOption(this.elements.iaModelSelect, state.iaModel)) {
-        this.elements.iaModelSelect.value = state.iaModel;
+    if (!this.isValidOption(this.elements.iaModelSelect, state.iaModel)) {
+      // Si le modèle actuel n'est pas valide, essayer de trouver un modèle Ollama
+      const ollamaOptgroup = this.elements.iaModelSelect.querySelector('optgroup[label="Ollama"]');
+      if (ollamaOptgroup && ollamaOptgroup.options && ollamaOptgroup.options.length > 0) {
+        updates.iaModel = ollamaOptgroup.options[0].value;
       } else {
-        // Fallback: utiliser la première option valide
-        const defaultIaModel = this.elements.iaModelSelect.options[0].value;
-        this.elements.iaModelSelect.value = defaultIaModel;
-        updates.iaModel = defaultIaModel;
-        stateUpdated = true;
+        // Sinon, utiliser le modèle OpenAI par défaut
+        updates.iaModel = 'openai/gpt-3.5-turbo';
       }
+      stateUpdated = true;
     }
+    this.updateModelSelectUI(updates.iaModel || state.iaModel);
     
     // Si des valeurs ont été mises à jour, mettre à jour l'état
     if (stateUpdated) {
-      // Mettre à jour l'état sans déclencher à nouveau syncUIWithState
+      console.log("Mise à jour de l'état avec les valeurs par défaut:", updates);
       setTimeout(() => this.stateManager.setState(updates), 0);
     }
     
-    // Mettre à jour les éléments visuels correspondants
-    this.updatePersonaLogo(state.persona);
+    // Mettre à jour les éléments visuels
+    this.updatePersonaLogo(updates.persona || state.persona);
     this.updateAppTitle();
   }
   
   /**
-   * Vérifie si une valeur est une option valide dans un select
-   * @param {HTMLSelectElement} selectElement - Élément select à vérifier
-   * @param {string} value - Valeur à vérifier
-   * @return {boolean} - True si l'option existe, sinon False
+   * Vérifie si une valeur est une option valide dans un élément select
+   * @param {HTMLSelectElement} selectElement - L'élément select à vérifier
+   * @param {string} value - La valeur à rechercher
+   * @return {boolean} True si l'option existe
    */
   isValidOption(selectElement, value) {
-    return Array.from(selectElement.options).some(option => option.value === value);
+    if (!selectElement) return false;
+    
+    // Vérifier directement dans les options du select
+    if (Array.from(selectElement.options).some(option => option.value === value)) {
+      return true;
+    }
+    
+    // Vérifier également dans les optgroups
+    const optgroups = selectElement.querySelectorAll('optgroup');
+    for (const optgroup of optgroups) {
+      const options = optgroup.querySelectorAll('option');
+      if (Array.from(options).some(option => option.value === value)) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+  
+  /**
+   * Met à jour explicitement le menu déroulant des modèles IA pour refléter le modèle actuellement sélectionné
+   * @param {string} modelName - Le nom du modèle à sélectionner dans l'interface
+   */
+  updateModelSelectUI(modelName) {
+    if (!this.elements.iaModelSelect) {
+      console.error("Élément select des modèles IA non trouvé");
+      return;
+    }
+    
+    // Vérifier si le modèle existe dans les options
+    if (this.isValidOption(this.elements.iaModelSelect, modelName)) {
+      // Mettre à jour la valeur affichée
+      this.elements.iaModelSelect.value = modelName;
+      console.log(`Menu déroulant mis à jour pour afficher: ${modelName}`);
+    } else {
+      console.warn(`Modèle ${modelName} non trouvé dans les options du menu déroulant`);
+      
+      // Si le modèle n'est pas dans les options, vérifier s'il s'agit d'un modèle Ollama
+      if (!modelName.startsWith('openai/')) {
+        // Tenter de l'ajouter dynamiquement au groupe Ollama
+        const ollamaOptgroup = this.elements.iaModelSelect.querySelector('optgroup[label="Ollama"]');
+        if (ollamaOptgroup) {
+          const option = document.createElement('option');
+          option.value = modelName;
+          option.textContent = modelName;
+          ollamaOptgroup.appendChild(option);
+          this.elements.iaModelSelect.value = modelName;
+          console.log(`Modèle ${modelName} ajouté dynamiquement au menu déroulant`);
+        }
+      }
+    }
   }
 }
 

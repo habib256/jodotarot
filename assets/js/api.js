@@ -3,7 +3,7 @@
  */
 
 import { API_KEY, API_URL_OPENAI, API_URL_OLLAMA, API_URL_OLLAMA_TAGS, getOllamaModelFormat, DEBUG_LEVEL, SETTINGS } from './config.js';
-import { getMetaPrompt, enrichirPromptContextuel } from './metaprompt.js';
+import { getMetaPrompt, enrichirPromptContextuel } from './prompt.js';
 import PERSONAS, { getPersonaPrompt } from './models/personas/index.js';
 import { TRANSLATIONS, getTranslation } from './translations/index.js';
 

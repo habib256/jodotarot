@@ -30,14 +30,15 @@
 .interpretation-panel {
   flex: 1;
   width: 100%;
-  height: 100%;
+  height: calc(100vh - 250px);
   padding: var(--spacing-lg) var(--spacing-xl);
   background-color: transparent;
   overflow-y: auto;
   position: relative;
-  display: block; /* Assure que le panneau est toujours affiché */
-  max-width: 900px; /* Définir une largeur maximale pour éviter des lignes trop longues */
-  margin: 0 auto; /* Centrer le panneau */
+  display: block;
+  max-width: 1200px;
+  margin: 0 auto;
+  z-index: 10; /* S'assurer que le panneau est au-dessus des autres éléments */
 }
 
 /* Zone pour les interprétations */
@@ -50,6 +51,32 @@
   line-height: var(--line-height-loose);
   color: var(--color-text);
   text-align: left;
+  height: 100%;
+  overflow-y: visible; /* Permettre le défilement naturel */
+}
+
+/* Troisième cadre: texte généré par l'IA */
+#interpretations-response {
+  display: none;
+  min-height: 300px;
+  max-height: 70vh;
+  position: relative;
+  overflow-y: auto !important;
+  margin-bottom: var(--spacing-xl);
+  z-index: 20; /* S'assurer que le panneau de réponse est au-dessus */
+  cursor: auto; /* Montrer un curseur texte pour indiquer la possibilité de sélection */
+  -webkit-user-select: text; /* Permettre la sélection de texte */
+  user-select: text;
+}
+
+.response-content {
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background-color: rgba(107, 91, 149, 0.02);
+  border-radius: var(--border-radius-sm);
+  font-size: 1.05em;
+  position: relative;
+  z-index: 20; /* S'assurer que le contenu est au-dessus */
 }
 
 /* Conteneur d'interprétation */
@@ -99,7 +126,7 @@
   .container {
     flex-direction: column;
     height: auto;
-    min-height: 100vh; /* S'assure que le conteneur prend au moins toute la hauteur de la fenêtre */
+    min-height: 100vh;
   }
   
   .spread-panel {
@@ -112,15 +139,11 @@
   
   .interpretation-panel {
     width: 100%;
-    margin: 0;
+    margin: 0 auto;
     padding: var(--spacing-md);
-    min-height: 300px; /* Hauteur minimale pour assurer la visibilité */
-    display: block; /* Force l'affichage du panneau */
-    overflow-y: auto; /* Permet de faire défiler si le contenu est trop grand */
-  }
-  
-  #interpretations {
-    max-width: 100%;
+    height: auto;
+    min-height: calc(100vh - 650px); /* Espace pour le contenu après le spread */
+    max-width: 900px;
   }
 }
 
@@ -134,7 +157,9 @@
   
   .interpretation-panel {
     padding: var(--spacing-sm);
-    min-height: 250px; /* Ajusté pour les écrans encore plus petits */
+    height: auto;
+    min-height: calc(100vh - 650px);
+    max-width: 100%;
   }
   
   #interpretations [class^="interpretation-"] p,

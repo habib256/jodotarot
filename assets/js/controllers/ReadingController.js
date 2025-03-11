@@ -25,20 +25,21 @@ class ReadingController {
     
     // Éléments DOM
     this.elements = {
-      questionInput: document.getElementById('question'),
-      drawButton: document.getElementById('tirer'),
-      // Nouveaux éléments pour la section d'interprétation
+      spreadPanels: {
+        cross: document.getElementById('spread'),
+        horseshoe: document.getElementById('horseshoe-spread'),
+        love: document.getElementById('love-spread'),
+        celticCross: document.getElementById('celtic-cross-spread')
+      },
+      spreadZone: document.querySelector('.spread-panel'),
       interpretationsInfo: document.getElementById('interpretations-info'),
       interpretationsPrompt: document.getElementById('interpretations-prompt'),
-      interpretationsResponse: document.getElementById('interpretations-response'),
       promptContent: document.querySelector('#interpretations-prompt .prompt-content'),
+      interpretationsResponse: document.getElementById('interpretations-response'),
       responseContent: document.querySelector('#interpretations-response .response-content'),
       loadingAnimations: document.getElementById('loading-animations'),
-      // Conteneurs de spread
-      spreadContainer: document.getElementById('spread'),
-      horseshoeSpreadContainer: document.getElementById('horseshoe-spread'),
-      loveSpreadContainer: document.getElementById('love-spread'),
-      celticCrossSpreadContainer: document.getElementById('celtic-cross-spread')
+      tirerButton: document.getElementById('tirer'),
+      questionInput: document.getElementById('question')
     };
     
     // Initialisation des écouteurs d'événements
@@ -46,6 +47,11 @@ class ReadingController {
     
     // Initialiser les positions de cartes pour tous les tirages au démarrage
     this.initializeAllSpreads();
+    this.initializeDeck();
+    this.initScrollHandlers();
+    
+    // Charger le type de tirage par défaut
+    this.showSpread(this.stateManager.getState().spreadType || 'cross');
   }
   
   /**
@@ -53,7 +59,7 @@ class ReadingController {
    */
   initEventListeners() {
     // Bouton de tirage
-    this.elements.drawButton.addEventListener('click', this.performReading.bind(this));
+    this.elements.tirerButton.addEventListener('click', this.performReading.bind(this));
     
     // Changement de type de tirage
     document.getElementById('spread-type').addEventListener('change', (event) => {
@@ -71,23 +77,20 @@ class ReadingController {
     const state = this.stateManager.getState();
     const language = state.language || 'fr';
     
-    // S'assurer qu'un jeu est chargé dès le démarrage
-    this.initializeDeck();
-    
     // Initialiser le tirage en croix
-    this.crossSpread = createSpread('cross', this.elements.spreadContainer, language);
+    this.crossSpread = createSpread('cross', this.elements.spreadPanels.cross, language);
     this.crossSpread.initializeCardPositions();
     
     // Initialiser le tirage en fer à cheval
-    this.horseshoeSpread = createSpread('horseshoe', this.elements.horseshoeSpreadContainer, language);
+    this.horseshoeSpread = createSpread('horseshoe', this.elements.spreadPanels.horseshoe, language);
     this.horseshoeSpread.initializeCardPositions();
     
     // Initialiser le tirage de l'amour
-    this.loveSpread = createSpread('love', this.elements.loveSpreadContainer, language);
+    this.loveSpread = createSpread('love', this.elements.spreadPanels.love, language);
     this.loveSpread.initializeCardPositions();
     
     // Initialiser le tirage en croix celtique
-    this.celticCrossSpread = createSpread('celticCross', this.elements.celticCrossSpreadContainer, language);
+    this.celticCrossSpread = createSpread('celticCross', this.elements.spreadPanels.celticCross, language);
     this.celticCrossSpread.initializeCardPositions();
     
     // Afficher le tirage initial (par défaut en croix)
@@ -138,25 +141,25 @@ class ReadingController {
    */
   showSpread(spreadType) {
     // Masquer tous les conteneurs
-    this.elements.spreadContainer.style.display = 'none';
-    this.elements.horseshoeSpreadContainer.style.display = 'none';
-    this.elements.loveSpreadContainer.style.display = 'none';
-    this.elements.celticCrossSpreadContainer.style.display = 'none';
+    this.elements.spreadPanels.cross.style.display = 'none';
+    this.elements.spreadPanels.horseshoe.style.display = 'none';
+    this.elements.spreadPanels.love.style.display = 'none';
+    this.elements.spreadPanels.celticCross.style.display = 'none';
     
     // Afficher le conteneur approprié
     switch (spreadType) {
       case 'horseshoe':
-        this.elements.horseshoeSpreadContainer.style.display = 'flex';
+        this.elements.spreadPanels.horseshoe.style.display = 'flex';
         break;
       case 'love':
-        this.elements.loveSpreadContainer.style.display = 'flex';
+        this.elements.spreadPanels.love.style.display = 'flex';
         break;
       case 'celticCross':
-        this.elements.celticCrossSpreadContainer.style.display = 'flex';
+        this.elements.spreadPanels.celticCross.style.display = 'flex';
         break;
       case 'cross':
       default:
-        this.elements.spreadContainer.style.display = 'flex';
+        this.elements.spreadPanels.cross.style.display = 'flex';
         break;
     }
   }
@@ -331,10 +334,13 @@ class ReadingController {
       this.elements.interpretationsPrompt.style.display = 'block';
       
       // Vérifier si le contenu du prompt déborde et nécessite un défilement
-      setTimeout(() => this.checkPromptOverflow(), 100); // Léger délai pour s'assurer que le DOM est mis à jour
+      setTimeout(() => this.checkPromptOverflow(), 100);
       
       // Variables pour l'effet de machine à écrire
-      this.fullText = ''; // Stocké dans l'instance pour y accéder depuis startTypewriterEffect
+      this.fullText = '';
+      
+      // S'assurer que la zone de réponse est visible
+      this.elements.interpretationsResponse.style.display = 'block';
       
       // Obtenir une interprétation avec streaming et effet de machine à écrire
       const handleChunk = (chunk) => {
@@ -348,9 +354,6 @@ class ReadingController {
         
         // Commencer/reprendre l'effet de machine à écrire
         this.startTypewriterEffect();
-        
-        // Faire défiler vers le bas pour voir la dernière partie de la réponse
-        this.elements.interpretationsResponse.scrollTop = this.elements.interpretationsResponse.scrollHeight;
       };
       
       // Afficher le conteneur d'interprétation
@@ -362,20 +365,18 @@ class ReadingController {
         </div>
       `;
       
-      // Afficher le conteneur de réponse avec effet de machine à écrire
-      this.elements.responseContent.innerHTML = '<p class="typewriter-text"></p>';
-      this.elements.interpretationsResponse.style.display = 'block';
+      // Utiliser une div au lieu d'un paragraphe pour permettre le HTML
+      this.elements.responseContent.innerHTML = '<div class="typewriter-text"></div>';
       
       // Appeler le service IA pour obtenir l'interprétation
-      // Correction de l'ordre des paramètres pour correspondre à la signature de la méthode dans AIService
       await this.aiService.getInterpretation(
-        reading,       // Les cartes tirées
-        question,      // La question posée
-        persona,       // Le persona à utiliser pour l'interprétation
-        model,         // Le modèle d'IA à utiliser (mistral, llama, etc.)
-        language,      // La langue de l'interprétation
-        spreadType,    // Le type de tirage
-        handleChunk    // Callback pour le streaming
+        reading,
+        question,
+        persona,
+        model,
+        language,
+        spreadType,
+        handleChunk
       );
       
       // Masquer le message de chargement une fois l'interprétation terminée
@@ -401,11 +402,10 @@ class ReadingController {
     // Paramètres de l'effet
     const baseTypingSpeed = 5; // Vitesse de base en millisecondes
     const charsPerTypingCycle = 3; // Nombre de caractères à ajouter à chaque cycle
-    const currentTextLength = typewriterElement.textContent.length;
+    const currentTextLength = typewriterElement.innerHTML.length;
     const targetTextLength = this.fullText.length;
     
     // Calcul dynamique de la vitesse et du nombre de caractères par cycle
-    // Plus il y a de texte, plus nous traitons de caractères à la fois
     const textLengthDifference = targetTextLength - currentTextLength;
     const adjustedCharsPerCycle = textLengthDifference > 200 
       ? Math.min(10, Math.floor(textLengthDifference / 50)) // Plus de caractères pour de grands textes
@@ -417,8 +417,8 @@ class ReadingController {
         // Calculer l'index de fin pour ce cycle
         const nextIndex = Math.min(currentIndex + adjustedCharsPerCycle, targetTextLength);
         
-        // Mettre à jour le texte affiché
-        typewriterElement.textContent = this.fullText.substring(0, nextIndex);
+        // Mettre à jour le texte affiché en permettant le HTML
+        typewriterElement.innerHTML = this.fullText.substring(0, nextIndex);
         
         // Continuer avec les caractères suivants
         this.typewriterTimeout = setTimeout(() => {
@@ -427,6 +427,23 @@ class ReadingController {
       } else {
         // Animation terminée, effacer la référence du timeout
         this.typewriterTimeout = null;
+        
+        // S'assurer que le défilement fonctionne correctement après la génération
+        this.elements.interpretationsResponse.style.overflow = "auto";
+        this.elements.interpretationsResponse.style.pointerEvents = "auto";
+        
+        // Appliquer un style spécifique pour indiquer que la génération est terminée
+        typewriterElement.classList.add("generation-complete");
+        
+        // Ajouter des styles pour indiquer que le contenu est défilable
+        const style = document.createElement('style');
+        style.textContent = `
+          .generation-complete {
+            overflow-y: auto !important;
+            pointer-events: auto !important;
+          }
+        `;
+        document.head.appendChild(style);
       }
     };
     
@@ -538,17 +555,17 @@ class ReadingController {
     let spreadContainer;
     switch (spreadType) {
       case 'horseshoe':
-        spreadContainer = this.elements.horseshoeSpreadContainer;
+        spreadContainer = this.elements.spreadPanels.horseshoe;
         break;
       case 'love':
-        spreadContainer = this.elements.loveSpreadContainer;
+        spreadContainer = this.elements.spreadPanels.love;
         break;
       case 'celticCross':
-        spreadContainer = this.elements.celticCrossSpreadContainer;
+        spreadContainer = this.elements.spreadPanels.celticCross;
         break;
       case 'cross':
       default:
-        spreadContainer = this.elements.spreadContainer;
+        spreadContainer = this.elements.spreadPanels.cross;
         break;
     }
     
@@ -598,6 +615,41 @@ class ReadingController {
         error: 'Erreur lors de la restauration du tirage précédent.'
       });
     }
+  }
+
+  /**
+   * Initialise les gestionnaires d'événements de défilement pour la zone d'interprétation
+   */
+  initScrollHandlers() {
+    // Ajouter tabindex pour que l'élément puisse recevoir le focus
+    this.elements.interpretationsResponse.setAttribute('tabindex', '0');
+    
+    // Ajouter un gestionnaire pour l'événement de la molette
+    this.elements.interpretationsResponse.addEventListener('wheel', (event) => {
+      // Empêcher le comportement de défilement par défaut
+      event.preventDefault();
+      
+      // Calculer la quantité de défilement
+      const delta = event.deltaY || event.detail || event.wheelDelta;
+      
+      // Appliquer le défilement à l'élément
+      this.elements.interpretationsResponse.scrollTop += delta > 0 ? 60 : -60;
+    });
+    
+    // S'assurer que l'élément peut recevoir le focus lorsqu'on clique dessus
+    this.elements.interpretationsResponse.addEventListener('click', () => {
+      this.elements.interpretationsResponse.focus();
+    });
+    
+    // Ajouter un style pour montrer le focus
+    const style = document.createElement('style');
+    style.textContent = `
+      #interpretations-response:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(107, 91, 149, 0.5);
+      }
+    `;
+    document.head.appendChild(style);
   }
 }
 

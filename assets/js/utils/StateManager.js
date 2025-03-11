@@ -83,8 +83,17 @@ class StateManager {
     for (const [key, value] of Object.entries(validatedUpdates)) {
       // Si la valeur est undefined, null, ou une chaîne vide, utiliser la valeur par défaut
       if (value === undefined || value === null || value === '') {
-        console.warn(`Valeur invalide pour ${key}, utilisation de la valeur par défaut`);
+        console.warn(`Valeur invalide pour ${key}, utilisation de la valeur par défaut ${this.defaults[key]}`);
         validatedUpdates[key] = this.defaults[key];
+      }
+      
+      // Validation spécifique pour iaModel
+      if (key === 'iaModel' && value) {
+        // Vérifier si le modèle commence par 'openai/' ou est un modèle Ollama valide
+        if (!value.startsWith('openai/') && !value.match(/^[a-zA-Z0-9-_.:]+$/)) {
+          console.warn(`Modèle IA invalide: ${value}, utilisation du modèle par défaut ${this.defaults.iaModel}`);
+          validatedUpdates[key] = this.defaults.iaModel;
+        }
       }
     }
     
@@ -98,9 +107,23 @@ class StateManager {
   emitChangeEvents(changedValues) {
     for (const [key, value] of Object.entries(changedValues)) {
       const eventName = `${key}:changed`;
+      
+      // Log spécifique pour le changement de modèle IA
+      if (key === 'iaModel') {
+        console.log(`StateManager: Émission de l'événement iaModel:changed avec la valeur ${value}`);
+      }
+      
+      // Émettre l'événement spécifique
       document.dispatchEvent(new CustomEvent(eventName, {
         detail: { [key]: value, state: this.state }
       }));
+      
+      // Pour iaModel, émettre un événement supplémentaire pour garantir la synchronisation UI
+      if (key === 'iaModel') {
+        document.dispatchEvent(new CustomEvent('iaModelUI:update', {
+          detail: { model: value, state: this.state }
+        }));
+      }
     }
     
     // Émettre un événement global pour tout changement d'état

@@ -95,39 +95,34 @@ document.addEventListener('DOMContentLoaded', async () => {
  * Initialise les services et contrôleurs
  */
 async function initializeApp() {
-  // Créer les instances des services
-  stateManager = new StateManager();
-  aiService = new AIService();
-  deckService = new DeckService();
-  uiService = new UIService();
+  console.log("Initialisation de JodoTarot...");
   
-  // Créer les instances des contrôleurs
-  appController = new AppController(stateManager);
-  readingController = new ReadingController(stateManager, deckService, aiService);
-  configController = new ConfigController(stateManager, aiService);
-  
-  // Enregistrer les personas
-  registerPersona('tarologue', TarologuePersona);
-  registerPersona('oracle', OraclePersona);
-  registerPersona('jung', JungPersona);
-  registerPersona('voyante', VoyantePersona);
-  registerPersona('freud', FreudPersona);
-  registerPersona('pretre', PretrePersona);
-  registerPersona('rabbin', RabbinPersona);
-  registerPersona('imam', ImamPersona);
-  registerPersona('dalailama', DalailamaPersona);
-  registerPersona('sorciere', SorcierePersona);
-  registerPersona('alchimiste', AlchimistePersona);
-  registerPersona('mage', MagePersona);
-  registerPersona('francmacon', FrancmaconPersona);
-  registerPersona('socrate', SocratePersona);
-  registerPersona('montaigne', MontaignePersona);
-  registerPersona('salomon', SalomonPersona);
-  registerPersona('quichotte', QuichottePersona);
-  registerPersona('lacan', LacanPersona);
-  registerPersona('dolto', DoltoPersona);
-  registerPersona('demon', DemonPersona);
-  registerPersona('noegoman', NoEgoPersona);
+  try {
+    // Créer et initialiser les services
+    stateManager = new StateManager();
+    aiService = new AIService(stateManager);
+    deckService = new DeckService(stateManager);
+    uiService = new UIService();
+    
+    // Créer et initialiser les contrôleurs
+    configController = new ConfigController(stateManager, aiService);
+    readingController = new ReadingController(stateManager, deckService, aiService);
+    appController = new AppController(stateManager, configController, readingController);
+    
+    // Charger les ressources nécessaires
+    await loadInitialResources();
+    
+    // Configurer les écouteurs d'événements globaux
+    setupEventListeners();
+    
+    // Améliorer le défilement
+    enhanceScrolling();
+    
+    console.log("JodoTarot initialisé avec succès!");
+  } catch (error) {
+    console.error("Erreur lors de l'initialisation de JodoTarot:", error);
+    showErrorMessage("Erreur lors de l'initialisation de l'application");
+  }
 }
 
 /**
@@ -172,25 +167,76 @@ async function loadInitialResources() {
 }
 
 /**
- * Configure les écouteurs d'événements entre contrôleurs
+ * Configure les écouteurs d'événements globaux
  */
 function setupEventListeners() {
-  // Écouter le changement de persona pour réinitialiser l'affichage
-  document.addEventListener('persona:changed', () => {
-    readingController.resetDisplays();
+  // Écouteur pour les erreurs globales
+  window.addEventListener('error', (event) => {
+    console.error('Erreur globale:', event.error);
+    showErrorMessage(`Une erreur s'est produite: ${event.error.message}`);
   });
   
-  // Écouter le changement de jeu de cartes
-  document.addEventListener('cardSet:changed', (event) => {
-    readingController.changeDeck(event.detail.cardSet);
+  // Écouteur pour les rejets de promesses non gérés
+  window.addEventListener('unhandledrejection', (event) => {
+    console.error('Promesse rejetée non gérée:', event.reason);
+    showErrorMessage(`Erreur asynchrone: ${event.reason}`);
   });
+}
+
+/**
+ * Améliore le défilement dans l'application, en particulier pour la zone d'interprétation
+ */
+function enhanceScrolling() {
+  // Obtenir les références aux éléments concernés
+  const interpretationPanel = document.querySelector('.interpretation-panel');
+  const interpretationsResponse = document.getElementById('interpretations-response');
   
-  // Écouter le changement de type de tirage
-  document.addEventListener('spreadType:changed', (event) => {
-    const { spreadType } = event.detail;
-    readingController.resetDisplays();
-    console.log(`Type de tirage changé pour: ${spreadType}`);
-  });
+  if (!interpretationsResponse) return;
+  
+  // S'assurer que la zone d'interprétation peut recevoir le focus
+  interpretationsResponse.setAttribute('tabindex', '0');
+  
+  // Empêcher la propagation des événements de défilement
+  interpretationsResponse.addEventListener('wheel', (event) => {
+    // Vérifier si l'élément de réponse est visible
+    if (interpretationsResponse.style.display === 'none') return;
+    
+    // Obtenir la hauteur totale et visible
+    const scrollHeight = interpretationsResponse.scrollHeight;
+    const clientHeight = interpretationsResponse.clientHeight;
+    
+    // Si le contenu est plus grand que la zone visible, gérer le défilement
+    if (scrollHeight > clientHeight) {
+      // Calculer la direction et la quantité de défilement
+      const delta = event.deltaY;
+      const scrollTop = interpretationsResponse.scrollTop;
+      
+      // Vérifier si on est au début ou à la fin du contenu
+      if ((delta > 0 && scrollTop + clientHeight < scrollHeight) || 
+          (delta < 0 && scrollTop > 0)) {
+        // Empêcher le défilement de la page et appliquer à notre élément
+        event.preventDefault();
+        interpretationsResponse.scrollTop += delta;
+      }
+    }
+  }, { passive: false });
+  
+  // Ajouter des styles pour indiquer que l'élément est défilable
+  const style = document.createElement('style');
+  style.textContent = `
+    #interpretations-response {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(107, 91, 149, 0.5) transparent;
+      transition: box-shadow 0.2s ease;
+    }
+    #interpretations-response:hover {
+      box-shadow: 0 0 8px rgba(107, 91, 149, 0.3);
+    }
+    .response-content {
+      padding-right: 16px; /* Espace pour la scrollbar */
+    }
+  `;
+  document.head.appendChild(style);
 }
 
 /**

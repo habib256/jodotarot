@@ -9,6 +9,10 @@
   background-color: white;
   border-radius: var(--border-radius-md);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  max-width: 1200px; /* Augmentation de la largeur maximale */
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
 }
 
 .interpretation-section h3 {
@@ -68,7 +72,19 @@
   line-height: var(--line-height-loose);
   position: relative;
   margin: 0;
-  min-height: 1.5em; /* Assure une hauteur minimale même quand le contenu est vide */
+  min-height: 1.5em;
+  height: auto;
+  overflow: visible;
+  pointer-events: auto !important; /* Permettre les interactions */
+  z-index: 50; /* S'assurer qu'il est au-dessus des autres éléments */
+}
+
+/* Style spécifique pour l'élément une fois la génération terminée */
+.generation-complete {
+  overflow-y: auto !important;
+  pointer-events: auto !important;
+  height: auto;
+  width: 100%;
 }
 
 /* Curseur clignotant pour la machine à écrire */
@@ -82,6 +98,12 @@
   background-color: var(--color-primary);
   display: inline-block;
   animation: typewriter-cursor-blink 0.7s ease-in-out infinite;
+  pointer-events: none; /* Ne pas bloquer les interactions */
+}
+
+/* Faire disparaître le curseur quand la génération est terminée */
+.generation-complete::after {
+  display: none;
 }
 
 /* Animation du curseur clignotant */
@@ -92,10 +114,75 @@
 
 /* Troisième cadre: texte généré par l'IA */
 #interpretations-response {
-  display: none; /* Caché par défaut, affiché quand une réponse est disponible */
-  max-height: 650px; /* Plus de contenu visible */
-  overflow-y: auto;
+  display: none;
+  min-height: 300px;
+  max-height: 70vh;
   position: relative;
+  overflow-y: auto !important;
+  margin-bottom: var(--spacing-xl);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(107, 91, 149, 0.5) transparent;
+  touch-action: pan-y; /* Autoriser le défilement tactile */
+  will-change: scroll-position; /* Optimisation pour le défilement */
+  -webkit-overflow-scrolling: touch; /* Défilement fluide sur iOS */
+  isolation: isolate; /* Crée un nouveau contexte d'empilement */
+  z-index: 30; /* Assurer que c'est au-dessus de tout */
+}
+
+/* Wrapper pour la zone de défilement */
+#interpretations-response::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 15px; /* Largeur de la zone de défilement */
+  background-color: rgba(107, 91, 149, 0.05);
+  border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0;
+  z-index: 1;
+  pointer-events: none; /* Ne pas interférer avec les événements souris */
+}
+
+/* Définir un système de niveaux d'empilements clair */
+#interpretations-response h3 {
+  z-index: 31;
+  position: relative;
+}
+
+/* Style de la scrollbar pour Webkit */
+#interpretations-response::-webkit-scrollbar {
+  width: 8px;
+}
+
+#interpretations-response::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#interpretations-response::-webkit-scrollbar-thumb {
+  background-color: rgba(107, 91, 149, 0.5);
+  border-radius: 4px;
+}
+
+/* Style des titres dans l'interprétation */
+#interpretations-response h2,
+#interpretations-response h3,
+#interpretations-response h4 {
+  margin-top: 1.5em;
+  margin-bottom: 0.8em;
+  color: var(--color-primary);
+  font-weight: bold;
+}
+
+#interpretations-response h2 {
+  font-size: 1.5em;
+}
+
+#interpretations-response h3 {
+  font-size: 1.3em;
+}
+
+#interpretations-response h4 {
+  font-size: 1.1em;
 }
 
 .response-content {
@@ -105,7 +192,9 @@
   padding: var(--spacing-md) var(--spacing-lg);
   background-color: rgba(107, 91, 149, 0.02);
   border-radius: var(--border-radius-sm);
-  font-size: 1.05em; /* Légèrement plus grand pour une meilleure lisibilité */
+  font-size: 1.05em;
+  width: 100%;
+  z-index: 31; /* Au-dessus des décorations */
 }
 
 /* Paragraphes dans le contenu de la réponse */
@@ -113,6 +202,10 @@
   margin-bottom: var(--spacing-md);
   text-align: justify;
   line-height: 1.6;
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-sm);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 /* Styles pour le contenu vide */

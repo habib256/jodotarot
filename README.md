@@ -206,7 +206,7 @@ Développé avec ❤️ pour les amateurs de tarot et d'exploration intérieure.
   - `app.js` (188 lignes): Gestion des événements et de l'interaction utilisateur
   - `api.js` (658 lignes): Communication avec les API d'IA (OpenAI et Ollama)
   - `ui.js` (281 lignes): Gestion de l'interface utilisateur
-  - `metaprompt.js` (72 lignes): Gestion des prompts IA
+  - `prompt.js` (72 lignes): Gestion des prompts IA
   - `config.js` (103 lignes): Configuration globale de l'application
 
 - Architecture MVC claire avec:

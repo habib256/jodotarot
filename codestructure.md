@@ -13,9 +13,9 @@ jodotarot/
 │   │   ├── api.js           # Communication avec OpenAI et Ollama (658 lignes)
 │   │   ├── ui.js            # Gestion de l'interface utilisateur (281 lignes)
 │   │   ├── config.js        # Configuration globale (clés API, endpoints) (103 lignes)
-│   │   ├── main.js          # Point d'entrée de l'application (231 lignes)
+│   │   ├── main.js          # Point d'entrée de l'application (260 lignes)
 │   │   ├── app.js           # Gestion des événements et interactions (188 lignes)
-│   │   ├── metaprompt.js    # Gestion des prompts IA (72 lignes)
+│   │   ├── prompt.js    # Gestion des prompts IA (72 lignes)
 │   │   ├── translations/    # Fichiers de traduction
 │   │   ├── services/        # Services métier
 │   │   │   ├── AIService.js     # Service d'intelligence artificielle (412 lignes)
@@ -23,7 +23,7 @@ jodotarot/
 │   │   │   └── DeckService.js   # Service de gestion du jeu de cartes (436 lignes)
 │   │   ├── controllers/     # Contrôleurs
 │   │   │   ├── ConfigController.js    # Contrôleur de configuration (654 lignes)
-│   │   │   ├── ReadingController.js   # Contrôleur de lecture de tarot (604 lignes)
+│   │   │   ├── ReadingController.js   # Contrôleur de lecture de tarot (639 lignes)
 │   │   │   └── AppController.js       # Contrôleur principal de l'application (216 lignes)
 │   │   ├── utils/           # Fonctions utilitaires
 │   │   └── models/          # Modèles de données
@@ -45,12 +45,20 @@ jodotarot/
 │   │   ├── components/      # Styles des composants
 │   │   ├── layouts/         # Structures de mise en page
 │   │   ├── modules/         # Modules CSS spécifiques
-│   │   │   ├── interpretations.css    # Styles pour les interprétations (352 lignes)
+│   │   │   ├── interpretations.css    # Styles pour les interprétations (365 lignes)
+│   │   │   │   ├── Système de défilement optimisé
+│   │   │   │   ├── Compatibilité tactile et molette
+│   │   │   │   ├── Styles pour machine à écrire
+│   │   │   │   └── Gestion des états post-génération
 │   │   │   ├── love-spread.css        # Styles pour le tirage de l'Amour (115 lignes)
 │   │   │   ├── horseshoe-spread.css   # Styles pour le tirage en Fer à Cheval (110 lignes)
 │   │   │   ├── cross-spread.css       # Styles pour le tirage en Croix (130 lignes)
 │   │   │   ├── celtic-cross-spread.css # Styles pour la Croix Celtique (157 lignes)
 │   │   │   ├── persona.css            # Styles pour les personas (1369 lignes)
+│   │   │   │   ├── Styles spécifiques par persona
+│   │   │   │   ├── Animations et transitions
+│   │   │   │   ├── Compatibilité avec le système de défilement
+│   │   │   │   └── Gestion des interactions utilisateur
 │   │   │   └── select.css             # Styles pour les éléments select (60 lignes)
 │   │   └── utils/           # Classes utilitaires
 │   └── images/              # Images et ressources graphiques
@@ -147,18 +155,26 @@ Models (Personas, Spreads, Cards, Translations)
   - Coordonne DeckService et AIService
   - Gère le flux de tirage complet
   - Valide la cohérence des tirages
+  - Implémente le système de défilement pour les interprétations
+  - Gère l'effet de machine à écrire
+  - Assure l'accessibilité du contenu généré
 
 - **ConfigController**: Configuration
   - Gère les paramètres utilisateur
   - Coordonne les changements de langue
   - Configure les services IA
+  - Gère la synchronisation UI/État
+  - Gère la connectivité des modèles IA
+  - Implémente un système robuste de gestion des erreurs
+  - Maintient la cohérence entre l'UI et l'état global
+  - Gère les modèles Ollama et OpenAI de manière dynamique
 
 #### 2. Services
 
 - **AIService**: 
   - Communique UNIQUEMENT via api.js pour les appels IA
   - Gère le cache des réponses
-  - Construit les prompts via metaprompt.js
+  - Construit les prompts via prompt.js
   - NE MODIFIE PAS directement l'UI
 
 - **DeckService**:
@@ -171,6 +187,8 @@ Models (Personas, Spreads, Cards, Translations)
   - SEUL responsable des mises à jour DOM
   - Gère les animations et transitions
   - Coordonne l'affichage des cartes
+  - Gère les interactions de défilement
+  - Optimise l'expérience utilisateur pour le contenu dynamique
   - NE CONTIENT PAS de logique métier
 
 - **StateManager**:
@@ -210,25 +228,39 @@ Models (Personas, Spreads, Cards, Translations)
   - Paramètres système
   - NE CONTIENT PAS de logique
 
-- **metaprompt.js**:
+- **prompt.js**:
   - Construction des prompts IA
   - Enrichissement contextuel
   - Formatage des réponses
   - DÉLÈGUE les appels API à api.js
+
+- **main.js**:
+  - Point d'entrée de l'application
+  - Initialisation des composants
+  - Configuration des écouteurs d'événements
+  - Amélioration du défilement (`enhanceScrolling()`)
+  - Gestion des erreurs globales
 
 ### Points d'Attention pour le Développement
 
 1. **Modifications UI**:
    - TOUJOURS passer par UIService
    - NE JAMAIS modifier le DOM directement depuis les controllers
+   - TOUJOURS vérifier la validité des options avant mise à jour
+   - UTILISER les événements personnalisés pour la synchronisation
+   - IMPLÉMENTER le défilement avec les propriétés appropriées (`overflow`, `pointer-events`)
 
-2. **Appels API**:
-   - TOUJOURS passer par api.js
-   - NE JAMAIS faire d'appels directs depuis les composants
+2. **Gestion des Modèles IA**:
+   - TOUJOURS vérifier la connectivité avant changement
+   - GÉRER les fallbacks de manière appropriée
+   - MAINTENIR la cohérence entre UI et état
+   - SUPPORTER l'ajout dynamique de modèles Ollama
 
 3. **État Application**:
    - TOUJOURS utiliser StateManager
    - NE JAMAIS stocker l'état dans les composants
+   - SYNCHRONISER l'UI avec l'état de manière bidirectionnelle
+   - VALIDER les options avant mise à jour
 
 4. **Traductions**:
    - TOUJOURS utiliser getTranslation()
@@ -244,11 +276,105 @@ Models (Personas, Spreads, Cards, Translations)
    - NE PAS dupliquer la logique entre services
    - UTILISER les interfaces définies
 
+7. **Gestion du Défilement et Interactions**:
+   - UTILISER la méthode `initScrollHandlers()` pour initialiser le défilement
+   - ÉVITER `pointer-events: none` sur les conteneurs défilables
+   - ASSURER la compatibilité avec la molette de souris et le tactile
+   - MAINTENIR des niveaux z-index cohérents pour éviter les problèmes d'interaction
+   - PERMETTRE les interactions utilisateur avec le texte généré
+
+### 🤖 Construction du Prompt Système
+
+Le système de construction des prompts suit une architecture en couches qui assure une génération cohérente et personnalisée des instructions pour l'IA. Voici le détail du processus:
+
+#### 1. Structure des Composants
+
+```
+assets/js/
+├── prompt.js              # Gestion centrale des prompts
+├── services/
+│   └── AIService.js      # Service d'IA et construction des prompts
+├── models/
+│   └── personas/         # Définitions des personas
+└── translations/         # Traductions des prompts
+```
+
+#### 2. Flux de Construction du Prompt
+
+1. **Initialisation** (`AIService.getInterpretation`):
+   - Reçoit: cartes, question, persona, modèle, langue
+   - Coordonne la construction des prompts système et utilisateur
+
+2. **Construction des Prompts Système** (`AIService.buildSystemPrompts`):
+   - Récupère le métaprompt via `getMetaPrompt(langue)`
+   - Obtient le prompt du persona via `getPersonaPrompt()`
+   - Combine dans l'ordre:
+     1. Métaprompt (règles générales)
+     2. Prompt du persona (style et approche)
+
+3. **Construction du Prompt Principal** (`AIService.buildPrompt`):
+   - Crée une instance du type de tirage
+   - Génère la description détaillée des cartes
+   - Enrichit avec la question via `enrichirPromptContextuel()`
+   - Ajoute le texte d'emphase pour la spécificité
+
+#### 3. Composants du Prompt Final
+
+1. **Métaprompt** (via `prompt.js`):
+   ```
+   Format obligatoire (400-450 mots):
+   - Réponse concise et complète
+   - Utilisation d'émojis pertinents
+   - Formatage HTML spécifique
+   - Aspects psychologiques et symboliques
+   - Connexions entre cartes
+   - Langage accessible
+   - Conseil pratique final
+   ```
+
+2. **Prompt du Persona**:
+   - Style d'expression unique
+   - Approche d'interprétation spécifique
+   - Vocabulaire caractéristique
+   - Citations représentatives
+
+3. **Description du Tirage**:
+   - Position et signification de chaque carte
+   - Relations entre les cartes
+   - Contexte du type de tirage
+
+4. **Emphase sur la Question**:
+   ```
+   IMPORTANT: Réponse DIRECTEMENT liée à la question
+   - Focus sur les éléments spécifiques
+   - Adaptation à la demande précise
+   - Pas de réponse générique
+   ```
+
+#### 4. Validation et Contrôles
+
+- Vérification des paramètres essentiels
+- Validation du format des cartes
+- Contrôle de la cohérence du tirage
+- Logs de débogage en mode développement
+
+#### 5. Gestion des Langues
+
+- Support multilingue intégré
+- Traductions des prompts système
+- Adaptation des personas
+- Messages d'interface localisés
+
 ## 🔧 Caractéristiques Techniques
 
 - **Cache**: LocalStorage pour les préférences et réponses IA
 - **Gestion d'Erreurs**: Système robuste pour les erreurs API
 - **Responsive Design**: Adaptation à tous les écrans
+- **Système de Défilement**: Gestion optimisée pour la zone d'interprétation avec:
+  - Détection automatique du contenu défilable
+  - Support de la molette de souris et des interactions tactiles
+  - Styles adaptés pour une meilleure expérience utilisateur
+  - Séparation propre des événements pour éviter les conflits
 - **Performance**: Optimisation des appels API et du rendu
 - **Modularité**: Architecture permettant l'ajout facile de:
   - Nouveaux jeux de cartes
@@ -479,6 +605,8 @@ assets/
 - Support multilingue
 - Système de personas
 - Cache des réponses
+- Gestion optimisée du défilement
+- Affichage HTML dans l'interprétation
 
 ### En Développement
 - Support des arcanes mineurs
@@ -551,7 +679,9 @@ drawButton.click
     → DeckService.drawCards()
       → UIService.displayCards()
         → AIService.getInterpretation()
-          → UIService.displayInterpretation()
+          → ReadingController.startTypewriterEffect()
+            → ReadingController.initScrollHandlers()
+              → UIService.displayInterpretation()
 ```
 
 3. **Changement de Persona**

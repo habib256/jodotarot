@@ -1294,32 +1294,29 @@
   animation: fadeIn 0.5s ease-out;
   transition: all 0.3s ease;
   background-color: transparent !important;
-  pointer-events: none; /* Les clics passent à travers */
+  pointer-events: auto; /* Permettre les interactions */
 }
 
 [class$="-intro"], [class$="-content"], [class$="-closing"] {
   animation: slideIn 0.5s ease-out;
   transition: opacity 0.3s ease;
   background: none !important;
-  pointer-events: none; /* Les clics passent à travers */
+  pointer-events: auto; /* Permettre les interactions */
 }
 
-/* Assurer la transparence absolue pendant le défilement */
+/* Assurer des styles cohérents sans bloquer le défilement */
 .interpretation-panel,
-#interpretations,
-#interpretations * {
+#interpretations {
   background-color: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  box-shadow: none !important;
 }
 
-/* Réactiver les interactions uniquement sur les paragraphes */
+/* Réactiver les interactions pour tous les éléments */
 [class^="interpretation-"] p,
 [class$="-intro"] p,
 [class$="-content"] p,
-[class$="-closing"] p {
-  pointer-events: auto; /* On peut sélectionner le texte */
+[class$="-closing"] p,
+.typewriter-text {
+  pointer-events: auto !important; /* On peut sélectionner le texte */
   background-color: rgba(255, 255, 255, 0.75) !important;
   padding: 8px;
   border-radius: 4px;
@@ -1344,7 +1341,7 @@
 
 /* Animation d'écriture avec clics activés */
 .typing-effect {
-  pointer-events: auto;
+  pointer-events: auto !important;
   border-right: 2px solid transparent;
   animation: typing 0.5s steps(1, end) infinite;
 }
@@ -1354,16 +1351,22 @@
   to { border-right-color: transparent; }
 }
 
-/* S'assurer que le scrollbar ne crée pas d'effet indésirable */
-#interpretations::-webkit-scrollbar {
+/* Styles de la barre de défilement */
+#interpretations-response {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(107, 91, 149, 0.5) transparent;
+  overflow-y: auto !important;
+}
+
+#interpretations-response::-webkit-scrollbar {
   width: 8px;
 }
 
-#interpretations::-webkit-scrollbar-track {
+#interpretations-response::-webkit-scrollbar-track {
   background: transparent;
 }
 
-#interpretations::-webkit-scrollbar-thumb {
-  background-color: rgba(107, 91, 149, 0.3);
+#interpretations-response::-webkit-scrollbar-thumb {
+  background-color: rgba(107, 91, 149, 0.5);
   border-radius: 4px;
 } 
