@@ -109,19 +109,13 @@
       <div class="controls-container">
         <button id="tirer" class="primary-button">Tirer les cartes</button>
       </div>
-      
-      <!-- Panneau d'information, d'erreur et de chargement déplacé sous la question -->
-      <div id="interpretations-info" class="interpretation-section info-panel information-zone">
-        <div class="information-zone__header">
-          <h3 class="information-zone__title">Information</h3>
-        </div>
-        <div class="information-zone__content">
-          <p id="default-interpretation">Les interprétations s'afficheront après le tirage.</p>
-          <p id="ollama-promo" class="promo-text"></p>
-          <div id="loading-animations" class="loading-container"></div>
-        </div>
-      </div>
     </div>
+  </div>
+  
+  <!-- Conteneur invisible pour les éléments fonctionnels -->
+  <div style="display: none;">
+    <p id="ollama-promo" class="promo-text"></p>
+    <div id="loading-animations" class="loading-container"></div>
   </div>
   
   <!-- Ligne de séparation entre le haut et le bas de la page -->

@@ -25,13 +25,10 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
   try {
     console.log(`🔍 DEBUG - Requête API avec modèle: ${modele}`);
     
-    // Préparer les éléments UI
-    const interpretationsInfo = document.getElementById('interpretations-info');
-    const interpretationsPrompt = document.getElementById('interpretations-prompt');
-    const interpretationsResponse = document.getElementById('interpretations-response');
-    const promptContent = document.querySelector('#interpretations-prompt .prompt-content');
-    const responseContent = document.querySelector('#interpretations-response .response-content');
+    // Éléments DOM
+    const responseContent = document.querySelector('.response-content');
     const loadingAnimations = document.getElementById('loading-animations');
+    const ollamaPromo = document.getElementById('ollama-promo');
     
     // Si on utilise Ollama, vérifier d'abord la connexion
     const isOllama = modele.startsWith('ollama:');
@@ -39,7 +36,6 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
     
     if (isOllama) {
       // Afficher la promotion Ollama
-      const ollamaPromo = document.getElementById('ollama-promo');
       if (ollamaPromo) {
         ollamaPromo.innerText = getTranslation('ollama.promo', langue) || "Powered by Ollama - A local AI model running on your computer";
       }
@@ -55,43 +51,37 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
           const testingText = getTranslation('ollama.testing', langue) || `Vérification de la connexion à Ollama...`;
           
           // Mise à jour pour respecter la nouvelle structure HTML
-          const infoContent = interpretationsInfo.querySelector('.information-zone__content');
+          const infoContent = responsePrompt.querySelector('.information-zone__content');
           if (infoContent) {
             infoContent.innerHTML = `<p>${testingText}</p>`;
           } else {
-            interpretationsInfo.innerHTML = `
-              <div class="information-zone__header">
-                <h3 class="information-zone__title">${getTranslation('information.title', langue, 'Information')}</h3>
-              </div>
+            responsePrompt.innerHTML = `
               <div class="information-zone__content">
                 <p>${testingText}</p>
               </div>
             `;
           }
           
-          interpretationsPrompt.style.display = 'none';
-          interpretationsResponse.style.display = 'none';
+          responsePrompt.style.display = 'none';
+          responseResponse.style.display = 'none';
           return testingText;
         } else if (connectivityTest.status === 'error') {
           const errorMessage = `${getTranslation('interpretation.connectionError', langue) || 'Erreur de connexion à Ollama:'} ${connectivityTest.message}`;
           
           // Mise à jour pour respecter la nouvelle structure HTML
-          const infoContent = interpretationsInfo.querySelector('.information-zone__content');
+          const infoContent = responsePrompt.querySelector('.information-zone__content');
           if (infoContent) {
             infoContent.innerHTML = `<p class="error">${errorMessage}</p>`;
           } else {
-            interpretationsInfo.innerHTML = `
-              <div class="information-zone__header">
-                <h3 class="information-zone__title">${getTranslation('information.title', langue, 'Information')}</h3>
-              </div>
+            responsePrompt.innerHTML = `
               <div class="information-zone__content">
                 <p class="error">${errorMessage}</p>
               </div>
             `;
           }
           
-          interpretationsPrompt.style.display = 'none';
-          interpretationsResponse.style.display = 'none';
+          responsePrompt.style.display = 'none';
+          responseResponse.style.display = 'none';
           throw new Error(`Erreur Ollama: ${connectivityTest.message}`);
         }
       } catch (err) {
@@ -168,12 +158,12 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
         <div class="progress-bar"></div>
       </div>
     `;
-    interpretationsInfo.innerHTML = '';
-    interpretationsInfo.appendChild(progressContainer);
+    responsePrompt.innerHTML = '';
+    responsePrompt.appendChild(progressContainer);
     
     const partialResponse = document.createElement('div');
     partialResponse.className = 'partial-response';
-    responseContent.appendChild(partialResponse);
+    responseResponse.appendChild(partialResponse);
     
     try {
       console.log("🔍 DEBUG - Début fetch API");
@@ -337,7 +327,9 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
                   responseChunks.push(responseText);
                   // Mise à jour de l'affichage avec la réponse cumulative
                   fullResponse = responseChunks.join('');
-                  responseContent.innerHTML = formatStreamingResponse(fullResponse);
+                  if (responseContent) {
+                    responseContent.innerHTML = formatStreamingResponse(fullResponse);
+                  }
                 }
                 
                 if (parsedChunk.done) {
@@ -364,7 +356,9 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
                 const content = parsedChunk.choices[0]?.delta?.content || '';
                 if (content) {
                   fullResponse += content;
-                  responseContent.innerHTML = formatStreamingResponse(fullResponse);
+                  if (responseContent) {
+                    responseContent.innerHTML = formatStreamingResponse(fullResponse);
+                  }
                 }
               } catch (e) {
                 console.error("Erreur lors du parsing du chunk OpenAI:", e);
@@ -404,12 +398,16 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
       }
     } catch (fetchError) {
       console.error("🔍 DEBUG - Erreur critique fetch:", fetchError);
-      responseContent.innerHTML = `<p class="error">${getTranslation('interpretation.apiError', langue) || 'Erreur API:'} ${fetchError.message}</p>`;
+      if (responseContent) {
+        responseContent.innerHTML = `<p class="error">${getTranslation('interpretation.apiError', langue) || 'Erreur API:'} ${fetchError.message}</p>`;
+      }
       throw fetchError;
     }
   } catch (error) {
     console.error("🔍 DEBUG - Erreur globale:", error);
-    responseContent.innerHTML = `<p class="error">${getTranslation('interpretation.error', langue) || 'Erreur:'} ${error.message}</p>`;
+    if (responseContent) {
+      responseContent.innerHTML = `<p class="error">${getTranslation('interpretation.error', langue) || 'Erreur:'} ${error.message}</p>`;
+    }
     throw error;
   }
 }
@@ -601,11 +599,9 @@ async function testOllamaConnectivity(modelName) {
       return {
         status: 'error',
         success: false,
-        message: connectivityResult.message,
+        message: 'connectivity.ollamaConnectionError',
         details: connectivityResult,
         suggestions: [
-          'warnings.checkOllamaRunning',
-          'warnings.checkNetworkConnection',
           'warnings.installOllama'
         ]
       };

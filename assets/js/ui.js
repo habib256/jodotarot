@@ -105,27 +105,10 @@ function updateUILanguage(langue) {
   // Mettre à jour le bouton
   document.getElementById('tirer').textContent = getTranslation('form.submitButton', langue);
   
-  // Mettre à jour le contenu par défaut des interprétations si aucun tirage n'a été effectué
-  const interpretationsInfo = document.getElementById('interpretations-info');
-  if (interpretationsInfo) {
-    const defaultText = getTranslation('interpretation.default', langue, 'Les interprétations s\'afficheront après le tirage.');
-    
-    // Vérifier si nous devons réinitialiser complètement ou juste mettre à jour le texte
-    const defaultInterpretation = interpretationsInfo.querySelector('#default-interpretation');
-    
-    if (defaultInterpretation) {
-      // Le panneau est dans son état par défaut, mettons à jour le texte
-      defaultInterpretation.textContent = defaultText;
-      
-      // Mettre à jour aussi le titre
-      const title = interpretationsInfo.querySelector('.information-zone__title');
-      if (title) {
-        title.textContent = getTranslation('information.title', langue, 'Information');
-      }
-    } else {
-      // Nous sommes en cours de tirage ou d'interprétation, ne pas réinitialiser
-      // Le contenu sera mis à jour lors du prochain tirage
-    }
+  // Mettre à jour les affichages des réponses
+  const responseContent = document.querySelector('.response-content');
+  if (responseContent) {
+    responseContent.innerHTML = '';
   }
   
   // Mettre à jour les étiquettes des groupes d'options
@@ -254,17 +237,9 @@ function resetAllDisplays() {
   });
   
   // Réinitialiser les interprétations
-  const interpretationsInfo = document.getElementById('interpretations-info');
-  if (interpretationsInfo) {
-    const defaultText = getTranslation('interpretation.default', langue, 'Les interprétations s\'afficheront après le tirage.');
-    interpretationsInfo.innerHTML = `
-      <div class="information-zone__header">
-        <h3 class="information-zone__title">${getTranslation('information.title', langue, 'Information')}</h3>
-      </div>
-      <div class="information-zone__content">
-        <p id="default-interpretation">${defaultText}</p>
-      </div>
-    `;
+  const responseContent = document.querySelector('.response-content');
+  if (responseContent) {
+    responseContent.innerHTML = '';
   }
 }
 

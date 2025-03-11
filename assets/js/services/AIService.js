@@ -141,7 +141,7 @@ class AIService {
         
         if (!this.apiKey) {
           result.message = 'Clé API OpenAI manquante';
-          result.suggestions.push('Configurer une clé API OpenAI valide');
+          result.suggestions.push('Configurer une clé API');
           return result;
         }
         

@@ -29,9 +29,6 @@ class ConfigController {
       warningContainer: document.getElementById('connectivity-warning') || this.createWarningContainer()
     };
     
-    // Initialiser les warning containers
-    this.createWarningContainer();
-    
     // Initialiser les écouteurs d'événements
     this.initEventListeners();
     
@@ -207,6 +204,11 @@ class ConfigController {
       return; // Pas de changement, ne rien faire
     }
     
+    // Nettoyer les avertissements précédents
+    if (this.elements.warningContainer) {
+      this.clearWarnings();
+    }
+    
     // Désactiver le sélecteur pendant le test pour éviter les clics multiples
     this.elements.iaModelSelect.disabled = true;
     
@@ -229,11 +231,7 @@ class ConfigController {
         this.elements.iaModelSelect.value = previousModel;
         
         // Afficher un avertissement
-        this.showWarning(
-          'Modèle non disponible',
-          modelTest.message || `Le modèle ${iaModel} n'est pas accessible.`,
-          modelTest.suggestions || []
-        );
+        this.showModelWarning(modelTest);
       }
     } catch (error) {
       // En cas d'erreur, annuler le changement
@@ -241,11 +239,11 @@ class ConfigController {
       this.elements.iaModelSelect.value = previousModel;
       
       // Afficher l'erreur dans le conteneur d'avertissement au lieu d'un message temporaire
-      this.showWarning(
-        'Erreur de changement de modèle',
-        `${error.message}`,
-        ['Vérifier la disponibilité du modèle', 'Vérifier la configuration de votre API']
-      );
+      this.showModelWarning({
+        title: 'Erreur de changement de modèle',
+        message: `${error.message}`,
+        suggestions: ['Vérifier la disponibilité du modèle', 'Vérifier la configuration de votre API']
+      });
     } finally {
       // Réactiver le sélecteur dans tous les cas
       this.elements.iaModelSelect.disabled = false;
@@ -352,12 +350,6 @@ class ConfigController {
     
     // Mettre à jour les textes des options des menus déroulants
     this.updateDropdownOptions(language);
-    
-    // Mettre à jour l'interprétation par défaut
-    const defaultInterpretation = document.getElementById('default-interpretation');
-    if (defaultInterpretation) {
-      defaultInterpretation.textContent = getTranslation('interpretation.default', language);
-    }
     
     // Mettre à jour le texte promotionnel pour Ollama si présent
     const ollamaPromo = document.getElementById('ollama-promo');
@@ -521,14 +513,14 @@ class ConfigController {
       if (modelName.startsWith('openai/') && (!this.aiService.apiKey || this.aiService.apiKey === "YOUR API KEY")) {
         console.warn(`La clé API OpenAI n'est pas configurée pour utiliser ${modelName}`);
         
-        this.showWarning(
-          getTranslation('warnings.apiKeyMissing', state.language),
-          getTranslation('warnings.apiKeyMissingDetails', state.language, { modelName }),
-          [
+        this.showModelWarning({
+          title: getTranslation('warnings.apiKeyMissing', state.language),
+          message: getTranslation('warnings.apiKeyMissingDetails', state.language, { modelName }),
+          suggestions: [
             getTranslation('warnings.configureAPIKey', state.language),
             getTranslation('warnings.useLocalModel', state.language)
           ]
-        );
+        });
         
         // Ajouter un bouton pour configurer la clé API
         const configButton = document.createElement('button');
@@ -583,15 +575,15 @@ class ConfigController {
         // mais ne pas recharger automatiquement les modèles pour éviter les doublons
         if (modelName.startsWith('ollama:')) {
           // Au lieu de recharger automatiquement, proposer un bouton
-          this.showWarning(
-            getTranslation('warnings.modelUnavailable', state.language),
-            result.message || getTranslation('warnings.modelUnavailableDetails', state.language, { modelName }),
-            [
+          this.showModelWarning({
+            title: getTranslation('warnings.modelUnavailable', state.language),
+            message: result.message || getTranslation('warnings.modelUnavailableDetails', state.language, { modelName }),
+            suggestions: [
               getTranslation('warnings.checkOllamaRunning', state.language),
               getTranslation('warnings.refreshOllamaModels', state.language),
               getTranslation('warnings.selectDifferentModel', state.language)
             ]
-          );
+          });
           
           // Ajouter un bouton pour recharger la liste des modèles
           const refreshButton = document.createElement('button');
@@ -651,37 +643,56 @@ class ConfigController {
             ];
         
         // Afficher un avertissement avec les informations détaillées
-        this.showWarning(
-          getTranslation('warnings.modelUnavailable', state.language),
-          result.message || getTranslation('warnings.modelUnavailableDetails', state.language, { modelName }),
-          suggestions
-        );
+        this.showModelWarning({
+          title: getTranslation('warnings.modelUnavailable', state.language),
+          message: result.message || getTranslation('warnings.modelUnavailableDetails', state.language, { modelName }),
+          suggestions: suggestions
+        });
       } else {
         console.log(`Modèle ${modelName} disponible:`, result);
       }
     } catch (error) {
       console.error('Erreur lors du test de connectivité:', error);
-      this.showWarning(
-        getTranslation('warnings.error', state.language),
-        error.message,
-        [getTranslation('warnings.tryAgain', state.language)]
-      );
+      this.showModelWarning({
+        title: getTranslation('warnings.error', state.language),
+        message: error.message,
+        suggestions: [getTranslation('warnings.tryAgain', state.language)]
+      });
     }
   }
   
   /**
    * Affiche un avertissement
-   * @param {string} title - Titre de l'avertissement
-   * @param {string} message - Message de l'avertissement
-   * @param {Array} suggestions - Suggestions pour résoudre le problème
+   * @param {Object} status - Objet contenant les informations de l'avertissement
    */
-  showWarning(title = 'Avertissement', message = '', suggestions = []) {
-    const state = this.stateManager.getState();
-    const language = state.language || 'fr';
+  showModelWarning(status) {
+    const language = this.stateManager.getState().language || 'fr';
     
-    // S'assurer que title et message sont des chaînes
-    title = String(title || 'Avertissement');
-    message = String(message || '');
+    // Extraire les informations de l'état et s'assurer qu'elles existent
+    const { title = 'warnings.modelUnavailable', message = '', suggestions = [] } = status || {};
+    
+    // S'assurer que le conteneur d'avertissement existe
+    if (!this.elements.warningContainer) {
+      this.elements.warningContainer = this.createWarningContainer();
+    } else {
+      // Nettoyer les avertissements précédents
+      this.clearWarnings();
+    }
+    
+    // Traduire le titre
+    const translatedTitle = title.startsWith('warnings.') ? 
+      getTranslation(title.replace('warnings.', ''), language) : 
+      getTranslation(title, language) || title;
+    
+    // Traduire le message principal
+    let translatedMessage;
+    if (message.startsWith('connectivity.')) {
+      translatedMessage = getTranslation(message, language);
+    } else if (message.startsWith('warnings.')) {
+      translatedMessage = getTranslation(message.replace('warnings.', ''), language);
+    } else {
+      translatedMessage = message;
+    }
     
     // S'assurer que suggestions est un tableau
     if (!Array.isArray(suggestions)) {
@@ -691,8 +702,8 @@ class ConfigController {
     // Créer le contenu HTML de l'avertissement
     let warningHTML = `
       <div class="warning-box">
-        <h3>⚠️ ${title}</h3>
-        <p>${message}</p>
+        <h3>⚠️ ${translatedTitle}</h3>
+        <p>${translatedMessage}</p>
     `;
     
     // Ajouter les suggestions si présentes
@@ -711,11 +722,6 @@ class ConfigController {
         <button id="dismiss-warning">${getTranslation('connectivity.dismiss', language) || 'Ignorer cet avertissement'}</button>
       </div>
     `;
-    
-    // Vérifier que le conteneur d'avertissement existe
-    if (!this.elements.warningContainer) {
-      this.elements.warningContainer = this.createWarningContainer();
-    }
     
     // Afficher l'avertissement
     this.elements.warningContainer.innerHTML = warningHTML;
@@ -820,11 +826,11 @@ class ConfigController {
           ollamaOptgroup.innerHTML = '<option disabled>Erreur de chargement des modèles</option>';
           
           // Afficher un avertissement avec un bouton pour réessayer
-          this.showWarning(
-            "Problème de chargement des modèles Ollama",
-            `Erreur: ${error.message}`,
-            ["Vérifier que le serveur Ollama est démarré", "Vérifier votre connexion réseau"]
-          );
+          this.showModelWarning({
+            title: "Problème de chargement des modèles Ollama",
+            message: `Erreur: ${error.message}`,
+            suggestions: ["Vérifier que le serveur Ollama est démarré", "Vérifier votre connexion réseau"]
+          });
           
           // Si un modèle Ollama était sélectionné, mais pas de modèles, fallback sur OpenAI
           if (isOllamaModelSelected) {
@@ -841,12 +847,13 @@ class ConfigController {
         ollamaOptgroup.innerHTML = '<option disabled>Aucun modèle Ollama trouvé</option>';
         
         // Afficher un message d'erreur avec instructions pour installer des modèles
-        this.showWarning(
-          "Aucun modèle Ollama disponible",
-          "Vous devez installer au moins un modèle pour utiliser Ollama.",
-          ["Utilisez la commande 'ollama pull llama3' pour installer un modèle", 
-           "Consultez ollama.com pour plus d'informations"]
-        );
+        this.showModelWarning({
+          title: "warnings.noOllamaModels",
+          message: "warnings.noOllamaModelsDetails",
+          suggestions: [
+            "warnings.installModel"
+          ]
+        });
         
         // Si un modèle Ollama était sélectionné, fallback sur OpenAI
         if (isOllamaModelSelected) {
@@ -897,11 +904,11 @@ class ConfigController {
       }
       
       // Afficher un message d'erreur
-      this.showWarning(
-        getTranslation('warnings.error', this.stateManager.getState().language),
-        error.message,
-        [getTranslation('warnings.tryAgain', this.stateManager.getState().language)]
-      );
+      this.showModelWarning({
+        title: getTranslation('warnings.error', this.stateManager.getState().language),
+        message: error.message,
+        suggestions: [getTranslation('warnings.tryAgain', this.stateManager.getState().language)]
+      });
       
       const currentModelName = this.elements.iaModelSelect.value;
       if (currentModelName && currentModelName.startsWith('ollama:')) {

@@ -32,7 +32,6 @@ class ReadingController {
         celticCross: document.getElementById('celtic-cross-spread')
       },
       spreadZone: document.querySelector('.spread-panel'),
-      interpretationsInfo: document.getElementById('interpretations-info'),
       interpretationPanel: document.querySelector('.interpretation-panel'),
       responseContent: document.querySelector('.response-content'),
       loadingAnimations: document.getElementById('loading-animations'),
@@ -338,7 +337,7 @@ class ReadingController {
   resetDisplays() {
     // Réinitialiser le contenu des interprétations
     if (this.elements.responseContent) {
-      this.elements.responseContent.innerHTML = '<p id="default-interpretation">Les interprétations s\'afficheront après le tirage.</p>';
+      this.elements.responseContent.innerHTML = '';
     }
 
     this.stateManager.setState({ lastInterpretation: null });
@@ -600,14 +599,8 @@ class ReadingController {
         }
         
         // Afficher la section d'interprétation
-        if (this.elements.interpretationsInfo) {
-          this.elements.interpretationsInfo.style.display = 'block';
-        }
-        if (this.elements.interpretationsPrompt) {
-          this.elements.interpretationsPrompt.style.display = 'block';
-        }
-        if (this.elements.interpretationsResponse) {
-          this.elements.interpretationsResponse.style.display = 'block';
+        if (this.elements.interpretationPanel) {
+          this.elements.interpretationPanel.style.display = 'block';
         }
       }
     } catch (error) {
