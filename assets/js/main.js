@@ -184,59 +184,41 @@ function setupEventListeners() {
 }
 
 /**
- * Améliore le défilement dans l'application, en particulier pour la zone d'interprétation
+ * Initialise le gestionnaire de défilement pour la zone d'interprétation
+ * Cela permet de défiler avec la molette de souris dans la zone d'interprétation
  */
 function enhanceScrolling() {
-  // Obtenir les références aux éléments concernés
-  const interpretationPanel = document.querySelector('.interpretation-panel');
-  const interpretationsResponse = document.getElementById('interpretations-response');
+  const responseContent = document.querySelector('.response-content');
   
-  if (!interpretationsResponse) return;
+  if (!responseContent) return;
   
-  // S'assurer que la zone d'interprétation peut recevoir le focus
-  interpretationsResponse.setAttribute('tabindex', '0');
+  // Permettre de recevoir le focus pour une meilleure accessibilité
+  responseContent.setAttribute('tabindex', '0');
   
-  // Empêcher la propagation des événements de défilement
-  interpretationsResponse.addEventListener('wheel', (event) => {
-    // Vérifier si l'élément de réponse est visible
-    if (interpretationsResponse.style.display === 'none') return;
+  // Gestionnaire pour l'événement de la molette
+  responseContent.addEventListener('wheel', (event) => {
+    // Vérifier si l'élément est visible
+    if (responseContent.style.display === 'none') return;
     
-    // Obtenir la hauteur totale et visible
-    const scrollHeight = interpretationsResponse.scrollHeight;
-    const clientHeight = interpretationsResponse.clientHeight;
+    // Empêcher le comportement de défilement par défaut
+    event.preventDefault();
     
-    // Si le contenu est plus grand que la zone visible, gérer le défilement
-    if (scrollHeight > clientHeight) {
-      // Calculer la direction et la quantité de défilement
-      const delta = event.deltaY;
-      const scrollTop = interpretationsResponse.scrollTop;
-      
-      // Vérifier si on est au début ou à la fin du contenu
-      if ((delta > 0 && scrollTop + clientHeight < scrollHeight) || 
-          (delta < 0 && scrollTop > 0)) {
-        // Empêcher le défilement de la page et appliquer à notre élément
-        event.preventDefault();
-        interpretationsResponse.scrollTop += delta;
-      }
-    }
-  }, { passive: false });
-  
-  // Ajouter des styles pour indiquer que l'élément est défilable
-  const style = document.createElement('style');
-  style.textContent = `
-    #interpretations-response {
-      scrollbar-width: thin;
-      scrollbar-color: rgba(107, 91, 149, 0.5) transparent;
-      transition: box-shadow 0.2s ease;
-    }
-    #interpretations-response:hover {
-      box-shadow: 0 0 8px rgba(107, 91, 149, 0.3);
-    }
-    .response-content {
-      padding-right: 16px; /* Espace pour la scrollbar */
-    }
-  `;
-  document.head.appendChild(style);
+    // Calculer les dimensions de défilement
+    const scrollHeight = responseContent.scrollHeight;
+    const clientHeight = responseContent.clientHeight;
+    
+    // Si le contenu nécessite un défilement
+    if (scrollHeight <= clientHeight) return;
+    
+    // Calculer la position de défilement
+    const scrollTop = responseContent.scrollTop;
+    
+    // Calculer la quantité de défilement
+    const delta = event.deltaY || event.detail || event.wheelDelta;
+    
+    // Appliquer le défilement
+    responseContent.scrollTop += delta;
+  });
 }
 
 /**

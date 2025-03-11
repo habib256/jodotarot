@@ -33,10 +33,8 @@ class ReadingController {
       },
       spreadZone: document.querySelector('.spread-panel'),
       interpretationsInfo: document.getElementById('interpretations-info'),
-      interpretationsPrompt: document.getElementById('interpretations-prompt'),
-      promptContent: document.querySelector('#interpretations-prompt .prompt-content'),
-      interpretationsResponse: document.getElementById('interpretations-response'),
-      responseContent: document.querySelector('#interpretations-response .response-content'),
+      interpretationPanel: document.querySelector('.interpretation-panel'),
+      responseContent: document.querySelector('.response-content'),
       loadingAnimations: document.getElementById('loading-animations'),
       tirerButton: document.getElementById('tirer'),
       questionInput: document.getElementById('question')
@@ -252,8 +250,7 @@ class ReadingController {
       this.stateManager.setState({
         cards: drawnCards,
         question: question,
-        isLoading: true,
-        error: null
+        isLoading: true
       });
       
       // Afficher le tirage
@@ -263,20 +260,23 @@ class ReadingController {
       await this.getInterpretation(
         drawnCards,
         question,
-        state.spreadType,
-        state.language,
         state.persona,
-        state.iaModel
+        state.iaModel,
+        state.language,
+        state.spreadType
       );
     } catch (error) {
       console.error("Erreur lors du tirage:", error);
+      
+      // Mettre à jour l'état avec l'erreur
+      // Attention: garder les propriétés qui ont un default défini
       this.stateManager.setState({
-        error: error.message,
         isLoading: false
       });
       
+      // Nous gérons l'affichage de l'erreur directement sans passer par l'état
       // Afficher l'erreur à l'utilisateur
-      this.elements.interpretationsDiv.innerHTML = `<p class="error">${error.message}</p>`;
+      this.elements.responseContent.innerHTML = `<p class="error">${error.message}</p>`;
     }
   }
   
@@ -284,63 +284,36 @@ class ReadingController {
    * Réinitialise les affichages
    */
   resetDisplays() {
-    // Réinitialiser le premier cadre (infos)
-    if (this.elements.interpretationsInfo) {
-      this.elements.interpretationsInfo.innerHTML = '<p id="default-interpretation">Les interprétations s\'afficheront après le tirage.</p>';
+    // Réinitialiser le contenu des interprétations
+    if (this.elements.responseContent) {
+      this.elements.responseContent.innerHTML = '<p id="default-interpretation">Les interprétations s\'afficheront après le tirage.</p>';
     }
-    
-    // Masquer les autres cadres
-    if (this.elements.interpretationsPrompt) {
-      this.elements.interpretationsPrompt.style.display = 'none';
-      this.elements.promptContent.innerHTML = '';
-    }
-    
-    if (this.elements.interpretationsResponse) {
-      this.elements.interpretationsResponse.style.display = 'none';
-      this.elements.responseContent.innerHTML = '';
-    }
-    
-    // Réinitialiser les conteneurs de tirages
-    if (this.currentSpread) {
-      this.currentSpread.reset();
-    }
+
+    this.stateManager.setState({ lastInterpretation: null });
   }
   
   /**
-   * Obtient une interprétation pour le tirage actuel
-   * @param {Array} reading - Cartes tirées
-   * @param {string} question - Question posée
-   * @param {string} spreadType - Type de tirage
-   * @param {string} language - Langue de l'interprétation
-   * @param {string} persona - Persona pour l'interprétation
-   * @param {string} model - Modèle d'IA à utiliser
+   * Obtient l'interprétation des cartes tirées
    */
-  async getInterpretation(reading, question, spreadType, language, persona, model) {
+  async getInterpretation(reading, question, persona, model, language = 'fr', spreadType = 'cross') {
     try {
-      // Préparer le prompt pour l'IA basé sur le tirage
-      const prompt = this.currentSpread.generateReadingDescription();
+      // Préparer le prompt avec le spread, cartes, question, etc.
+      const spread = this.currentSpread;
+      const prompt = await this.aiService.buildPrompt(
+        reading, 
+        question, 
+        language, 
+        spreadType
+      );
       
-      // Formater le prompt pour une meilleure lisibilité
-      const formattedPrompt = this.formatPromptForDisplay(prompt, question);
-      
-      // Mettre à jour le titre du bloc de prompt - sans bouton d'agrandissement
-      const promptHeader = this.elements.interpretationsPrompt.querySelector('h3');
-      if (promptHeader) {
-        promptHeader.textContent = 'Prompt';
-      }
-      
-      // Afficher le prompt formaté dans le deuxième cadre
-      this.elements.promptContent.innerHTML = formattedPrompt;
-      this.elements.interpretationsPrompt.style.display = 'block';
-      
-      // Vérifier si le contenu du prompt déborde et nécessite un défilement
-      setTimeout(() => this.checkPromptOverflow(), 100);
+      // Stocker l'interprétation actuelle pour la restauration éventuelle
+      this.stateManager.setState({
+        currentSpreadType: spreadType,
+        currentCardsDrawn: JSON.stringify(reading)
+      });
       
       // Variables pour l'effet de machine à écrire
       this.fullText = '';
-      
-      // S'assurer que la zone de réponse est visible
-      this.elements.interpretationsResponse.style.display = 'block';
       
       // Obtenir une interprétation avec streaming et effet de machine à écrire
       const handleChunk = (chunk) => {
@@ -356,9 +329,8 @@ class ReadingController {
         this.startTypewriterEffect();
       };
       
-      // Afficher le conteneur d'interprétation
-      // Préparer l'affichage des animations de chargement dans le premier cadre
-      this.elements.interpretationsInfo.innerHTML = `
+      // Préparer l'affichage des animations de chargement
+      this.elements.responseContent.innerHTML = `
         <div class="loading-message">
           <p>Génération de l'interprétation en cours...</p>
           <div class="loading-spinner"></div>
@@ -379,15 +351,14 @@ class ReadingController {
         handleChunk
       );
       
-      // Masquer le message de chargement une fois l'interprétation terminée
-      this.elements.interpretationsInfo.innerHTML = `
-        <p class="success-message">Interprétation générée avec succès</p>
-      `;
+      // Indiquer par une classe que l'interprétation est terminée
+      const typewriterElement = this.elements.responseContent.querySelector('.typewriter-text');
+      if (typewriterElement) {
+        typewriterElement.classList.add('generation-complete');
+      }
     } catch (error) {
       console.error("Erreur lors de l'obtention de l'interprétation:", error);
-      this.elements.interpretationsInfo.innerHTML = `<p class="error">Erreur lors de l'interprétation: ${error.message}</p>`;
-      this.elements.interpretationsPrompt.style.display = 'none';
-      this.elements.interpretationsResponse.style.display = 'none';
+      this.elements.responseContent.innerHTML = `<p class="error">Erreur lors de l'interprétation: ${error.message}</p>`;
     }
   }
   
@@ -429,21 +400,14 @@ class ReadingController {
         this.typewriterTimeout = null;
         
         // S'assurer que le défilement fonctionne correctement après la génération
-        this.elements.interpretationsResponse.style.overflow = "auto";
-        this.elements.interpretationsResponse.style.pointerEvents = "auto";
+        this.elements.responseContent.style.overflow = "auto";
+        this.elements.responseContent.style.pointerEvents = "auto";
         
         // Appliquer un style spécifique pour indiquer que la génération est terminée
         typewriterElement.classList.add("generation-complete");
         
-        // Ajouter des styles pour indiquer que le contenu est défilable
-        const style = document.createElement('style');
-        style.textContent = `
-          .generation-complete {
-            overflow-y: auto !important;
-            pointer-events: auto !important;
-          }
-        `;
-        document.head.appendChild(style);
+        // Initialiser les gestionnaires de défilement
+        this.initScrollHandlers();
       }
     };
     
@@ -452,71 +416,8 @@ class ReadingController {
   }
   
   /**
-   * Vérifie si le contenu du prompt déborde et nécessite un défilement
-   * Ajoute ou supprime la classe 'has-overflow' en conséquence
-   */
-  checkPromptOverflow() {
-    const promptBlock = this.elements.interpretationsPrompt;
-    const promptContent = this.elements.promptContent;
-    
-    if (!promptBlock || !promptContent) return;
-    
-    // Si le contenu est plus grand que le conteneur, il y a débordement
-    const hasOverflow = promptContent.scrollHeight > promptBlock.clientHeight;
-    
-    // Ajouter ou supprimer la classe based sur le statut de débordement
-    if (hasOverflow) {
-      promptBlock.classList.add('has-overflow');
-    } else {
-      promptBlock.classList.remove('has-overflow');
-    }
-  }
-  
-  /**
-   * Formate le prompt pour l'affichage HTML
-   * @param {string} prompt - Le prompt brut généré
-   * @param {string} question - La question posée
-   * @return {string} Le prompt formaté en HTML
-   */
-  formatPromptForDisplay(prompt, question) {
-    // Échapper les caractères HTML spéciaux
-    const escapeHTML = (text) => {
-      return text
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    };
-    
-    // Formater la question
-    const formattedQuestion = `<div class="prompt-question"><strong>Question :</strong> ${escapeHTML(question)}</div>`;
-    
-    // Séparer les sections du prompt
-    const sections = escapeHTML(prompt).split('\n\n');
-    
-    // Construire le HTML formaté
-    let formattedHTML = formattedQuestion + '<div class="prompt-sections">';
-    
-    sections.forEach(section => {
-      if (section.trim()) {
-        // Mettre en évidence les titres des sections
-        if (section.includes(':')) {
-          const [title, content] = section.split(':', 2);
-          formattedHTML += `<div class="prompt-section"><span class="prompt-section-title">${title}:</span>${content}</div>`;
-        } else {
-          formattedHTML += `<div class="prompt-section">${section}</div>`;
-        }
-      }
-    });
-    
-    formattedHTML += '</div>';
-    return formattedHTML;
-  }
-  
-  /**
-   * Change le jeu de cartes utilisé
-   * @param {string} deckId - Identifiant du jeu de cartes
+   * Change le jeu de cartes utilisé pour les tirages
+   * @param {string} deckId - Identifiant du nouveau jeu
    */
   async changeDeck(deckId) {
     try {
@@ -618,38 +519,27 @@ class ReadingController {
   }
 
   /**
-   * Initialise les gestionnaires d'événements de défilement pour la zone d'interprétation
+   * Initialise les gestionnaires d'événements pour le défilement
    */
   initScrollHandlers() {
-    // Ajouter tabindex pour que l'élément puisse recevoir le focus
-    this.elements.interpretationsResponse.setAttribute('tabindex', '0');
+    this.elements.responseContent.setAttribute('tabindex', '0');
     
-    // Ajouter un gestionnaire pour l'événement de la molette
-    this.elements.interpretationsResponse.addEventListener('wheel', (event) => {
-      // Empêcher le comportement de défilement par défaut
+    // Gérer le défilement avec la molette de souris
+    this.elements.responseContent.addEventListener('wheel', (event) => {
+      // Empêcher le défilement de la page
       event.preventDefault();
       
-      // Calculer la quantité de défilement
+      // Calculer la direction et la vitesse du défilement
       const delta = event.deltaY || event.detail || event.wheelDelta;
       
       // Appliquer le défilement à l'élément
-      this.elements.interpretationsResponse.scrollTop += delta > 0 ? 60 : -60;
+      this.elements.responseContent.scrollTop += delta > 0 ? 60 : -60;
     });
     
-    // S'assurer que l'élément peut recevoir le focus lorsqu'on clique dessus
-    this.elements.interpretationsResponse.addEventListener('click', () => {
-      this.elements.interpretationsResponse.focus();
+    // Permettre le focus au clic
+    this.elements.responseContent.addEventListener('click', () => {
+      this.elements.responseContent.focus();
     });
-    
-    // Ajouter un style pour montrer le focus
-    const style = document.createElement('style');
-    style.textContent = `
-      #interpretations-response:focus {
-        outline: none;
-        box-shadow: 0 0 0 2px rgba(107, 91, 149, 0.5);
-      }
-    `;
-    document.head.appendChild(style);
   }
 }
 

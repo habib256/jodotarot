@@ -1,0 +1,50 @@
+/**
+ * Styles globaux pour le défilement
+ */
+
+/* Styles de base pour le défilement */
+* {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(107, 91, 149, 0.5) transparent;
+}
+
+/* Style de la scrollbar pour Webkit */
+*::-webkit-scrollbar {
+  width: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(107, 91, 149, 0.5);
+  border-radius: 4px;
+}
+
+/* Zones défilables spécifiques */
+.scrollable-content {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  will-change: scroll-position;
+  touch-action: pan-y;
+}
+
+/* Styles spécifiques pour le panneau d'interprétation */
+.interpretation-section, 
+#interpretations-response,
+.response-content {
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(107, 91, 149, 0.5) transparent;
+}
+
+/* Styles spécifiques pour les personas */
+[class^="interpretation-"] {
+  padding: var(--spacing-md);
+  box-sizing: border-box;
+  width: 100%;
+  overflow-y: visible;
+} 

@@ -728,7 +728,8 @@ class ConfigController {
     if (this.isValidOption(this.elements.iaModelSelect, modelName)) {
       // Mettre à jour la valeur affichée
       this.elements.iaModelSelect.value = modelName;
-      console.log(`Menu déroulant mis à jour pour afficher: ${modelName}`);
+      // Utiliser console.debug au lieu de console.log pour réduire la verbosité
+      console.debug(`Menu déroulant mis à jour pour afficher: ${modelName}`);
     } else {
       console.warn(`Modèle ${modelName} non trouvé dans les options du menu déroulant`);
       

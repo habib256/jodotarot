@@ -2,7 +2,8 @@
  * Styles pour le conteneur principal de l'application
  */
 
-.container {
+/* Conteneur général - NE PAS UTILISER pour les panneaux de tirage */
+.main-container {
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-lg);
@@ -22,8 +23,8 @@
   max-width: 1200px;
 }
 
-/* Conteneur pour le tirage avec une hauteur minimale */
-.spread-container {
+/* Conteneur générique pour les zones de tirage (hors panneaux principaux) */
+.spread-area {
   min-height: 500px;
   display: flex;
   justify-content: center;
@@ -46,18 +47,18 @@
 
 /* Styles responsifs */
 @media (max-width: 1024px) {
-  .container {
+  .main-container {
     padding: 0 var(--spacing-md);
   }
 }
 
 @media (max-width: 768px) {
-  .container {
+  .main-container {
     flex-direction: column-reverse;
     padding: 0 var(--spacing-sm);
   }
   
-  .spread-container {
+  .spread-area {
     min-height: 400px;
   }
 } 

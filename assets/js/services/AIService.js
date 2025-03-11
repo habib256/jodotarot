@@ -198,11 +198,11 @@ class AIService {
   
   /**
    * Construit le prompt principal pour l'interprétation
-   * @param {Array} reading - Les cartes tirées
-   * @param {string} question - La question posée
-   * @param {string} language - La langue
-   * @param {string} spreadType - Le type de tirage (cross, horseshoe, love, celticCross)
-   * @return {string} Le prompt formaté
+   * @param {Array} reading - Tableau des cartes tirées
+   * @param {string} question - Question posée
+   * @param {string} language - Code de langue 
+   * @param {string} spreadType - Type de tirage
+   * @return {string} Prompt formaté
    */
   buildPrompt(reading, question, language, spreadType = 'cross') {
     // S'assurer que reading est un tableau

@@ -9,10 +9,15 @@
   background-color: white;
   border-radius: var(--border-radius-md);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  max-width: 1200px; /* Augmentation de la largeur maximale */
-  margin-left: auto;
-  margin-right: auto;
   width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  box-sizing: border-box;
+}
+
+/* Dernier élément sans marge en bas */
+.interpretation-section:last-child {
+  margin-bottom: 0;
 }
 
 .interpretation-section h3 {
@@ -68,7 +73,6 @@
 /* Effet de machine à écrire */
 .typewriter-text {
   white-space: pre-wrap;
-  font-family: var(--font-family-special);
   line-height: var(--line-height-loose);
   position: relative;
   margin: 0;
@@ -114,19 +118,15 @@
 
 /* Troisième cadre: texte généré par l'IA */
 #interpretations-response {
-  display: none;
-  min-height: 300px;
-  max-height: 70vh;
-  position: relative;
-  overflow-y: auto !important;
-  margin-bottom: var(--spacing-xl);
-  scrollbar-width: thin;
-  scrollbar-color: rgba(107, 91, 149, 0.5) transparent;
-  touch-action: pan-y; /* Autoriser le défilement tactile */
-  will-change: scroll-position; /* Optimisation pour le défilement */
-  -webkit-overflow-scrolling: touch; /* Défilement fluide sur iOS */
-  isolation: isolate; /* Crée un nouveau contexte d'empilement */
-  z-index: 30; /* Assurer que c'est au-dessus de tout */
+  margin-bottom: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+#interpretations-response .response-content {
+  flex: 1;
+  overflow-y: auto;
 }
 
 /* Wrapper pour la zone de défilement */
@@ -206,7 +206,54 @@
   border-radius: var(--border-radius-sm);
   font-size: 1.05em;
   width: 100%;
-  z-index: 31; /* Au-dessus des décorations */
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  z-index: 31;
+}
+
+/* Styles pour la scrollbar */
+.response-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.response-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.response-content::-webkit-scrollbar-thumb {
+  background-color: rgba(107, 91, 149, 0.5);
+  border-radius: 4px;
+}
+
+/* Style des titres dans l'interprétation */
+.response-content h1,
+.response-content h2,
+.response-content h3,
+.response-content h4 {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-primary);
+  font-weight: bold;
+}
+
+.response-content h1 {
+  font-size: 1.7em;
+  border-bottom: 1px solid rgba(107, 91, 149, 0.2);
+  padding-bottom: var(--spacing-xs);
+}
+
+.response-content h2 {
+  font-size: 1.5em;
+}
+
+.response-content h3 {
+  font-size: 1.3em;
+}
+
+.response-content h4 {
+  font-size: 1.1em;
 }
 
 /* Paragraphes dans le contenu de la réponse */

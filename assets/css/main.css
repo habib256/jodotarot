@@ -8,6 +8,11 @@
 @import 'base/reset.css';
 @import 'base/typography.css';
 
+/* Utilitaires (déplacé en haut pour être disponible partout) */
+@import 'utils/scrolling.css';
+@import 'utils/animations.css';
+@import 'utils/helpers.css';
+
 /* Composants */
 @import 'components/buttons.css';
 @import 'components/cards.css';
@@ -30,23 +35,19 @@
 @import 'modules/interpretations.css';
 @import 'modules/persona.css';
 
-/* Utilitaires */
-@import 'utils/animations.css';
-@import 'utils/helpers.css';
-
 /**
  * Ce fichier central permet d'organiser les importations CSS
  * selon une structure logique et facilite la maintenance.
  * 
  * L'ordre d'importation est important :
  * 1. Variables et reset (fondation)
- * 2. Composants atomiques réutilisables
- * 3. Layouts et structures de page
- * 4. Modules spécifiques à l'application
- * 5. Utilitaires et helpers
+ * 2. Utilitaires (disponibles partout)
+ * 3. Composants atomiques réutilisables
+ * 4. Layouts et structures de page
+ * 5. Modules spécifiques à l'application
  */
 
-/* Règles globales */
+/* Règles globales minimales */
 html, body {
   height: 100%;
   width: 100%;
@@ -54,17 +55,11 @@ html, body {
   padding: 0;
   overflow-x: hidden;
   overflow-y: auto;
+  box-sizing: border-box;
 }
 
-* {
-  /* Garantir que le défilement est permis partout */
-  -webkit-overflow-scrolling: touch;
+*, *:before, *:after {
+  box-sizing: inherit;
 }
 
-/* Assurer que les conteneurs défilables fonctionnent correctement */
-.interpretation-section, 
-#interpretations-response,
-.response-content,
-.interpretation-panel {
-  -webkit-overflow-scrolling: touch;
-} 
+/* Suppression des styles redondants de défilement qui sont maintenant dans scrolling.css */ 

@@ -18,6 +18,8 @@
   --color-text-light: #666;         /* Texte secondaire et descriptions */
   --color-text-lightest: #999;      /* Texte tertiaire, placeholders et notes */
   
+  --color-table-green: #a0d5b5;     /* Vert clair - Couleur de la table de jeu */
+  
   --color-success: #28a745;         /* Vert - Pour les confirmations et succès */
   --color-warning: #ffc107;         /* Jaune - Pour les avertissements */
   --color-error: #dc3545;           /* Rouge - Pour les erreurs et alertes */
@@ -78,11 +80,11 @@
   --card-width: 100px;        /* Largeur standard des cartes de tarot */
   --card-height: 170px;       /* Hauteur standard (ratio ~1:1.7) */
   --card-width-large: 160px;  /* Largeur des cartes agrandies */
-  --card-height-large: 272px; /* Hauteur des cartes agrandies */
+  --card-height-large: 300px; /* Hauteur des cartes agrandies */
   
   /* Dimensions du conteneur de tirage */
-  --spread-width: 600px;      /* Largeur de l'espace de tirage */
-  --spread-height: 550px;     /* Hauteur de l'espace de tirage */
+  --spread-width: 650px;      /* Largeur de l'espace de tirage */
+  --spread-height: 800px;     /* Hauteur de l'espace de tirage */
 
   /* Variables pour les positions des cartes */
 
@@ -99,48 +101,48 @@
   --cross-bottom-y: 82%;
 
   /* Positions en fer à cheval */
-  --horseshoe-past-x: 40%;         /* Position du passé lointain */
+  --horseshoe-past-x: 30%;         /* Position du passé lointain */
   --horseshoe-past-y: 20%;
   --horseshoe-recent-x: 50%;       /* Position du passé récent */
-  --horseshoe-recent-y: 90%;
+  --horseshoe-recent-y: 80%;
   --horseshoe-present-x: 20%;      /* Position du présent */
   --horseshoe-present-y: 45%;
   --horseshoe-future-x: 32%;       /* Position du futur proche */
-  --horseshoe-future-y: 80%;
-  --horseshoe-outcome-x: 60%;      /* Position du résultat */
+  --horseshoe-future-y: 70%;
+  --horseshoe-outcome-x: 70%;      /* Position du résultat */
   --horseshoe-outcome-y: 20%;
   --horseshoe-influences-x: 68%;   /* Position des influences externes */
-  --horseshoe-influences-y: 80%;
+  --horseshoe-influences-y: 70%;
   --horseshoe-advice-x: 80%;       /* Position du conseil final */
   --horseshoe-advice-y: 45%;
 
   /* Positions du tirage de l'amour */
   /* Première ligne - Vous et Partenaire */
   --love-you-x: 50%;          /* card-1: self - Vous dans la relation */
-  --love-you-y: 55%;
+  --love-you-y: 50%;
   --love-partner-x: 50%;      /* card-2: partner - Votre partenaire */
   --love-partner-y: 20%;
   
   /* Deuxième ligne - Relation et Obstacles */
   --love-relationship-x: 30%; /* card-3: relationship - Dynamique relationnelle */
-  --love-relationship-y: 40%;
-  --love-foundation-x: 70%;   /* card-4: obstacles - Défis à surmonter */
-  --love-foundation-y: 40%;
+  --love-relationship-y: 35%;
+  --love-foundation-x: 70%;   /* card-4: obstacles - OBstacles à surmonter */
+  --love-foundation-y: 35%;
   
   /* Troisième ligne - Passé (Désirs), Présent (Résultat), Futur (Conseil) */
-  --love-past-x: 30%;         /* card-5: desires - Vos désirs et motivations */
-  --love-past-y: 75%;
+  --love-past-x: 30%;         /* card-5: desires - Vos désirs secrets */
+  --love-past-y: 65%;
   --love-present-x: 50%;      /* card-6: outcome - Situation présente */
-  --love-present-y: 90%;
+  --love-present-y: 80%;
   --love-future-x: 70%;       /* card-7: advice - Conseils pour l'avenir */
-  --love-future-y: 75%;
+  --love-future-y: 65%;
 
   /* Positions de la croix celtique */
   /* Centre de la croix */
   --celtic-present-x: 35%;    /* Carte 1: Situation actuelle */
   --celtic-present-y: 45%;
   --celtic-challenge-x: 35%;  /* Carte 2: Obstacle/Défi (croisée) */
-  --celtic-challenge-y: 45%;
+  --celtic-challenge-y: 60%;
   
   /* Tige de la croix */
   --celtic-crown-x: 35%;     /* Carte 5: Couronne/Objectif */

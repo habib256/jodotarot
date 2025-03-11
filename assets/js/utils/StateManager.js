@@ -82,7 +82,7 @@ class StateManager {
     // Vérifier si des valeurs sont invalides et les remplacer par les valeurs par défaut
     for (const [key, value] of Object.entries(validatedUpdates)) {
       // Si la valeur est undefined, null, ou une chaîne vide, utiliser la valeur par défaut
-      if (value === undefined || value === null || value === '') {
+      if ((value === undefined || value === null || value === '') && key in this.defaults) {
         console.warn(`Valeur invalide pour ${key}, utilisation de la valeur par défaut ${this.defaults[key]}`);
         validatedUpdates[key] = this.defaults[key];
       }
