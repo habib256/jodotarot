@@ -368,8 +368,11 @@ class ReadingController {
       
       // Obtenir une interprétation avec streaming et effet de machine à écrire
       const handleChunk = (chunk) => {
+        // Supprimer les timestamps qui pourraient apparaître à la fin (comme "2025-03-11T17:58:05.280771997Z")
+        const cleanedChunk = chunk.replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z$/g, '');
+        
         // Ajouter le nouveau chunk au texte complet
-        this.fullText += chunk;
+        this.fullText += cleanedChunk;
         
         // Si une animation de frappe est déjà en cours, l'arrêter
         if (this.typewriterTimeout) {
@@ -401,6 +404,13 @@ class ReadingController {
         spreadType,
         handleChunk
       );
+      
+      // Extraire le nom du modèle sans préfixe
+      const modelName = model.replace('ollama:', '').replace('openai/', '');
+      
+      // Ajouter le nom du modèle à la fin du texte avec le formatage HTML approprié et aligné à droite
+      this.fullText += `\n\n<div style="text-align: right;"><em>Généré par: ${modelName}</em></div>`;
+      this.startTypewriterEffect();
       
       // Indiquer par une classe que l'interprétation est terminée
       const typewriterElement = this.elements.responseContent.querySelector('.typewriter-text');
