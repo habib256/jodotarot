@@ -59,6 +59,18 @@ class ReadingController {
     // Bouton de tirage
     this.elements.tirerButton.addEventListener('click', this.performReading.bind(this));
     
+    // Écouter les changements de jeu de cartes
+    document.addEventListener('deckId:changed', async (event) => {
+      console.log(`🎴 Changement de jeu détecté: ${event.detail.deckId}`);
+      try {
+        // Charger le nouveau jeu
+        await this.changeDeck(event.detail.deckId);
+        console.log(`✅ Nouveau jeu chargé: ${event.detail.deckId}`);
+      } catch (error) {
+        console.error(`❌ Erreur lors du chargement du jeu ${event.detail.deckId}:`, error);
+      }
+    });
+    
     // Changement de type de tirage
     document.getElementById('spread-type').addEventListener('change', (event) => {
       const spreadType = event.target.value;
@@ -461,18 +473,36 @@ class ReadingController {
    */
   async changeDeck(deckId) {
     try {
-      // Charger le nouveau jeu
-      await this.deckService.loadDeck(deckId);
+      console.log(`🔄 Chargement du jeu ${deckId}...`);
       
-      // Si un tirage a déjà été effectué, mettre à jour les cartes
-      if (this.currentReading.length > 0) {
+      // Réinitialiser l'état actuel
+      this.currentReading = [];
+      
+      // Charger le nouveau jeu
+      const newDeck = await this.deckService.loadDeck(deckId);
+      if (!newDeck) {
+        throw new Error(`Échec du chargement du jeu ${deckId}`);
+      }
+      
+      console.log(`✅ Jeu ${deckId} chargé avec succès - ${newDeck.getAllCards().length} cartes disponibles`);
+      
+      // Réinitialiser l'affichage
+      this.showSpread(this.stateManager.getState().spreadType || 'cross');
+      
+      // Si un tirage a déjà été effectué, effectuer un nouveau tirage
+      const previousCardDrawn = this.stateManager.getState().currentCardsDrawn;
+      if (previousCardDrawn && previousCardDrawn !== '[]') {
+        console.log('🎴 Des cartes ont été tirées précédemment, mise à jour de l\'affichage...');
         this.updateCardDisplay();
       }
+      
+      return newDeck;
     } catch (error) {
-      console.error("Erreur lors du changement de jeu:", error);
+      console.error(`❌ Erreur lors du changement de jeu ${deckId}:`, error);
       this.stateManager.setState({
-        error: error.message
+        error: `Erreur lors du chargement du jeu ${deckId}: ${error.message}`
       });
+      throw error;
     }
   }
   
@@ -480,13 +510,43 @@ class ReadingController {
    * Met à jour l'affichage des cartes avec le jeu actuel
    */
   updateCardDisplay() {
+    // Obtenir le jeu de cartes actuel et l'état global
+    const currentDeck = this.deckService.getCurrentDeck();
+    const state = this.stateManager.getState();
+    
+    // Si nous n'avons pas de jeu actuel, abandonner
+    if (!currentDeck) {
+      console.error("❌ Impossible de mettre à jour l'affichage : aucun jeu de cartes actif");
+      return;
+    }
+    
+    console.log(`🔄 Mise à jour de l'affichage avec le jeu ${currentDeck.deckId}`);
+    
+    // Si nous avons des cartes tirées, les mettre à jour
+    if (this.currentReading.length > 0) {
+      // Pour chaque carte dans la lecture actuelle, mettre à jour son URL d'image
+      // en fonction du jeu de cartes actuel
+      this.currentReading = this.currentReading.map(card => {
+        // Trouver la carte correspondante dans le jeu actuel
+        const freshCard = currentDeck.getCardById(card.id);
+        if (freshCard) {
+          // Créer une copie de la carte avec l'URL d'image mise à jour
+          return {
+            ...card,
+            imageUrl: freshCard.imageUrl,
+            backImageUrl: freshCard.backImageUrl
+          };
+        }
+        return card;
+      });
+    }
+    
     // Mettre à jour l'état avec les cartes actuelles
     this.stateManager.setState({
       cards: this.currentReading
     });
     
     // Récupérer le type de tirage actuel
-    const state = this.stateManager.getState();
     const spreadType = state.spreadType || 'cross';
     
     // Afficher le tirage approprié

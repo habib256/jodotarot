@@ -124,12 +124,21 @@ class Deck {
   }
   
   /**
-   * Recherche une carte par son ID
-   * @param {string} cardId - ID de la carte à rechercher
+   * Recherche une carte par son id
+   * @param {string|number} cardId - ID de la carte à rechercher
    * @return {Object|null} La carte trouvée ou null
    */
   findCardById(cardId) {
     return this.originalCards.find(card => card.id === cardId) || null;
+  }
+  
+  /**
+   * Alias de findCardById
+   * @param {string|number} cardId - ID de la carte à rechercher
+   * @return {Object|null} La carte trouvée ou null
+   */
+  getCardById(cardId) {
+    return this.findCardById(cardId);
   }
   
   /**

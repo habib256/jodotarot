@@ -63,48 +63,48 @@ const cardsData = {
     return {
       id: i,
       name: fileName.substring(3).split('.')[0],
-      imageUrl: `assets/images/tarot/set01/${fileName}`,
-      backImageUrl: `assets/images/tarot/set01/22 Dos de carte.png`,
+      imageUrl: `assets/images/cards/marseille/${fileName}`,
+      backImageUrl: `assets/images/cards/marseille/22 Dos de carte.png`,
       keywords: []
     };
   }),
   
   'set02': Array(23).fill().map((_, i) => {
-    // Pour le second jeu (Rider-Waite)
+    // Pour le second jeu (Tarot Thiago Lehmann)
     const cardId = i.toString().padStart(2, '0');
     
-    // Noms des arcanes majeurs
+    // Noms des arcanes majeurs en français (comme dans les fichiers)
     const majorArcanaNames = {
-      "00": "The Fool",
-      "01": "The Magician",
-      "02": "The High Priestess",
-      "03": "The Empress",
-      "04": "The Emperor",
-      "05": "The Hierophant",
-      "06": "The Lovers",
-      "07": "The Chariot",
-      "08": "Strength",
-      "09": "The Hermit",
-      "10": "Wheel of Fortune",
-      "11": "Justice",
-      "12": "The Hanged Man",
-      "13": "Death",
+      "00": "Le fou",
+      "01": "Bateleur",
+      "02": "Papesse",
+      "03": "Imperatrice",
+      "04": "Empereur",
+      "05": "Pape",
+      "06": "Les amoureux",
+      "07": "Chariot",
+      "08": "Justice",
+      "09": "Ermite",
+      "10": "La roue",
+      "11": "Force",
+      "12": "Le pendu",
+      "13": "La mort",
       "14": "Temperance",
-      "15": "The Devil",
-      "16": "The Tower",
-      "17": "The Star",
-      "18": "The Moon",
-      "19": "The Sun",
-      "20": "Judgement",
-      "21": "The World",
-      "22": "Card Back"
+      "15": "Diable",
+      "16": "La Tour",
+      "17": "Etoile",
+      "18": "La lune",
+      "19": "Le soleil",
+      "20": "Le jugement",
+      "21": "Le monde",
+      "22": "Dos de carte"
     };
     
     return {
       id: i,
       name: majorArcanaNames[cardId],
-      imageUrl: `assets/images/tarot/set02/${cardId}.jpg`,
-      backImageUrl: `assets/images/tarot/set02/22.jpg`,
+      imageUrl: `assets/images/cards/lehmann/${cardId} ${majorArcanaNames[cardId]}.jpg`,
+      backImageUrl: `assets/images/cards/lehmann/22 Dos de carte.png`,
       keywords: []
     };
   })

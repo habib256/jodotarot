@@ -165,8 +165,20 @@ class ConfigController {
   handleCardSetChange(event) {
     const cardSet = event.target.value;
     
+    // Ajouter du débogage
+    console.log(`🃏 Changement de jeu de cartes: ${cardSet}`);
+    
     // Mettre à jour l'état via StateManager uniquement
     this.stateManager.setState({ cardSet });
+    
+    // Vérifier si CardSet et DeckId sont synchronisés
+    console.log(`🔄 État après mise à jour - cardSet: ${this.stateManager.state.cardSet}, deckId: ${this.stateManager.state.deckId}`);
+    
+    // Nous devrions aussi mettre à jour deckId pour être cohérent
+    if (this.stateManager.state.deckId !== cardSet) {
+      console.log(`⚠️ Synchronisation deckId avec cardSet: ${cardSet}`);
+      this.stateManager.setState({ deckId: cardSet });
+    }
     
     // Réinitialiser l'affichage du tirage aux positions par défaut
     resetAllDisplays();

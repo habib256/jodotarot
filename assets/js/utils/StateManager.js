@@ -249,6 +249,15 @@ class StateManager {
       // Ajouter un log pour déboguer
       console.log('🔄 StateManager.setState appelé avec:', JSON.stringify(updates));
       
+      // Synchroniser cardSet et deckId si l'un des deux change
+      if (updates.cardSet && updates.cardSet !== this.state.cardSet) {
+        updates.deckId = updates.cardSet;
+        console.log(`🔄 Synchronisation automatique: deckId <- cardSet (${updates.cardSet})`);
+      } else if (updates.deckId && updates.deckId !== this.state.deckId) {
+        updates.cardSet = updates.deckId;
+        console.log(`🔄 Synchronisation automatique: cardSet <- deckId (${updates.deckId})`);
+      }
+      
       // Valider chaque mise à jour
       for (const [key, value] of Object.entries(updates)) {
         console.log(`📋 Validation de ${key}:`, value);
