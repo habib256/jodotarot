@@ -96,12 +96,43 @@
             cursor: move;
             user-select: none;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             font-size: 14px;
             color: #333;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            transition: transform 0.2s ease-out, box-shadow 0.2s ease-in-out, filter 0.2s ease-in-out;
+            padding: 5px;
+            z-index: 1;
+        }
+
+        .card .position-number {
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--color-primary);
+            margin-bottom: 5px;
+            transform: none;
+            pointer-events: none;
+        }
+
+        .card .card-name {
+            font-weight: bold;
+            margin-bottom: 2px;
+            transform: none;
+            pointer-events: none;
+        }
+
+        .card .card-description {
+            font-size: 10px;
+            text-align: center;
+            color: #666;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            max-width: 90%;
+            transform: none;
+            pointer-events: none;
         }
 
         .card.selected {
@@ -311,56 +342,56 @@
          * Définition des types de tirages disponibles
          * Structure: 
          * - name: Nom affiché du tirage
-         * - cards: Tableau des cartes avec leur nom technique et label d'affichage
+         * - cards: Tableau des cartes avec leur nom technique, label d'affichage, position et description
          */
         const spreads = {
             cross: {
                 name: 'Tirage en Croix',
                 cards: [
-                    { name: 'center', label: 'Centre' },
-                    { name: 'top', label: 'Haut' },
-                    { name: 'left', label: 'Gauche' },
-                    { name: 'right', label: 'Droite' },
-                    { name: 'bottom', label: 'Bas' }
+                    { name: 'center', label: 'Centre', position: 1, description: 'La situation centrale' },
+                    { name: 'top', label: 'Haut', position: 2, description: 'L\'influence supérieure' },
+                    { name: 'right', label: 'Droite', position: 3, description: 'Ce qui arrive' },
+                    { name: 'bottom', label: 'Bas', position: 4, description: 'La fondation' },
+                    { name: 'left', label: 'Gauche', position: 5, description: 'Ce qui s\'en va' }
                 ]
             },
             horseshoe: {
                 name: 'Fer à Cheval',
                 cards: [
-                    { name: 'past', label: 'Passé' },
-                    { name: 'recent', label: 'Récent' },
-                    { name: 'present', label: 'Présent' },
-                    { name: 'future', label: 'Futur' },
-                    { name: 'outcome', label: 'Résultat' },
-                    { name: 'influences', label: 'Influences' },
-                    { name: 'advice', label: 'Conseil' }
+                    { name: 'past', label: 'Passé', position: 1, description: 'Le passé lointain' },
+                    { name: 'recent', label: 'Récent', position: 2, description: 'Le passé récent' },
+                    { name: 'present', label: 'Présent', position: 3, description: 'Le présent' },
+                    { name: 'future', label: 'Futur', position: 4, description: 'Le futur proche' },
+                    { name: 'outcome', label: 'Résultat', position: 5, description: 'Le résultat probable' },
+                    { name: 'influences', label: 'Influences', position: 6, description: 'Les influences externes' },
+                    { name: 'advice', label: 'Conseil', position: 7, description: 'Les conseils' }
                 ]
             },
             love: {
                 name: 'Tirage de l\'Amour',
                 cards: [
-                    { name: 'you', label: 'Vous' },
-                    { name: 'partner', label: 'Partenaire' },
-                    { name: 'relationship', label: 'Relation' },
-                    { name: 'foundation', label: 'Fondation' },
-                    { name: 'past', label: 'Passé' },
-                    { name: 'present', label: 'Présent' },
-                    { name: 'future', label: 'Futur' }
+                    { name: 'you', label: 'Vous', position: 1, description: 'Votre position dans la relation' },
+                    { name: 'partner', label: 'Partenaire', position: 2, description: 'La position de votre partenaire' },
+                    { name: 'relationship', label: 'Relation', position: 3, description: 'La dynamique actuelle' },
+                    { name: 'foundation', label: 'Fondation', position: 4, description: 'La base de la relation' },
+                    { name: 'past', label: 'Passé', position: 5, description: 'L\'histoire passée' },
+                    { name: 'present', label: 'Présent', position: 6, description: 'La situation présente' },
+                    { name: 'future', label: 'Futur', position: 7, description: 'L\'évolution future' }
                 ]
             },
             celtic: {
                 name: 'Croix Celtique',
                 cards: [
-                    { name: 'present', label: 'Présent' },
-                    { name: 'challenge', label: 'Défi' },
-                    { name: 'crown', label: 'Couronne' },
-                    { name: 'foundation', label: 'Fondation' },
-                    { name: 'past', label: 'Passé' },
-                    { name: 'future', label: 'Futur' },
-                    { name: 'self', label: 'Soi' },
-                    { name: 'environment', label: 'Environnement' },
-                    { name: 'hopes', label: 'Espoirs' },
-                    { name: 'outcome', label: 'Résultat' }
+                    { name: 'present', label: 'Présent', position: 1, description: 'Situation actuelle' },
+                    { name: 'challenge', label: 'Défi', position: 2, description: 'Obstacle ou défi immédiat' },
+                    { name: 'crown', label: 'Couronne', position: 5, description: 'Influence consciente/Objectifs' },
+                    { name: 'foundation', label: 'Fondation', position: 3, description: 'Base de la situation' },
+                    { name: 'past', label: 'Passé', position: 4, description: 'Passé récent/Ce qui s\'en va' },
+                    { name: 'future', label: 'Futur', position: 6, description: 'Futur proche/Ce qui vient' },
+                    { name: 'self', label: 'Soi', position: 7, description: 'Votre attitude/Comment vous êtes perçu' },
+                    { name: 'environment', label: 'Environnement', position: 8, description: 'Influences extérieures' },
+                    { name: 'hopes', label: 'Espoirs', position: 9, description: 'Espérances ou craintes' },
+                    { name: 'outcome', label: 'Résultat', position: 10, description: 'Résultat final' }
                 ]
             }
         };
@@ -411,14 +442,26 @@
                 initialCardPositions[spreadType] = {};
                 
                 spreads[spreadType].cards.forEach(card => {
-                    const xVarName = `--${spreadType}-${card.name}-x`;
-                    const yVarName = `--${spreadType}-${card.name}-y`;
-                    const rotationVarName = `--${spreadType}-${card.name}-rotation`;
+                    // Vérifier d'abord les variables standardisées
+                    const xVarName = `--${spreadType}-position-${card.position}-x`;
+                    const yVarName = `--${spreadType}-position-${card.position}-y`;
+                    const rotationVarName = `--${spreadType}-position-${card.position}-rotation`;
                     
                     // Utiliser les nouvelles fonctions standardisées
-                    const x = getCSSVariableNumeric(xVarName);
-                    const y = getCSSVariableNumeric(yVarName);
-                    const rotation = getCSSVariableNumeric(rotationVarName);
+                    let x = getCSSVariableNumeric(xVarName);
+                    let y = getCSSVariableNumeric(yVarName);
+                    let rotation = getCSSVariableNumeric(rotationVarName);
+                    
+                    // Si les variables standardisées n'existent pas, essayer les anciennes
+                    if (isNaN(x) || isNaN(y)) {
+                        const oldXVarName = `--${spreadType}-${card.name}-x`;
+                        const oldYVarName = `--${spreadType}-${card.name}-y`;
+                        const oldRotationVarName = `--${spreadType}-${card.name}-rotation`;
+                        
+                        x = getCSSVariableNumeric(oldXVarName);
+                        y = getCSSVariableNumeric(oldYVarName);
+                        rotation = getCSSVariableNumeric(oldRotationVarName);
+                    }
                     
                     // Valeur par défaut si la variable n'existe pas ou n'est pas un nombre valide
                     cardPositions[spreadType][card.name] = {
@@ -490,8 +533,26 @@
         function createCard(card, index) {
             const cardEl = document.createElement('div');
             cardEl.className = 'card';
-            cardEl.textContent = `${card.label} (${index + 1})`;
             cardEl.dataset.name = card.name;
+            cardEl.dataset.position = card.position;
+            
+            // Créer les éléments internes avec le numéro de position et la description
+            const positionEl = document.createElement('div');
+            positionEl.className = 'position-number';
+            positionEl.textContent = card.position;
+            
+            const nameEl = document.createElement('div');
+            nameEl.className = 'card-name';
+            nameEl.textContent = card.label;
+            
+            const descriptionEl = document.createElement('div');
+            descriptionEl.className = 'card-description';
+            descriptionEl.textContent = card.description;
+            
+            // Ajouter les éléments à la carte
+            cardEl.appendChild(positionEl);
+            cardEl.appendChild(nameEl);
+            cardEl.appendChild(descriptionEl);
             
             // Position par défaut au centre (sera écrasée si une position existe)
             cardEl.style.left = '50%';
@@ -508,10 +569,14 @@
          * @param {MouseEvent} e - Événement de clic souris
          */
         function startDragging(e) {
+            // Sélectionner la carte parente, peu importe où le clic a été fait
             if (selectedCard) {
                 selectedCard.classList.remove('selected');
             }
-            selectedCard = e.target;
+            
+            // Utiliser e.currentTarget pour obtenir l'élément sur lequel l'événement a été attaché
+            // et non l'élément sur lequel l'utilisateur a cliqué
+            selectedCard = e.currentTarget;
             selectedCard.classList.add('selected');
 
             // Récupérer la rotation actuelle de la carte sélectionnée
@@ -555,7 +620,7 @@
                 selectedCard.style.left = boundedX + '%';
                 selectedCard.style.top = boundedY + '%';
                 
-                // Conserver la rotation dans la transformation
+                // Conserver la rotation dans la transformation mais sans animation
                 const name = selectedCard.dataset.name;
                 const spreadType = spreadSelect.value;
                 const rotation = cardPositions[spreadType][name].rotation || 0;
@@ -590,6 +655,10 @@
 
             document.addEventListener('mousemove', onMouseMove);
             document.addEventListener('mouseup', onMouseUp);
+            
+            // Empêcher la propagation de l'événement pour éviter des comportements indésirables
+            e.preventDefault();
+            e.stopPropagation();
         }
 
         // Gestion de la rotation
@@ -707,91 +776,29 @@
             return val1 !== val2;
         }
 
-        // Fonction mise à jour avec option pour forcer un rendu immédiat et formatage optimisé
-        function updateOutput(instant = false) {
-            // Commencer par récupérer le type de tirage actif pour les manipulations visuelles
-            const activeSpreadType = spreadSelect.value;
-            
-            // Durant le déplacement d'une carte (instant = true), on n'affiche que les variables du tirage actif
-            // pour une meilleure performance, sinon on affiche tout
-            const showOnlyActiveSpread = instant && selectedCard;
-            
-            // Variables pour suivre les modifications
-            let hasChangedValues = false;
-            let css = "";
-            
-            // Dimensions des cartes - vérifier si modifiées
-            const initialBaseWidth = getCSSVariableNumeric('--card-base-width') || 95;
-            const initialRatio = getCSSVariableNumeric('--card-ratio') || 1.7;
-            const initialScaleFactor = getCSSVariableNumeric('--card-scale-factor') || 1;
-            
-            // N'inclure les dimensions que si elles sont différentes des valeurs initiales
-            if (hasChanged(cardBaseWidth.value, initialBaseWidth)) {
-                css += `--card-base-width: ${cardBaseWidth.value}px;\n`;
-                hasChangedValues = true;
+        // Fonction pour générer le CSS des variables de position
+        function generatePositionCSS(spreadType, position) {
+            // Si les positions n'existent pas, utiliser des valeurs par défaut
+            if (!cardPositions[spreadType] || !cardPositions[spreadType][position.name]) {
+                return '';
             }
             
-            if (hasChanged(cardRatio.value, initialRatio)) {
-                css += `--card-ratio: ${cardRatio.value};\n`;
-                hasChangedValues = true;
+            let css = '';
+            const pos = cardPositions[spreadType][position.name];
+            
+            // Utiliser le format standardisé des variables de position
+            const formattedX = `--${spreadType}-position-${position.position}-x: ${Math.round(pos.x)}%;\n`;
+            const formattedY = `--${spreadType}-position-${position.position}-y: ${Math.round(pos.y)}%;\n`;
+            
+            css += formattedX;
+            css += formattedY;
+            
+            // Ajouter la rotation si nécessaire
+            if (pos.rotation && pos.rotation !== 0) {
+                css += `--${spreadType}-position-${position.position}-rotation: ${pos.rotation}deg;\n`;
             }
             
-            if (hasChanged(cardScaleFactor.value, initialScaleFactor)) {
-                css += `--card-scale-factor: ${cardScaleFactor.value};\n`;
-                hasChangedValues = true;
-            }
-            
-            // Parcourir tous les types de tirages disponibles
-            for (const spreadType in spreads) {
-                // Si on est en mode déplacement, on n'affiche que le tirage actif
-                if (showOnlyActiveSpread && spreadType !== activeSpreadType) continue;
-                
-                if (!cardPositions[spreadType] || !initialCardPositions[spreadType]) continue;
-                
-                // Parcourir les cartes pour ce tirage
-                for (const name in cardPositions[spreadType]) {
-                    if (!initialCardPositions[spreadType][name]) continue;
-                    
-                    const pos = cardPositions[spreadType][name];
-                    const initialPos = initialCardPositions[spreadType][name];
-                    
-                    // Vérifier si x a changé
-                    if (hasChanged(Math.round(pos.x), Math.round(initialPos.x))) {
-                        css += `--${spreadType}-${name}-x: ${Math.round(pos.x)}%;\n`;
-                        hasChangedValues = true;
-                    }
-                    
-                    // Vérifier si y a changé
-                    if (hasChanged(Math.round(pos.y), Math.round(initialPos.y))) {
-                        css += `--${spreadType}-${name}-y: ${Math.round(pos.y)}%;\n`;
-                        hasChangedValues = true;
-                    }
-                    
-                    // Vérifier si rotation a changé
-                    const rotation = pos.rotation || 0;
-                    const initialRotation = initialPos.rotation || 0;
-                    if (hasChanged(rotation, initialRotation)) {
-                        css += `--${spreadType}-${name}-rotation: ${rotation}deg;\n`;
-                        hasChangedValues = true;
-                    }
-                }
-            }
-            
-            // Si aucune valeur n'a changé, afficher un message simple
-            if (!hasChangedValues) {
-                css = "/* Aucune modification */";
-            }
-            
-            // Mise à jour du texte de la zone d'affichage principale
-            output.textContent = css;
-            
-            // Si besoin d'une mise à jour immédiate, forcer un reflow
-            if (instant) {
-                // Technique standard pour forcer un reflow
-                output.style.display = 'none';
-                void output.offsetHeight; // Force reflow
-                output.style.display = '';
-            }
+            return css;
         }
 
         /**
@@ -846,7 +853,87 @@
                 }
             });
             
-            updateOutput();
+            // Réinitialiser le texte CSS à chaque changement de tirage
+            resetCSSOutput();
+        }
+        
+        /**
+         * Réinitialise la zone d'affichage du CSS au message par défaut
+         */
+        function resetCSSOutput() {
+            output.textContent = `/* Sélectionnez et déplacez les cartes pour générer le CSS du tirage ${spreads[spreadSelect.value].name} */`;
+        }
+        
+        // Fonction mise à jour avec le nouveau format des variables standardisées
+        function updateOutput(instant = false) {
+            // Commencer par récupérer le type de tirage actif pour les manipulations visuelles
+            const activeSpreadType = spreadSelect.value;
+            
+            // Durant le déplacement d'une carte (instant = true), on n'affiche que les variables du tirage actif
+            // pour une meilleure performance, sinon on affiche tout
+            const showOnlyActiveSpread = instant && selectedCard;
+            
+            // Variables pour suivre les modifications
+            let hasChangedValues = false;
+            let css = "";
+            
+            // Dimensions des cartes - vérifier si modifiées
+            const initialBaseWidth = getCSSVariableNumeric('--card-base-width') || 95;
+            const initialRatio = getCSSVariableNumeric('--card-ratio') || 1.7;
+            const initialScaleFactor = getCSSVariableNumeric('--card-scale-factor') || 1;
+            
+            // N'inclure les dimensions que si elles sont différentes des valeurs initiales
+            if (hasChanged(cardBaseWidth.value, initialBaseWidth)) {
+                css += `--card-base-width: ${cardBaseWidth.value}px;\n`;
+                hasChangedValues = true;
+            }
+            
+            if (hasChanged(cardRatio.value, initialRatio)) {
+                css += `--card-ratio: ${cardRatio.value};\n`;
+                hasChangedValues = true;
+            }
+            
+            if (hasChanged(cardScaleFactor.value, initialScaleFactor)) {
+                css += `--card-scale-factor: ${cardScaleFactor.value};\n`;
+                hasChangedValues = true;
+            }
+            
+            // Parcourir tous les types de tirages disponibles
+            for (const spreadType in spreads) {
+                // Si on est en mode déplacement, on n'affiche que le tirage actif
+                if (showOnlyActiveSpread && spreadType !== activeSpreadType) continue;
+                
+                // Ajouter un commentaire pour le type de tirage
+                css += `\n/* Variables pour le tirage ${spreads[spreadType].name} */\n`;
+                
+                // Parcourir les cartes pour ce tirage
+                for (const card of spreads[spreadType].cards) {
+                    // Générer les variables de position au format standardisé
+                    let positionCSS = generatePositionCSS(spreadType, card);
+                    
+                    if (positionCSS) {
+                        css += positionCSS;
+                        hasChangedValues = true;
+                    }
+                }
+            }
+            
+            // Si aucune valeur n'a changé, afficher un message simple
+            if (!hasChangedValues) {
+                resetCSSOutput();
+                return;
+            }
+            
+            // Mise à jour du texte de la zone d'affichage principale
+            output.textContent = css;
+            
+            // Si besoin d'une mise à jour immédiate, forcer un reflow
+            if (instant) {
+                // Technique standard pour forcer un reflow
+                output.style.display = 'none';
+                void output.offsetHeight; // Force reflow
+                output.style.display = '';
+            }
         }
 
         /**

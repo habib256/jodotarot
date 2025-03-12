@@ -40,40 +40,81 @@
 
 /* Positions spécifiques pour chaque carte */
 .card-position.center, .center {
-  left: var(--cross-center-x);
-  top: var(--cross-center-y);
+  left: var(--cross-position-1-x);
+  top: var(--cross-position-1-y);
   transform: translate(-50%, -50%);
   z-index: 3;
   transform-origin: center center;
 }
 
 .card-position.top, .top {
-  left: var(--cross-top-x);
-  top: var(--cross-top-y);
+  left: var(--cross-position-2-x);
+  top: var(--cross-position-2-y);
   transform: translate(-50%, 0);
   z-index: 2;
   transform-origin: center top;
 }
 
 .card-position.left, .left {
-  left: var(--cross-left-x);
-  top: var(--cross-left-y);
+  left: var(--cross-position-3-x);
+  top: var(--cross-position-3-y);
   transform: translate(0, -50%);
   z-index: 2;
   transform-origin: left center;
 }
 
 .card-position.right, .right {
-  left: var(--cross-right-x);
-  top: var(--cross-right-y);
+  left: var(--cross-position-4-x);
+  top: var(--cross-position-4-y);
   transform: translate(-100%, -50%);
   z-index: 2;
   transform-origin: right center;
 }
 
 .card-position.bottom, .bottom {
-  left: var(--cross-bottom-x);
-  top: var(--cross-bottom-y);
+  left: var(--cross-position-5-x);
+  top: var(--cross-position-5-y);
+  transform: translate(-50%, -100%);
+  z-index: 2;
+  transform-origin: center bottom;
+}
+
+/* Positions numériques (nouvelles classes pour compatibilité) */
+.card-position-1, .position-1 {
+  left: var(--cross-position-1-x);
+  top: var(--cross-position-1-y);
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  transform-origin: center center;
+}
+
+.card-position-2, .position-2 {
+  left: var(--cross-position-2-x);
+  top: var(--cross-position-2-y);
+  transform: translate(-50%, 0);
+  z-index: 2;
+  transform-origin: center top;
+}
+
+.card-position-3, .position-3 {
+  left: var(--cross-position-3-x);
+  top: var(--cross-position-3-y);
+  transform: translate(0, -50%);
+  z-index: 2;
+  transform-origin: left center;
+}
+
+.card-position-4, .position-4 {
+  left: var(--cross-position-4-x);
+  top: var(--cross-position-4-y);
+  transform: translate(-100%, -50%);
+  z-index: 2;
+  transform-origin: right center;
+}
+
+.card-position-5, .position-5 {
+  left: var(--cross-position-5-x);
+  top: var(--cross-position-5-y);
   transform: translate(-50%, -100%);
   z-index: 2;
   transform-origin: center bottom;
@@ -81,7 +122,9 @@
 
 /* Effets au survol uniformisés */
 .center:hover, .top:hover, .left:hover, .right:hover, .bottom:hover,
+.position-1:hover, .position-2:hover, .position-3:hover, .position-4:hover, .position-5:hover,
 .card-position.center:hover, .card-position.top:hover, .card-position.left:hover, .card-position.right:hover, .card-position.bottom:hover,
+.card-position-1:hover, .card-position-2:hover, .card-position-3:hover, .card-position-4:hover, .card-position-5:hover,
 .spread .card-position:hover {
   z-index: 10;
   filter: brightness(1.08);

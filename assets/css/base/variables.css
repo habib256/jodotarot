@@ -106,87 +106,170 @@
   /* Variables pour les positions des cartes */
 
   /* Tirage en croix */
-  --cross-center-x: 50%;      /* Position centrale - Situation actuelle */
-  --cross-center-y: 50%;
-  --cross-top-x: 50%;         /* Position haute - Ce qui influence */
-  --cross-top-y: 18%;
-  --cross-left-x: 25%;        /* Position gauche - Passé */
-  --cross-left-y: 50%;
-  --cross-right-x: 75%;       /* Position droite - Futur */
-  --cross-right-y: 50%;
-  --cross-bottom-x: 50%;      /* Position basse - Résultat */
-  --cross-bottom-y: 82%;
+  /* Position 1: Centrale - Situation actuelle (précédemment 'center') */
+  --cross-position-1-x: 50%;
+  --cross-position-1-y: 50%;
+  /* Position 2: Haute - Ce qui influence (précédemment 'top') */
+  --cross-position-2-x: 50%;
+  --cross-position-2-y: 18%;
+  /* Position 3: Gauche - Passé (précédemment 'left') */
+  --cross-position-3-x: 25%;
+  --cross-position-3-y: 50%;
+  /* Position 4: Droite - Futur (précédemment 'right') */
+  --cross-position-4-x: 75%;
+  --cross-position-4-y: 50%;
+  /* Position 5: Basse - Résultat (précédemment 'bottom') */
+  --cross-position-5-x: 50%;
+  --cross-position-5-y: 82%;
+
+  /* Conserver les anciennes variables temporairement pour compatibilité */
+  --cross-center-x: var(--cross-position-1-x);
+  --cross-center-y: var(--cross-position-1-y);
+  --cross-top-x: var(--cross-position-2-x);
+  --cross-top-y: var(--cross-position-2-y);
+  --cross-left-x: var(--cross-position-3-x);
+  --cross-left-y: var(--cross-position-3-y);
+  --cross-right-x: var(--cross-position-4-x);
+  --cross-right-y: var(--cross-position-4-y);
+  --cross-bottom-x: var(--cross-position-5-x);
+  --cross-bottom-y: var(--cross-position-5-y);
 
   /* Positions en fer à cheval */
-  --horseshoe-past-x: 30%;         /* Position du passé lointain */
-  --horseshoe-past-y: 15%;
-  --horseshoe-recent-x: 50%;       /* Position du passé récent */
-  --horseshoe-recent-y: 80%;
-  --horseshoe-present-x: 20%;      /* Position du présent */
-  --horseshoe-present-y: 42%;
-  --horseshoe-future-x: 25%;       /* Position du futur proche */
-  --horseshoe-future-y: 70%;
-  --horseshoe-outcome-x: 70%;      /* Position du résultat */
-  --horseshoe-outcome-y: 15%;
-  --horseshoe-influences-x: 75%;   /* Position des influences externes */
-  --horseshoe-influences-y: 70%;
-  --horseshoe-advice-x: 80%;       /* Position du conseil final */
-  --horseshoe-advice-y: 42%;
+  /* Position 1: Passé lointain (précédemment 'past') */
+  --horseshoe-position-1-x: 30%;
+  --horseshoe-position-1-y: 15%;
+  /* Position 2: Passé récent (précédemment 'recent') */
+  --horseshoe-position-2-x: 50%;
+  --horseshoe-position-2-y: 80%;
+  /* Position 3: Présent (précédemment 'present') */
+  --horseshoe-position-3-x: 20%;
+  --horseshoe-position-3-y: 42%;
+  /* Position 4: Futur proche (précédemment 'future') */
+  --horseshoe-position-4-x: 25%;
+  --horseshoe-position-4-y: 70%;
+  /* Position 5: Résultat (précédemment 'outcome') */
+  --horseshoe-position-5-x: 70%;
+  --horseshoe-position-5-y: 15%;
+  /* Position 6: Influences externes (précédemment 'influences') */
+  --horseshoe-position-6-x: 75%;
+  --horseshoe-position-6-y: 70%;
+  /* Position 7: Conseil final (précédemment 'advice') */
+  --horseshoe-position-7-x: 80%;
+  --horseshoe-position-7-y: 42%;
+
+  /* Conserver les anciennes variables temporairement pour compatibilité */
+  --horseshoe-past-x: var(--horseshoe-position-1-x);
+  --horseshoe-past-y: var(--horseshoe-position-1-y);
+  --horseshoe-recent-x: var(--horseshoe-position-2-x);
+  --horseshoe-recent-y: var(--horseshoe-position-2-y);
+  --horseshoe-present-x: var(--horseshoe-position-3-x);
+  --horseshoe-present-y: var(--horseshoe-position-3-y);
+  --horseshoe-future-x: var(--horseshoe-position-4-x);
+  --horseshoe-future-y: var(--horseshoe-position-4-y);
+  --horseshoe-outcome-x: var(--horseshoe-position-5-x);
+  --horseshoe-outcome-y: var(--horseshoe-position-5-y);
+  --horseshoe-influences-x: var(--horseshoe-position-6-x);
+  --horseshoe-influences-y: var(--horseshoe-position-6-y);
+  --horseshoe-advice-x: var(--horseshoe-position-7-x);
+  --horseshoe-advice-y: var(--horseshoe-position-7-y);
 
   /* Positions du tirage de l'amour */
-  /* Première ligne - Vous et Partenaire */
-  --love-you-x: 50%;          /* card-1: self - Vous dans la relation */
-  --love-you-y: 50%;
-  --love-partner-x: 50%;      /* card-2: partner - Votre partenaire */
-  --love-partner-y: 20%;
+  /* Position 1: Vous dans la relation (précédemment 'you') */
+  --love-position-1-x: 50%;
+  --love-position-1-y: 50%;
+  /* Position 2: Votre partenaire (précédemment 'partner') */
+  --love-position-2-x: 50%;
+  --love-position-2-y: 20%;
   
-  /* Deuxième ligne - Relation et Obstacles */
-  --love-relationship-x: 25%; /* card-3: relationship - Dynamique relationnelle */
-  --love-relationship-y: 35%;
-  --love-foundation-x: 75%;   /* card-4: obstacles - OBstacles à surmonter */
-  --love-foundation-y: 35%;
+  /* Position 3: Dynamique relationnelle (précédemment 'relationship') */
+  --love-position-3-x: 25%;
+  --love-position-3-y: 35%;
+  /* Position 4: Obstacles à surmonter (précédemment 'foundation') */
+  --love-position-4-x: 75%;
+  --love-position-4-y: 35%;
   
-  /* Troisième ligne - Passé (Désirs), Présent (Résultat), Futur (Conseil) */
-  --love-past-x: 25%;         /* card-5: desires - Vos désirs secrets */
-  --love-past-y: 65%;
-  --love-present-x: 50%;      /* card-6: outcome - Situation présente */
-  --love-present-y: 80%;
-  --love-future-x: 75%;       /* card-7: advice - Conseils pour l'avenir */
-  --love-future-y: 65%;
+  /* Position 5: Vos désirs secrets (précédemment 'past') */
+  --love-position-5-x: 25%;
+  --love-position-5-y: 65%;
+  /* Position 6: Situation présente (précédemment 'present') */
+  --love-position-6-x: 50%;
+  --love-position-6-y: 80%;
+  /* Position 7: Conseils pour l'avenir (précédemment 'future') */
+  --love-position-7-x: 75%;
+  --love-position-7-y: 65%;
+
+  /* Conserver les anciennes variables temporairement pour compatibilité */
+  --love-you-x: var(--love-position-1-x);
+  --love-you-y: var(--love-position-1-y);
+  --love-partner-x: var(--love-position-2-x);
+  --love-partner-y: var(--love-position-2-y);
+  --love-relationship-x: var(--love-position-3-x);
+  --love-relationship-y: var(--love-position-3-y);
+  --love-foundation-x: var(--love-position-4-x);
+  --love-foundation-y: var(--love-position-4-y);
+  --love-past-x: var(--love-position-5-x);
+  --love-past-y: var(--love-position-5-y);
+  --love-present-x: var(--love-position-6-x);
+  --love-present-y: var(--love-position-6-y);
+  --love-future-x: var(--love-position-7-x);
+  --love-future-y: var(--love-position-7-y);
 
 
   /* Positions pour Croix Celtique */
-/* Carte 1: Présent */
---celtic-present-x: 39%;
---celtic-present-y: 37%;
-/* Carte 2: Défi */
---celtic-challenge-x: 39%;
---celtic-challenge-y: 46%;
---celtic-challenge-rotation: 90deg;
-/* Carte 3: Couronne */
---celtic-crown-x: 39%;
---celtic-crown-y: 63%;
-/* Carte 4: Fondation */
---celtic-foundation-x: 16%;
---celtic-foundation-y: 37%;
-/* Carte 5: Passé */
---celtic-past-x: 40%;
---celtic-past-y: 13%;
-/* Carte 6: Futur */
---celtic-future-x: 61%;
---celtic-future-y: 37%;
-/* Carte 7: Soi */
---celtic-self-x: 84%;
---celtic-self-y: 86%;
-/* Carte 8: Environnement */
---celtic-environment-x: 84%;
---celtic-environment-y: 62%;
-/* Carte 9: Espoirs */
---celtic-hopes-x: 84%;
---celtic-hopes-y: 37%;
-/* Carte 10: Résultat */
---celtic-outcome-x: 84%;
---celtic-outcome-y: 13%;
+  /* Position 1: Présent (précédemment 'present') */
+  --celtic-position-1-x: 39%;
+  --celtic-position-1-y: 37%;
+  /* Position 2: Défi (précédemment 'challenge') */
+  --celtic-position-2-x: 39%;
+  --celtic-position-2-y: 46%;
+  --celtic-position-2-rotation: 90deg;
+  /* Position 3: Couronne (précédemment 'crown') */
+  --celtic-position-3-x: 39%;
+  --celtic-position-3-y: 63%;
+  /* Position 4: Fondation (précédemment 'foundation') */
+  --celtic-position-4-x: 16%;
+  --celtic-position-4-y: 37%;
+  /* Position 5: Passé (précédemment 'past') */
+  --celtic-position-5-x: 40%;
+  --celtic-position-5-y: 13%;
+  /* Position 6: Futur (précédemment 'future') */
+  --celtic-position-6-x: 61%;
+  --celtic-position-6-y: 37%;
+  /* Position 7: Soi (précédemment 'self') */
+  --celtic-position-7-x: 84%;
+  --celtic-position-7-y: 86%;
+  /* Position 8: Environnement (précédemment 'environment') */
+  --celtic-position-8-x: 84%;
+  --celtic-position-8-y: 62%;
+  /* Position 9: Espoirs (précédemment 'hopes') */
+  --celtic-position-9-x: 84%;
+  --celtic-position-9-y: 37%;
+  /* Position 10: Résultat (précédemment 'outcome') */
+  --celtic-position-10-x: 84%;
+  --celtic-position-10-y: 13%;
+
+  /* Conserver les anciennes variables temporairement pour compatibilité */
+  --celtic-present-x: var(--celtic-position-1-x);
+  --celtic-present-y: var(--celtic-position-1-y);
+  --celtic-challenge-x: var(--celtic-position-2-x);
+  --celtic-challenge-y: var(--celtic-position-2-y);
+  --celtic-challenge-rotation: var(--celtic-position-2-rotation);
+  --celtic-crown-x: var(--celtic-position-3-x);
+  --celtic-crown-y: var(--celtic-position-3-y);
+  --celtic-foundation-x: var(--celtic-position-4-x);
+  --celtic-foundation-y: var(--celtic-position-4-y);
+  --celtic-past-x: var(--celtic-position-5-x);
+  --celtic-past-y: var(--celtic-position-5-y);
+  --celtic-future-x: var(--celtic-position-6-x);
+  --celtic-future-y: var(--celtic-position-6-y);
+  --celtic-self-x: var(--celtic-position-7-x);
+  --celtic-self-y: var(--celtic-position-7-y);
+  --celtic-environment-x: var(--celtic-position-8-x);
+  --celtic-environment-y: var(--celtic-position-8-y);
+  --celtic-hopes-x: var(--celtic-position-9-x);
+  --celtic-hopes-y: var(--celtic-position-9-y);
+  --celtic-outcome-x: var(--celtic-position-10-x);
+  --celtic-outcome-y: var(--celtic-position-10-y);
 }
 
 /* Media Queries pour les différentes tailles d'écran */

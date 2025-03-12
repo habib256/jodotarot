@@ -24,53 +24,73 @@
   align-items: center;
 }
 
-/* Positionnement spécifique pour chaque carte */
+/* Positionnement spécifique pour chaque carte - Position 1 (Passé) */
 .horseshoe-spread .card-1,
-.horseshoe-spread .past {
-  left: var(--horseshoe-past-x);
-  top: var(--horseshoe-past-y);
+.horseshoe-spread .past,
+.horseshoe-spread .position-1,
+.horseshoe-spread .card-position-1 {
+  left: var(--horseshoe-position-1-x);
+  top: var(--horseshoe-position-1-y);
   transform: translate(-50%, -50%);
 }
 
+/* Position 2 (Passé récent) */
 .horseshoe-spread .card-2,
-.horseshoe-spread .recent {
-  left: var(--horseshoe-recent-x);
-  top: var(--horseshoe-recent-y);
+.horseshoe-spread .recent,
+.horseshoe-spread .position-2,
+.horseshoe-spread .card-position-2 {
+  left: var(--horseshoe-position-2-x);
+  top: var(--horseshoe-position-2-y);
   transform: translate(-50%, -50%);
 }
 
+/* Position 3 (Présent) */
 .horseshoe-spread .card-3,
-.horseshoe-spread .present {
-  left: var(--horseshoe-present-x);
-  top: var(--horseshoe-present-y);
+.horseshoe-spread .present,
+.horseshoe-spread .position-3,
+.horseshoe-spread .card-position-3 {
+  left: var(--horseshoe-position-3-x);
+  top: var(--horseshoe-position-3-y);
   transform: translate(-50%, -50%);
 }
 
+/* Position 4 (Futur proche) */
 .horseshoe-spread .card-4,
-.horseshoe-spread .future {
-  left: var(--horseshoe-future-x);
-  top: var(--horseshoe-future-y);
+.horseshoe-spread .future,
+.horseshoe-spread .position-4,
+.horseshoe-spread .card-position-4 {
+  left: var(--horseshoe-position-4-x);
+  top: var(--horseshoe-position-4-y);
   transform: translate(-50%, -50%);
 }
 
+/* Position 5 (Résultat) */
 .horseshoe-spread .card-5,
-.horseshoe-spread .outcome {
-  left: var(--horseshoe-outcome-x);
-  top: var(--horseshoe-outcome-y);
+.horseshoe-spread .outcome,
+.horseshoe-spread .position-5,
+.horseshoe-spread .card-position-5 {
+  left: var(--horseshoe-position-5-x);
+  top: var(--horseshoe-position-5-y);
   transform: translate(-50%, -50%);
 }
 
+/* Position 6 (Influences) */
 .horseshoe-spread .card-6,
-.horseshoe-spread .influences {
-  left: var(--horseshoe-influences-x);
-  top: var(--horseshoe-influences-y);
+.horseshoe-spread .influences,
+.horseshoe-spread .position-6,
+.horseshoe-spread .card-position-6 {
+  left: var(--horseshoe-position-6-x);
+  top: var(--horseshoe-position-6-y);
   transform: translate(-50%, -50%);
 }
 
+/* Position 7 (Conseil) */
 .horseshoe-spread .card-7,
-.horseshoe-spread .advice {
-  left: var(--horseshoe-advice-x);
-  top: var(--horseshoe-advice-y);
+.horseshoe-spread .advice,
+.horseshoe-spread .position-7,
+.horseshoe-spread .card-position-7 {
+  left: var(--horseshoe-position-7-x);
+  top: var(--horseshoe-position-7-y);
   transform: translate(-50%, -50%);
 }
 

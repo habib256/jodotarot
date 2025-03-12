@@ -29,54 +29,79 @@
 }
 
 /* Positionnement spécifique pour chaque carte */
-/* Première ligne - Vous et Partenaire */
-.love-spread .card-1 { /* self - Votre cœur */
-  left: var(--love-you-x);
-  top: var(--love-you-y);
+/* Position 1: Vous (Votre cœur) */
+.love-spread .card-1,
+.love-spread .self,
+.love-spread .position-1,
+.love-spread .card-position-1 {
+  left: var(--love-position-1-x);
+  top: var(--love-position-1-y);
   transform: translate(-50%, -50%);
   z-index: 2;
 }
 
-.love-spread .card-2 { /* partner - Son cœur */
-  left: var(--love-partner-x);
-  top: var(--love-partner-y);
+/* Position 2: Partenaire (Son cœur) */
+.love-spread .card-2,
+.love-spread .partner,
+.love-spread .position-2,
+.love-spread .card-position-2 {
+  left: var(--love-position-2-x);
+  top: var(--love-position-2-y);
   transform: translate(-50%, -50%);
   z-index: 2;
 }
 
-/* Deuxième ligne - Relation et Obstacles */
-.love-spread .card-3 { /* relationship - Relation actuelle */
-  left: var(--love-relationship-x);
-  top: var(--love-relationship-y);
+/* Position 3: Relation (Relation actuelle) */
+.love-spread .card-3,
+.love-spread .relationship,
+.love-spread .position-3,
+.love-spread .card-position-3 {
+  left: var(--love-position-3-x);
+  top: var(--love-position-3-y);
   transform: translate(-50%, -50%);
   z-index: 2;
 }
 
-.love-spread .card-4 { /* obstacles - Fondation */
-  left: var(--love-foundation-x);
-  top: var(--love-foundation-y);
+/* Position 4: Obstacles (Obstacles à surmonter) */
+.love-spread .card-4,
+.love-spread .obstacles,
+.love-spread .position-4,
+.love-spread .card-position-4 {
+  left: var(--love-position-4-x);
+  top: var(--love-position-4-y);
   transform: translate(-50%, -50%);
   z-index: 2;
 }
 
-/* Troisième ligne - Désirs, Résultat, Conseil */
-.love-spread .card-5 { /* desires - Passé */
-  left: var(--love-past-x);
-  top: var(--love-past-y);
+/* Position 5: Désirs (Désirs secrets) */
+.love-spread .card-5,
+.love-spread .desires,
+.love-spread .position-5,
+.love-spread .card-position-5 {
+  left: var(--love-position-5-x);
+  top: var(--love-position-5-y);
   transform: translate(-50%, -50%);
   z-index: 2;
 }
 
-.love-spread .card-6 { /* outcome - Présent */
-  left: var(--love-present-x);
-  top: var(--love-present-y);
+/* Position 6: Résultat (Résultat probable) */
+.love-spread .card-6,
+.love-spread .outcome,
+.love-spread .position-6,
+.love-spread .card-position-6 {
+  left: var(--love-position-6-x);
+  top: var(--love-position-6-y);
   transform: translate(-50%, -50%);
   z-index: 2;
 }
 
-.love-spread .card-7 { /* advice - Futur */
-  left: var(--love-future-x);
-  top: var(--love-future-y);
+/* Position 7: Conseil (Conseil final) */
+.love-spread .card-7,
+.love-spread .advice,
+.love-spread .position-7,
+.love-spread .card-position-7 {
+  left: var(--love-position-7-x);
+  top: var(--love-position-7-y);
   transform: translate(-50%, -50%);
   z-index: 2;
 }

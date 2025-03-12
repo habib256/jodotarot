@@ -100,18 +100,46 @@ class BaseSpread {
       // Appliquer le style de positionnement en utilisant les variables CSS
       positionElement.style.position = 'absolute';
       
-      // Utiliser cssName s'il existe, sinon utiliser name pour la rétrocompatibilité
-      const cssPositionName = position.cssName || position.name;
-      if (cssPositionName) {
-        positionElement.style.left = `var(--${this.key}-${cssPositionName}-x)`;
-        positionElement.style.top = `var(--${this.key}-${cssPositionName}-y)`;
-      }
+      // Stratégie d'application des positions:
+      // 1. Utiliser position numérique si disponible (nouveau standard)
+      // 2. Sinon utiliser cssName (pour compatibilité)
+      // 3. Sinon utiliser name (pour rétrocompatibilité)
       
-      // Appliquer la rotation si nécessaire
-      if (position.rotation) {
-        positionElement.style.transform = `translate(-50%, -50%) rotate(${position.rotation}deg)`;
+      if (position.position) {
+        // Nouveau standard - position numérique
+        positionElement.style.left = `var(--${this.key}-position-${position.position}-x)`;
+        positionElement.style.top = `var(--${this.key}-position-${position.position}-y)`;
+        
+        // Ajouter la rotation si elle existe pour cette position numérique
+        const rotationVar = `--${this.key}-position-${position.position}-rotation`;
+        const rotationValue = getComputedStyle(document.documentElement).getPropertyValue(rotationVar);
+        
+        if (rotationValue && rotationValue.trim() !== '') {
+          positionElement.style.transform = `translate(-50%, -50%) rotate(${rotationValue})`;
+        } else if (position.rotation) {
+          positionElement.style.transform = `translate(-50%, -50%) rotate(${position.rotation}deg)`;
+        } else {
+          positionElement.style.transform = 'translate(-50%, -50%)';
+        }
       } else {
-        positionElement.style.transform = 'translate(-50%, -50%)';
+        // Ancien système - nom sémantique
+        const cssPositionName = position.cssName || position.name;
+        if (cssPositionName) {
+          positionElement.style.left = `var(--${this.key}-${cssPositionName}-x)`;
+          positionElement.style.top = `var(--${this.key}-${cssPositionName}-y)`;
+          
+          // Vérifier s'il existe une variable de rotation pour cette position
+          const rotationVar = `--${this.key}-${cssPositionName}-rotation`;
+          const rotationValue = getComputedStyle(document.documentElement).getPropertyValue(rotationVar);
+          
+          if (rotationValue && rotationValue.trim() !== '') {
+            positionElement.style.transform = `translate(-50%, -50%) rotate(${rotationValue})`;
+          } else if (position.rotation) {
+            positionElement.style.transform = `translate(-50%, -50%) rotate(${position.rotation}deg)`;
+          } else {
+            positionElement.style.transform = 'translate(-50%, -50%)';
+          }
+        }
       }
       
       // Ajouter au DOM

@@ -32,13 +32,13 @@ class CrossSpread extends BaseSpread {
       'zh': '五张牌十字形牌阵，全面了解情况、问题、过去的影响、未来和结果。'
     };
     
-    // Définition des positions des cartes (noms uniquement)
+    // Définition des positions des cartes (noms sémantiques + numéros)
     this.cardPositions = [
-      { name: 'center', cssName: 'center' },  // Centre - Situation actuelle
-      { name: 'top', cssName: 'top' },     // Haut - Ce qui influence
-      { name: 'left', cssName: 'left' },    // Gauche - Passé
-      { name: 'right', cssName: 'right' },   // Droite - Futur
-      { name: 'bottom', cssName: 'bottom' }   // Bas - Résultat
+      { name: 'center', cssName: 'center', position: 1 },  // Centre - Situation actuelle
+      { name: 'top', cssName: 'top', position: 2 },        // Haut - Ce qui influence
+      { name: 'left', cssName: 'left', position: 3 },      // Gauche - Passé
+      { name: 'right', cssName: 'right', position: 4 },    // Droite - Futur
+      { name: 'bottom', cssName: 'bottom', position: 5 }   // Bas - Résultat
     ];
     
     // Significations des positions
@@ -108,6 +108,7 @@ class CrossSpread extends BaseSpread {
   
   /**
    * Surcharge la méthode pour utiliser les noms spécifiques (center, top, etc.)
+   * et également les numéros de position pour une standardisation
    * @param {number} positionIndex - Indice de la position
    * @param {Object} positionData - Données de la position
    * @return {string} Nom de classe CSS
@@ -115,7 +116,19 @@ class CrossSpread extends BaseSpread {
   getPositionClassName(positionIndex, positionData) {
     // Assurer que la classe card-position est toujours incluse, puis ajouter le nom spécifique comme classe additionnelle
     const baseClass = super.getPositionClassName(positionIndex, positionData);
-    return positionData.name ? `${baseClass} ${positionData.name}` : baseClass;
+    let additionalClasses = '';
+    
+    // Ajouter classe basée sur le nom sémantique (pour compatibilité)
+    if (positionData.name) {
+      additionalClasses += ` ${positionData.name}`;
+    }
+    
+    // Ajouter classe basée sur le numéro de position (nouveau standard)
+    if (positionData.position) {
+      additionalClasses += ` position-${positionData.position} card-position-${positionData.position}`;
+    }
+    
+    return `${baseClass}${additionalClasses}`;
   }
   
   /**

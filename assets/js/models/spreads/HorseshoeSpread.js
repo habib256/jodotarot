@@ -34,13 +34,13 @@ class HorseshoeSpread extends BaseSpread {
     
     // Définition des positions des cartes (noms uniquement)
     this.cardPositions = [
-      { name: 'past', cssName: 'past' },      // Passé
-      { name: 'recent', cssName: 'recent' },    // Passé récent
-      { name: 'present', cssName: 'present' },   // Présent
-      { name: 'future', cssName: 'future' },    // Futur proche
-      { name: 'outcome', cssName: 'outcome' },   // Résultat
-      { name: 'influences', cssName: 'influences' },// Influences
-      { name: 'advice', cssName: 'advice' }     // Conseil
+      { name: 'past', cssName: 'past', position: 1 },      // Passé
+      { name: 'recent', cssName: 'recent', position: 2 },    // Passé récent
+      { name: 'present', cssName: 'present', position: 3 },   // Présent
+      { name: 'future', cssName: 'future', position: 4 },    // Futur proche
+      { name: 'outcome', cssName: 'outcome', position: 5 },   // Résultat
+      { name: 'influences', cssName: 'influences', position: 6 },// Influences
+      { name: 'advice', cssName: 'advice', position: 7 }     // Conseil
     ];
     
     // Significations des positions
@@ -170,14 +170,27 @@ class HorseshoeSpread extends BaseSpread {
   // Implémentation de la méthode pour utiliser les noms des positions comme classes
   /**
    * Surcharge la méthode pour utiliser les noms spécifiques (past, recent, etc.)
+   * et également les numéros de position pour une standardisation
    * @param {number} positionIndex - Indice de la position
    * @param {Object} positionData - Données de la position
    * @return {string} Nom de classe CSS
    */
   getPositionClassName(positionIndex, positionData) {
     // Assurer que la classe card-position est toujours incluse, puis ajouter le nom spécifique comme classe additionnelle
-    const baseClasses = 'card-position card-' + (positionIndex + 1);
-    return positionData.name ? `${baseClasses} ${positionData.name}` : baseClasses;
+    const baseClass = super.getPositionClassName(positionIndex, positionData);
+    let additionalClasses = '';
+    
+    // Ajouter classe basée sur le nom sémantique (pour compatibilité)
+    if (positionData.name) {
+      additionalClasses += ` ${positionData.name}`;
+    }
+    
+    // Ajouter classe basée sur le numéro de position (nouveau standard)
+    if (positionData.position) {
+      additionalClasses += ` position-${positionData.position} card-position-${positionData.position}`;
+    }
+    
+    return `${baseClass}${additionalClasses}`;
   }
 }
 

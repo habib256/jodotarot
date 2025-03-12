@@ -34,16 +34,16 @@ class CelticCrossSpread extends BaseSpread {
     
     // Définition des positions des cartes (noms uniquement)
     this.cardPositions = [
-      { name: 'present', cssName: 'present' },           // Situation actuelle
-      { name: 'challenge', cssName: 'challenge', rotation: 90 }, // Défi/Obstacle (croisé sur la 1ère)
-      { name: 'foundation', cssName: 'foundation' },        // Base/Fondation
-      { name: 'past', cssName: 'past' },             // Passé récent
-      { name: 'crown', cssName: 'crown' },            // Couronne/Résultat potentiel
-      { name: 'future', cssName: 'future' },           // Futur immédiat
-      { name: 'self', cssName: 'self' },             // Vous-même
-      { name: 'environment', cssName: 'environment' },       // Environnement/Influences extérieures
-      { name: 'hopes', cssName: 'hopes' },            // Espoirs/Craintes
-      { name: 'outcome', cssName: 'outcome' }           // Résultat final
+      { name: 'present', cssName: 'present', position: 1 },           // Situation actuelle
+      { name: 'challenge', cssName: 'challenge', rotation: 90, position: 2 }, // Défi/Obstacle (croisé sur la 1ère)
+      { name: 'foundation', cssName: 'foundation', position: 3 },        // Base/Fondation
+      { name: 'past', cssName: 'past', position: 4 },             // Passé récent
+      { name: 'crown', cssName: 'crown', position: 5 },            // Couronne/Résultat potentiel
+      { name: 'future', cssName: 'future', position: 6 },           // Futur immédiat
+      { name: 'self', cssName: 'self', position: 7 },             // Vous-même
+      { name: 'environment', cssName: 'environment', position: 8 },       // Environnement/Influences extérieures
+      { name: 'hopes', cssName: 'hopes', position: 9 },            // Espoirs/Craintes
+      { name: 'outcome', cssName: 'outcome', position: 10 }           // Résultat final
     ];
     
     // Significations des positions
@@ -250,6 +250,7 @@ class CelticCrossSpread extends BaseSpread {
   
   /**
    * Surcharge pour utiliser les noms CSS corrects
+   * et également les numéros de position pour une standardisation
    */
   initializeCardPositions() {
     if (!this.container) {
@@ -261,6 +262,8 @@ class CelticCrossSpread extends BaseSpread {
     
     this.cardPositions.forEach((position, index) => {
       const positionElement = document.createElement('div');
+      
+      // Ajouter classes sémantiques et numériques
       positionElement.className = this.getPositionClassName(index, position) + ' empty';
       positionElement.setAttribute('data-position', index);
       positionElement.setAttribute('data-position-name', this.getPositionMeaning(index));
@@ -272,23 +275,63 @@ class CelticCrossSpread extends BaseSpread {
       
       positionElement.style.position = 'absolute';
       
-      // Utiliser le nom CSS correct pour les variables de position
-      if (position.cssName) {
+      // Utiliser la position numérique en priorité
+      if (position.position) {
+        positionElement.style.left = `var(--${this.key}-position-${position.position}-x)`;
+        positionElement.style.top = `var(--${this.key}-position-${position.position}-y)`;
+        
+        // Vérifier s'il existe une variable de rotation numérique
+        const rotationVar = `--${this.key}-position-${position.position}-rotation`;
+        const rotationValue = getComputedStyle(document.documentElement).getPropertyValue(rotationVar);
+        
+        if (rotationValue && rotationValue.trim() !== '') {
+          positionElement.style.transform = `translate(-50%, -50%) rotate(${rotationValue})`;
+        } else if (position.rotation) {
+          positionElement.style.transform = `translate(-50%, -50%) rotate(${position.rotation}deg)`;
+        } else {
+          positionElement.style.transform = 'translate(-50%, -50%)';
+        }
+      } 
+      // Fallback vers l'ancien système
+      else if (position.cssName) {
         positionElement.style.left = `var(--${this.key}-${position.cssName}-x)`;
         positionElement.style.top = `var(--${this.key}-${position.cssName}-y)`;
-      }
-      
-      // Appliquer la rotation si spécifiée
-      if (position.rotation) {
-        positionElement.style.transform = `translate(-50%, -50%) rotate(${position.rotation}deg)`;
-      } else {
-        positionElement.style.transform = 'translate(-50%, -50%)';
+        
+        // Appliquer la rotation si spécifiée
+        if (position.rotation) {
+          positionElement.style.transform = `translate(-50%, -50%) rotate(${position.rotation}deg)`;
+        } else {
+          positionElement.style.transform = 'translate(-50%, -50%)';
+        }
       }
       
       this.container.appendChild(positionElement);
     });
     
     this.addVisualElements();
+  }
+  
+  /**
+   * Surcharge la méthode pour utiliser les noms spécifiques et les numéros
+   * @param {number} positionIndex - Indice de la position
+   * @param {Object} positionData - Données de la position
+   * @return {string} Nom de classe CSS
+   */
+  getPositionClassName(positionIndex, positionData) {
+    const baseClass = super.getPositionClassName(positionIndex, positionData);
+    let additionalClasses = '';
+    
+    // Ajouter classe basée sur le nom sémantique (pour compatibilité)
+    if (positionData.name) {
+      additionalClasses += ` ${positionData.name}`;
+    }
+    
+    // Ajouter classe basée sur le numéro de position (nouveau standard)
+    if (positionData.position) {
+      additionalClasses += ` position-${positionData.position} card-position-${positionData.position}`;
+    }
+    
+    return `${baseClass}${additionalClasses}`;
   }
 }
 
