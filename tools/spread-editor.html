@@ -876,6 +876,9 @@
          * et met à jour l'affichage CSS
          */
         function loadSpread() {
+            // Réinitialiser immédiatement le texte CSS au début de la fonction
+            resetCSSOutput();
+            
             workspace.innerHTML = '';
             const spreadType = spreadSelect.value;
             const spread = spreads[spreadType];
@@ -934,15 +937,26 @@
                 }
             });
             
-            // Réinitialiser le texte CSS à chaque changement de tirage
+            // Assurer une dernière fois que le texte CSS est réinitialisé et forcer l'affichage
             resetCSSOutput();
+            output.classList.remove('updating');
         }
         
         /**
          * Réinitialise la zone d'affichage du CSS au message par défaut
          */
         function resetCSSOutput() {
-            output.textContent = `/* Sélectionnez et déplacez les cartes pour générer le CSS du tirage ${spreads[spreadSelect.value].name} */`;
+            // Message plus détaillé indiquant qu'un nouveau tirage a été chargé
+            const spreadName = spreads[spreadSelect.value].name;
+            output.textContent = `/* Tirage '${spreadName}' chargé ! \n * \n * Sélectionnez et déplacez les cartes pour générer le CSS du tirage.\n * Seules les modifications par rapport aux valeurs initiales seront affichées. \n */`;
+            
+            // S'assurer que la classe 'updating' est retirée
+            output.classList.remove('updating');
+            
+            // Force un reflow pour garantir la mise à jour immédiate
+            output.style.display = 'none';
+            void output.offsetHeight;
+            output.style.display = '';
         }
         
         // Fonction mise à jour avec le nouveau format des variables standardisées
@@ -1060,7 +1074,13 @@
          */
         function initApp() {
             // Écouteurs d'événements principaux
-            spreadSelect.addEventListener('change', loadSpread);
+            spreadSelect.addEventListener('change', function() {
+                // Réinitialiser explicitement la zone de texte CSS avant de charger le nouveau spread
+                resetCSSOutput();
+                // Puis charger le nouveau spread
+                loadSpread();
+            });
+            
             document.getElementById('resetBtn').addEventListener('click', () => {
                 // Charger les positions depuis variables.css au lieu de simplement vider
                 loadInitialPositions();
@@ -1113,18 +1133,6 @@
         
         // Démarrer l'application
         initApp();
-        
-        // Ajouter un message d'information au chargement
-        setTimeout(() => {
-            const welcomeMessage = 'Bienvenue dans l\'éditeur de positions de cartes!\n\n' +
-                '- Sélectionnez un type de tirage dans le menu déroulant\n' +
-                '- Déplacez les cartes à l\'aide de la souris\n' +
-                '- Ajustez la rotation avec le curseur\n' +
-                '- Les variables CSS modifiées s\'afficheront automatiquement\n' +
-                '- Seules les modifications par rapport aux valeurs initiales sont affichées\n\n' +
-                'Cliquez sur OK pour commencer.';
-            alert(welcomeMessage);
-        }, 500);
     </script>
 </body>
 </html> 
