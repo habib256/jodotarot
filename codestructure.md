@@ -95,6 +95,8 @@ jodotarot/
 │   │   ├── layouts/              # Mises en page
 │   │   └── utils/                # Utilitaires CSS
 │   └── images/                   # Images et ressources graphiques
+├── tools/                        # Outils de développement
+│   └── spread-editor.html        # Éditeur visuel des positions des cartes (901 lignes)
 ├── index.html                    # Page principale (147 lignes)
 ├── favicon.ico                   # Icône du site (23 lignes)
 ├── screenshot.png                # Capture d'écran de l'application (2165 lignes)
@@ -159,6 +161,33 @@ jodotarot/
 - Persistance dans localStorage
 - Gestion des événements et notifications
 - Schéma de migration pour les mises à jour
+
+### 7. Outils de Développement
+
+#### Éditeur de Positions des Cartes (`spread-editor.html`)
+
+Un outil autonome en HTML/CSS/JavaScript permettant de définir visuellement les positions des cartes pour les différents types de tirages.
+
+- **Interface visuelle interactive** permettant de déplacer les cartes à la souris
+- **Contrôle de rotation** pour orienter les cartes à différents angles
+- **Adaptation automatique aux dimensions de l'écran** utilisant les media queries
+- **Génération automatique de variables CSS** prêtes à être copiées dans `variables.css`
+- **Comparaison en temps réel** avec les positions initiales pour n'afficher que les modifications
+- **Support des 4 types de tirages** : Croix, Fer à Cheval, Amour et Croix Celtique
+- **Contrôle des dimensions des cartes** via des curseurs interactifs
+
+Cet outil suit l'architecture de "variables.css comme source unique de vérité" en générant des variables CSS optimisées pour le positionnement des cartes. Les positions sont exprimées en pourcentages pour assurer une adaptabilité à toutes les tailles d'écran.
+
+```css
+/* Exemple de sortie générée par l'éditeur */
+--cross-center-x: 50%;
+--cross-center-y: 50%;
+--cross-top-x: 42%;
+--cross-top-y: 13%;
+--cross-left-x: 25%;
+--cross-left-y: 50%;
+/* etc. */
+```
 
 ## 🔄 Flux de Données
 

@@ -94,7 +94,7 @@
   --card-base-width: 95px;          /* Taille de base pour mobile */
   --card-ratio: 1.7;                /* Ratio hauteur/largeur constant */
   --card-scale-factor: 1;           /* Facteur d'échelle de base */
-  --card-scale-large: 4;            /* Facteur d'agrandissement au clic */
+  
   
   /* Dimensions calculées */
   --card-width: calc(var(--card-base-width) * var(--card-scale-factor));
@@ -154,29 +154,39 @@
   --love-future-x: 75%;       /* card-7: advice - Conseils pour l'avenir */
   --love-future-y: 65%;
 
-  /* Positions pour Croix Celtique */
---celtic-outcome-x: 84%;
---celtic-outcome-y: 17%;
---celtic-hopes-x: 84%;
---celtic-hopes-y: 41%;
---celtic-environment-x: 84%;
---celtic-environment-y: 63%;
---celtic-self-x: 85%;
---celtic-self-y: 84%;
---celtic-future-x: 60%;
---celtic-future-y: 41%;
---celtic-past-x: 39%;
---celtic-past-y: 14%;
---celtic-foundation-x: 18%;
---celtic-foundation-y: 42%;
---celtic-crown-x: 39%;
---celtic-crown-y: 71%;
---celtic-challenge-x: 40%;
---celtic-challenge-y: 48%;
---celtic-challenge-rotation: 90deg;
---celtic-present-x: 39%;
---celtic-present-y: 42%;
 
+  /* Positions pour Croix Celtique */
+/* Carte 1: Présent */
+--celtic-present-x: 39%;
+--celtic-present-y: 37%;
+/* Carte 2: Défi */
+--celtic-challenge-x: 39%;
+--celtic-challenge-y: 46%;
+--celtic-challenge-rotation: 90deg;
+/* Carte 3: Couronne */
+--celtic-crown-x: 39%;
+--celtic-crown-y: 63%;
+/* Carte 4: Fondation */
+--celtic-foundation-x: 16%;
+--celtic-foundation-y: 37%;
+/* Carte 5: Passé */
+--celtic-past-x: 40%;
+--celtic-past-y: 13%;
+/* Carte 6: Futur */
+--celtic-future-x: 61%;
+--celtic-future-y: 37%;
+/* Carte 7: Soi */
+--celtic-self-x: 84%;
+--celtic-self-y: 86%;
+/* Carte 8: Environnement */
+--celtic-environment-x: 84%;
+--celtic-environment-y: 62%;
+/* Carte 9: Espoirs */
+--celtic-hopes-x: 84%;
+--celtic-hopes-y: 37%;
+/* Carte 10: Résultat */
+--celtic-outcome-x: 84%;
+--celtic-outcome-y: 13%;
 }
 
 /* Media Queries pour les différentes tailles d'écran */

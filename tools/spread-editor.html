@@ -276,12 +276,26 @@
             </div>
             
             <div class="control-group">
-                <div class="coordinates">
-                    <div>Position X: <span id="posX">0</span>% | Position Y: <span id="posY">0</span>%</div>
-                </div>
                 <div class="rotation-control">
                     <label for="rotationSlider">Rotation: <span id="rotationValue" class="rotation-value">0°</span></label>
                     <input type="range" id="rotationSlider" min="0" max="360" value="0" step="5">
+                </div>
+            </div>
+            
+            <!-- Nouveau contrôle pour les dimensions des cartes -->
+            <div class="control-group">
+                <h3 style="margin: 5px 0; font-size: 14px;">Dimensions des Cartes:</h3>
+                <div class="card-dimension-control">
+                    <label for="cardBaseWidth">Largeur de base (px): <span id="cardBaseWidthValue">95</span></label>
+                    <input type="range" id="cardBaseWidth" min="60" max="150" value="95" step="5">
+                </div>
+                <div class="card-dimension-control">
+                    <label for="cardRatio">Ratio hauteur/largeur: <span id="cardRatioValue">1.7</span></label>
+                    <input type="range" id="cardRatio" min="1.4" max="2.0" value="1.7" step="0.1">
+                </div>
+                <div class="card-dimension-control">
+                    <label for="cardScaleFactor">Facteur d'échelle: <span id="cardScaleFactorValue">1</span></label>
+                    <input type="range" id="cardScaleFactor" min="0.8" max="1.5" value="1" step="0.1">
                 </div>
             </div>
             
@@ -356,13 +370,12 @@
          */
         let selectedCard = null;
         let cardPositions = {}; // Structure de données pour stocker les positions de toutes les cartes
+        let initialCardPositions = {};
         
         // Éléments DOM principaux
         const workspace = document.getElementById('workspace');
         const spreadSelect = document.getElementById('spreadType');
         const output = document.getElementById('output');
-        const posX = document.getElementById('posX');
-        const posY = document.getElementById('posY');
         const rotationSlider = document.getElementById('rotationSlider');
         const rotationValue = document.getElementById('rotationValue');
 
@@ -395,6 +408,7 @@
             
             spreadTypes.forEach(spreadType => {
                 cardPositions[spreadType] = {};
+                initialCardPositions[spreadType] = {};
                 
                 spreads[spreadType].cards.forEach(card => {
                     const xVarName = `--${spreadType}-${card.name}-x`;
@@ -412,10 +426,59 @@
                         y: isNaN(y) ? 50 : y,
                         rotation: isNaN(rotation) ? 0 : rotation
                     };
+                    
+                    // Stocker également les valeurs initiales pour comparaison ultérieure
+                    initialCardPositions[spreadType][card.name] = {
+                        x: isNaN(x) ? 50 : x,
+                        y: isNaN(y) ? 50 : y,
+                        rotation: isNaN(rotation) ? 0 : rotation
+                    };
                 });
             });
             
-            console.log('Positions initiales chargées:', cardPositions);
+            // Charger aussi les dimensions des cartes depuis variables.css
+            loadCardDimensionsFromCSS();
+            
+            console.log('Positions initiales et dimensions chargées:', cardPositions);
+        }
+
+        // Fonction pour charger les dimensions des cartes depuis variables.css
+        function loadCardDimensionsFromCSS() {
+            // Récupérer les dimensions depuis variables.css
+            const baseWidth = getCSSVariableNumeric('--card-base-width') || 95;
+            const ratio = getCSSVariableNumeric('--card-ratio') || 1.7;
+            const scaleFactor = getCSSVariableNumeric('--card-scale-factor') || 1;
+            
+            console.log('Chargement des dimensions depuis CSS:', { baseWidth, ratio, scaleFactor });
+            
+            // Mettre à jour les curseurs
+            cardBaseWidth.value = baseWidth;
+            cardRatio.value = ratio;
+            cardScaleFactor.value = scaleFactor;
+            
+            // Mettre à jour les affichages textuels
+            cardBaseWidthValue.textContent = baseWidth;
+            cardRatioValue.textContent = ratio;
+            cardScaleFactorValue.textContent = scaleFactor;
+            
+            // Appliquer ces dimensions au document
+            document.documentElement.style.setProperty('--card-base-width', `${baseWidth}px`);
+            document.documentElement.style.setProperty('--card-ratio', ratio);
+            document.documentElement.style.setProperty('--card-scale-factor', scaleFactor);
+            
+            // Générer le CSS pour les dimensions
+            generateCardDimensionsCSS();
+        }
+        
+        // Fonction pour générer le CSS des dimensions des cartes
+        function generateCardDimensionsCSS() {
+            let css = "";
+            
+            css += `--card-base-width: ${cardBaseWidth.value}px;\n`;
+            css += `--card-ratio: ${cardRatio.value};\n`;
+            css += `--card-scale-factor: ${cardScaleFactor.value};\n`;
+            
+            return css;
         }
 
         /**
@@ -478,8 +541,9 @@
             }
             
             function onMouseMove(e) {
-                // Empêcher les événements par défaut pour éviter les problèmes
-                e.preventDefault();
+                if (!selectedCard) return;
+                
+                const rect = workspace.getBoundingClientRect();
                 
                 const x = ((e.clientX - rect.left) / rect.width) * 100;
                 const y = ((e.clientY - rect.top) / rect.height) * 100;
@@ -492,14 +556,18 @@
                 selectedCard.style.top = boundedY + '%';
                 
                 // Conserver la rotation dans la transformation
+                const name = selectedCard.dataset.name;
+                const spreadType = spreadSelect.value;
                 const rotation = cardPositions[spreadType][name].rotation || 0;
                 selectedCard.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
 
-                // Update coordinates display
-                posX.textContent = Math.round(boundedX);
-                posY.textContent = Math.round(boundedY);
-
                 // Sauvegarder la position immédiatement
+                if (!cardPositions[spreadType]) {
+                    cardPositions[spreadType] = {};
+                }
+                if (!cardPositions[spreadType][name]) {
+                    cardPositions[spreadType][name] = { rotation: 0 };
+                }
                 cardPositions[spreadType][name].x = boundedX;
                 cardPositions[spreadType][name].y = boundedY;
                 
@@ -554,43 +622,167 @@
             updateOutput(true);
         });
 
-        // Fonction mise à jour avec option pour forcer un rendu immédiat et formatage optimisé
-        function updateOutput(instant = false) {
-            const spreadType = spreadSelect.value;
-            const positions = cardPositions[spreadType];
-            if (!positions) return;
-
-            let css = `/* -------------------------------------------- */
-/* Positions pour ${spreads[spreadType].name} */
-/* Ces variables doivent être placées dans variables.css */
-/* -------------------------------------------- */\n\n`;
-
-            // Tri des cartes pour un affichage ordonné
-            const sortedCards = Object.entries(positions).sort((a, b) => {
-                // Retrouver l'index de la carte dans la définition du spread
-                const indexA = spreads[spreadType].cards.findIndex(c => c.name === a[0]);
-                const indexB = spreads[spreadType].cards.findIndex(c => c.name === b[0]);
-                return indexA - indexB;
-            });
-
-            // Grouper les propriétés par carte pour une meilleure lisibilité
-            sortedCards.forEach(([name, pos], index) => {
-                // Trouver le label de la carte pour le commentaire
-                const cardInfo = spreads[spreadType].cards.find(c => c.name === name);
-                const cardLabel = cardInfo ? cardInfo.label : name;
-                
-                css += `/* Carte ${index + 1}: ${cardLabel} */\n`;
-                css += `--${spreadType}-${name}-x: ${Math.round(pos.x)}%;\n`;
-                css += `--${spreadType}-${name}-y: ${Math.round(pos.y)}%;\n`;
-                
-                // Ajouter la rotation uniquement si elle n'est pas nulle
-                if (pos.rotation && pos.rotation !== 0) {
-                    css += `--${spreadType}-${name}-rotation: ${pos.rotation}deg;\n`;
-                }
-                css += '\n';
+        // Gestion des dimensions des cartes
+        const cardBaseWidth = document.getElementById('cardBaseWidth');
+        const cardRatio = document.getElementById('cardRatio');
+        const cardScaleFactor = document.getElementById('cardScaleFactor');
+        const cardBaseWidthValue = document.getElementById('cardBaseWidthValue');
+        const cardRatioValue = document.getElementById('cardRatioValue');
+        const cardScaleFactorValue = document.getElementById('cardScaleFactorValue');
+        
+        // Charger les valeurs actuelles depuis les variables CSS
+        cardBaseWidth.value = getCSSVariableNumeric('--card-base-width') || 95;
+        cardRatio.value = getCSSVariableNumeric('--card-ratio') || 1.7;
+        cardScaleFactor.value = getCSSVariableNumeric('--card-scale-factor') || 1;
+        cardBaseWidthValue.textContent = cardBaseWidth.value;
+        cardRatioValue.textContent = cardRatio.value;
+        cardScaleFactorValue.textContent = cardScaleFactor.value;
+        
+        // Variable pour le debounce
+        let dimensionChangeTimeout = null;
+        
+        // Mise à jour des valeurs affichées avec debounce pour éviter trop de rechargements
+        cardBaseWidth.addEventListener('input', function() {
+            cardBaseWidthValue.textContent = this.value;
+            debounceDimensionChange();
+        });
+        
+        cardRatio.addEventListener('input', function() {
+            cardRatioValue.textContent = this.value;
+            debounceDimensionChange();
+        });
+        
+        cardScaleFactor.addEventListener('input', function() {
+            cardScaleFactorValue.textContent = this.value;
+            debounceDimensionChange();
+        });
+        
+        // Fonction de debounce pour éviter trop d'appels rapprochés
+        function debounceDimensionChange() {
+            clearTimeout(dimensionChangeTimeout);
+            
+            // Appliquer immédiatement les styles sans recalculer
+            document.documentElement.style.setProperty('--card-base-width', `${cardBaseWidth.value}px`);
+            document.documentElement.style.setProperty('--card-ratio', cardRatio.value);
+            document.documentElement.style.setProperty('--card-scale-factor', cardScaleFactor.value);
+            
+            // Attendre un peu avant de recharger complètement (pour une meilleure performance)
+            dimensionChangeTimeout = setTimeout(() => {
+                applyCardDimensions();
+            }, 300);
+        }
+        
+        // Fonction pour appliquer les dimensions en temps réel
+        function applyCardDimensions() {
+            console.log("Applying card dimensions:", {
+                width: cardBaseWidth.value,
+                ratio: cardRatio.value,
+                scaleFactor: cardScaleFactor.value
             });
             
-            // Mise à jour du texte
+            // Générer les variables CSS pour les dimensions des cartes
+            updateCardSizeOutput();
+            
+            // Recharger le spread pour appliquer les nouvelles dimensions
+            loadSpread();
+        }
+        
+        // Fonction pour générer les variables CSS des dimensions des cartes
+        function updateCardSizeOutput() {
+            // Générer le CSS des dimensions
+            const css = generateCardDimensionsCSS();
+            
+            // Au lieu d'afficher une sortie temporaire, mettre à jour directement la sortie principale
+            // en appelant updateOutput qui mettra à jour la zone principale
+            updateOutput(false);
+        }
+
+        // Fonction pour comparer deux valeurs avec une tolérance pour les nombres
+        function hasChanged(val1, val2, tolerance = 0.5) {
+            // Pour les nombres, utiliser une tolérance
+            if (typeof val1 === 'number' && typeof val2 === 'number') {
+                return Math.abs(val1 - val2) > tolerance;
+            }
+            // Pour les autres types, comparaison stricte
+            return val1 !== val2;
+        }
+
+        // Fonction mise à jour avec option pour forcer un rendu immédiat et formatage optimisé
+        function updateOutput(instant = false) {
+            // Commencer par récupérer le type de tirage actif pour les manipulations visuelles
+            const activeSpreadType = spreadSelect.value;
+            
+            // Durant le déplacement d'une carte (instant = true), on n'affiche que les variables du tirage actif
+            // pour une meilleure performance, sinon on affiche tout
+            const showOnlyActiveSpread = instant && selectedCard;
+            
+            // Variables pour suivre les modifications
+            let hasChangedValues = false;
+            let css = "";
+            
+            // Dimensions des cartes - vérifier si modifiées
+            const initialBaseWidth = getCSSVariableNumeric('--card-base-width') || 95;
+            const initialRatio = getCSSVariableNumeric('--card-ratio') || 1.7;
+            const initialScaleFactor = getCSSVariableNumeric('--card-scale-factor') || 1;
+            
+            // N'inclure les dimensions que si elles sont différentes des valeurs initiales
+            if (hasChanged(cardBaseWidth.value, initialBaseWidth)) {
+                css += `--card-base-width: ${cardBaseWidth.value}px;\n`;
+                hasChangedValues = true;
+            }
+            
+            if (hasChanged(cardRatio.value, initialRatio)) {
+                css += `--card-ratio: ${cardRatio.value};\n`;
+                hasChangedValues = true;
+            }
+            
+            if (hasChanged(cardScaleFactor.value, initialScaleFactor)) {
+                css += `--card-scale-factor: ${cardScaleFactor.value};\n`;
+                hasChangedValues = true;
+            }
+            
+            // Parcourir tous les types de tirages disponibles
+            for (const spreadType in spreads) {
+                // Si on est en mode déplacement, on n'affiche que le tirage actif
+                if (showOnlyActiveSpread && spreadType !== activeSpreadType) continue;
+                
+                if (!cardPositions[spreadType] || !initialCardPositions[spreadType]) continue;
+                
+                // Parcourir les cartes pour ce tirage
+                for (const name in cardPositions[spreadType]) {
+                    if (!initialCardPositions[spreadType][name]) continue;
+                    
+                    const pos = cardPositions[spreadType][name];
+                    const initialPos = initialCardPositions[spreadType][name];
+                    
+                    // Vérifier si x a changé
+                    if (hasChanged(Math.round(pos.x), Math.round(initialPos.x))) {
+                        css += `--${spreadType}-${name}-x: ${Math.round(pos.x)}%;\n`;
+                        hasChangedValues = true;
+                    }
+                    
+                    // Vérifier si y a changé
+                    if (hasChanged(Math.round(pos.y), Math.round(initialPos.y))) {
+                        css += `--${spreadType}-${name}-y: ${Math.round(pos.y)}%;\n`;
+                        hasChangedValues = true;
+                    }
+                    
+                    // Vérifier si rotation a changé
+                    const rotation = pos.rotation || 0;
+                    const initialRotation = initialPos.rotation || 0;
+                    if (hasChanged(rotation, initialRotation)) {
+                        css += `--${spreadType}-${name}-rotation: ${rotation}deg;\n`;
+                        hasChangedValues = true;
+                    }
+                }
+            }
+            
+            // Si aucune valeur n'a changé, afficher un message simple
+            if (!hasChangedValues) {
+                css = "/* Aucune modification */";
+            }
+            
+            // Mise à jour du texte de la zone d'affichage principale
             output.textContent = css;
             
             // Si besoin d'une mise à jour immédiate, forcer un reflow
@@ -658,17 +850,6 @@
         }
 
         /**
-         * Met à jour les dimensions des cartes selon les media queries
-         * Cette fonction est appelée lors des changements de taille d'écran
-         */
-        function applyCardDimensions() {
-            // Les variables CSS sont automatiquement mises à jour par le navigateur
-            // grâce aux media queries dans variables.css
-            // Cette fonction peut être appelée lors du redimensionnement de la fenêtre
-            loadSpread(); // Recharger le spread pour appliquer les nouvelles dimensions
-        }
-
-        /**
          * Initialise l'application
          * Configure les écouteurs d'événements et charge le premier tirage
          */
@@ -679,13 +860,10 @@
                 // Charger les positions depuis variables.css au lieu de simplement vider
                 loadInitialPositions();
                 loadSpread();
+                // Notifier l'utilisateur
+                alert('Toutes les positions et dimensions ont été réinitialisées aux valeurs de variables.css');
             });
 
-            document.getElementById('copyBtn').addEventListener('click', () => {
-                navigator.clipboard.writeText(output.textContent);
-                alert('Variables CSS copiées dans le presse-papier !');
-            });
-            
             // Écouter les changements de taille d'écran
             window.addEventListener('resize', function() {
                 // Utiliser un debounce pour éviter trop d'appels
@@ -698,6 +876,20 @@
             
             // Charger le premier tirage
             loadSpread();
+
+            // Adapter la fonction copyBtn pour ajouter une explication
+            document.getElementById('copyBtn').addEventListener('click', function() {
+                // Utiliser directement le contenu de la zone d'affichage qui contient déjà les variables modifiées
+                const modifiedCss = output.textContent;
+                
+                // Copier dans le presse-papier
+                navigator.clipboard.writeText(modifiedCss).catch(err => {
+                    console.error('Erreur lors de la copie: ', err);
+                });
+                
+                // Notification de copie
+                alert('CSS copié');
+            });
         }
         
         // Démarrer l'application
