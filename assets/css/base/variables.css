@@ -158,8 +158,9 @@
   /* Centre de la croix */
   --celtic-present-x: 35%;    /* Carte 1: Situation actuelle */
   --celtic-present-y: 45%;
-  --celtic-challenge-x: 35%;  /* Carte 2: Obstacle/Défi (croisée) */
-  --celtic-challenge-y: 60%;
+  --celtic-challenge-x: 30%;  /* Carte 2: Obstacle/Défi (croisée) */
+  --celtic-challenge-y: 40%;
+  --celtic-challenge-rotation: 90deg; /* Rotation de la carte défi */
   
   /* Tige de la croix */
   --celtic-crown-x: 35%;     /* Carte 5: Couronne/Objectif */

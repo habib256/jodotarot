@@ -34,7 +34,7 @@
 .celtic-cross-spread .card-2 {
   left: var(--celtic-challenge-x);
   top: var(--celtic-challenge-y);
-  transform: translate(-50%, -50%) rotate(90deg);
+  transform: translate(-50%, -50%) rotate(var(--celtic-challenge-rotation));
 }
 
 .celtic-cross-spread .card-3 {
@@ -101,7 +101,7 @@
 
 /* Pour la carte avec rotation */
 .celtic-cross-spread .card-2:hover {
-  transform: translate(-50%, -50%) rotate(90deg) scale(1.02);
+  transform: translate(-50%, -50%) rotate(var(--celtic-challenge-rotation)) scale(1.02);
 }
 
 /* Éléments visuels de la croix celtique */
