@@ -43,7 +43,7 @@ class StateManager {
           if (!value) return false;
           const normalizedValue = value.trim().toLowerCase();
           
-          // Validation du mode prompt
+          // Le mode "prompt" est toujours valide
           if (normalizedValue === 'prompt') {
             return true;
           }

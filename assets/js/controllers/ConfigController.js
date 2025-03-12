@@ -7,6 +7,7 @@ import AIService from '../services/AIService.js';
 import { createPersona } from '../main.js';
 import { TRANSLATIONS, getTranslation } from '../translations/index.js';
 import { updateUILanguage, updatePersonaLogo, resetAllDisplays } from '../ui.js';
+import { API_URL_OLLAMA_TAGS, SETTINGS } from '../config.js';
 
 class ConfigController {
   /**
@@ -542,303 +543,77 @@ class ConfigController {
   }
   
   /**
-   * Teste la connectivité avec le modèle d'IA sélectionné
-   * et affiche des avertissements appropriés en cas de problème
+   * Teste la connectivité avec le modèle sélectionné
+   * @returns {Promise<void>}
    */
   async testModelConnectivity() {
-    const state = this.stateManager.getState();
-    const modelName = state.iaModel;
+    const currentModel = this.stateManager.getState().iaModel;
+    
+    // Le mode prompt est toujours disponible
+    if (currentModel === 'prompt') {
+      this.clearWarnings();
+      return;
+    }
     
     try {
-      this.clearWarnings();
+      // Tester la connectivité selon le type de modèle
+      let status;
       
-      // Si c'est le mode prompt, ne rien faire
-      if (modelName === 'prompt') {
-        console.log('Mode Prompt sélectionné - pas de test de connectivité nécessaire');
-        return;
-      }
-      
-      // Si aucun modèle n'est spécifié, ne rien faire
-      if (!modelName) {
-        console.warn('Tentative de test de connectivité sans modèle spécifié');
-        return;
-      }
-      
-      // Si c'est un modèle OpenAI et qu'il n'y a pas de clé API configurée,
-      // afficher un avertissement spécifique
-      if (modelName.startsWith('openai/') && (!this.aiService.apiKey || this.aiService.apiKey === "YOUR API KEY")) {
-        console.warn(`La clé API OpenAI n'est pas configurée pour utiliser ${modelName}`);
-        
-        this.showModelWarning({
-          title: getTranslation('warnings.apiKeyMissing', state.language),
-          message: getTranslation('warnings.apiKeyMissingDetails', state.language, { modelName }),
-          suggestions: [
-            getTranslation('warnings.configureAPIKey', state.language),
-            getTranslation('warnings.useLocalModel', state.language),
-            "Utiliser le mode Prompt (sans IA)"
-          ]
-        });
-        
-        // Ajouter des boutons pour les actions possibles
-        const warningContainer = document.querySelector('.warning-container');
-        if (warningContainer) {
-          const buttonContainer = document.createElement('div');
-          buttonContainer.style.display = 'flex';
-          buttonContainer.style.gap = '10px';
-          buttonContainer.style.marginTop = '10px';
-          
-          // Bouton pour configurer la clé API
-          const configButton = document.createElement('button');
-          configButton.textContent = getTranslation('config.configureAPIKey', state.language);
-          configButton.className = 'config-button';
-          configButton.style.padding = '8px 12px';
-          configButton.style.backgroundColor = '#4CAF50';
-          configButton.style.color = 'white';
-          configButton.style.border = 'none';
-          configButton.style.borderRadius = '4px';
-          configButton.style.cursor = 'pointer';
-          configButton.addEventListener('click', () => this.showAPIKeyConfigDialog());
-          
-          // Bouton pour le mode Prompt
-          const promptButton = document.createElement('button');
-          promptButton.textContent = "Utiliser le mode Prompt";
-          promptButton.className = 'config-button';
-          promptButton.style.padding = '8px 12px';
-          promptButton.style.backgroundColor = '#f39c12';
-          promptButton.style.color = 'white';
-          promptButton.style.border = 'none';
-          promptButton.style.borderRadius = '4px';
-          promptButton.style.cursor = 'pointer';
-          promptButton.addEventListener('click', () => this.selectPromptMode());
-          
-          buttonContainer.appendChild(configButton);
-          buttonContainer.appendChild(promptButton);
-          warningContainer.appendChild(buttonContainer);
-        } else {
-          // Ancien code pour le bouton de configuration (si le conteneur d'avertissement n'existe pas)
-          const configButton = document.createElement('button');
-          configButton.textContent = getTranslation('config.configureAPIKey', state.language);
-          configButton.className = 'config-button';
-          configButton.style.marginTop = '10px';
-          configButton.style.padding = '8px 12px';
-          configButton.style.backgroundColor = '#4CAF50';
-          configButton.style.color = 'white';
-          configButton.style.border = 'none';
-          configButton.style.borderRadius = '4px';
-          configButton.style.cursor = 'pointer';
-          configButton.addEventListener('click', () => this.showAPIKeyConfigDialog());
-          
-          // Ajouter après l'affichage de l'avertissement
-          setTimeout(() => {
-            const warningElement = document.querySelector('.warning-message');
-            if (warningElement) {
-              warningElement.appendChild(configButton);
-            }
-          }, 100);
-        }
-        
-        // On ne recharge pas automatiquement les modèles Ollama ici pour éviter les doublons
-        // Ajouter juste un bouton pour suggérer de passer à Ollama
-        const switchToOllamaButton = document.createElement('button');
-        switchToOllamaButton.textContent = getTranslation('warnings.useLocalModel', state.language);
-        switchToOllamaButton.className = 'config-button';
-        switchToOllamaButton.style.marginTop = '10px';
-        switchToOllamaButton.style.marginLeft = '10px';
-        switchToOllamaButton.style.padding = '8px 12px';
-        switchToOllamaButton.style.backgroundColor = '#2196F3';
-        switchToOllamaButton.style.color = 'white';
-        switchToOllamaButton.style.border = 'none';
-        switchToOllamaButton.style.borderRadius = '4px';
-        switchToOllamaButton.style.cursor = 'pointer';
-        switchToOllamaButton.onclick = async () => {
-          // On recharge les modèles Ollama seulement lorsque l'utilisateur clique sur le bouton
-          await this.loadOllamaModels();
-        };
-        
-        if (warningElement) {
-          warningElement.appendChild(switchToOllamaButton);
-        }
-        
-        return;
-      }
-      
-      // Utiliser le test amélioré qui fournit des informations détaillées
-      const result = await this.aiService.testModelAvailability(modelName);
-      
-      if (!result.available) {
-        console.warn(`Modèle ${modelName} non disponible:`, result);
-        
-        // Si le modèle n'est pas disponible, afficher un avertissement approprié
-        // mais ne pas recharger automatiquement les modèles pour éviter les doublons
-        if (modelName.startsWith('ollama:')) {
-          // Au lieu de recharger automatiquement, proposer un bouton
-          this.showModelWarning({
-            title: getTranslation('warnings.modelUnavailable', state.language),
-            message: result.message || getTranslation('warnings.modelUnavailableDetails', state.language, { modelName }),
-            suggestions: [
-              getTranslation('warnings.checkOllamaRunning', state.language),
-              getTranslation('warnings.refreshOllamaModels', state.language),
-              getTranslation('warnings.selectDifferentModel', state.language)
-            ]
-          });
-          
-          // Ajouter un bouton pour recharger la liste des modèles
-          const refreshButton = document.createElement('button');
-          refreshButton.textContent = getTranslation('warnings.refreshOllamaModels', state.language);
-          refreshButton.className = 'config-button';
-          refreshButton.style.marginTop = '10px';
-          refreshButton.style.padding = '8px 12px';
-          refreshButton.style.backgroundColor = '#2196F3';
-          refreshButton.style.color = 'white';
-          refreshButton.style.border = 'none';
-          refreshButton.style.borderRadius = '4px';
-          refreshButton.style.cursor = 'pointer';
-          refreshButton.onclick = async () => {
-            await this.loadOllamaModels();
-          };
-          
-          setTimeout(() => {
-            const warningElement = document.querySelector('.warning-message');
-            if (warningElement) {
-              warningElement.appendChild(refreshButton);
-            }
-          }, 100);
-        } else if (modelName.startsWith('openai/')) {
-          // Si l'échec est dû à une clé API invalide, proposer de la configurer
-          if (result.message && result.message.includes('API')) {
-            const configButton = document.createElement('button');
-            configButton.textContent = getTranslation('config.configureAPIKey', state.language);
-            configButton.className = 'config-button';
-            configButton.style.marginTop = '10px';
-            configButton.style.padding = '8px 12px';
-            configButton.style.backgroundColor = '#4CAF50';
-            configButton.style.color = 'white';
-            configButton.style.border = 'none';
-            configButton.style.borderRadius = '4px';
-            configButton.style.cursor = 'pointer';
-            configButton.onclick = () => this.showAPIKeyConfigDialog();
-            
-            // Ajouter après l'affichage de l'avertissement
-            setTimeout(() => {
-              const warningElement = document.querySelector('.warning-message');
-              if (warningElement) {
-                warningElement.appendChild(configButton);
-              }
-            }, 100);
-          }
-          
-          // Si un modèle Ollama était sélectionné, mais pas de modèles, fallback sur OpenAI
-          if (isOllamaModelSelected) {
-            // Tester si OpenAI est disponible (a une clé API valide)
-            if (this.aiService.apiKey && this.aiService.apiKey !== "YOUR API KEY") {
-              this.selectDefaultOpenAIModel();
-            } else {
-              // Si OpenAI n'est pas disponible, utiliser le mode Prompt
-              this.selectPromptMode();
-            }
-          }
-        }
-        
-        // Utiliser les suggestions fournies par le test de disponibilité
-        // ou une liste par défaut si aucune suggestion n'est fournie
-        const suggestions = result.suggestions && result.suggestions.length > 0 
-          ? result.suggestions.map(s => getTranslation(s, state.language, s))
-          : [
-              getTranslation('warnings.checkConnection', state.language),
-              getTranslation('warnings.tryAgain', state.language)
-            ];
-        
-        // Afficher un avertissement avec les informations détaillées
-        this.showModelWarning({
-          title: getTranslation('warnings.modelUnavailable', state.language),
-          message: result.message || getTranslation('warnings.modelUnavailableDetails', state.language, { modelName }),
-          suggestions: suggestions
-        });
+      if (currentModel.startsWith('openai/')) {
+        // Test de connectivité OpenAI
+        status = await this.aiService.testOpenAIConnectivity();
+      } else if (currentModel.startsWith('ollama:')) {
+        // Test de connectivité Ollama
+        status = await this.aiService.testOllamaConnectivity();
       } else {
-        console.log(`Modèle ${modelName} disponible:`, result);
+        console.warn(`Type de modèle non reconnu: ${currentModel}`);
+        this.selectPromptMode(); // Fallback sur le mode prompt
+        return;
       }
+      
+      // Afficher les avertissements appropriés
+      this.showModelWarning(status);
+      
     } catch (error) {
       console.error('Erreur lors du test de connectivité:', error);
       this.showModelWarning({
-        title: getTranslation('warnings.error', state.language),
-        message: error.message,
-        suggestions: [getTranslation('warnings.tryAgain', state.language)]
+        status: 'error',
+        message: error.message
       });
     }
   }
   
   /**
-   * Affiche un avertissement
-   * @param {Object} status - Objet contenant les informations de l'avertissement
+   * Affiche un avertissement concernant le modèle
+   * @param {Object} status - Statut du modèle
    */
   showModelWarning(status) {
-    const language = this.stateManager.getState().language || 'fr';
-    
-    // Extraire les informations de l'état et s'assurer qu'elles existent
-    const { title = 'warnings.modelUnavailable', message = '', suggestions = [] } = status || {};
-    
-    // S'assurer que le conteneur d'avertissement existe
-    if (!this.elements.warningContainer) {
-      this.elements.warningContainer = this.createWarningContainer();
-    } else {
-      // Nettoyer les avertissements précédents
+    // Si c'est le mode prompt, ne pas afficher d'avertissement
+    if (this.stateManager.getState().iaModel === 'prompt') {
       this.clearWarnings();
+      return;
     }
-    
-    // Traduire le titre
-    const translatedTitle = title.startsWith('warnings.') ? 
-      getTranslation(title.replace('warnings.', ''), language) : 
-      getTranslation(title, language) || title;
-    
-    // Traduire le message principal
-    let translatedMessage;
-    if (message.startsWith('connectivity.')) {
-      translatedMessage = getTranslation(message, language);
-    } else if (message.startsWith('warnings.')) {
-      translatedMessage = getTranslation(message.replace('warnings.', ''), language);
-    } else {
-      translatedMessage = message;
+
+    // Créer ou récupérer le conteneur d'avertissement
+    const warningContainer = this.elements.warningContainer;
+    if (!warningContainer) return;
+
+    // Vider les avertissements existants
+    warningContainer.innerHTML = '';
+
+    // Si le statut est un succès, ne pas afficher d'avertissement
+    if (status.status === 'success') {
+      this.clearWarnings();
+      return;
     }
-    
-    // S'assurer que suggestions est un tableau
-    if (!Array.isArray(suggestions)) {
-      suggestions = [];
-    }
-    
-    // Créer le contenu HTML de l'avertissement
-    let warningHTML = `
-      <div class="warning-box">
-        <h3>⚠️ ${translatedTitle}</h3>
-        <p>${translatedMessage}</p>
-    `;
-    
-    // Ajouter les suggestions si présentes
-    if (suggestions.length > 0) {
-      warningHTML += `<p>${getTranslation('connectivity.suggestions', language) || 'Suggestions:'}</p><ul>`;
-      
-      suggestions.forEach(suggestion => {
-        warningHTML += `<li>${suggestion}</li>`;
-      });
-      
-      warningHTML += `</ul>`;
-    }
-    
-    // Ajouter le bouton de fermeture
-    warningHTML += `
-        <button id="dismiss-warning">${getTranslation('connectivity.dismiss', language) || 'Ignorer cet avertissement'}</button>
-      </div>
-    `;
-    
-    // Afficher l'avertissement
-    this.elements.warningContainer.innerHTML = warningHTML;
-    
-    // Ajouter un gestionnaire d'événements pour fermer l'avertissement
-    const dismissButton = document.getElementById('dismiss-warning');
-    if (dismissButton) {
-      dismissButton.addEventListener('click', () => {
-        this.clearWarnings();
-      });
-    }
+
+    // Créer le message d'avertissement
+    const warningElement = document.createElement('div');
+    warningElement.className = `warning-message warning-${status.status}`;
+    warningElement.textContent = status.message;
+
+    // Ajouter le message au conteneur
+    warningContainer.appendChild(warningElement);
   }
   
   /**
@@ -936,17 +711,25 @@ class ConfigController {
           console.warn("Erreur lors de la lecture de la cache Ollama:", e);
         }
       }
-      
+
       // Si pas de cache valide, récupérer les modèles
       if (!usedCache) {
         try {
-          const timeoutPromise = new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('Timeout lors du chargement des modèles Ollama')), 10000);
-          });
+          const response = await fetch(API_URL_OLLAMA_TAGS);
           
-          const modelsPromise = this.aiService.getOllamaModels();
-          ollamaModels = await Promise.race([modelsPromise, timeoutPromise]);
+          if (!response.ok) {
+            throw new Error(`Erreur HTTP: ${response.status}`);
+          }
           
+          const data = await response.json();
+          
+          if (!data.models || !Array.isArray(data.models)) {
+            throw new Error('Format de réponse Ollama invalide');
+          }
+          
+          ollamaModels = data.models;
+          
+          // Mettre en cache
           localStorage.setItem(cacheKey, JSON.stringify({
             timestamp: Date.now(),
             models: ollamaModels
@@ -957,12 +740,13 @@ class ConfigController {
           return false;
         }
       }
-      
+
       // Mettre à jour le groupe Ollama avec les modèles disponibles
       ollamaGroup.innerHTML = '';
       
       if (ollamaModels && ollamaModels.length > 0) {
         ollamaModels
+          .filter(model => !model.name.includes('partial') && !model.name.includes('downloading'))
           .sort((a, b) => a.name.localeCompare(b.name))
           .forEach(model => {
             const option = document.createElement('option');

@@ -107,6 +107,22 @@ class AIService {
    */
   async testModelAvailability(modelName) {
     try {
+      // Le mode "prompt" est un cas spécial qui :
+      // 1. Est toujours disponible car il n'utilise aucun modèle d'IA
+      // 2. Sert de fallback sécurisé quand aucun modèle n'est disponible
+      // 3. Permet de voir le prompt qui serait envoyé à l'IA sans faire d'appel
+      // 4. Utile pour le débogage et la personnalisation des prompts
+      if (modelName === 'prompt') {
+        return {
+          available: true,
+          status: 'success',
+          modelName: 'prompt',
+          message: 'Mode Prompt toujours disponible',
+          details: { mode: 'prompt' },
+          suggestions: []
+        };
+      }
+
       const result = {
         available: false,
         status: 'pending',
@@ -245,6 +261,37 @@ class AIService {
       const systemPrompts = this.buildSystemPrompts(persona, language, spreadType);
       const prompt = this.buildPrompt(reading, question, language, spreadType);
       
+      // Mode spécial "prompt" (Sans IA)
+      // Ce mode est une fonctionnalité de sécurité et de débogage qui :
+      // 1. Est toujours disponible même sans connexion à un service d'IA
+      // 2. Affiche les prompts système et utilisateur qui seraient envoyés à l'IA
+      // 3. Permet de vérifier et ajuster les prompts sans faire d'appels API
+      // 4. Sert de solution de repli si aucun modèle d'IA n'est disponible
+      // 5. Aide à la compréhension du système de prompts pour les développeurs
+      if (model === 'prompt') {
+        console.log('📝 Mode Prompt activé : affichage du prompt sans appel à l\'IA');
+        
+        // Formater le prompt pour l'affichage
+        const response = `<div class="prompt-display">
+          <h3>📝 Mode Prompt (Aucun modèle d'IA utilisé)</h3>
+          <p>Voici le prompt qui aurait été envoyé à l'IA :</p>
+          <div class="system-prompts">
+            <h4>Prompts système :</h4>
+            <pre>${systemPrompts.map(p => p).join('\n\n---\n\n')}</pre>
+          </div>
+          <div class="user-prompt">
+            <h4>Prompt utilisateur :</h4>
+            <pre>${prompt}</pre>
+          </div>
+          <p class="prompt-note">Note : Aucune connexion à l'IA n'a été effectuée. Pour obtenir une interprétation générée, veuillez sélectionner un modèle disponible.</p>
+        </div>`;
+        
+        this.isGenerating = false;
+        return response;
+      }
+      
+      // Continuer avec le reste de la logique pour les autres modèles...
+      
       // Afficher uniquement le prompt final
       if (this.debugMode) {
         // Construire le prompt complet comme il sera envoyé à l'IA
@@ -265,26 +312,7 @@ class AIService {
       // Obtenir la réponse selon le type de modèle (OpenAI ou Ollama)
       let response;
       
-      // Mode spécial "prompt" : afficher le prompt au lieu de faire un appel API
-      if (model === 'prompt') {
-        console.log('📝 Mode Prompt activé : affichage du prompt sans appel à l\'IA');
-        
-        // Formater le prompt pour l'affichage
-        response = `<div class="prompt-display">
-          <h3>📝 Mode Prompt (Aucun modèle d'IA utilisé)</h3>
-          <p>Voici le prompt qui aurait été envoyé à l'IA :</p>
-          <div class="system-prompts">
-            <h4>Prompts système :</h4>
-            <pre>${systemPrompts.map(p => p).join('\n\n---\n\n')}</pre>
-          </div>
-          <div class="user-prompt">
-            <h4>Prompt utilisateur :</h4>
-            <pre>${prompt}</pre>
-          </div>
-          <p class="prompt-note">Note : Aucune connexion à l'IA n'a été effectuée. Pour obtenir une interprétation générée, veuillez configurer une clé API ou sélectionner un modèle disponible.</p>
-        </div>`;
-      }
-      else if (model.startsWith('openai/')) {
+      if (model.startsWith('openai/')) {
         response = await this.getOpenAIResponse(prompt, systemPrompts, model.replace('openai/', ''));
       } else {
         // Si un callback de streaming est fourni, utiliser le streaming pour Ollama
@@ -806,6 +834,21 @@ class AIService {
    * @returns {Promise<Object>} Résultat du test avec des informations détaillées
    */
   async testOllamaConnectivity() {
+    // Le mode "prompt" est une option spéciale qui :
+    // 1. Ne nécessite aucune connectivité réseau
+    // 2. Est toujours considéré comme disponible
+    // 3. Permet de continuer à utiliser l'application sans IA
+    // 4. Sert de solution de secours en cas de problème de connexion
+    if (this.stateManager?.getState()?.iaModel === 'prompt') {
+      return {
+        status: 'success',
+        success: true,
+        message: 'Mode Prompt toujours disponible',
+        details: { mode: 'prompt' },
+        suggestions: []
+      };
+    }
+
     try {
       // Utiliser la fonction améliorée de l'API
       const result = await testOllamaConnectivity();

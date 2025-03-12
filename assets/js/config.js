@@ -24,12 +24,15 @@ const SETTINGS = {
   DEFAULT_LANGUAGE: "fr",        // Langue par défaut
   DEFAULT_DECK: "set01",         // Jeu de cartes par défaut
   DEFAULT_SPREAD: "cross",       // Type de tirage par défaut
-  DEFAULT_MODEL: "ollama:llama3.1:latest", // Modèle d'IA par défaut (utilise llama3.1:latest)
+  DEFAULT_MODEL: "prompt",       // Modèle par défaut changé à "prompt" pour plus de sécurité
   
   // Paramètres d'interface
   HIDE_PROMPT: false,      // Masquer le prompt envoyé à l'IA
   AUTO_SCROLL: true,       // Défilement automatique des interprétations
   DARK_MODE: false,        // Mode sombre
+  
+  // Nouveau paramètre pour garantir que "prompt" est toujours disponible
+  ALWAYS_AVAILABLE_MODELS: ["prompt"]  // Liste des modèles toujours disponibles
 };
 
 // Configuration des timeouts (en millisecondes)
