@@ -29,30 +29,33 @@
   --color-error: #dc3545;           /* Rouge - Pour les erreurs et alertes */
   --color-info: #17a2b8;            /* Bleu - Pour les messages informatifs */
   
-  /* Typographie */
-  --font-family-base: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;    /* Police principale de l'interface */
-  --font-family-headings: 'Georgia', serif;                               /* Police des titres */
-  --font-family-special: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;  /* Police pour les interprétations */
+  /* Typographie ultra-compacte */
+  --font-family-base: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --font-family-headings: 'Georgia', serif;
+  --font-family-special: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
   
-  --font-size-xs: 0.75rem;   /* 12px - Pour les petits textes et notes */
-  --font-size-sm: 0.875rem;  /* 14px - Pour les textes secondaires */
-  --font-size-base: 1rem;    /* 16px - Taille de base pour le texte principal */
-  --font-size-md: 1.125rem;  /* 18px - Pour le contenu important */
-  --font-size-lg: 1.25rem;   /* 20px - Pour les sous-titres */
-  --font-size-xl: 1.5rem;    /* 24px - Pour les titres de sections */
-  --font-size-xxl: 2rem;     /* 32px - Pour les titres principaux */
+  /* Tailles de police réduites */
+  --font-size-xs: 0.6875rem;   /* 11px */
+  --font-size-sm: 0.75rem;     /* 12px - était 14px */
+  --font-size-base: 0.875rem;  /* 14px - était 16px */
+  --font-size-md: 1rem;        /* 16px - était 18px */
+  --font-size-lg: 1.125rem;    /* 18px - était 20px */
+  --font-size-xl: 1.25rem;     /* 20px - était 22px */
+  --font-size-xxl: 1.5rem;     /* 24px - était 28px */
   
-  --line-height-tight: 1.25;  /* Interligne serré pour les titres */
-  --line-height-base: 1.5;    /* Interligne standard pour le texte courant */
-  --line-height-loose: 1.75;  /* Interligne large pour les interprétations */
+  /* Interlignes minimaux */
+  --line-height-tight: 1.1;    /* Pour les titres - était 1.2 */
+  --line-height-base: 1.3;     /* Pour le texte standard - était 1.4 */
+  --line-height-loose: 1.4;    /* Pour les interprétations - était 1.5 */
   
-  /* Espacement */
-  --spacing-xs: 0.25rem;   /* 4px - Espacement minimal */
-  --spacing-sm: 0.5rem;    /* 8px - Espacement des éléments internes */
-  --spacing-md: 1rem;      /* 16px - Espacement standard */
-  --spacing-lg: 1.5rem;    /* 24px - Espacement entre sections */
-  --spacing-xl: 2rem;      /* 32px - Grands espacements */
-  --spacing-xxl: 3rem;     /* 48px - Espacement maximal */
+  /* Espacements minimaux */
+  --spacing-xxs: 0.125rem;     /* 2px - était 3.2px */
+  --spacing-xs: 0.25rem;       /* 4px - était 4.8px */
+  --spacing-sm: 0.375rem;      /* 6px - était 8px */
+  --spacing-md: 0.5rem;        /* 8px - était 11.2px */
+  --spacing-lg: 0.75rem;       /* 12px - était 16px */
+  --spacing-xl: 1rem;          /* 16px - était 24px */
+  --spacing-xxl: 1.5rem;       /* 24px - était 32px */
   
   /* Bordures et ombres */
   --border-radius-sm: 0.25rem;  /* 4px - Arrondis subtils */
@@ -80,15 +83,25 @@
   --z-index-modal: 100;    /* Fenêtres modales */
   --z-index-toast: 1000;   /* Notifications */
   
-  /* Dimensions des cartes */
-  --card-width: 100px;        /* Largeur standard des cartes de tarot */
-  --card-height: 170px;       /* Hauteur standard (ratio ~1:1.7) */
-  --card-width-large: 180px;  /* Largeur des cartes agrandies */
-  --card-height-large: 306px; /* Hauteur des cartes agrandies */
+  /* Breakpoints pour le responsive */
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+  --breakpoint-xxl: 1400px;
+
+  /* Dimensions des cartes - Mobile first */
+  --card-base-width: 95px;          /* Taille de base pour mobile */
+  --card-ratio: 1.7;                /* Ratio hauteur/largeur constant */
+  --card-scale-factor: 1;           /* Facteur d'échelle de base */
+  --card-scale-large: 4;            /* Facteur d'agrandissement au clic */
   
-  /* Dimensions du conteneur de tirage */
-  --spread-width: 650px;      /* Largeur de l'espace de tirage */
-  --spread-height: 800px;     /* Hauteur de l'espace de tirage */
+  /* Dimensions calculées */
+  --card-width: calc(var(--card-base-width) * var(--card-scale-factor));
+  --card-height: calc(var(--card-width) * var(--card-ratio));
+  --card-width-large: calc(var(--card-width) * var(--card-scale-large));
+  --card-height-large: calc(var(--card-width-large) * var(--card-ratio));
+
 
   /* Variables pour les positions des cartes */
 
@@ -97,28 +110,28 @@
   --cross-center-y: 50%;
   --cross-top-x: 50%;         /* Position haute - Ce qui influence */
   --cross-top-y: 18%;
-  --cross-left-x: 30%;        /* Position gauche - Passé */
+  --cross-left-x: 25%;        /* Position gauche - Passé */
   --cross-left-y: 50%;
-  --cross-right-x: 70%;       /* Position droite - Futur */
+  --cross-right-x: 75%;       /* Position droite - Futur */
   --cross-right-y: 50%;
   --cross-bottom-x: 50%;      /* Position basse - Résultat */
   --cross-bottom-y: 82%;
 
   /* Positions en fer à cheval */
   --horseshoe-past-x: 30%;         /* Position du passé lointain */
-  --horseshoe-past-y: 20%;
+  --horseshoe-past-y: 15%;
   --horseshoe-recent-x: 50%;       /* Position du passé récent */
   --horseshoe-recent-y: 80%;
   --horseshoe-present-x: 20%;      /* Position du présent */
-  --horseshoe-present-y: 45%;
-  --horseshoe-future-x: 32%;       /* Position du futur proche */
+  --horseshoe-present-y: 42%;
+  --horseshoe-future-x: 25%;       /* Position du futur proche */
   --horseshoe-future-y: 70%;
   --horseshoe-outcome-x: 70%;      /* Position du résultat */
-  --horseshoe-outcome-y: 20%;
-  --horseshoe-influences-x: 68%;   /* Position des influences externes */
+  --horseshoe-outcome-y: 15%;
+  --horseshoe-influences-x: 75%;   /* Position des influences externes */
   --horseshoe-influences-y: 70%;
   --horseshoe-advice-x: 80%;       /* Position du conseil final */
-  --horseshoe-advice-y: 45%;
+  --horseshoe-advice-y: 42%;
 
   /* Positions du tirage de l'amour */
   /* Première ligne - Vous et Partenaire */
@@ -128,17 +141,17 @@
   --love-partner-y: 20%;
   
   /* Deuxième ligne - Relation et Obstacles */
-  --love-relationship-x: 30%; /* card-3: relationship - Dynamique relationnelle */
+  --love-relationship-x: 25%; /* card-3: relationship - Dynamique relationnelle */
   --love-relationship-y: 35%;
-  --love-foundation-x: 70%;   /* card-4: obstacles - OBstacles à surmonter */
+  --love-foundation-x: 75%;   /* card-4: obstacles - OBstacles à surmonter */
   --love-foundation-y: 35%;
   
   /* Troisième ligne - Passé (Désirs), Présent (Résultat), Futur (Conseil) */
-  --love-past-x: 30%;         /* card-5: desires - Vos désirs secrets */
+  --love-past-x: 25%;         /* card-5: desires - Vos désirs secrets */
   --love-past-y: 65%;
   --love-present-x: 50%;      /* card-6: outcome - Situation présente */
   --love-present-y: 80%;
-  --love-future-x: 70%;       /* card-7: advice - Conseils pour l'avenir */
+  --love-future-x: 75%;       /* card-7: advice - Conseils pour l'avenir */
   --love-future-y: 65%;
 
   /* Positions de la croix celtique */
@@ -169,4 +182,54 @@
   --celtic-hopes-y: 40%;
   --celtic-outcome-x: 75%;    /* Carte 10: Résultat final */
   --celtic-outcome-y: 20%;
+}
+
+/* Media Queries pour les différentes tailles d'écran */
+@media (min-width: 576px) {
+  :root {
+    --card-base-width: 80px;
+    --card-scale-large: 3.5;
+  }
+}
+
+@media (min-width: 768px) {
+  :root {
+    --card-base-width: 90px;
+    --card-scale-large: 4;
+  }
+}
+
+@media (min-width: 992px) {
+  :root {
+    --card-base-width: 100px;
+    --card-scale-large: 4.5;
+  }
+}
+
+@media (min-width: 1200px) {
+  :root {
+    --card-base-width: 110px;
+    --card-scale-large: 5;
+  }
+}
+
+@media (min-width: 1400px) {
+  :root {
+    --card-base-width: 120px;
+    --card-scale-large: 5.5;
+  }
+}
+
+/* Media Queries pour l'orientation */
+@media (orientation: landscape) {
+  :root {
+    --card-scale-large: calc(var(--card-scale-large) * 0.8); /* Réduire la taille en mode paysage */
+  }
+}
+
+/* Media Query pour les écrans très hauts */
+@media (min-height: 1000px) {
+  :root {
+    --card-scale-factor: 1.2; /* Augmenter légèrement la taille de base */
+  }
 } 

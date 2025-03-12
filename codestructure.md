@@ -553,7 +553,7 @@ Chaque type de tirage a son propre fichier CSS qui utilise les variables:
 
 ### 3. Nouvelle Architecture de Positionnement
 
-La nouvelle architecture suit le principe de "CSS comme source unique de vérité" pour le positionnement des cartes.
+La nouvelle architecture suit le principe de "variables.css comme source unique de vérité" pour le positionnement des cartes.
 
 #### a. Classes JavaScript (`assets/js/models/spreads/`)
 
