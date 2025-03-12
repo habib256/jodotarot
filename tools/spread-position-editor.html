@@ -4,11 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Éditeur de Positions des Cartes de Tarot</title>
+    <link rel="stylesheet" href="../assets/css/base/variables.css">
+    <!-- 
+    *******************************************************
+    * ÉDITEUR DE POSITIONS DES CARTES DE TAROT
+    *******************************************************
+    * 
+    * Cet outil permet de définir visuellement les positions des cartes
+    * pour les différents types de tirages de JodoTarot.
+    * 
+    * PRINCIPES ARCHITECTURAUX:
+    * 1. Utilise les variables CSS de variables.css comme source unique de vérité
+    * 2. Ne redéfinit jamais les variables déjà présentes dans variables.css
+    * 3. Génère des variables CSS à copier dans variables.css
+    * 4. Adapte ses dimensions automatiquement selon les media queries
+    *
+    * UTILISATION:
+    * - Sélectionnez un type de tirage dans le menu déroulant
+    * - Déplacez les cartes à la position souhaitée
+    * - Ajustez la rotation si nécessaire
+    * - Copiez le CSS généré et collez-le dans variables.css
+    * 
+    * DÉPENDANCES:
+    * - ../assets/css/base/variables.css (dimensions et styles de base)
+    *
+    -->
     <style>
         :root {
-            --card-base-width: 100px;
-            --card-ratio: 1.7;
-            --card-height: calc(var(--card-base-width) * var(--card-ratio));
+            /* Reprise des variables du fichier panels.css */
+            --spread-width: 650px;
+            --spread-height: 800px;
+            /* Ne pas redéfinir les variables de couleur ou de cartes déjà dans variables.css */
         }
 
         body {
@@ -16,38 +42,56 @@
             margin: 0;
             padding: 20px;
             background: #f5f5f7;
+            height: 100vh;
+            overflow: hidden;
         }
 
         #app {
             display: flex;
             gap: 20px;
-            max-width: 1400px;
+            max-width: 1600px; /* Augmenté pour avoir plus d'espace */
             margin: 0 auto;
+            height: calc(100vh - 40px); /* Utilise toute la hauteur disponible */
         }
 
         #workspace {
-            flex: 1;
-            background: #a0d5b5;
-            border-radius: 10px;
-            height: 80vh;
+            /* Reprise exacte des styles du spread-panel de JodoTarot */
+            flex: 0 0 var(--spread-width);
+            width: var(--spread-width);
+            min-width: var(--spread-width);
+            height: var(--spread-height);
+            max-height: var(--spread-height);
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
             position: relative;
+            padding: 0;
+            margin: var(--spacing-lg, 12px) 0 var(--spacing-lg, 12px) var(--spacing-sm, 6px);
+            background-color: var(--color-table-green, #a0d5b5);
+            border-radius: var(--border-radius-md, 8px);
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
             overflow: hidden;
+            box-sizing: border-box;
         }
 
         #controls {
-            width: 300px;
+            width: 400px; /* Un peu plus large */
             background: white;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            height: var(--spread-height);
+            overflow-y: auto;
         }
 
         .card {
-            width: var(--card-base-width);
+            width: var(--card-width);
             height: var(--card-height);
             background: white;
-            border: 2px solid #6b5b95;
-            border-radius: 5px;
+            border: 2px solid var(--color-primary);
+            border-radius: calc(var(--card-width) * 0.05);  /* Utiliser la même formule que dans cards.css */
             position: absolute;
             cursor: move;
             user-select: none;
@@ -57,14 +101,24 @@
             font-size: 14px;
             color: #333;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-in-out, filter 0.2s ease-in-out;
         }
 
         .card.selected {
-            border-color: #28a745;
-            box-shadow: 0 0 0 2px #28a745;
+            border-color: var(--color-success);
+            box-shadow: 0 0 0 2px var(--color-success);
+            z-index: 10;
+            filter: brightness(1.08);
         }
 
-        select, button {
+        .card:hover {
+            z-index: 10;
+            filter: brightness(1.08);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+            transform: scale(1.02);
+        }
+
+        select, button, input {
             width: 100%;
             padding: 8px;
             margin-bottom: 10px;
@@ -72,11 +126,19 @@
             border-radius: 4px;
         }
 
+        select {
+            font-weight: bold;
+            color: var(--color-primary);
+            background-color: #f5f5f7;
+            border-left: 3px solid var(--color-primary);
+        }
+
         button {
-            background: #6b5b95;
+            background: var(--color-primary);
             color: white;
             border: none;
             cursor: pointer;
+            font-weight: 500;
         }
 
         button:hover {
@@ -84,19 +146,115 @@
         }
 
         #output {
-            margin-top: 20px;
+            margin-top: 10px;
             background: #f8f9fa;
-            padding: 10px;
-            border-radius: 4px;
+            padding: 15px;
+            border-radius: 6px;
             font-family: monospace;
             white-space: pre-wrap;
-            max-height: 300px;
+            max-height: 100%;
+            height: calc(100% - 40px); /* Utilise tout l'espace disponible */
             overflow-y: auto;
+            transition: background-color 0.2s ease-in-out;
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+            border: 1px solid #eaeaea;
+        }
+        
+        #output.updating {
+            background-color: #e9f5e9;
+            border-left: 3px solid var(--color-success);
         }
 
         .coordinates {
-            margin-top: 10px;
+            margin-top: 5px;
+            margin-bottom: 10px;
             font-size: 14px;
+            padding: 8px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .rotation-control {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 10px;
+            flex-direction: column;
+        }
+        
+        .rotation-control input {
+            width: 100%;
+            margin-top: 5px;
+        }
+        
+        .rotation-value {
+            font-weight: bold;
+            color: var(--color-primary);
+        }
+        
+        /* Grouper les contrôles pour gagner de l'espace */
+        .control-group {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .output-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .output-container h3 {
+            color: var(--color-primary);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
+        
+        /* Styles responsifs similaires à ceux de JodoTarot */
+        @media (max-width: 1200px) {
+            #app {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            #workspace {
+                margin: var(--spacing-lg, 12px) auto;
+            }
+            
+            #controls {
+                width: var(--spread-width, 650px);
+                max-width: 100%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            #workspace {
+                width: 100%;
+                max-width: 600px;
+                min-width: 320px;
+            }
+            
+            #controls {
+                width: 100%;
+                max-width: 600px;
+            }
+        }
+        
+        /* Adaptations des cartes selon le Media Query similaires à JodoTarot */
+        @media (max-width: 576px) {
+            /* Cette section n'est plus nécessaire car nous utilisons les variables CSS directement
+               Les variables sont déjà ajustées par les media queries dans variables.css */
+        }
+        
+        @media (max-width: 400px) {
+            /* Cette section n'est plus nécessaire car nous utilisons les variables CSS directement
+               Les variables sont déjà ajustées par les media queries dans variables.css */
         }
     </style>
 </head>
@@ -104,23 +262,44 @@
     <div id="app">
         <div id="workspace"></div>
         <div id="controls">
-            <select id="spreadType">
-                <option value="cross">Tirage en Croix</option>
-                <option value="horseshoe">Fer à Cheval</option>
-                <option value="love">Tirage de l'Amour</option>
-                <option value="celtic">Croix Celtique</option>
-            </select>
-            <button id="resetBtn">Réinitialiser</button>
-            <button id="copyBtn">Copier les Variables CSS</button>
-            <div class="coordinates">
-                <div>Position X: <span id="posX">0</span>%</div>
-                <div>Position Y: <span id="posY">0</span>%</div>
+            <div class="control-group">
+                <select id="spreadType">
+                    <option value="cross">➕ Tirage en Croix</option>
+                    <option value="horseshoe">🧲 Fer à Cheval</option>
+                    <option value="love">❤️ Tarot de l'amour</option>
+                    <option value="celtic">☘️ Croix Celtique</option>
+                </select>
+                <div class="button-group" style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <button id="resetBtn" style="flex: 1;">Réinitialiser</button>
+                    <button id="copyBtn" style="flex: 1;">Copier CSS</button>
+                </div>
             </div>
-            <div id="output"></div>
+            
+            <div class="control-group">
+                <div class="coordinates">
+                    <div>Position X: <span id="posX">0</span>% | Position Y: <span id="posY">0</span>%</div>
+                </div>
+                <div class="rotation-control">
+                    <label for="rotationSlider">Rotation: <span id="rotationValue" class="rotation-value">0°</span></label>
+                    <input type="range" id="rotationSlider" min="0" max="360" value="0" step="5">
+                </div>
+                <button id="resetRotationBtn">Réinitialiser la rotation</button>
+            </div>
+            
+            <div class="output-container">
+                <h3 style="margin: 5px 0; font-size: 14px;">Variables CSS:</h3>
+                <div id="output"></div>
+            </div>
         </div>
     </div>
 
     <script>
+        /**
+         * Définition des types de tirages disponibles
+         * Structure: 
+         * - name: Nom affiché du tirage
+         * - cards: Tableau des cartes avec leur nom technique et label d'affichage
+         */
         const spreads = {
             cross: {
                 name: 'Tirage en Croix',
@@ -173,21 +352,87 @@
             }
         };
 
+        /**
+         * Variables globales et éléments DOM
+         */
         let selectedCard = null;
-        let cardPositions = {};
+        let cardPositions = {}; // Structure de données pour stocker les positions de toutes les cartes
+        
+        // Éléments DOM principaux
         const workspace = document.getElementById('workspace');
         const spreadSelect = document.getElementById('spreadType');
         const output = document.getElementById('output');
         const posX = document.getElementById('posX');
         const posY = document.getElementById('posY');
+        const rotationSlider = document.getElementById('rotationSlider');
+        const rotationValue = document.getElementById('rotationValue');
+        const resetRotationBtn = document.getElementById('resetRotationBtn');
 
+        /**
+         * Fonctions utilitaires pour manipuler les variables CSS
+         * Ces fonctions standardisent l'accès aux variables CSS dans tout le code
+         */
+        // Fonction améliorée pour extraire les valeurs des variables CSS
+        function getComputedCSSVariable(variableName) {
+            // Standardisation: utiliser toujours cette fonction pour récupérer les valeurs CSS
+            return getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
+        }
+        
+        // Nouvelle fonction utilitaire pour extraire la valeur avec son unité (%, px, deg, etc.)
+        function getCSSVariableWithUnit(variableName) {
+            return getComputedCSSVariable(variableName);
+        }
+        
+        // Fonction pour extraire une valeur numérique sans unité
+        function getCSSVariableNumeric(variableName) {
+            const value = getComputedCSSVariable(variableName);
+            // Extraction de la valeur numérique quelle que soit l'unité (%, px, deg, etc.)
+            const numericValue = parseFloat(value);
+            return isNaN(numericValue) ? 0 : numericValue;
+        }
+
+        // Fonction pour charger les positions initiales depuis variables.css
+        function loadInitialPositions() {
+            const spreadTypes = ['cross', 'horseshoe', 'love', 'celtic'];
+            
+            spreadTypes.forEach(spreadType => {
+                cardPositions[spreadType] = {};
+                
+                spreads[spreadType].cards.forEach(card => {
+                    const xVarName = `--${spreadType}-${card.name}-x`;
+                    const yVarName = `--${spreadType}-${card.name}-y`;
+                    const rotationVarName = `--${spreadType}-${card.name}-rotation`;
+                    
+                    // Utiliser les nouvelles fonctions standardisées
+                    const x = getCSSVariableNumeric(xVarName);
+                    const y = getCSSVariableNumeric(yVarName);
+                    const rotation = getCSSVariableNumeric(rotationVarName);
+                    
+                    // Valeur par défaut si la variable n'existe pas ou n'est pas un nombre valide
+                    cardPositions[spreadType][card.name] = {
+                        x: isNaN(x) ? 50 : x,
+                        y: isNaN(y) ? 50 : y,
+                        rotation: isNaN(rotation) ? 0 : rotation
+                    };
+                });
+            });
+            
+            console.log('Positions initiales chargées:', cardPositions);
+        }
+
+        /**
+         * Crée un élément DOM représentant une carte de tarot
+         * @param {Object} card - Définition de la carte depuis l'objet spreads
+         * @param {number} index - Index de la carte dans le tableau
+         * @returns {HTMLElement} - Élément DOM représentant la carte
+         */
         function createCard(card, index) {
             const cardEl = document.createElement('div');
             cardEl.className = 'card';
             cardEl.textContent = `${card.label} (${index + 1})`;
             cardEl.dataset.name = card.name;
             
-            // Position initiale au centre
+            // Position par défaut au centre (sera écrasée si une position existe)
             cardEl.style.left = '50%';
             cardEl.style.top = '50%';
             cardEl.style.transform = 'translate(-50%, -50%)';
@@ -196,6 +441,11 @@
             return cardEl;
         }
 
+        /**
+         * Gère le début du glisser-déposer d'une carte
+         * Configure les gestionnaires d'événements pour le mouvement et la fin du glisser
+         * @param {MouseEvent} e - Événement de clic souris
+         */
         function startDragging(e) {
             if (selectedCard) {
                 selectedCard.classList.remove('selected');
@@ -203,86 +453,279 @@
             selectedCard = e.target;
             selectedCard.classList.add('selected');
 
-            const rect = workspace.getBoundingClientRect();
-            const cardRect = selectedCard.getBoundingClientRect();
+            // Récupérer la rotation actuelle de la carte sélectionnée
+            const name = selectedCard.dataset.name;
+            const spreadType = spreadSelect.value;
+            const rotation = cardPositions[spreadType]?.[name]?.rotation || 0;
+            
+            // Mettre à jour le slider de rotation
+            rotationSlider.value = rotation;
+            rotationValue.textContent = `${rotation}°`;
 
+            const rect = workspace.getBoundingClientRect();
+            
+            // Mettre en évidence la zone de sortie et la garder en évidence pendant le déplacement
+            output.classList.add('updating');
+            
+            // Garantir que les positions sont initialisées
+            if (!cardPositions[spreadType]) {
+                cardPositions[spreadType] = {};
+            }
+            if (!cardPositions[spreadType][name]) {
+                cardPositions[spreadType][name] = { 
+                    x: parseFloat(selectedCard.style.left) || 50, 
+                    y: parseFloat(selectedCard.style.top) || 50,
+                    rotation: rotation 
+                };
+            }
+            
             function onMouseMove(e) {
+                // Empêcher les événements par défaut pour éviter les problèmes
+                e.preventDefault();
+                
                 const x = ((e.clientX - rect.left) / rect.width) * 100;
                 const y = ((e.clientY - rect.top) / rect.height) * 100;
                 
-                selectedCard.style.left = x + '%';
-                selectedCard.style.top = y + '%';
-                selectedCard.style.transform = 'translate(-50%, -50%)';
+                // Limiter les valeurs entre 0 et 100
+                const boundedX = Math.max(0, Math.min(100, x));
+                const boundedY = Math.max(0, Math.min(100, y));
+                
+                selectedCard.style.left = boundedX + '%';
+                selectedCard.style.top = boundedY + '%';
+                
+                // Conserver la rotation dans la transformation
+                const rotation = cardPositions[spreadType][name].rotation || 0;
+                selectedCard.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
 
                 // Update coordinates display
-                posX.textContent = Math.round(x);
-                posY.textContent = Math.round(y);
+                posX.textContent = Math.round(boundedX);
+                posY.textContent = Math.round(boundedY);
 
-                // Save position
-                const name = selectedCard.dataset.name;
-                const spreadType = spreadSelect.value;
-                if (!cardPositions[spreadType]) {
-                    cardPositions[spreadType] = {};
-                }
-                cardPositions[spreadType][name] = { x, y };
-                updateOutput();
+                // Sauvegarder la position immédiatement
+                cardPositions[spreadType][name].x = boundedX;
+                cardPositions[spreadType][name].y = boundedY;
+                
+                // Forcer la mise à jour du texte CSS à chaque mouvement
+                updateOutput(true);
             }
 
             function onMouseUp() {
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
+                
+                // Retirer la mise en évidence de la sortie après un court délai
+                setTimeout(() => {
+                    output.classList.remove('updating');
+                }, 300);
+                
+                // S'assurer que la sortie est à jour une dernière fois
+                updateOutput(false);
             }
 
             document.addEventListener('mousemove', onMouseMove);
             document.addEventListener('mouseup', onMouseUp);
         }
 
-        function updateOutput() {
+        // Gestion de la rotation
+        rotationSlider.addEventListener('input', function() {
+            if (!selectedCard) return;
+            
+            const rotation = parseInt(this.value);
+            rotationValue.textContent = `${rotation}°`;
+            
+            const name = selectedCard.dataset.name;
+            const spreadType = spreadSelect.value;
+            
+            // Appliquer la rotation à la carte
+            selectedCard.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+            
+            // Sauvegarder la rotation
+            if (!cardPositions[spreadType]) {
+                cardPositions[spreadType] = {};
+            }
+            if (!cardPositions[spreadType][name]) {
+                cardPositions[spreadType][name] = { x: 50, y: 50 };
+            }
+            cardPositions[spreadType][name].rotation = rotation;
+            
+            // Mettre en évidence la sortie
+            output.classList.add('updating');
+            setTimeout(() => output.classList.remove('updating'), 300);
+            
+            // Mise à jour immédiate
+            updateOutput(true);
+        });
+        
+        // Réinitialiser la rotation
+        resetRotationBtn.addEventListener('click', function() {
+            if (!selectedCard) return;
+            
+            const name = selectedCard.dataset.name;
+            const spreadType = spreadSelect.value;
+            
+            // Réinitialiser la rotation
+            rotationSlider.value = 0;
+            rotationValue.textContent = "0°";
+            
+            // Appliquer la rotation à la carte
+            selectedCard.style.transform = `translate(-50%, -50%) rotate(0deg)`;
+            
+            // Sauvegarder la rotation
+            if (cardPositions[spreadType] && cardPositions[spreadType][name]) {
+                cardPositions[spreadType][name].rotation = 0;
+            }
+            
+            updateOutput();
+        });
+
+        // Fonction mise à jour avec option pour forcer un rendu immédiat et formatage optimisé
+        function updateOutput(instant = false) {
             const spreadType = spreadSelect.value;
             const positions = cardPositions[spreadType];
             if (!positions) return;
 
-            let css = `/* Positions pour ${spreads[spreadType].name} */\n`;
-            Object.entries(positions).forEach(([name, pos]) => {
+            let css = `/* -------------------------------------------- */
+/* Positions pour ${spreads[spreadType].name} */
+/* Ces variables doivent être placées dans variables.css */
+/* -------------------------------------------- */\n\n`;
+
+            // Tri des cartes pour un affichage ordonné
+            const sortedCards = Object.entries(positions).sort((a, b) => {
+                // Retrouver l'index de la carte dans la définition du spread
+                const indexA = spreads[spreadType].cards.findIndex(c => c.name === a[0]);
+                const indexB = spreads[spreadType].cards.findIndex(c => c.name === b[0]);
+                return indexA - indexB;
+            });
+
+            // Grouper les propriétés par carte pour une meilleure lisibilité
+            sortedCards.forEach(([name, pos], index) => {
+                // Trouver le label de la carte pour le commentaire
+                const cardInfo = spreads[spreadType].cards.find(c => c.name === name);
+                const cardLabel = cardInfo ? cardInfo.label : name;
+                
+                css += `/* Carte ${index + 1}: ${cardLabel} */\n`;
                 css += `--${spreadType}-${name}-x: ${Math.round(pos.x)}%;\n`;
                 css += `--${spreadType}-${name}-y: ${Math.round(pos.y)}%;\n`;
+                
+                // Ajouter la rotation uniquement si elle n'est pas nulle
+                if (pos.rotation && pos.rotation !== 0) {
+                    css += `--${spreadType}-${name}-rotation: ${pos.rotation}deg;\n`;
+                }
+                css += '\n';
             });
+            
+            // Mise à jour du texte
             output.textContent = css;
+            
+            // Si besoin d'une mise à jour immédiate, forcer un reflow
+            if (instant) {
+                // Technique standard pour forcer un reflow
+                output.style.display = 'none';
+                void output.offsetHeight; // Force reflow
+                output.style.display = '';
+            }
         }
 
+        /**
+         * Charge un type de tirage dans l'espace de travail
+         * Crée les cartes, positionne les selon les données enregistrées
+         * et met à jour l'affichage CSS
+         */
         function loadSpread() {
             workspace.innerHTML = '';
             const spreadType = spreadSelect.value;
             const spread = spreads[spreadType];
             
+            // Désélectionner la carte actuelle
+            selectedCard = null;
+            
+            // Réinitialiser le contrôle de rotation
+            rotationSlider.value = 0;
+            rotationValue.textContent = "0°";
+            
+            // Adaptation spécifique par type de tirage
+            switch(spreadType) {
+                case 'cross':
+                    workspace.className = 'spread';
+                    break;
+                case 'horseshoe':
+                    workspace.className = 'horseshoe-spread';
+                    break;
+                case 'love':
+                    workspace.className = 'love-spread';
+                    break;
+                case 'celtic':
+                    workspace.className = 'celtic-cross-spread';
+                    break;
+            }
+            
             spread.cards.forEach((card, index) => {
                 const cardEl = createCard(card, index);
                 workspace.appendChild(cardEl);
                 
-                // Restore saved position if exists
+                // Ajouter la classe correspondant au type de carte
+                cardEl.classList.add(card.name);
+                
+                // Restore saved position and rotation if exists
                 if (cardPositions[spreadType]?.[card.name]) {
                     const pos = cardPositions[spreadType][card.name];
                     cardEl.style.left = pos.x + '%';
                     cardEl.style.top = pos.y + '%';
+                    
+                    // Appliquer la rotation si elle existe
+                    const rotation = pos.rotation || 0;
+                    cardEl.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
                 }
             });
             
             updateOutput();
         }
 
-        spreadSelect.addEventListener('change', loadSpread);
-        document.getElementById('resetBtn').addEventListener('click', () => {
-            cardPositions[spreadSelect.value] = {};
+        /**
+         * Met à jour les dimensions des cartes selon les media queries
+         * Cette fonction est appelée lors des changements de taille d'écran
+         */
+        function applyCardDimensions() {
+            // Les variables CSS sont automatiquement mises à jour par le navigateur
+            // grâce aux media queries dans variables.css
+            // Cette fonction peut être appelée lors du redimensionnement de la fenêtre
+            loadSpread(); // Recharger le spread pour appliquer les nouvelles dimensions
+        }
+
+        /**
+         * Initialise l'application
+         * Configure les écouteurs d'événements et charge le premier tirage
+         */
+        function initApp() {
+            // Écouteurs d'événements principaux
+            spreadSelect.addEventListener('change', loadSpread);
+            document.getElementById('resetBtn').addEventListener('click', () => {
+                // Charger les positions depuis variables.css au lieu de simplement vider
+                loadInitialPositions();
+                loadSpread();
+            });
+
+            document.getElementById('copyBtn').addEventListener('click', () => {
+                navigator.clipboard.writeText(output.textContent);
+                alert('Variables CSS copiées dans le presse-papier !');
+            });
+            
+            // Écouter les changements de taille d'écran
+            window.addEventListener('resize', function() {
+                // Utiliser un debounce pour éviter trop d'appels
+                clearTimeout(window.resizeTimer);
+                window.resizeTimer = setTimeout(applyCardDimensions, 250);
+            });
+
+            // Charger les positions initiales depuis variables.css
+            loadInitialPositions();
+            
+            // Charger le premier tirage
             loadSpread();
-        });
-
-        document.getElementById('copyBtn').addEventListener('click', () => {
-            navigator.clipboard.writeText(output.textContent);
-            alert('Variables CSS copiées dans le presse-papier !');
-        });
-
-        // Initial load
-        loadSpread();
+        }
+        
+        // Démarrer l'application
+        initApp();
     </script>
 </body>
 </html> 
