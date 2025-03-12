@@ -1,213 +1,271 @@
-# Conventions de Nommage CSS pour les Tirages de Tarot
+# Conventions de Nommage CSS
 
-## Introduction
+## Méthodologie BEM
 
-Ce document détaille les conventions de nommage CSS adoptées pour les positions des cartes dans les différents tirages de tarot de notre application. Ces conventions visent à standardiser l'approche tout en conservant la lisibilité et la rétrocompatibilité.
+JodoTarot utilise la méthodologie BEM (Block Element Modifier) pour structurer son CSS.
 
-## Principes de Base
-
-### Double Système de Nommage
-
-Nous utilisons deux systèmes de nommage parallèles pour les sélecteurs CSS :
-
-1. **Sélecteurs sémantiques** : Basés sur la signification de la position (ex: `.card-present`, `.card-past`)
-2. **Sélecteurs numériques** : Basés sur un identifiant numérique (ex: `.card-1`, `.card-2`)
-
-Cette double approche permet à la fois une compréhension intuitive du code et une standardisation technique.
-
-### Variables CSS
-
-Les coordonnées de positionnement sont définies via des variables CSS avec la convention suivante :
+### Structure
 
 ```css
---[tirage]-position-[numéro]-[propriété]
+.block {}                     /* Block : composant autonome */
+.block__element {}           /* Element : partie d'un block */
+.block--modifier {}          /* Modifier : variante d'un block */
+.block__element--modifier {} /* Modifier sur un élément */
 ```
 
-Où :
-- `[tirage]` = nom du tirage (cross, horseshoe, love, celtic)
-- `[numéro]` = identifiant numérique de la position (1, 2, 3...)
-- `[propriété]` = propriété concernée (x, y, rotation, etc.)
+### Exemples
 
-Exemples :
 ```css
---cross-position-1-x
---horseshoe-position-3-rotation
---love-position-2-y
+/* Carte de tarot */
+.card {}                    /* Block de base */
+.card__image {}            /* Image de la carte */
+.card__title {}            /* Titre de la carte */
+.card--reversed {}         /* Modificateur : carte inversée */
+.card--selected {}         /* Modificateur : carte sélectionnée */
+.card__image--loading {}   /* Image en cours de chargement */
+
+/* Tirage */
+.spread {}                 /* Block de tirage */
+.spread__position {}       /* Position dans le tirage */
+.spread__card {}          /* Carte dans le tirage */
+.spread--cross {}         /* Type de tirage en croix */
+.spread__position--active {} /* Position active */
 ```
 
-## Variables par Type de Tirage
+## Espaces de Noms
 
-### Tirage en Croix (Cross Spread)
+### Préfixes Fonctionnels
 
 ```css
-/* Variables de position X */
---cross-position-1-x  /* Position centre X */
---cross-position-2-x  /* Position haut X */
---cross-position-3-x  /* Position droite X */
---cross-position-4-x  /* Position bas X */
---cross-position-5-x  /* Position gauche X */
+/* Layout */
+.l-container {}
+.l-grid {}
+.l-flex {}
 
-/* Variables de position Y */
---cross-position-1-y  /* Position centre Y */
---cross-position-2-y  /* Position haut Y */
---cross-position-3-y  /* Position droite Y */
---cross-position-4-y  /* Position bas Y */
---cross-position-5-y  /* Position gauche Y */
+/* Composants */
+.c-button {}
+.c-card {}
+.c-spread {}
+
+/* Utilitaires */
+.u-hidden {}
+.u-visible {}
+.u-center {}
+
+/* États */
+.is-active {}
+.is-disabled {}
+.is-loading {}
+
+/* JavaScript hooks */
+.js-trigger {}
+.js-target {}
+.js-animate {}
 ```
 
-### Tirage en Fer à Cheval (Horseshoe Spread)
+## Variables CSS
+
+### Nommage des Variables
 
 ```css
-/* Variables de position X */
---horseshoe-position-1-x  /* Position passé X */
---horseshoe-position-2-x  /* Position récent X */
---horseshoe-position-3-x  /* Position présent X */
---horseshoe-position-4-x  /* Position futur X */
---horseshoe-position-5-x  /* Position résultat X */
---horseshoe-position-6-x  /* Position influences X */
---horseshoe-position-7-x  /* Position conseil X */
-
-/* Variables de position Y */
---horseshoe-position-1-y  /* Position passé Y */
---horseshoe-position-2-y  /* Position récent Y */
---horseshoe-position-3-y  /* Position présent Y */
---horseshoe-position-4-y  /* Position futur Y */
---horseshoe-position-5-y  /* Position résultat Y */
---horseshoe-position-6-y  /* Position influences Y */
---horseshoe-position-7-y  /* Position conseil Y */
-```
-
-### Tirage de l'Amour (Love Spread)
-
-```css
-/* Variables de position X */
---love-position-1-x  /* Position vous X */
---love-position-2-x  /* Position partenaire X */
---love-position-3-x  /* Position relation X */
---love-position-4-x  /* Position fondation X */
---love-position-5-x  /* Position passé X */
---love-position-6-x  /* Position présent X */
---love-position-7-x  /* Position futur X */
-
-/* Variables de position Y */
---love-position-1-y  /* Position vous Y */
---love-position-2-y  /* Position partenaire Y */
---love-position-3-y  /* Position relation Y */
---love-position-4-y  /* Position fondation Y */
---love-position-5-y  /* Position passé Y */
---love-position-6-y  /* Position présent Y */
---love-position-7-y  /* Position futur Y */
-```
-
-### Croix Celtique (Celtic Cross Spread)
-
-```css
-/* Variables de position X */
---celtic-position-1-x  /* Position situation actuelle X */
---celtic-position-2-x  /* Position défi X */
---celtic-position-3-x  /* Position passé X */
---celtic-position-4-x  /* Position futur X */
---celtic-position-5-x  /* Position conscient X */
---celtic-position-6-x  /* Position inconscient X */
---celtic-position-7-x  /* Position vous-même X */
---celtic-position-8-x  /* Position externe X */
---celtic-position-9-x  /* Position espoirs X */
---celtic-position-10-x /* Position résultat X */
-
-/* Variables de position Y */
---celtic-position-1-y  /* Position situation actuelle Y */
---celtic-position-2-y  /* Position défi Y */
---celtic-position-3-y  /* Position passé Y */
---celtic-position-4-y  /* Position futur Y */
---celtic-position-5-y  /* Position conscient Y */
---celtic-position-6-y  /* Position inconscient Y */
---celtic-position-7-y  /* Position vous-même Y */
---celtic-position-8-y  /* Position externe Y */
---celtic-position-9-y  /* Position espoirs Y */
---celtic-position-10-y /* Position résultat Y */
-
-/* Variables de rotation (spécifiques à certaines positions) */
---celtic-position-2-rotation  /* Rotation pour la carte "défi" */
-```
-
-## Utilisation des Sélecteurs
-
-### Sélecteurs Sémantiques et Numériques
-
-Chaque position de carte est accessible via deux sélecteurs équivalents :
-
-```css
-.card-present, .card-1 {
-  /* Styles pour la première position */
-}
-
-.card-challenge, .card-2 {
-  /* Styles pour la deuxième position */
-}
-```
-
-### Exemples d'Utilisation
-
-Pour le tirage en croix :
-```css
-.card-center, .card-1 {
-  transform: translate(var(--cross-position-1-x), var(--cross-position-1-y));
-}
-
-.card-top, .card-2 {
-  transform: translate(var(--cross-position-2-x), var(--cross-position-2-y));
-}
-```
-
-Pour le tirage Croix Celtique avec rotation :
-```css
-.card-challenge, .card-2 {
-  transform: translate(var(--celtic-position-2-x), var(--celtic-position-2-y)) 
-             rotate(var(--celtic-position-2-rotation, 90deg));
-}
-```
-
-## Adaptation Responsive
-
-Les variables peuvent être redéfinies dans les media queries pour adapter le positionnement aux différentes tailles d'écran :
-
-```css
-/* Valeurs par défaut */
 :root {
-  --cross-position-1-x: 0;
-  --cross-position-1-y: 0;
-  /* ... autres variables ... */
+  /* Couleurs */
+  --color-primary: #3498db;
+  --color-secondary: #2ecc71;
+  --color-text: #2c3e50;
+  
+  /* Espacements */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 2rem;
+  
+  /* Typographie */
+  --font-family-base: 'Arial', sans-serif;
+  --font-size-base: 16px;
+  --line-height-base: 1.5;
+  
+  /* Breakpoints */
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  
+  /* Animations */
+  --animation-duration: 0.3s;
+  --animation-timing: ease-in-out;
+}
+```
+
+## Media Queries
+
+### Points de Rupture
+
+```css
+/* Mobile First */
+@media (min-width: 576px) { /* Small devices */ }
+@media (min-width: 768px) { /* Medium devices */ }
+@media (min-width: 992px) { /* Large devices */ }
+@media (min-width: 1200px) { /* Extra large devices */ }
+```
+
+## Animations
+
+### Nommage des Keyframes
+
+```css
+/* Préfixe 'anim-' pour les animations */
+@keyframes anim-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-/* Tablettes */
-@media (max-width: 768px) {
-  :root {
-    --cross-position-1-x: 0;
-    --cross-position-1-y: 0;
-    /* ... ajustements pour tablettes ... */
-  }
+@keyframes anim-slide-up {
+  from { transform: translateY(20px); }
+  to { transform: translateY(0); }
 }
 
-/* Mobiles */
-@media (max-width: 480px) {
-  :root {
-    --cross-position-1-x: 0;
-    --cross-position-1-y: 0;
-    /* ... ajustements pour mobiles ... */
-  }
+/* Utilisation */
+.card {
+  animation: anim-fade-in 0.3s ease-in-out;
 }
+```
+
+## Thèmes
+
+### Variables de Thème
+
+```css
+/* Thème clair (défaut) */
+:root {
+  --theme-bg: #ffffff;
+  --theme-text: #000000;
+  --theme-primary: #3498db;
+}
+
+/* Thème sombre */
+[data-theme="dark"] {
+  --theme-bg: #2c3e50;
+  --theme-text: #ffffff;
+  --theme-primary: #3498db;
+}
+```
+
+## États Interactifs
+
+### Conventions de Nommage
+
+```css
+/* États de base */
+.button { }
+.button:hover { }
+.button:focus { }
+.button:active { }
+
+/* États avec classes */
+.button.is-active { }
+.button.is-disabled { }
+.button.is-loading { }
+```
+
+## Organisation des Fichiers
+
+```
+styles/
+├── base/
+│   ├── _reset.css
+│   ├── _typography.css
+│   └── _variables.css
+├── components/
+│   ├── _buttons.css
+│   ├── _cards.css
+│   └── _spreads.css
+├── layouts/
+│   ├── _grid.css
+│   └── _containers.css
+├── themes/
+│   ├── _light.css
+│   └── _dark.css
+└── main.css
 ```
 
 ## Bonnes Pratiques
 
-1. **Commentaires** : Toujours indiquer la correspondance sémantique en commentaire des variables numériques.
-2. **Ordre** : Organiser les variables dans un ordre logique et constant.
-3. **Valeurs par défaut** : Fournir des valeurs par défaut pour les propriétés optionnelles.
-4. **Documentation** : Maintenir ce document à jour lors de l'ajout de nouveaux tirages ou modifications.
-5. **Rétrocompatibilité** : Toujours conserver les deux systèmes de sélecteurs (sémantique et numérique).
+1. **Spécificité**
+   - Éviter les sélecteurs trop spécifiques
+   - Limiter l'imbrication à 2-3 niveaux
+   - Utiliser les classes plutôt que les IDs
 
-## Migration et Évolution
+2. **Réutilisabilité**
+   - Créer des composants modulaires
+   - Utiliser des utilitaires
+   - Éviter les styles en ligne
 
-La transition vers ce système standardisé a été effectuée en préservant la compatibilité avec le code existant. Les anciens sélecteurs sémantiques continueront de fonctionner, tandis que les nouveaux sélecteurs numériques offrent une alternative plus cohérente et systématique.
+3. **Maintenabilité**
+   - Commenter les sections complexes
+   - Grouper les propriétés logiquement
+   - Suivre un ordre cohérent
 
-Pour chaque nouveau tirage, appliquer rigoureusement ces conventions afin de maintenir la cohérence de l'ensemble du système. 
+4. **Performance**
+   - Minimiser les sélecteurs
+   - Éviter les duplications
+   - Optimiser les animations
+
+## Exemple Complet
+
+```css
+/* Composant Card */
+.card {
+  /* Variables locales */
+  --card-padding: var(--spacing-md);
+  --card-radius: 8px;
+  
+  /* Layout */
+  display: flex;
+  flex-direction: column;
+  padding: var(--card-padding);
+  border-radius: var(--card-radius);
+  
+  /* Thème */
+  background: var(--theme-bg);
+  color: var(--theme-text);
+  
+  /* Animation */
+  transition: transform var(--animation-duration) var(--animation-timing);
+}
+
+/* Éléments */
+.card__image {
+  width: 100%;
+  height: auto;
+  border-radius: calc(var(--card-radius) - 2px);
+}
+
+.card__title {
+  margin-top: var(--spacing-sm);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+}
+
+/* Modificateurs */
+.card--selected {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* États */
+.card.is-loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Media Queries */
+@media (min-width: var(--breakpoint-md)) {
+  .card {
+    flex-direction: row;
+  }
+  
+  .card__image {
+    width: 30%;
+  }
+}
+``` 

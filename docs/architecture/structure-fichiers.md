@@ -32,7 +32,7 @@ jodotarot/
 │   │   │   ├── ConfigController.js    # Contrôleur de configuration (1320 lignes)
 │   │   │   └── ReadingController.js   # Contrôleur de lecture (869 lignes)
 │   │   ├── utils/           # Utilitaires
-│   │   │   └── StateManager.js   # Gestionnaire d'état (816 lignes)
+│   │   │   └── StateManager.js   # Gestionnaire d'état (825 lignes)
 │   │   └── models/          # Modèles de données
 │   │       ├── personas/         # Définitions des personas (23 personas)
 │   │       │   ├── BasePersona.js           # Classe de base (94 lignes)
@@ -72,17 +72,42 @@ jodotarot/
 │   │   │   ├── select.css               # Sélecteurs (134 lignes)
 │   │   │   └── warnings.css             # Messages d'avertissement (167 lignes)
 │   │   ├── layouts/              # Mises en page
+│   │   │   ├── container.css            # Conteneurs principaux
+│   │   │   ├── header.css               # En-tête de l'application  
+│   │   │   └── panels.css               # Panneaux d'interface
 │   │   └── utils/                # Utilitaires CSS
+│   │       ├── scrolling.css            # Gestion du défilement
+│   │       ├── animations.css           # Animations réutilisables
+│   │       └── helpers.css              # Classes utilitaires
 │   └── images/               # Images et ressources graphiques
 ├── tools/                    # Outils de développement
 │   └── spread-editor.html        # Éditeur visuel des positions des cartes (901 lignes)
 ├── docs/                     # Documentation technique
 │   ├── index.md                  # Point d'entrée de la documentation
+│   ├── README.md                 # Structure de la documentation
 │   ├── architecture/             # Documentation sur l'architecture
+│   │   ├── vue-ensemble.md              # Vue d'ensemble de l'architecture
+│   │   ├── interactions-composants.md   # Interactions entre composants
+│   │   ├── flux-donnees.md              # Flux de données
+│   │   ├── structure-fichiers.md        # Ce document
+│   │   └── securite.md                  # Sécurité et protection des données
 │   ├── composants/               # Documentation des composants
+│   │   ├── construction-prompts.md      # Construction des prompts IA
+│   │   ├── integration-ia.md            # Intégration avec l'IA
+│   │   ├── personas.md                  # Système de personas
+│   │   ├── state-manager.md             # Gestionnaire d'état
+│   │   ├── traduction.md                # Système de traduction
+│   │   └── interactions-utilisateur.md  # Gestion des interactions utilisateur
 │   ├── ui/                       # Documentation de l'interface utilisateur
+│   │   └── positionnement-cartes.md     # Système de positionnement des cartes
 │   ├── tools/                    # Documentation des outils
+│   │   └── spread-editor.md             # Éditeur de positions
 │   └── standards/                # Standards et conventions
+│       ├── bonnes-pratiques.md          # Bonnes pratiques de développement
+│       ├── card-positions.md            # Référence des positions de cartes
+│       ├── css-naming-conventions.md    # Conventions de nommage CSS
+│       ├── tarot-position-standardization.md # Standardisation des positions
+│       └── internationalisation.md      # Standards d'internationalisation
 ├── index.html                # Page principale (147 lignes)
 ├── favicon.ico               # Icône du site (23 lignes)
 ├── screenshot.png            # Capture d'écran de l'application (2165 lignes)
@@ -116,6 +141,26 @@ jodotarot/
 - **models/spreads/** : Types de tirages disponibles
 - **models/cards/** : Définitions des cartes de tarot
 
+### Système de Traduction
+
+Le système de traduction est organisé pour faciliter l'internationalisation :
+
+- **translations/** : Fichiers de traduction par langue
+  - **index.js** : Exporte la fonction `getTranslation` et l'objet `TRANSLATIONS`
+  - **[language].js** : Fichiers de traduction spécifiques à chaque langue (fr, en, etc.)
+  - **README.md** : Documentation du système de traduction
+
+Structure des clés de traduction :
+```
+section.soussection.cle
+```
+
+Exemple d'utilisation :
+```javascript
+import { getTranslation } from '../translations/index.js';
+const translation = getTranslation('header.question', 'fr');
+```
+
 ### Structure CSS
 
 L'architecture CSS suit une organisation modulaire inspirée de la méthodologie ITCSS :
@@ -125,25 +170,50 @@ L'architecture CSS suit une organisation modulaire inspirée de la méthodologie
    - **reset.css** : Normalisation des styles par défaut
    - **typography.css** : Styles typographiques globaux
 
-2. **modules/** : Styles spécifiques aux fonctionnalités
+2. **utils/** : Utilitaires CSS (placés en début de cascade)
+   - **scrolling.css** : Optimisation du défilement
+   - **animations.css** : Animations réutilisables
+   - **helpers.css** : Classes utilitaires génériques
+
+3. **layouts/** : Mises en page globales
+   - **container.css** : Conteneurs principaux
+   - **header.css** : En-tête de l'application
+   - **panels.css** : Structure des panneaux
+
+4. **components/** : Composants d'interface réutilisables
+   - **buttons.css** : Styles des boutons
+   - **cards.css** : Styles des cartes de tarot
+   - **forms.css** : Styles des formulaires et contrôles
+   - **modal.css** : Fenêtres modales
+   - **select.css** : Sélecteurs personnalisés
+   - **loading.css** : Indicateurs de chargement
+   - **warnings.css** : Affichage des messages d'erreur
+
+5. **modules/** : Styles spécifiques aux fonctionnalités
    - **[spread]-spread.css** : Styles pour chaque type de tirage
    - **interpretations.css** : Styles pour l'affichage des interprétations
    - **persona.css** : Styles spécifiques aux personas
 
-3. **components/** : Composants d'interface réutilisables
-   - **buttons.css** : Styles des boutons
-   - **cards.css** : Styles des cartes de tarot
-   - **forms.css** : Styles des formulaires et contrôles
-
-4. **layouts/** : Mises en page globales
-   - Structures de disposition générales
-
-5. **utils/** : Utilitaires CSS
-   - Classes utilitaires et aides
+L'ordre d'importation dans main.css est crucial pour maintenir la cascade CSS :
+1. Variables et reset (fondation)
+2. Utilitaires (disponibles partout) 
+3. Layouts (structures)
+4. Composants atomiques réutilisables
+5. Modules spécifiques à l'application
 
 ### Outils de Développement
 
-- **tools/spread-editor.html** : Outil autonome permettant de définir visuellement les positions des cartes pour les différents types de tirages
+- **tools/spread-editor.html** : Outil autonome permettant de définir visuellement les positions des cartes pour les différents types de tirages. Cet outil génère les variables CSS correspondantes pour les positions des cartes.
+
+### Documentation
+
+La documentation est organisée thématiquement :
+
+- **architecture/** : Documentation sur l'architecture globale
+- **composants/** : Documentation des composants techniques
+- **ui/** : Documentation de l'interface utilisateur
+- **tools/** : Documentation des outils de développement
+- **standards/** : Standards et conventions de développement
 
 ## Conventions de Nommage
 
@@ -151,4 +221,17 @@ L'architecture CSS suit une organisation modulaire inspirée de la méthodologie
 - **kebab-case** pour les fichiers CSS (ex: `celtic-cross-spread.css`)
 - **PascalCase** pour les classes JavaScript (ex: `BasePersona`)
 - **kebab-case** pour les classes et identifiants CSS (ex: `.card-present`, `#tarot-app`)
-- Les noms de fichiers reflètent la fonctionnalité qu'ils contiennent 
+- Les noms de fichiers reflètent la fonctionnalité qu'ils contiennent
+- Les variables CSS suivent la convention `--category-name-property` (ex: `--celtic-position-1-x`)
+- Les événements personnalisés sont nommés selon le format `objet:action` (ex: `stateManager:ready`)
+
+## Gestion des Dépendances
+
+JodoTarot est conçu comme une application sans dépendances externes majeures. Tous les composants sont développés en interne pour garantir :
+
+1. **Performance** : Minimisation du poids des ressources chargées
+2. **Indépendance** : Pas de bibliothèques tierces à maintenir
+3. **Contrôle** : Maîtrise totale du comportement de chaque fonctionnalité
+4. **Cohérence** : Style de code uniforme à travers l'application
+
+Cette approche "vanilla" améliore la maintenabilité à long terme et facilite l'évolution de l'application sans se soucier de la compatibilité avec des bibliothèques externes. 

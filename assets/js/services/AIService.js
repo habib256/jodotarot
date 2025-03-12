@@ -33,9 +33,6 @@ class AIService {
     // Activation du mode de débogage selon le niveau défini dans la configuration
     this.debugMode = typeof DEBUG_LEVEL !== 'undefined' && DEBUG_LEVEL > 1;
     
-    // Cache pour les résultats d'interprétation
-    this.interpreterCache = {};
-    
     // AbortController pour pouvoir annuler les requêtes en cours
     this.currentController = null;
     
@@ -579,42 +576,40 @@ class AIService {
   }
   
   /**
-   * Obtient une réponse en streaming du modèle Ollama
-   * @param {string} prompt - Prompt à envoyer
-   * @param {Array} systemPrompts - Prompts système
-   * @param {string} model - Modèle Ollama à utiliser
-   * @param {Function} onChunk - Fonction de callback pour chaque morceau de réponse
-   * @param {AbortSignal} signal - Signal d'annulation
-   * @returns {Promise<string>} Réponse complète
+   * Obtient une réponse en streaming d'Ollama
+   * @param {string} prompt - Le prompt utilisateur
+   * @param {Array} systemPrompts - Les prompts système
+   * @param {string} modelName - Nom du modèle Ollama
+   * @param {Function} onChunk - Callback pour chaque morceau de réponse
+   * @param {AbortSignal} signal - Signal pour annuler la requête
+   * @return {Promise<string>} La réponse complète
    */
-  async getOllamaStreamingResponse(prompt, systemPrompts, model, onChunk, signal) {
-    // Utilisation du modèle sans préfixe
-    const modelName = model.replace('ollama:', '');
-    // Obtenir les informations de format mais n'utiliser que le nom du modèle pour la requête
-    const modelFormat = getOllamaModelFormat(modelName);
+  async getOllamaStreamingResponse(prompt, systemPrompts, modelName, onChunk, signal) {
+    // Nettoyer le nom du modèle (enlever le préfixe ollama: si présent)
+    const cleanModelName = modelName.replace('ollama:', '');
     
-    // Construire le corps de la requête selon le format attendu par Ollama
+    // Construire le prompt complet en combinant les prompts système et le prompt utilisateur
+    const fullPrompt = [
+      ...systemPrompts,
+      prompt
+    ].join('\n\n');
+    
+    // Corps de la requête pour Ollama
     const body = {
-      // CORRECTION: Utiliser simplement le nom du modèle comme chaîne de caractères
-      model: modelName,
-      messages: [
-        // Ajouter les prompts système comme messages de l'assistant
-        ...systemPrompts.map(systemPrompt => ({
-          role: "system",
-          content: systemPrompt
-        })),
-        // Ajouter le prompt principal comme message de l'utilisateur
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      stream: true
+      model: cleanModelName,
+      prompt: fullPrompt,
+      stream: true,
+      options: {
+        temperature: 0.7,
+        num_predict: 1000
+      }
     };
     
     try {
       if (this.debugMode) {
-        console.log(`🔄 Envoi de la requête en streaming à Ollama (${modelName})`);
+        console.log(`🔄 Envoi de la requête en streaming à Ollama (${cleanModelName})`);
+        console.log('Prompt complet:', fullPrompt);
+        console.log('Corps de la requête:', body);
       }
       
       // Vérifier que le callback est bien une fonction
@@ -661,29 +656,10 @@ class AIService {
             // Analyser chaque ligne comme un objet JSON
             const data = JSON.parse(line);
             
-            // Extraire le contenu selon le format du modèle
-            let content = '';
-            
-            // Essayer d'abord le format détecté pour le modèle
-            if (modelFormat && modelFormat.responseKey) {
-              // Utiliser la méthode extractResponseContent avec le format approprié
-              content = this.extractResponseContent(data, modelFormat.responseKey, modelName);
-            }
-            
-            // Si rien n'a été trouvé avec le format spécifique, essayer les formats courants
-            if (!content && data.message && data.message.content) {
-              content = data.message.content;
-            } else if (!content && data.response) {
-              content = data.response;
-            }
-            
-            // Si du contenu a été trouvé, le traiter
-            if (content) {
-              // Ajouter ce morceau à la réponse complète
-              completeResponse += content;
-              
-              // Appeler le callback avec ce morceau
-              onChunk(content);
+            // Extraire le contenu de la réponse
+            if (data.response) {
+              completeResponse += data.response;
+              onChunk(data.response);
             }
           } catch (error) {
             console.error("Erreur lors de l'analyse du chunk JSON:", error);
@@ -863,6 +839,84 @@ class AIService {
         suggestions: ['warnings.unexpectedError', 'warnings.tryAgain']
       };
     }
+  }
+
+  /**
+   * Méthode utilitaire centralisée pour la gestion des erreurs
+   * @param {Error} error - L'erreur attrapée
+   * @param {string} context - Contexte dans lequel l'erreur s'est produite
+   * @param {boolean} rethrow - Si true, l'erreur sera relancée après traitement
+   * @returns {Object|null} - Un objet d'erreur formaté ou null
+   */
+  handleServiceError(error, context, rethrow = false) {
+    // Standardiser le format de l'erreur
+    const errorInfo = {
+      message: error.message || 'Erreur inconnue',
+      context: context,
+      timestamp: new Date().toISOString(),
+      type: error.name || 'Error',
+      stack: this.debugMode ? error.stack : null
+    };
+    
+    // Log de l'erreur avec contexte
+    console.error(`AIService - Erreur dans ${context}:`, errorInfo);
+    
+    // Mettre à jour l'état
+    this.isGenerating = false;
+    
+    // Relancer l'erreur si demandé
+    if (rethrow) {
+      throw error;
+    }
+    
+    return errorInfo;
+  }
+
+  /**
+   * Traiter les erreurs spécifiques à l'API OpenAI
+   * @param {Error} error - L'erreur d'origine
+   * @param {string} context - Contexte dans lequel l'erreur s'est produite
+   * @returns {string} - Message d'erreur utilisateur
+   */
+  handleOpenAIError(error, context) {
+    let userMessage = "Une erreur est survenue lors de la communication avec OpenAI.";
+    
+    // Vérifier si c'est une erreur de clé API ou d'authentification
+    if (error.message && (
+        error.message.includes('API key') ||
+        error.message.includes('authentication') ||
+        error.message.includes('401')
+    )) {
+      userMessage = "Erreur d'authentification OpenAI. Vérifiez votre clé API.";
+      
+      // Réinitialiser la clé API dans le localStorage
+      localStorage.removeItem('openai_api_key');
+    }
+    
+    this.handleServiceError(error, context);
+    return userMessage;
+  }
+
+  /**
+   * Traiter les erreurs spécifiques à Ollama
+   * @param {Error} error - L'erreur d'origine
+   * @param {string} context - Contexte dans lequel l'erreur s'est produite
+   * @returns {string} - Message d'erreur utilisateur
+   */
+  handleOllamaError(error, context) {
+    let userMessage = "Une erreur est survenue lors de la communication avec Ollama.";
+    
+    // Vérifier si c'est une erreur de connexion
+    if (error.message && (
+        error.message.includes('network') ||
+        error.message.includes('fetch') ||
+        error.message.includes('connect')
+    )) {
+      userMessage = "Impossible de se connecter à Ollama. Vérifiez que le service est bien lancé.";
+    }
+    
+    this.handleServiceError(error, context);
+    return userMessage;
   }
 }
 

@@ -475,33 +475,32 @@ class UIService {
 
 ### Mise en Cache des Interactions
 
-Pour optimiser les performances :
+**Note: Cette fonctionnalité est décrite ici comme une pratique recommandée mais n'est actuellement pas implémentée dans le code.**
 
 ```javascript
-// Mise en cache des résultats d'interaction coûteuse
-class AIService {
-  constructor() {
-    this.interpretationCache = new Map();
+// Exemple conceptuel - Non implémenté dans la version actuelle
+function getInterpretation(cards, spreadType) {
+  // La mise en cache pourrait être implémentée comme ceci
+  const cacheKey = this.getCacheKey(cards, spreadType);
+  
+  // Vérification si résultat en cache
+  if (this.interpretationCache && this.interpretationCache.has(cacheKey)) {
+    return this.interpretationCache.get(cacheKey);
   }
   
-  async interpretReading(cards, spreadType) {
-    const cacheKey = this.getCacheKey(cards, spreadType);
-    
-    // Vérification si résultat en cache
-    if (this.interpretationCache.has(cacheKey)) {
-      return this.interpretationCache.get(cacheKey);
-    }
-    
-    // Sinon, effectuer l'interaction coûteuse
-    const interpretation = await this.generateInterpretation(cards, spreadType);
-    
-    // Mettre en cache pour future utilisation
+  // Sinon, générer une nouvelle interprétation
+  const interpretation = this.generateInterpretation(cards, spreadType);
+  
+  // Mettre en cache pour future utilisation
+  if (this.interpretationCache) {
     this.interpretationCache.set(cacheKey, interpretation);
-    
-    return interpretation;
   }
+  
+  return interpretation;
 }
 ```
+
+Cette approche pourrait être implémentée dans de futures versions pour améliorer les performances en évitant de régénérer des interprétations identiques.
 
 ## Bonnes Pratiques pour les Interactions
 

@@ -1,75 +1,128 @@
 # Vue d'Ensemble de l'Architecture
 
+## Introduction
+
+JodoTarot est une application web modulaire pour les tirages de tarot, construite en JavaScript ES6. Elle permet de réaliser des tirages de tarot interprétés par une intelligence artificielle avec différents personas et styles d'interprétation.
+
 ## Architecture Globale
-
-JodoTarot est une application web modulaire construite en JavaScript ES6. L'architecture suit un modèle orienté composants avec une séparation claire des responsabilités.
-
-## Principes Architecturaux
-
-L'application est structurée selon un modèle MVC (Modèle-Vue-Contrôleur) adapté, avec une organisation en couches :
-
-```
-Controllers (AppController, ReadingController, ConfigController)
-     ↑↓                    ↑↓                     ↑↓
-Services (AIService, DeckService, UIService, StateManager)
-     ↑↓                    ↑↓                     ↑↓
-Models (Personas, Spreads, Cards, Translations)
-```
-
-### Séparation des Responsabilités
-
-- **Controllers**: Orchestrent les interactions entre services et vues
-- **Services**: Implémentent la logique métier spécifique
-- **Models**: Définissent et encapsulent les données
-- **UI Components**: Gèrent l'affichage et les interactions utilisateur
-
-### Principes Clés
-
-1. **Modularité** : Chaque composant a une responsabilité unique et bien définie
-2. **Extensibilité** : Architecture permettant d'ajouter facilement de nouvelles fonctionnalités
-3. **Isolation** : Les modules communiquent via des interfaces clairement définies
-4. **Réutilisabilité** : Les composants sont conçus pour être réutilisables
-5. **Testabilité** : Architecture facilitant les tests unitaires et d'intégration
-
-## Communication entre Composants
-
-La communication entre les composants suit des principes stricts :
-
-1. **Event-Driven** : Utilisation d'événements personnalisés pour la communication asynchrone
-2. **Dépendance Explicite** : Les dépendances sont injectées via constructeurs ou méthodes
-3. **État Centralisé** : Utilisation de StateManager comme source unique de vérité
-4. **Interfaces Propres** : Communication via API publiques bien définies
-
-## Structure Générale
 
 ```mermaid
 graph TD
-    A[AppController] --> B[ReadingController]
-    A --> C[ConfigController]
-    
-    B --> D[DeckService]
-    B --> E[AIService]
-    B --> F[UIService]
-    
-    C --> F
-    C --> G[StateManager]
-    
-    D --> H[Card Models]
-    D --> I[Spread Models]
-    
-    E --> J[Prompt System]
-    E --> K[API Integration]
-    
-    F --> L[DOM Manipulation]
-    F --> M[Animation]
-    
-    G --> N[LocalStorage]
+    A[Interface Utilisateur] -->|Interactions| B[Contrôleurs]
+    B -->|Gestion État| C[StateManager]
+    B -->|Services| D[Services]
+    D -->|IA| E[AIService]
+    E -->|API| F[OpenAI/Ollama]
+    D -->|Données| G[DataService]
+    G -->|Stockage| H[LocalStorage]
+    I[Personas] -->|Configuration| E
+    J[Spreads] -->|Types de Tirages| B
 ```
 
-## Points Forts de l'Architecture
+## Composants Principaux
 
-- **Centralisation de l'État** : Gestion cohérente de l'état via StateManager
-- **API Abstraction** : Séparation claire entre logique métier et intégrations externes
-- **CSS Modulaire** : Organisation CSS par composants et fonctionnalités
-- **Adaptation Responsive** : Conception adaptative via variables CSS et media queries
-- **Internationalisation** : Support multilingue intégré au niveau architecture 
+### 1. Interface Utilisateur
+- Interface responsive et moderne
+- Support multilingue
+- Thèmes personnalisables
+- Animations fluides
+
+### 2. Gestionnaire d'État (StateManager)
+- État global centralisé
+- Persistance automatique
+- Gestion des changements
+- Synchronisation UI
+
+### 3. Services
+- **AIService** : Communication avec les IA
+- **DataService** : Gestion des données
+- **LocalizationService** : Traductions
+- **ThemeService** : Gestion des thèmes
+
+### 4. Contrôleurs
+- **ReadingController** : Gestion des tirages
+- **DeckController** : Gestion des jeux
+- **PersonaController** : Gestion des personas
+- **ConfigController** : Configuration
+
+### 5. Modèles
+- **Personas** : Styles d'interprétation
+- **Spreads** : Types de tirages
+- **Cards** : Cartes de tarot
+- **Settings** : Paramètres
+
+## Principes de Conception
+
+1. **Modularité**
+   - Composants indépendants
+   - Couplage faible
+   - Interfaces claires
+
+2. **Extensibilité**
+   - Architecture pluggable
+   - Points d'extension définis
+   - Configuration flexible
+
+3. **Maintenabilité**
+   - Code documenté
+   - Tests automatisés
+   - Standards de codage
+
+4. **Performance**
+   - Chargement optimisé
+   - Mise en cache intelligente
+   - Streaming des réponses
+
+## Flux de Données
+
+1. **Entrée Utilisateur**
+   - Sélection des cartes
+   - Configuration du tirage
+   - Questions et paramètres
+
+2. **Traitement**
+   - Validation des données
+   - Construction des prompts
+   - Communication IA
+
+3. **Sortie**
+   - Interprétation
+   - Affichage progressif
+   - Sauvegarde locale
+
+## Technologies Utilisées
+
+- **Frontend** : JavaScript ES6+
+- **UI** : HTML5, CSS3
+- **Storage** : LocalStorage
+- **IA** : OpenAI API, Ollama
+- **Build** : Webpack/Vite
+
+## Sécurité
+
+1. **Protection des Données**
+   - Stockage local sécurisé
+   - Pas de données sensibles
+   - Validation des entrées
+
+2. **API Security**
+   - Gestion sécurisée des clés
+   - Rate limiting
+   - Validation des réponses
+
+## Évolutions Futures
+
+1. **Fonctionnalités**
+   - Support des arcanes mineurs
+   - Historique des tirages
+   - Mode hors-ligne complet
+
+2. **Technique**
+   - PWA complète
+   - Synchronisation cloud
+   - API publique
+
+3. **IA**
+   - Nouveaux modèles
+   - Apprentissage continu
+   - Personnalisation avancée 

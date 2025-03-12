@@ -8,199 +8,210 @@ Le système des personas est un élément central de JodoTarot qui permet de per
 
 ```mermaid
 graph TD
-    A[PersonaManager] -->|Gère| B[Collection de Personas]
-    B -->|Inclut| C[Personas de Base]
-    B -->|Inclut| D[Personas Spécialisés]
-    B -->|Inclut| E[Personas Custom]
-    A -->|Interagit avec| F[AIService]
-    A -->|Stocke préférences| G[StateManager]
-    H[UI Controller] -->|Sélection utilisateur| A
+    A[PERSONAS Object] -->|Stocke| B[Collection de Personas]
+    B -->|Inclut| C[Classes de Personas]
+    E[main.js] -->|Importe| C
+    F[StateManager] -->|Stocke préférence| G[Persona actif]
+    H[AIService] -->|Utilise| I[getPersonaPrompt]
+    I -->|Récupère| B
 ```
 
 ### Composants Principaux
 
-1. **PersonaManager** 
-   - Service central qui gère tous les personas disponibles
-   - Permet la sélection, la persistance et la récupération du persona actif
-   - Intègre les paramètres de personnalisation avec le système d'IA
+1. **Objet PERSONAS** 
+   - Collection centralisée des classes de personas
+   - Implémenté dans `assets/js/models/personas/index.js`
+   - Permet l'accès aux personas depuis le service IA
 
 2. **Classe de Base Persona**
-   - Définit l'interface commune à tous les personas
+   - Définit l'interface commune à tous les personas (`BasePersona`)
    - Fournit les méthodes pour obtenir le style d'interprétation
    - Gère la traduction et l'adaptation multilingue
 
 3. **Personas Spécialisés**
    - Extensions de la classe de base avec des comportements spécifiques
-   - Adaptés à différents types de tirages et contextes
-   - Exemples : MysticPersona, PsychologistPersona, AstrologerPersona, etc.
+   - Personnalisent le prompt et le formatage des interprétations
+   - Exemple : `TarologuePersona`, `JungPersona`, `SorcierePersona`, etc.
 
 ## Types de Personas Disponibles
 
 JodoTarot offre actuellement 21 personas différents, chacun avec une approche unique :
 
-### Catégories Principales
+### Catégories dans l'Interface
 
-1. **Approches Traditionnelles**
-   - **Oracle** : Style mystique et sibyllin
-   - **Tarologue Traditionnel** : Interprétation classique du tarot
-   - **Hermétiste** : Focus sur le symbolisme occulte
+1. **Arts Divinatoires**
+   - **Tarologue** : Interprétation traditionnelle du tarot
+   - **Oracle Mystique** : Style sibyllin et énigmatique
+   - **Voyante Gitane** : Approche intuitive et directe
 
-2. **Approches Contemporaines**
-   - **Coach de Vie** : Orientation pratique et développement personnel
-   - **Psychologue Jungien** : Perspective archétypale et psychologique
-   - **Conseiller Spirituel** : Guidance spirituelle et éthique
+2. **Traditions Spirituelles**
+   - **Prêtre Exégète** : Perspective chrétienne et théologique
+   - **Rabbin Kabbaliste** : Interprétation kabbalistique
+   - **Imam Soufis** : Approche mystique islamique
+   - **Dalaï-Lama** : Sagesse bouddhiste
 
-3. **Approches Spécifiques**
-   - **Astrologue** : Intègre des éléments d'astrologie
-   - **Alchimiste** : Utilise la symbolique de transformation
-   - **Poète** : Style littéraire et métaphorique
+3. **Traditions Ésotériques**
+   - **Sorcière Ancestrale** : Savoir des traditions païennes
+   - **Alchimiste Ésotérique** : Symbolisme alchimique
+   - **Mage Élémentaliste** : Correspondances élémentaires
+   - **Maître Franc-Maçon** : Symbolisme maçonnique
 
-4. **Approches Culturelles**
-   - **Chamane** : Perspective des traditions chamaniques
-   - **Kabbaliste** : Interprétation basée sur la Kabbale
-   - **Philosophe Taoïste** : Approche basée sur l'équilibre et le Tao
+4. **Psychanalystes**
+   - **Sigmund Freud** : Interprétation psychanalytique
+   - **Carl Jung** : Perspective des archétypes
+   - **Jacques Lacan** : Approche structuraliste
+   - **Françoise Dolto** : Psychanalyse de l'image du corps
+
+5. **Philosophes**
+   - **Socrate** : Questionnement et maïeutique
+   - **Roi Salomon** : Sagesse biblique
+   - **Michel de Montaigne** : Humanisme et relativisme
+   - **Don Quichotte** : Idéalisme romanesque
+
+6. **Spéciaux**
+   - **Démon Tentateur** : Perspective subversive
+   - **NoEgoMan** : Interprétation sans ego
 
 ## Fonctionnement du Système
 
 ### 1. Définition d'un Persona
 
-Chaque persona est défini par plusieurs attributs :
+Chaque persona est défini comme une classe qui hérite de `BasePersona` :
 
 ```javascript
-class MysterieuxPersona extends BasePersona {
-  constructor() {
-    super({
-      id: 'mysterieux',
-      nameKey: 'mysterieuxPersonaName',
-      descriptionKey: 'mysterieuxPersonaDesc',
-      iconClass: 'fa-moon',
-      category: 'esoteric'
-    });
+class TarologuePersona extends BasePersona {
+  constructor(language = 'fr') {
+    super('tarologue', language);
+    
+    // Noms localisés
+    this.name = {
+      'fr': 'Tarologue',
+      'en': 'Tarot Reader',
+      'es': 'Tarólogo',
+      'de': 'Tarotleser',
+      'it': 'Tarologo',
+      'zh': '塔罗牌解读者'
+    };
+    
+    // Descriptions localisées
+    this.description = {
+      'fr': 'Un expert en lecture du tarot de Marseille avec une approche traditionnelle et symbolique.',
+      // ... autres langues
+    };
+    
+    // Spécialisations
+    this.specializations = ['Tarot de Marseille', 'Symbolisme', 'Divination'];
+    
+    // Templates de prompts par langue
+    this.promptTemplate = {
+      'fr': `Vous êtes {{PERSONA_NAME}}, {{PERSONA_DESCRIPTION}}
+      
+      Pour cette lecture de tarot en {{SPREAD_TYPE}}, adoptez le ton d'un tarologue expérimenté...`,
+      // ... autres langues
+    };
   }
   
-  getPromptStyle(language) {
-    return getTranslation('mysterieuxPromptStyle', language) + 
-      "\nTon style est cryptique et mystérieux. " +
-      "Tu parles par énigmes et suggères plus que tu n'affirmes. " +
-      "Tu utilises beaucoup de symboles et de références ésotériques.";
+  formatInterpretation(interpretation) {
+    // Personnalisation optionnelle du formatage
+    return interpretation;
   }
 }
 ```
 
-### 2. Sélection et Activation
+### 2. Enregistrement et Initialisation
 
-Le processus de sélection d'un persona suit ces étapes :
+Les personas sont définis comme des classes individuelles importées dans le système :
 
-1. L'utilisateur choisit un persona dans l'interface
-2. Le PersonaManager active le persona sélectionné
-3. La préférence est enregistrée dans le StateManager
-4. L'AIService est notifié du changement pour adapter les interprétations
+```javascript
+// Import des personas dans models/personas/index.js
+import TarologuePersona from './TarologuePersona.js';
+import OraclePersona from './OraclePersona.js';
+// ... autres imports
 
-### 3. Intégration avec le Système d'IA
+// Objet contenant tous les personas indexés par leur clé
+const PERSONAS = {
+  tarologue: TarologuePersona,
+  oracle: OraclePersona,
+  // ... autres personas
+};
 
-Lorsqu'une interprétation est demandée :
+// Fonction pour obtenir le prompt système pour un persona
+function getPersonaPrompt(personaKey, langue, spreadType = 'cross') {
+  // Vérifier si le persona existe
+  if (!PERSONAS[personaKey]) {
+    console.error(`Persona non trouvé: ${personaKey}`);
+    personaKey = 'tarologue'; // Utiliser le tarologue par défaut
+  }
+  
+  // Créer une instance du persona avec la langue spécifiée
+  const persona = new PERSONAS[personaKey](langue);
+  
+  // Retourner le prompt système
+  return persona.buildSystemPrompt(spreadType);
+}
+```
 
-1. Le style du persona actif est récupéré via `getPromptStyle()`
-2. Ce style est intégré dans le prompt envoyé à l'IA
-3. L'IA adapte son interprétation en fonction du style demandé
-4. Le résultat reflète la "personnalité" du persona choisi
+### 3. Sélection et Utilisation
+
+Le processus de sélection et d'utilisation d'un persona fonctionne ainsi :
+
+1. L'utilisateur sélectionne un persona dans l'interface (menu déroulant)
+2. Le StateManager stocke l'identifiant du persona choisi
+3. Lors d'une interprétation, le service AI récupère le prompt du persona
+4. La fonction `getPersonaPrompt` crée une instance du persona et génère le prompt système
 
 ## Personnalisation des Personas
 
-### Style d'Interprétation
+### Construction du Prompt Système
 
-Le style d'interprétation est défini par la méthode `getPromptStyle()` qui renvoie des instructions spécifiques pour l'IA :
+Chaque persona définit un template de prompt qui est personnalisé selon plusieurs facteurs :
 
 ```javascript
-getPromptStyle(language) {
-  return `
-    Tu es un ${this.getName(language)}.
-    ${getTranslation('commonPromptInstructions', language)}
+buildSystemPrompt(spreadType = 'cross') {
+  const template = this.promptTemplate[this.language] || this.promptTemplate['fr'] || '';
+  
+  // Remplacer les variables dans le template
+  let formattedTemplate = template
+    .replace('{{PERSONA_NAME}}', this.getName())
+    .replace('{{PERSONA_DESCRIPTION}}', this.getDescription())
+    .replace('{{SPREAD_TYPE}}', spreadType);
     
-    Style spécifique :
-    - Ton ton est ${this.getTone(language)}
-    - Tu mets l'accent sur ${this.getFocus(language)}
-    - Tu utilises souvent ${this.getLanguageStyle(language)}
-    
-    Évite de :
-    - ${this.getAvoidance(language)}
-    
-    Structure ta réponse en ${this.getStructure(language)}
-  `;
+  // Ajouter les spécialisations si nécessaire
+  if (this.specializations && this.specializations.length > 0) {
+    // ... code pour ajouter les spécialisations
+  }
+  
+  return formattedTemplate;
 }
 ```
 
-### Attributs Personnalisables
+### Attributs des Personas
 
 Chaque persona peut personnaliser :
 
-- **Ton** : Formel, amical, mystérieux, direct, etc.
-- **Focus** : Psychologie, spiritualité, pratique, symbolisme, etc.
-- **Style de langage** : Métaphores, termes techniques, langage poétique, etc.
-- **Structure** : Organisation de l'interprétation (sections, paragraphes)
-- **Éléments à éviter** : Ce que le persona ne ferait jamais
+- **Nom et description** : Traduits dans toutes les langues supportées
+- **Template de prompt** : Instructions spécifiques pour l'IA selon la langue
+- **Spécialisations** : Domaines d'expertise particuliers
+- **Formatage** : Transformation optionnelle du texte d'interprétation
 
-## Implémentation Technique
-
-### Enregistrement des Personas
-
-Les personas sont enregistrés auprès du PersonaManager lors de l'initialisation :
-
-```javascript
-// Extrait simplifié
-class PersonaManager {
-  constructor() {
-    this.personas = {};
-    this.activePersona = null;
-  }
-  
-  registerPersona(persona) {
-    this.personas[persona.getId()] = persona;
-  }
-  
-  initialize() {
-    // Enregistrement des personas standard
-    this.registerPersona(new MysticPersona());
-    this.registerPersona(new PsychologistPersona());
-    // etc.
-    
-    // Restauration du persona préféré
-    const savedPersonaId = stateManager.getState('preferredPersona');
-    if (savedPersonaId && this.personas[savedPersonaId]) {
-      this.setActivePersona(savedPersonaId);
-    } else {
-      // Persona par défaut
-      this.setActivePersona('tarotTraditional');
-    }
-  }
-}
-```
-
-### Support Multilingue
+## Support Multilingue
 
 Les personas supportent toutes les langues de l'application :
 
-- Noms et descriptions traduits
-- Instructions de style adaptées à chaque langue
-- Terminologie spécifique ajustée selon le contexte culturel
+- Chaque persona définit ses attributs dans toutes les langues supportées
+- La langue est passée au constructeur lors de l'instanciation
+- Les méthodes comme `getName()` et `getDescription()` retournent les valeurs dans la langue demandée
+- Le prompt système est généré dans la langue appropriée
 
 ## Bonnes Pratiques pour Étendre le Système
 
 Pour créer de nouveaux personas :
 
-1. **Hériter de BasePersona** pour maintenir la cohérence
-2. **Définir un style unique** qui apporte une valeur distinctive
-3. **Tester avec différents tirages** pour assurer la cohérence
-4. **Documenter les particularités** de chaque nouveau persona
-5. **Respecter la structure** des instructions pour l'IA
-
-## Évolutions Futures
-
-- Personas personnalisables par l'utilisateur
-- Personas spécifiques à certains types de tirages
-- Adaptation dynamique du style selon le contexte
-- Métriques d'appréciation pour affiner les personas
-- Personas à orientation culturelle plus diversifiée
+1. **Créer une nouvelle classe** qui hérite de `BasePersona`
+2. **Définir les attributs multilingues** (nom, description, prompt)
+3. **Personnaliser le prompt template** avec un style unique
+4. **Ajouter des spécialisations** pertinentes
+5. **Enregistrer le persona** dans le registre global
 
 ## Références
 

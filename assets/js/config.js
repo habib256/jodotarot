@@ -51,7 +51,7 @@ const API_KEY = SETTINGS.API_KEY;
 const API_URL_OPENAI = `${SETTINGS.OPENAI_URL}/chat/completions`;
 
 // Configuration pour l'API Ollama (local)
-const API_URL_OLLAMA = `${SETTINGS.OLLAMA_URL}/api/chat`;
+const API_URL_OLLAMA = `${SETTINGS.OLLAMA_URL}/api/generate`;
 const API_URL_OLLAMA_TAGS = `${SETTINGS.OLLAMA_URL}/api/tags`;
 
 // Configuration des modèles Ollama

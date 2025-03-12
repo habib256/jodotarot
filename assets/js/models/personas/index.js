@@ -1,75 +1,83 @@
 /**
- * Exporte tous les personas disponibles dans l'application
+ * Point d'entrée central pour tous les personas
+ * Permet l'importation dynamique et l'accès par clé
  */
 
-import TarologuePersona from './TarologuePersona.js';
-import OraclePersona from './OraclePersona.js';
-import VoyantePersona from './VoyantePersona.js';
-import PretrePersona from './PretrePersona.js';
-import RabbinPersona from './RabbinPersona.js';
-import ImamPersona from './ImamPersona.js';
-import DalailamaPersona from './DalailamaPersona.js';
-import FrancmaconPersona from './FrancmaconPersona.js';
-import SorcierePersona from './SorcierePersona.js';
-import AlchimistePersona from './AlchimistePersona.js';
-import MagePersona from './MagePersona.js';
-import FreudPersona from './FreudPersona.js';
-import JungPersona from './JungPersona.js';
-import LacanPersona from './LacanPersona.js';
-import DoltoPersona from './DoltoPersona.js';
-import SocratePersona from './SocratePersona.js';
-import SalomonPersona from './SalomonPersona.js';
-import MontaignePersona from './MontaignePersona.js';
-import QuichottePersona from './QuichottePersona.js';
-import DemonPersona from './DemonPersona.js';
-import NoEgoPersona from './NoEgoPersona.js';
-
-// Objet contenant tous les personas indexés par leur clé
-const PERSONAS = {
-  tarologue: TarologuePersona,
-  oracle: OraclePersona,
-  voyante: VoyantePersona,
-  pretre: PretrePersona,
-  rabbin: RabbinPersona,
-  imam: ImamPersona,
-  dalailama: DalailamaPersona,
-  francmacon: FrancmaconPersona,
-  sorciere: SorcierePersona,
-  alchimiste: AlchimistePersona,
-  mage: MagePersona,
-  freud: FreudPersona,
-  jung: JungPersona,
-  lacan: LacanPersona,
-  dolto: DoltoPersona,
-  socrate: SocratePersona,
-  salomon: SalomonPersona,
-  montaigne: MontaignePersona,
-  quichotte: QuichottePersona,
-  demon: DemonPersona,
-  noegoman: NoEgoPersona
+// Mappage des clés de personas vers leurs chemins de fichiers
+const PERSONA_PATHS = {
+  'tarologue': './TarologuePersona.js',
+  'oracle': './OraclePersona.js',
+  'jung': './JungPersona.js',
+  'voyante': './VoyantePersona.js',
+  'freud': './FreudPersona.js',
+  'pretre': './PretrePersona.js',
+  'sorciere': './SorcierePersona.js',
+  'socrate': './SocratePersona.js',
+  'demon': './DemonPersona.js',
+  'rabbin': './RabbinPersona.js',
+  'alchimiste': './AlchimistePersona.js',
+  'lacan': './LacanPersona.js',
+  'noegoman': './NoEgoPersona.js',
+  'dalailama': './DalailamaPersona.js',
+  'mage': './MagePersona.js',
+  'dolto': './DoltoPersona.js',
+  'montaigne': './MontaignePersona.js',
+  'imam': './ImamPersona.js',
+  'francmacon': './FrancmaconPersona.js',
+  'salomon': './SalomonPersona.js',
+  'quichotte': './QuichottePersona.js'
 };
 
 /**
- * Obtient le prompt système pour un persona spécifique
- * @param {string} personaKey - Clé du persona
- * @param {string} langue - Code de langue
- * @param {string} spreadType - Type de tirage
- * @returns {string} - Le prompt système formaté
+ * Récupère le prompt spécifique à un persona
+ * @param {string} personaKey - Clé identifiant le persona
+ * @param {string} language - Code de langue
+ * @param {string} spreadType - Type de tirage (cross, horseshoe, love, celticCross)
+ * @returns {string} Le prompt spécifique au persona
  */
-function getPersonaPrompt(personaKey, langue, spreadType = 'cross') {
-  // Vérifier si le persona existe
-  if (!PERSONAS[personaKey]) {
-    console.error(`Persona non trouvé: ${personaKey}`);
-    personaKey = 'tarologue'; // Utiliser le tarologue par défaut
+export async function getPersonaPrompt(personaKey, language = 'fr', spreadType = 'cross') {
+  try {
+    // Import dynamique du persona
+    const module = await import(PERSONA_PATHS[personaKey]);
+    const PersonaClass = module.default;
+    const persona = new PersonaClass(language);
+    return persona.buildSystemPrompt(spreadType);
+  } catch (error) {
+    console.error(`Erreur lors du chargement du prompt pour ${personaKey}:`, error);
+    return '';
   }
-  
-  // Créer une instance du persona avec la langue spécifiée
-  const persona = new PERSONAS[personaKey](langue);
-  
-  // Retourner le prompt système
-  return persona.buildSystemPrompt(spreadType);
 }
 
-// Exporter les personas et la fonction utilitaire
-export default PERSONAS;
-export { getPersonaPrompt }; 
+/**
+ * Charge tous les personas et les retourne sous forme d'un objet
+ * @returns {Promise<Object>} Un objet avec les clés de personas et leurs classes
+ */
+export async function getAllPersonas() {
+  const personas = {};
+  
+  // Charger tous les personas de manière asynchrone
+  const imports = await Promise.all(
+    Object.entries(PERSONA_PATHS).map(async ([key, path]) => {
+      try {
+        const module = await import(path);
+        return [key, module.default];
+      } catch (error) {
+        console.error(`Erreur lors du chargement du persona ${key}:`, error);
+        return [key, null];
+      }
+    })
+  );
+  
+  // Filtrer les imports qui ont échoué et construire l'objet final
+  imports
+    .filter(([_, PersonaClass]) => PersonaClass !== null)
+    .forEach(([key, PersonaClass]) => {
+      personas[key] = PersonaClass;
+    });
+  
+  return personas;
+}
+
+// Exporter une constante pour la compatibilité ascendante
+const PERSONAS = PERSONA_PATHS;
+export default PERSONAS; 

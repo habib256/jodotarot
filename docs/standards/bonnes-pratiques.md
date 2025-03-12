@@ -131,4 +131,307 @@
 - **Documenter les API** pour faciliter l'extension
 - **Prévoir la scalabilité** des nouvelles fonctionnalités
 - **Considérer l'impact sur les performances** des ajouts
-- **Intégrer gracieusement** les nouvelles technologies 
+- **Intégrer gracieusement** les nouvelles technologies
+
+## Standards de Code
+
+### 1. JavaScript
+
+```javascript
+// Utiliser const par défaut, let si nécessaire
+const config = {
+  // Configuration
+};
+let counter = 0;
+
+// Classes avec PascalCase
+class StateManager {
+  constructor() {
+    // ...
+  }
+}
+
+// Méthodes et variables en camelCase
+function calculateTotal() {
+  // ...
+}
+
+// Constantes en SNAKE_CASE
+const MAX_RETRIES = 3;
+```
+
+### 2. Documentation
+
+```javascript
+/**
+ * Description de la fonction
+ * @param {Type} paramName - Description du paramètre
+ * @returns {Type} Description du retour
+ * @throws {Error} Description de l'erreur
+ */
+function example(paramName) {
+  // ...
+}
+```
+
+### 3. Gestion des Erreurs
+
+```javascript
+try {
+  // Opération risquée
+  await riskyOperation();
+} catch (error) {
+  console.error('Description claire:', error);
+  throw new Error(`Contexte: ${error.message}`);
+}
+```
+
+## Organisation du Code
+
+### 1. Structure des Fichiers
+
+```
+src/
+├── components/     # Composants réutilisables
+├── services/      # Services métier
+├── models/        # Modèles de données
+├── utils/         # Utilitaires
+└── config/        # Configuration
+```
+
+### 2. Imports/Exports
+
+```javascript
+// Un export par fichier
+export default class MainClass { }
+
+// Exports multiples nommés
+export { func1, func2 };
+```
+
+## Tests
+
+### 1. Tests Unitaires
+
+```javascript
+describe('StateManager', () => {
+  it('should initialize with default state', () => {
+    const manager = new StateManager();
+    expect(manager.getState()).toBeDefined();
+  });
+});
+```
+
+### 2. Tests d'Intégration
+
+```javascript
+describe('AIService Integration', () => {
+  it('should handle API responses', async () => {
+    const service = new AIService();
+    const response = await service.getInterpretation();
+    expect(response).toBeDefined();
+  });
+});
+```
+
+## Performance
+
+### 1. Optimisation du Code
+
+```javascript
+// Éviter les calculs répétés
+const cachedValue = expensiveOperation();
+results.forEach(item => {
+  process(item, cachedValue);
+});
+```
+
+### 2. Gestion de la Mémoire
+
+```javascript
+// Nettoyage des listeners
+class Component {
+  destroy() {
+    this.listeners.forEach(l => l.remove());
+    this.listeners = [];
+  }
+}
+```
+
+## Sécurité
+
+### 1. Validation des Entrées
+
+```javascript
+function processUserInput(input) {
+  if (!input || typeof input !== 'string') {
+    throw new Error('Invalid input');
+  }
+  return sanitizeInput(input);
+}
+```
+
+### 2. Protection des Données
+
+```javascript
+// Stockage sécurisé des clés API
+function storeApiKey(key) {
+  const encoded = btoa(key);
+  localStorage.setItem('api_key', encoded);
+}
+```
+
+## Gestion de l'État
+
+### 1. Modifications d'État
+
+```javascript
+// Immutabilité
+function updateState(state, changes) {
+  return {
+    ...state,
+    ...changes
+  };
+}
+```
+
+### 2. Événements
+
+```javascript
+// Publication d'événements
+class EventEmitter {
+  emit(event, data) {
+    this.listeners[event]?.forEach(callback => {
+      try {
+        callback(data);
+      } catch (error) {
+        console.error(`Event handler error: ${error}`);
+      }
+    });
+  }
+}
+```
+
+## Internationalisation
+
+### 1. Textes
+
+```javascript
+const translations = {
+  fr: {
+    welcome: 'Bienvenue',
+    error: 'Erreur: {{message}}'
+  }
+};
+```
+
+### 2. Formatage
+
+```javascript
+function formatMessage(key, params) {
+  let message = translations[currentLang][key];
+  return message.replace(/\{\{(\w+)\}\}/g, (_, key) => params[key]);
+}
+```
+
+## Débogage
+
+### 1. Logging
+
+```javascript
+const DEBUG_LEVELS = {
+  NONE: 0,
+  ERROR: 1,
+  WARN: 2,
+  INFO: 3,
+  DEBUG: 4
+};
+
+function log(level, message, ...args) {
+  if (level <= currentDebugLevel) {
+    console.log(`[${new Date().toISOString()}] ${message}`, ...args);
+  }
+}
+```
+
+### 2. Monitoring
+
+```javascript
+class PerformanceMonitor {
+  start(operation) {
+    this.timers[operation] = performance.now();
+  }
+
+  end(operation) {
+    const duration = performance.now() - this.timers[operation];
+    log('perf', `${operation}: ${duration}ms`);
+  }
+}
+```
+
+## Versionnement
+
+### 1. Git
+
+```bash
+# Branches
+feature/nom-feature
+bugfix/nom-bug
+release/x.y.z
+
+# Commits
+type(scope): description
+
+# Types: feat, fix, docs, style, refactor, test, chore
+```
+
+### 2. Releases
+
+```bash
+# Tags sémantiques
+v1.0.0 # Major
+v1.1.0 # Minor
+v1.1.1 # Patch
+```
+
+## Déploiement
+
+### 1. Environnements
+
+```javascript
+const config = {
+  development: {
+    apiUrl: 'http://localhost:3000'
+  },
+  production: {
+    apiUrl: 'https://api.example.com'
+  }
+}[process.env.NODE_ENV];
+```
+
+### 2. Build
+
+```bash
+# Scripts npm
+"scripts": {
+  "build": "webpack --mode production",
+  "test": "jest --coverage",
+  "lint": "eslint src/**/*.js"
+}
+```
+
+## Maintenance
+
+### 1. Documentation
+
+- README.md à jour
+- Changelog maintenu
+- Documentation API
+- Guides d'utilisation
+
+### 2. Revue de Code
+
+- Pull requests documentées
+- Tests inclus
+- Revue par pairs
+- Standards respectés 

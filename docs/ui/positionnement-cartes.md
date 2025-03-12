@@ -1,172 +1,179 @@
-# Système de Positionnement des Cartes
+# Positionnement des Cartes
 
 ## Vue d'Ensemble
 
-Le positionnement des cartes de tarot dans JodoTarot est défini à travers une architecture en deux couches :
+Le système de positionnement des cartes dans JodoTarot utilise une approche hybride combinant :
+1. Un système numérique standardisé (nouveau standard)
+2. Un système sémantique (pour rétrocompatibilité)
 
-1. **Définition Logique** (JavaScript) - Structure et relations
-2. **Définition Visuelle** (CSS) - Positionnement exact et styles
+## Structure de Base
 
-Cette séparation permet une grande flexibilité, une maintenance simplifiée et une meilleure adaptabilité responsive.
+### Définition des Positions
 
-## Architecture du Système
+Chaque position de carte est définie avec les propriétés suivantes :
 
-### 1. Définition Logique (JavaScript)
-
-Les classes dans `assets/js/models/spreads/` définissent :
-- Le nombre de cartes pour chaque tirage
-- Les noms des positions (ex: 'center', 'top', 'left', etc.)
-- Les significations de chaque position dans différentes langues
-- Les classes CSS à utiliser pour chaque carte
-- L'identifiant numérique standardisé pour chaque position
-
-**Exemple pour le tirage en Croix :**
 ```javascript
-// CrossSpread.js
+{
+  name: 'present',           // Nom sémantique
+  cssName: 'present',        // Nom pour les variables CSS (legacy)
+  position: 1,              // Numéro de position (nouveau standard)
+  rotation: 0               // Rotation en degrés (optionnel)
+}
+```
+
+### Variables CSS
+
+Les positions sont définies via des variables CSS suivant deux formats :
+
+```css
+/* Format numérique (nouveau standard) */
+--${spreadType}-position-${number}-x: 40%;
+--${spreadType}-position-${number}-y: 40%;
+--${spreadType}-position-${number}-rotation: 0deg;
+
+/* Format sémantique (legacy) */
+--${spreadType}-${name}-x: 40%;
+--${spreadType}-${name}-y: 40%;
+--${spreadType}-${name}-rotation: 0deg;
+```
+
+## Implémentation
+
+### Classes CSS
+
+Les positions utilisent plusieurs classes pour assurer la compatibilité :
+
+```css
+.card-position {
+  /* Styles de base pour toutes les positions */
+  position: absolute;
+  transition: all 0.3s ease;
+}
+
+/* Classes de position */
+.card-${index + 1}              /* Position numérique de base */
+.position-${position}           /* Nouveau standard numérique */
+.card-position-${position}      /* Alternative numérique */
+.${name}                        /* Nom sémantique */
+```
+
+### Positionnement dans le DOM
+
+```javascript
+// Exemple de création d'une position
+const positionElement = document.createElement('div');
+positionElement.className = this.getPositionClassName(index, position) + ' empty';
+positionElement.setAttribute('data-position', index);
+positionElement.setAttribute('data-position-name', this.getPositionMeaning(index));
+positionElement.setAttribute('data-position-meaning', positionDescription);
+```
+
+## Types de Tirages
+
+### Croix Celtique
+
+```javascript
 this.cardPositions = [
-  { name: 'center', cssName: 'center', position: 1 },  // Centre - Situation actuelle
-  { name: 'top', cssName: 'top', position: 2 },        // Haut - Ce qui influence
-  { name: 'right', cssName: 'right', position: 3 },    // Droite - Futur
-  { name: 'bottom', cssName: 'bottom', position: 4 },  // Bas - Fondation
-  { name: 'left', cssName: 'left', position: 5 }       // Gauche - Passé
+  { name: 'present', cssName: 'present', position: 1 },           // Situation actuelle
+  { name: 'challenge', cssName: 'challenge', rotation: 90, position: 2 }, // Défi/Obstacle
+  { name: 'foundation', cssName: 'foundation', position: 3 },     // Base/Fondation
+  { name: 'past', cssName: 'past', position: 4 },                // Passé récent
+  { name: 'crown', cssName: 'crown', position: 5 },              // Couronne/Résultat
+  { name: 'future', cssName: 'future', position: 6 },            // Futur immédiat
+  { name: 'self', cssName: 'self', position: 7 },                // Vous-même
+  { name: 'environment', cssName: 'environment', position: 8 },   // Environnement
+  { name: 'hopes', cssName: 'hopes', position: 9 },              // Espoirs/Craintes
+  { name: 'outcome', cssName: 'outcome', position: 10 }          // Résultat final
 ];
 ```
 
-### 2. Définition Visuelle (CSS)
+### Tirage en Fer à Cheval
 
-Le positionnement exact est défini dans deux endroits :
-
-#### a. Variables CSS (`assets/css/base/variables.css`)
-
-Ce fichier centralise toutes les coordonnées sous forme de variables CSS, selon la convention standardisée :
-
-```css
-/* Tirage en croix */
---cross-position-1-x: 50%;  /* center */
---cross-position-1-y: 50%;
---cross-position-2-x: 50%;  /* top */
---cross-position-2-y: 20%;
---cross-position-3-x: 90%;  /* right */
---cross-position-3-y: 50%;
---cross-position-4-x: 50%;  /* bottom */
---cross-position-4-y: 80%;
---cross-position-5-x: 10%;  /* left */
---cross-position-5-y: 50%;
-
-/* Positions en fer à cheval */
---horseshoe-position-1-x: 10%;  /* past */
---horseshoe-position-1-y: 70%;
---horseshoe-position-2-x: 25%;  /* recent */
---horseshoe-position-2-y: 60%;
-/* etc. */
+```javascript
+this.cardPositions = [
+  { name: 'past', cssName: 'past', position: 1 },        // Passé lointain
+  { name: 'recent', cssName: 'recent', position: 2 },    // Passé récent
+  { name: 'present', cssName: 'present', position: 3 },  // Présent
+  { name: 'future', cssName: 'future', position: 4 },    // Futur proche
+  { name: 'outcome', cssName: 'outcome', position: 5 },  // Futur lointain
+  { name: 'advice', cssName: 'advice', position: 6 },    // Conseil
+  { name: 'summary', cssName: 'summary', position: 7 }   // Synthèse
+];
 ```
 
-#### b. Modules CSS spécifiques aux tirages (`assets/css/modules/`)
+### Tirage Amour
 
-Chaque type de tirage a son propre fichier CSS qui utilise les variables :
-- `cross-spread.css` (131 lignes) - Pour le tirage en Croix
-- `horseshoe-spread.css` (110 lignes) - Pour le tirage en Fer à Cheval
-- `love-spread.css` (113 lignes) - Pour le tirage de l'Amour  
-- `celtic-cross-spread.css` (162 lignes) - Pour la Croix Celtique
-
-**Exemple pour le tirage en Croix :**
-```css
-.card-center, .card-1 {
-  left: var(--cross-position-1-x);
-  top: var(--cross-position-1-y);
-  transform: translate(-50%, -50%);
-  z-index: 3;
-}
-
-.card-top, .card-2 {
-  left: var(--cross-position-2-x);
-  top: var(--cross-position-2-y);
-  transform: translate(-50%, -50%);
-  z-index: 2;
-}
-/* etc. */
+```javascript
+this.cardPositions = [
+  { name: 'self', cssName: 'you', position: 1 },           // Soi / Votre cœur
+  { name: 'partner', cssName: 'partner', position: 2 },    // Partenaire / Son cœur
+  { name: 'relationship', cssName: 'relationship', position: 3 }, // Relation actuelle
+  { name: 'obstacles', cssName: 'foundation', position: 4 },  // Obstacles à surmonter
+  { name: 'desires', cssName: 'past', position: 5 },       // Désirs secrets
+  { name: 'outcome', cssName: 'present', position: 6 },    // Résultat probable
+  { name: 'advice', cssName: 'future', position: 7 }       // Conseil final
+];
 ```
 
-## Système de Double Identification
+## Éditeur de Positions
 
-Pour assurer à la fois une lisibilité optimale et une standardisation technique, chaque position de carte peut être identifiée de deux manières :
+L'application inclut un éditeur visuel (`tools/spread-editor.html`) permettant de :
+- Définir visuellement les positions des cartes
+- Générer les variables CSS correspondantes
+- Tester les positions en temps réel
+- Sauvegarder les configurations
 
-1. **Identification Sémantique** : Utilise le nom descriptif de la position (ex: `.card-present`, `.card-past`)
-2. **Identification Numérique** : Utilise un numéro séquentiel (ex: `.card-1`, `.card-2`)
+### Utilisation de l'Éditeur
 
-Ces deux systèmes fonctionnent en parallèle et sont équivalents dans le code CSS.
+1. Ouvrir `tools/spread-editor.html`
+2. Sélectionner le type de tirage à éditer
+3. Déplacer les cartes à la position souhaitée
+4. Ajuster les rotations si nécessaire
+5. Générer et copier le CSS résultant
 
-## Flux de Création d'un Tirage
-
-1. **Définition Logique** dans la classe JavaScript correspondante (ex: `CelticCrossSpread.js`)
-   - Définition du nombre de cartes
-   - Attribution des noms sémantiques et identifiants numériques
-   - Association des significations
-
-2. **Initialisation des Positions** dans `BaseSpread.js`
-   - Création des éléments DOM
-   - Application des classes CSS
-   - Référencement aux variables CSS
-
-3. **Application des Styles** via les fichiers CSS correspondants
-   - Utilisation des variables CSS pour les positions
-   - Définition des z-index, rotations, et autres propriétés visuelles
-
-## Adaptation Responsive
-
-Le système utilise des pourcentages pour les positions, ce qui permet une adaptation naturelle aux différentes tailles d'écran. De plus, les variables CSS peuvent être redéfinies dans les media queries :
+### Format de Sortie
 
 ```css
-/* Tablettes */
-@media (max-width: 768px) {
-  :root {
-    --cross-position-1-x: 50%;
-    --cross-position-1-y: 45%;
-    /* ... ajustements pour tablettes ... */
-  }
-}
-
-/* Mobiles */
-@media (max-width: 480px) {
-  :root {
-    --cross-position-1-x: 50%;
-    --cross-position-1-y: 40%;
-    /* ... ajustements pour mobiles ... */
-  }
+/* Variables générées par l'éditeur */
+:root {
+  /* Croix Celtique */
+  --celtic-position-1-x: 40%;
+  --celtic-position-1-y: 40%;
+  --celtic-position-2-x: 40%;
+  --celtic-position-2-y: 40%;
+  --celtic-position-2-rotation: 90deg;
+  /* ... */
+  
+  /* Fer à Cheval */
+  --horseshoe-position-1-x: 20%;
+  --horseshoe-position-1-y: 50%;
+  /* ... */
+  
+  /* Tirage Amour */
+  --love-position-1-x: 30%;
+  --love-position-1-y: 40%;
+  /* ... */
 }
 ```
 
-## Avantages du Système
+## Bonnes Pratiques
 
-1. **Séparation des Responsabilités**
-   - JavaScript : Logique et structure des tirages
-   - CSS : Positionnement et style visuel
+1. **Nommage**
+   - Utiliser le nouveau système numérique pour les nouvelles implémentations
+   - Maintenir la compatibilité avec les noms sémantiques
+   - Documenter les significations des positions
 
-2. **Maintenance Simplifiée**
-   - Un seul endroit pour modifier les positions (variables.css)
-   - Pas de duplication des coordonnées
+2. **Positionnement**
+   - Centrer les cartes avec `transform: translate(-50%, -50%)`
+   - Utiliser des pourcentages pour les positions
+   - Appliquer les rotations après le centrage
 
-3. **Flexibilité Accrue**
-   - Support facile des media queries
-   - Adaptation dynamique aux différentes tailles d'écran
-   - Possibilité d'animations CSS complexes
+3. **Accessibilité**
+   - Fournir des attributs `data-position-name` et `data-position-meaning`
+   - Maintenir un ordre logique dans le DOM
+   - Assurer une navigation clavier cohérente
 
-4. **Meilleure Performance**
-   - Utilisation du moteur de rendu CSS natif
-   - Moins de calculs JavaScript
-
-5. **Extensibilité**
-   - Ajout facile de nouveaux types de tirages
-   - Personnalisation simple des positions par thème
-
-## Standardisation et Documentation
-
-Ce système fait l'objet d'une standardisation détaillée dans plusieurs documents :
-
-- [Positions de Cartes](../standards/card-positions.md) - Référence des positions dans chaque tirage
-- [Conventions de Nommage CSS](../standards/css-naming-conventions.md) - Standards pour les variables CSS
-- [Standardisation des Positions](../standards/tarot-position-standardization.md) - Projet d'harmonisation
-
-## Outil d'Édition Visuelle
-
-L'outil [Éditeur de Positions](../tools/spread-editor.md) permet de définir visuellement les positions des cartes et de générer automatiquement les variables CSS correspondantes, facilitant ainsi la maintenance et l'évolution du système. 
+4. **Performance**
+   - Utiliser `transform` pour les animations
+   - Regrouper les changements de style
+   - Éviter les calculs de position inutiles 

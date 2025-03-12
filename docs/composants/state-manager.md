@@ -2,7 +2,7 @@
 
 ## Vue d'Ensemble
 
-Le StateManager est le composant central de gestion d'état dans JodoTarot. Il agit comme une "source unique de vérité" (single source of truth) pour l'ensemble de l'application, assurant la cohérence des données entre les composants et leur persistance entre les sessions.
+Le StateManager est le composant central de gestion d'état dans JodoTarot. Il agit comme une "source unique de vérité" pour l'ensemble de l'application, assurant la cohérence des données et leur persistance entre les sessions.
 
 ## Architecture du StateManager
 
@@ -329,4 +329,211 @@ Pour travailler efficacement avec le StateManager :
 
 - [Flux de Données](../architecture/flux-donnees.md)
 - [Bonnes Pratiques](../standards/bonnes-pratiques.md)
-- [Interactions entre Composants](../architecture/interactions-composants.md) 
+- [Interactions entre Composants](../architecture/interactions-composants.md)
+
+## Schéma de Validation
+
+Le StateManager utilise un schéma de validation strict pour chaque propriété d'état :
+
+```javascript
+{
+  language: {
+    type: 'string',
+    enum: ['fr', 'en', 'es', 'de', 'it', 'zh'],
+    default: 'fr'
+  },
+  persona: {
+    type: 'string',
+    enum: [
+      'tarologue', 'oracle', 'voyante', 'pretre', 'rabbin', 'imam',
+      'dalailama', 'sorciere', 'alchimiste', 'mage', 'francmacon',
+      'freud', 'jung', 'lacan', 'dolto', 'socrate', 'salomon',
+      'montaigne', 'quichotte', 'demon', 'noegoman'
+    ],
+    default: 'tarologue'
+  },
+  cardSet: {
+    type: 'string',
+    enum: ['set01', 'set02'],
+    default: 'set01'
+  },
+  spreadType: {
+    type: 'string',
+    enum: ['cross', 'horseshoe', 'love', 'celticCross'],
+    default: 'cross'
+  },
+  iaModel: {
+    type: 'string',
+    validate: (value) => {
+      // Validation des modèles OpenAI et Ollama
+      // Voir implémentation complète dans le code
+    },
+    default: 'prompt'
+  }
+}
+```
+
+## Événements Système
+
+Le StateManager émet plusieurs événements personnalisés :
+
+- `stateManager:ready` : Émis quand l'état est initialisé
+- `stateManager:error` : Émis en cas d'erreur de gestion d'état
+- `state:changed` : Émis pour tout changement d'état
+- `${key}:changed` : Émis pour chaque propriété modifiée
+- `iaModelUI:update` : Événement spécial pour la synchronisation du modèle IA
+
+## Méthodes Principales
+
+### Initialisation
+
+```javascript
+async initialize() {
+  // Restaure l'état depuis localStorage
+  const restored = this.restoreState();
+  
+  // Émet l'événement ready
+  document.dispatchEvent(new CustomEvent('stateManager:ready', {
+    detail: { state: this.getState() }
+  }));
+}
+```
+
+### Modification d'État
+
+```javascript
+setState(updates) {
+  // Validation des mises à jour
+  const validatedUpdates = {};
+  const errors = [];
+  
+  // Traitement des mises à jour
+  for (const [key, value] of Object.entries(updates)) {
+    const validation = this.validateValue(key, value);
+    if (validation.isValid) {
+      validatedUpdates[key] = validation.value;
+    } else {
+      errors.push(validation.error);
+    }
+  }
+  
+  // Application des changements
+  this.state = {
+    ...this.state,
+    ...validatedUpdates
+  };
+  
+  // Notification des changements
+  this.notifyListeners(changedValues);
+  this.emitChangeEvents(changedValues);
+  this.persistState();
+}
+```
+
+### Abonnement aux Changements
+
+```javascript
+subscribe(listener) {
+  this.listeners.push(listener);
+  return () => {
+    const index = this.listeners.indexOf(listener);
+    if (index !== -1) {
+      this.listeners.splice(index, 1);
+    }
+  };
+}
+```
+
+## Persistance
+
+Le StateManager gère la persistance automatique dans localStorage :
+
+```javascript
+persistState() {
+  const stateString = JSON.stringify({
+    version: this.STATE_VERSION,
+    data: this.state
+  });
+  
+  localStorage.setItem('jodotarot_state', stateString);
+}
+
+restoreState() {
+  const saved = localStorage.getItem('jodotarot_state');
+  if (!saved) return false;
+  
+  const { version, data } = JSON.parse(saved);
+  const migrated = this.migrateState(version, data);
+  this.applyRestoredState(migrated);
+  
+  return true;
+}
+```
+
+## Intégration avec les Services
+
+### UIService
+
+```javascript
+class UIService {
+  constructor() {
+    document.addEventListener('stateManager:ready', this.handleStateReady.bind(this));
+    document.addEventListener('state:changed', this.handleStateChanged.bind(this));
+  }
+  
+  handleStateReady(event) {
+    this.synchronizeUIWithState(event.detail.state);
+  }
+  
+  handleStateChanged(event) {
+    const { changes, state } = event.detail;
+    this.synchronizeUIWithState(state, changes);
+  }
+}
+```
+
+### ConfigController
+
+```javascript
+class ConfigController {
+  constructor(stateManager, aiService, uiService) {
+    this.stateManager = stateManager;
+    
+    this.stateManager.subscribe((newState, changes) => {
+      this.syncUIWithState();
+      
+      if (changes.language) {
+        this.updateUILanguage(newState.language);
+      }
+      if (changes.spreadType) {
+        this.updateAppTitle();
+      }
+      if (changes.iaModel) {
+        this.testModelConnectivity();
+      }
+    });
+  }
+}
+```
+
+## Bonnes Pratiques
+
+1. **Validation Stricte**
+   - Toujours valider les données avant mise à jour
+   - Utiliser les schémas de validation définis
+   - Gérer les erreurs de validation
+
+2. **Gestion des Événements**
+   - Écouter les événements appropriés
+   - Réagir aux changements d'état
+   - Maintenir la synchronisation UI
+
+3. **Performance**
+   - Ne mettre à jour que les valeurs modifiées
+   - Éviter les mises à jour en cascade
+   - Optimiser la persistance
+
+4. **Maintenance**
+   - Suivre les migrations d'état
+   - Gérer les versions du schéma
+   - Nettoyer les écouteurs inutilisés 

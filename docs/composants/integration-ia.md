@@ -1,256 +1,160 @@
-# Intégration de l'Intelligence Artificielle
+# Intégration IA
 
-## Vue d'Ensemble
+## Vue d'ensemble
 
-L'intégration de l'intelligence artificielle est au cœur de JodoTarot, permettant des interprétations personnalisées des tirages de tarot. Le système est conçu pour être flexible, supportant plusieurs fournisseurs d'IA et différents modèles.
+JodoTarot utilise deux fournisseurs d'IA pour l'interprétation des tirages :
+- OpenAI (API cloud)
+- Ollama (API locale)
 
-## Architecture de l'Intégration IA
+Cette documentation se concentre sur l'intégration avec Ollama, qui permet d'exécuter des modèles d'IA localement.
 
-```mermaid
-graph TD
-    A[AIService] -->|Appel API| B[OpenAI]
-    A -->|Appel API| C[Ollama]
-    A -->|Appel API| D[Anthropic]
-    A -->|Utilise| E[Prompt Builder]
-    F[ConfigController] -->|Configure| A
-    A -->|Stocke| G[Cache des Réponses]
-    H[ReadingController] -->|Requête| A
-    A -->|Récupère| I[Persona actif]
+## Configuration Ollama
+
+### Prérequis
+
+1. Installer Ollama sur votre machine : [https://ollama.ai](https://ollama.ai)
+2. Démarrer le serveur Ollama :
+```bash
+ollama serve
+```
+3. Télécharger un modèle compatible (par exemple llama2) :
+```bash
+ollama pull llama2
 ```
 
-## Fournisseurs d'IA Supportés
+### Configuration dans JodoTarot
 
-JodoTarot prend en charge trois fournisseurs d'IA principaux :
-
-### 1. OpenAI
-- **Modèles disponibles** : GPT-4o, GPT-4, GPT-3.5-Turbo, GPT-4o-mini
-- **Configuration** : Nécessite une clé API valide
-- **Format** : Utilise l'API standard d'OpenAI avec streaming
-
-### 2. Ollama (Local)
-- **Modèles disponibles** : Tous les modèles installés localement via Ollama
-- **Configuration** : Nécessite une installation fonctionnelle d'Ollama sur la machine
-- **Format** : Utilise l'API compatible avec la spécification OpenAI
-
-### 3. Anthropic
-- **Modèles disponibles** : Claude-3 Opus
-- **Configuration** : Nécessite une clé API valide
-- **Format** : Utilise l'API standard d'Anthropic
-
-## Implémentation
-
-L'intégration IA est implémentée via plusieurs composants clés :
-
-### AIService
-
-Classe centrale gérant toutes les interactions avec les services d'IA, située dans `assets/js/services/AIService.js`.
+La configuration d'Ollama se fait dans `assets/js/config.js` :
 
 ```javascript
-class AIService {
-  constructor(stateManager) {
-    this.stateManager = stateManager;
-    this.apiKey = this.loadApiKey() || API_KEY;
-    this.interpreterCache = {};  // Cache pour éviter des appels redondants
-    // ...
+const SETTINGS = {
+  // URL du serveur Ollama local
+  OLLAMA_URL: "http://localhost:11434",
+  // ... autres paramètres
+};
+
+// Points d'accès de l'API Ollama
+const API_URL_OLLAMA = `${SETTINGS.OLLAMA_URL}/api/generate`;
+const API_URL_OLLAMA_TAGS = `${SETTINGS.OLLAMA_URL}/api/tags`;
+```
+
+### Timeouts et Paramètres
+
+```javascript
+const TIMEOUTS = {
+  OLLAMA_CONNECT: 30000,    // 30s pour la connexion initiale
+  OLLAMA_MODEL_LOAD: 60000, // 60s pour le chargement du modèle
+  OLLAMA_RESPONSE: 120000,  // 120s pour la génération
+  OLLAMA_CHECK: 5000,       // 5s pour vérifier l'état
+  MAX_RETRIES: 3,           // Nombre de tentatives
+  RETRY_DELAY: 1000        // Délai entre tentatives
+};
+```
+
+## Communication avec Ollama
+
+### Format de Requête
+
+Pour générer une interprétation, nous utilisons l'endpoint `/api/generate` avec le format suivant :
+
+```javascript
+{
+  "model": "nom_du_modele",  // ex: "llama2"
+  "prompt": "texte_complet", // Combinaison des prompts système et utilisateur
+  "stream": true,            // Activation du streaming
+  "options": {
+    "temperature": 0.7,      // Créativité de la génération
+    "num_predict": 1000      // Nombre max de tokens à générer
   }
-  
-  // Méthodes principales
-  async getInterpretation(question, cards, persona, language, spread) { /* ... */ }
-  async getOpenAIResponse(prompt, systemPrompts, model) { /* ... */ }
-  async getOllamaResponse(prompt, systemPrompts, model) { /* ... */ }
-  async getAnthropicResponse(prompt, systemPrompts, model) { /* ... */ }
-  async testModelAvailability(modelName) { /* ... */ }
 }
 ```
 
-### Mécanisme de Construction des Prompts
+### Gestion du Streaming
 
-Le système utilise un mécanisme sophistiqué pour générer des prompts adaptés à chaque modèle, persona et langue.
+Le streaming permet de recevoir la réponse progressivement. Voici comment nous le gérons :
 
-```javascript
-import { getPersonaPrompt } from './models/personas/index.js';
-import { getMetaPrompt, enrichirPromptContextuel } from './prompt.js';
-
-// Construction d'un prompt
-function buildPrompt(persona, cards, question, spreadType, language) {
-  // Obtenir le prompt spécifique au persona
-  const personaPrompt = getPersonaPrompt(persona, language);
-  
-  // Enrichir avec le contexte des cartes
-  const cardsContext = formatCardsForPrompt(cards, spreadType);
-  
-  // Ajouter le meta-prompt qui contient les instructions générales
-  const metaPrompt = getMetaPrompt(language);
-  
-  // Enrichir avec la question spécifique
-  return enrichirPromptContextuel(question, 
-    `${metaPrompt}\n${personaPrompt}\n${cardsContext}`, 
-    language);
-}
-```
-
-### Gestion des Erreurs et Résilience
-
-Le système intègre des mécanismes robustes pour gérer les erreurs de connexion ou d'API :
-
-1. **Timeouts adaptés** : Délais appropriés pour chaque type d'opération
-2. **Retries automatiques** : Tentatives multiples en cas d'échec temporaire
-3. **Fallback entre modèles** : Possibilité de basculer vers un modèle alternatif
-4. **Détection de modèles incomplets** : Gestion des réponses tronquées
+1. Envoi de la requête en streaming
+2. Lecture du flux de réponse avec un `ReadableStream`
+3. Décodage des chunks en UTF-8
+4. Parsing du JSON ligne par ligne
+5. Extraction de la réponse et envoi au callback
 
 ```javascript
-// Exemple de fetchWithRetry avec timeout
-async function fetchWithRetry(url, options, maxRetries = 2, timeoutMs = 5000) {
-  let retries = 0;
+// Exemple de traitement du streaming
+const reader = response.body.getReader();
+const decoder = new TextDecoder();
+
+while (true) {
+  const { done, value } = await reader.read();
+  if (done) break;
   
-  while (retries <= maxRetries) {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-      
-      const response = await fetch(url, {
-        ...options,
-        signal: controller.signal
-      });
-      
-      clearTimeout(timeoutId);
-      return response;
-    } catch (error) {
-      retries++;
-      if (retries > maxRetries) throw error;
-      
-      console.warn(`Tentative #${retries} échouée, nouvel essai...`);
-      await new Promise(r => setTimeout(r, 1000));
+  const chunk = decoder.decode(value, { stream: true });
+  const lines = chunk.split('\n').filter(line => line.trim());
+  
+  for (const line of lines) {
+    const data = JSON.parse(line);
+    if (data.response) {
+      onChunk(data.response);
     }
   }
 }
 ```
 
-## Configuration et Utilisation
+## Formats de Réponse
 
-### Initialisation du Service
-
-```javascript
-// Exemple d'initialisation dans main.js
-import AIService from './services/AIService.js';
-
-const stateManager = new StateManager();
-const aiService = new AIService(stateManager);
-
-// Vérification des modèles disponibles
-await aiService.checkAvailableModels();
-```
-
-### Exécution d'une Requête d'Interprétation
+Différents modèles peuvent avoir différents formats de réponse. Nous gérons cela avec une configuration par modèle :
 
 ```javascript
-// Exemple d'utilisation dans ReadingController
-async interpretReading() {
-  const state = this.stateManager.getState();
-  
-  try {
-    // Mettre à jour l'état pour indiquer le chargement
-    this.stateManager.setState({ isLoading: true });
-    
-    const interpretation = await this.aiService.getInterpretation(
-      state.question,
-      state.selectedCards,
-      state.persona,
-      state.language,
-      state.spreadType
-    );
-    
-    // Mettre à jour l'état avec l'interprétation
-    this.stateManager.setState({ 
-      interpretation,
-      isLoading: false
-    });
-    
-    // Afficher l'interprétation
-    this.displayInterpretation(interpretation);
-  } catch (error) {
-    console.error('Erreur lors de l\'interprétation:', error);
-    this.stateManager.setState({ 
-      error: error.message,
-      isLoading: false
-    });
-  }
-}
+const OLLAMA_MODEL_FORMATS = {
+  "llama2": {
+    pattern: /\bllama2\b/i,
+    responseKey: "response",
+    description: "Llama 2 (retourne response)"
+  },
+  // ... autres modèles
+};
 ```
 
-## Streaming des Réponses
+## Gestion des Erreurs
 
-JodoTarot utilise le streaming des réponses pour afficher les interprétations progressivement, améliorant l'expérience utilisateur :
+1. **Erreurs de connexion** : Vérification que le serveur Ollama est accessible
+2. **Erreurs de modèle** : Vérification que le modèle est installé
+3. **Erreurs de génération** : Gestion des timeouts et tentatives multiples
+4. **Erreurs de streaming** : Gestion des erreurs de parsing JSON
+
+## Bonnes Pratiques
+
+1. **Toujours vérifier la disponibilité du serveur** avant d'envoyer des requêtes
+2. **Utiliser le mode "prompt"** comme fallback si Ollama n'est pas disponible
+3. **Nettoyer le nom du modèle** en retirant le préfixe "ollama:"
+4. **Gérer les timeouts** appropriés selon l'opération
+5. **Logger les erreurs** pour faciliter le débogage
+
+## Débogage
+
+Activer le mode debug dans `config.js` pour plus de détails :
 
 ```javascript
-async function streamResponse(response, outputElement) {
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = '';
-  
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    
-    buffer += decoder.decode(value, { stream: true });
-    
-    // Traiter les lignes complètes (format SSE)
-    const lines = buffer.split('\n');
-    buffer = lines.pop();
-    
-    for (const line of lines) {
-      if (line.startsWith('data: ')) {
-        const jsonStr = line.slice(6);
-        if (jsonStr === '[DONE]') continue;
-        
-        try {
-          const json = JSON.parse(jsonStr);
-          const content = json.choices[0]?.delta?.content || '';
-          if (content) {
-            outputElement.innerHTML += formatStreamingResponse(content);
-            scrollToBottom();
-          }
-        } catch (e) {
-          console.warn('Erreur de parsing JSON:', e);
-        }
-      }
-    }
-  }
-}
+const DEBUG_LEVEL = 2; // 0: aucun, 1: basique, 2: détaillé
 ```
 
-## Détection et Configuration des Modèles
+Les logs incluront :
+- Les prompts envoyés
+- Le format des requêtes
+- Les réponses reçues
+- Les erreurs détaillées
 
-Le système détecte automatiquement les modèles disponibles, particulièrement pour Ollama :
+## Limitations Connues
 
-```javascript
-async function detectAvailableModels() {
-  // Modèles OpenAI et Anthropic toujours disponibles si API key présente
-  const models = {
-    openai: ['gpt-3.5-turbo', 'gpt-4', 'gpt-4o', 'gpt-4o-mini'],
-    anthropic: ['claude-3-opus-20240229'],
-    ollama: []
-  };
-  
-  // Tester la connexion à Ollama
-  try {
-    const ollamaTest = await verifierConnexionOllama();
-    if (ollamaTest.success) {
-      // Récupérer les modèles Ollama
-      models.ollama = await obtenirModelesOllama();
-    }
-  } catch (error) {
-    console.warn('Ollama non disponible:', error.message);
-  }
-  
-  return models;
-}
-```
+1. Certains modèles peuvent nécessiter beaucoup de RAM
+2. Les temps de chargement initial peuvent être longs
+3. La qualité des réponses dépend du modèle utilisé
+4. Le streaming peut être instable sur certains modèles
 
-## Bonnes Pratiques pour l'Utilisation des APIs IA
+## Évolutions Futures
 
-1. **Gestion des clés API** : Stockage sécurisé, rotation périodique
-2. **Économie de tokens** : Optimisation des prompts pour réduire la consommation
-3. **Mise en cache** : Réutilisation des résultats pour les mêmes entrées
-4. **Monitoring** : Surveillance de l'utilisation et des erreurs
-5. **Gestion du quota** : Vérification préventive des limites de quotas 
+1. Support de modèles multimodaux (images)
+2. Amélioration de la gestion de la mémoire
+3. Cache des réponses fréquentes
+4. Interface de gestion des modèles
+5. Support de nouveaux formats de modèles 

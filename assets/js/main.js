@@ -10,28 +10,8 @@ import AIService from './services/AIService.js';
 import DeckService from './services/DeckService.js';
 import UIService from './services/UIService.js';
 
-// Import des personas
-import TarologuePersona from './models/personas/TarologuePersona.js';
-import OraclePersona from './models/personas/OraclePersona.js';
-import JungPersona from './models/personas/JungPersona.js';
-import VoyantePersona from './models/personas/VoyantePersona.js';
-import FreudPersona from './models/personas/FreudPersona.js';
-import PretrePersona from './models/personas/PretrePersona.js';
-import SorcierePersona from './models/personas/SorcierePersona.js';
-import SocratePersona from './models/personas/SocratePersona.js';
-import DemonPersona from './models/personas/DemonPersona.js';
-import RabbinPersona from './models/personas/RabbinPersona.js';
-import AlchimistePersona from './models/personas/AlchimistePersona.js';
-import LacanPersona from './models/personas/LacanPersona.js';
-import NoEgoPersona from './models/personas/NoEgoPersona.js';
-import DalailamaPersona from './models/personas/DalailamaPersona.js';
-import MagePersona from './models/personas/MagePersona.js';
-import DoltoPersona from './models/personas/DoltoPersona.js';
-import MontaignePersona from './models/personas/MontaignePersona.js';
-import ImamPersona from './models/personas/ImamPersona.js';
-import FrancmaconPersona from './models/personas/FrancmaconPersona.js';
-import SalomonPersona from './models/personas/SalomonPersona.js';
-import QuichottePersona from './models/personas/QuichottePersona.js';
+// Import dynamique des personas au lieu d'imports individuels
+import { getAllPersonas } from './models/personas/index.js';
 
 // Import des tirages
 import CrossSpread from './models/spreads/CrossSpread.js';
@@ -74,6 +54,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     registerSpread('horseshoe', HorseshoeSpread);
     registerSpread('love', LoveSpread);
     registerSpread('celticCross', CelticCrossSpread);
+    
+    // Enregistrer tous les personas automatiquement
+    const allPersonas = await getAllPersonas();
+    for (const [key, PersonaClass] of Object.entries(allPersonas)) {
+      registerPersona(key, PersonaClass);
+    }
     
     // Créer et initialiser le gestionnaire d'état en premier
     stateManager = new StateManager();
@@ -188,11 +174,24 @@ function setupEventListeners() {
  * @return {BaseSpread} Instance de la disposition
  */
 export function createSpread(key, container, language = 'fr') {
-  const SpreadClass = window.registries.spreads[key];
-  if (!SpreadClass) {
-    throw new Error(`Disposition non trouvée: ${key}`);
+  // Vérifier si le type de tirage est valide
+  if (!window.registries.spreads || !window.registries.spreads[key]) {
+    console.error(`Type de tirage non trouvé: ${key}`);
+    // Utiliser un type de tirage par défaut (croix)
+    key = 'cross';
+    // Si même le type par défaut n'existe pas, lancer une erreur
+    if (!window.registries.spreads[key]) {
+      throw new Error(`Aucun type de tirage disponible`);
+    }
   }
-  return new SpreadClass(container, language);
+  
+  try {
+    const SpreadClass = window.registries.spreads[key];
+    return new SpreadClass(container, language);
+  } catch (error) {
+    console.error(`Erreur lors de la création du tirage ${key}:`, error);
+    throw new Error(`Impossible de créer le tirage: ${error.message}`);
+  }
 }
 
 /**
@@ -202,11 +201,24 @@ export function createSpread(key, container, language = 'fr') {
  * @return {BasePersona} Instance du persona
  */
 export function createPersona(key, language = 'fr') {
-  const PersonaClass = window.registries.personas[key];
-  if (!PersonaClass) {
-    throw new Error(`Persona non trouvé: ${key}`);
+  // Vérifier si le persona est valide
+  if (!window.registries.personas || !window.registries.personas[key]) {
+    console.error(`Persona non trouvé: ${key}`);
+    // Utiliser un persona par défaut (tarologue)
+    key = 'tarologue';
+    // Si même le persona par défaut n'existe pas, lancer une erreur
+    if (!window.registries.personas[key]) {
+      throw new Error(`Aucun persona disponible`);
+    }
   }
-  return new PersonaClass(language);
+  
+  try {
+    const PersonaClass = window.registries.personas[key];
+    return new PersonaClass(language);
+  } catch (error) {
+    console.error(`Erreur lors de la création du persona ${key}:`, error);
+    throw new Error(`Impossible de créer le persona: ${error.message}`);
+  }
 }
 
 /**
