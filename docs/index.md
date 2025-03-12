@@ -14,6 +14,8 @@ JodoTarot est une application web modulaire pour les tirages de tarot, construit
 
 ### 2. Composants Principaux
 - [Intégration IA](composants/integration-ia.md) - Communication avec les API OpenAI et Ollama
+- [Système de Personas](composants/personas.md) - Personnalités et styles d'interprétation
+- [Construction des Prompts](composants/construction-prompts.md) - Méthode détaillée de création des prompts
 - [Gestionnaire d'état](composants/state-manager.md) - Gestion de l'état global de l'application
 - [Système de traduction](composants/traduction.md) - Support multilingue
 

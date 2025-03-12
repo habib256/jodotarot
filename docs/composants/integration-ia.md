@@ -203,4 +203,5 @@ Pour l'extension ou la modification du système d'IA :
 - [Documentation Ollama](https://ollama.ai/library)
 - [Bonnes Pratiques](../standards/bonnes-pratiques.md)
 - [Gestionnaire d'État](state-manager.md)
+- [Système de Personas](personas.md)
 - [Construction des Prompts](construction-prompts.md) 
