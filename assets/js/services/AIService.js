@@ -268,20 +268,11 @@ class AIService {
       if (model === 'prompt') {
         console.log('📝 Mode Prompt activé : affichage du prompt sans appel à l\'IA');
         
-        // Formater le prompt pour l'affichage
-        const response = `<div class="prompt-display">
-          <h3>📝 Mode Prompt (Aucun modèle d'IA utilisé)</h3>
-          <p>Voici le prompt qui aurait été envoyé à l'IA :</p>
-          <div class="system-prompts">
-            <h4>Prompts système :</h4>
-            <div class="raw-prompt-text">${systemPrompts.map(p => p).join('\n\n---\n\n')}</div>
-          </div>
-          <div class="user-prompt">
-            <h4>Prompt utilisateur :</h4>
-            <div class="raw-prompt-text">${prompt}</div>
-          </div>
-          <p class="prompt-note">Note : Aucune connexion à l'IA n'a été effectuée. Pour obtenir une interprétation générée, veuillez sélectionner un modèle disponible.</p>
-        </div>`;
+        // Concaténer simplement les prompts système et utilisateur
+        const fullPrompt = `${systemPrompts.join('\n\n')}\n\n${prompt}`;
+        
+        // Affichage minimal sans formatage particulier
+        const response = `<div class="prompt-display">${fullPrompt}</div>`;
         
         this.isGenerating = false;
         return response;
