@@ -154,35 +154,29 @@
   --love-future-x: 75%;       /* card-7: advice - Conseils pour l'avenir */
   --love-future-y: 65%;
 
-  /* Positions de la croix celtique */
-  /* Centre de la croix */
-  --celtic-present-x: 35%;    /* Carte 1: Situation actuelle */
-  --celtic-present-y: 45%;
-  --celtic-challenge-x: 30%;  /* Carte 2: Obstacle/Défi (croisée) */
-  --celtic-challenge-y: 40%;
-  --celtic-challenge-rotation: 90deg; /* Rotation de la carte défi */
-  
-  /* Tige de la croix */
-  --celtic-crown-x: 35%;     /* Carte 5: Couronne/Objectif */
-  --celtic-crown-y: 15%;
-  --celtic-foundation-x: 35%; /* Carte 3: Base/Fondation */
-  --celtic-foundation-y: 75%;
-  
-  /* Bras de la croix */
-  --celtic-past-x: 15%;      /* Carte 4: Passé */
-  --celtic-past-y: 45%;
-  --celtic-future-x: 55%;    /* Carte 6: Futur */
-  --celtic-future-y: 45%;
-  
-  /* Bâton à droite (de bas en haut) */
-  --celtic-self-x: 75%;      /* Carte 7: Vous-même */
-  --celtic-self-y: 80%;
-  --celtic-environment-x: 75%; /* Carte 8: Environnement */
-  --celtic-environment-y: 60%;
-  --celtic-hopes-x: 75%;      /* Carte 9: Espoirs/Craintes */
-  --celtic-hopes-y: 40%;
-  --celtic-outcome-x: 75%;    /* Carte 10: Résultat final */
-  --celtic-outcome-y: 20%;
+  /* Positions pour Croix Celtique */
+--celtic-outcome-x: 84%;
+--celtic-outcome-y: 17%;
+--celtic-hopes-x: 84%;
+--celtic-hopes-y: 41%;
+--celtic-environment-x: 84%;
+--celtic-environment-y: 63%;
+--celtic-self-x: 85%;
+--celtic-self-y: 84%;
+--celtic-future-x: 60%;
+--celtic-future-y: 41%;
+--celtic-past-x: 39%;
+--celtic-past-y: 14%;
+--celtic-foundation-x: 18%;
+--celtic-foundation-y: 42%;
+--celtic-crown-x: 39%;
+--celtic-crown-y: 71%;
+--celtic-challenge-x: 40%;
+--celtic-challenge-y: 48%;
+--celtic-challenge-rotation: 90deg;
+--celtic-present-x: 39%;
+--celtic-present-y: 42%;
+
 }
 
 /* Media Queries pour les différentes tailles d'écran */

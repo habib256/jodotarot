@@ -101,6 +101,9 @@
 
 /* Pour la carte avec rotation */
 .celtic-cross-spread .card-2:hover {
+  z-index: 10;
+  filter: brightness(1.08);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
   transform: translate(-50%, -50%) rotate(var(--celtic-challenge-rotation)) scale(1.02);
 }
 

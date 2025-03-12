@@ -10,7 +10,7 @@ class CelticCrossSpread extends BaseSpread {
    * @param {string} language - Code de langue (fr, en, etc.)
    */
   constructor(container, language = 'fr') {
-    super('celticCross', container, language);
+    super('celtic', container, language);
     
     // Noms localisés
     this.name = {
@@ -35,7 +35,7 @@ class CelticCrossSpread extends BaseSpread {
     // Définition des positions des cartes (noms uniquement)
     this.cardPositions = [
       { name: 'present', cssName: 'present' },           // Situation actuelle
-      { name: 'challenge', cssName: 'challenge' }, // Défi/Obstacle (croisé sur la 1ère)
+      { name: 'challenge', cssName: 'challenge', rotation: 90 }, // Défi/Obstacle (croisé sur la 1ère)
       { name: 'foundation', cssName: 'foundation' },        // Base/Fondation
       { name: 'past', cssName: 'past' },             // Passé récent
       { name: 'crown', cssName: 'crown' },            // Couronne/Résultat potentiel
