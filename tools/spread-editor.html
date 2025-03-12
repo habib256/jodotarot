@@ -437,6 +437,47 @@
         function loadInitialPositions() {
             const spreadTypes = ['cross', 'horseshoe', 'love', 'celtic'];
             
+            // Positions par défaut selon le type de tirage pour une meilleure distribution visuelle
+            const defaultPositions = {
+                cross: {
+                    center: { x: 50, y: 50, rotation: 0 },
+                    top: { x: 50, y: 20, rotation: 0 },
+                    right: { x: 80, y: 50, rotation: 0 },
+                    bottom: { x: 50, y: 80, rotation: 0 },
+                    left: { x: 20, y: 50, rotation: 0 }
+                },
+                horseshoe: {
+                    past: { x: 20, y: 70, rotation: 0 },
+                    recent: { x: 30, y: 50, rotation: 0 },
+                    present: { x: 50, y: 40, rotation: 0 },
+                    future: { x: 70, y: 50, rotation: 0 },
+                    outcome: { x: 80, y: 70, rotation: 0 },
+                    influences: { x: 65, y: 85, rotation: 0 },
+                    advice: { x: 35, y: 85, rotation: 0 }
+                },
+                love: {
+                    you: { x: 30, y: 30, rotation: 0 },
+                    partner: { x: 70, y: 30, rotation: 0 },
+                    relationship: { x: 50, y: 40, rotation: 0 },
+                    foundation: { x: 50, y: 70, rotation: 0 },
+                    past: { x: 30, y: 60, rotation: 0 },
+                    present: { x: 50, y: 55, rotation: 0 },
+                    future: { x: 70, y: 60, rotation: 0 }
+                },
+                celtic: {
+                    present: { x: 40, y: 40, rotation: 0 },
+                    challenge: { x: 50, y: 40, rotation: 90 },
+                    crown: { x: 45, y: 10, rotation: 0 },
+                    foundation: { x: 45, y: 70, rotation: 0 },
+                    past: { x: 20, y: 40, rotation: 0 },
+                    future: { x: 70, y: 40, rotation: 0 },
+                    self: { x: 85, y: 15, rotation: 0 },
+                    environment: { x: 85, y: 30, rotation: 0 },
+                    hopes: { x: 85, y: 45, rotation: 0 },
+                    outcome: { x: 85, y: 60, rotation: 0 }
+                }
+            };
+            
             spreadTypes.forEach(spreadType => {
                 cardPositions[spreadType] = {};
                 initialCardPositions[spreadType] = {};
@@ -463,18 +504,23 @@
                         rotation = getCSSVariableNumeric(oldRotationVarName);
                     }
                     
+                    // Utiliser les valeurs par défaut spécifiques au tirage si elles sont disponibles
+                    const defaultX = defaultPositions[spreadType]?.[card.name]?.x || 50;
+                    const defaultY = defaultPositions[spreadType]?.[card.name]?.y || 50;
+                    const defaultRotation = defaultPositions[spreadType]?.[card.name]?.rotation || 0;
+                    
                     // Valeur par défaut si la variable n'existe pas ou n'est pas un nombre valide
                     cardPositions[spreadType][card.name] = {
-                        x: isNaN(x) ? 50 : x,
-                        y: isNaN(y) ? 50 : y,
-                        rotation: isNaN(rotation) ? 0 : rotation
+                        x: isNaN(x) ? defaultX : x,
+                        y: isNaN(y) ? defaultY : y,
+                        rotation: isNaN(rotation) ? defaultRotation : rotation
                     };
                     
                     // Stocker également les valeurs initiales pour comparaison ultérieure
                     initialCardPositions[spreadType][card.name] = {
-                        x: isNaN(x) ? 50 : x,
-                        y: isNaN(y) ? 50 : y,
-                        rotation: isNaN(rotation) ? 0 : rotation
+                        x: isNaN(x) ? defaultX : x,
+                        y: isNaN(y) ? defaultY : y,
+                        rotation: isNaN(rotation) ? defaultRotation : rotation
                     };
                 });
             });
@@ -605,8 +651,18 @@
                 };
             }
             
+            // Variable pour suivre l'état du glisser-déposer
+            let isDragging = true;
+            
             function onMouseMove(e) {
-                if (!selectedCard) return;
+                if (!selectedCard || !isDragging) return;
+                
+                // Vérifier si le bouton de la souris est toujours enfoncé
+                // Si buttons === 0, cela signifie qu'aucun bouton n'est enfoncé
+                if (e.buttons === 0) {
+                    onMouseUp();
+                    return;
+                }
                 
                 const rect = workspace.getBoundingClientRect();
                 
@@ -641,8 +697,10 @@
             }
 
             function onMouseUp() {
+                isDragging = false;
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
+                window.removeEventListener('blur', onWindowBlur);
                 
                 // Retirer la mise en évidence de la sortie après un court délai
                 setTimeout(() => {
@@ -652,9 +710,18 @@
                 // S'assurer que la sortie est à jour une dernière fois
                 updateOutput(false);
             }
+            
+            // Gérer la perte de focus de la fenêtre pendant le glissement
+            function onWindowBlur() {
+                // Terminer le glisser-déposer proprement quand la fenêtre perd le focus
+                if (isDragging) {
+                    onMouseUp();
+                }
+            }
 
             document.addEventListener('mousemove', onMouseMove);
             document.addEventListener('mouseup', onMouseUp);
+            window.addEventListener('blur', onWindowBlur);
             
             // Empêcher la propagation de l'événement pour éviter des comportements indésirables
             e.preventDefault();
@@ -758,21 +825,23 @@
         
         // Fonction pour générer les variables CSS des dimensions des cartes
         function updateCardSizeOutput() {
-            // Générer le CSS des dimensions
-            const css = generateCardDimensionsCSS();
-            
-            // Au lieu d'afficher une sortie temporaire, mettre à jour directement la sortie principale
-            // en appelant updateOutput qui mettra à jour la zone principale
+            // Ne pas générer le CSS ici, car updateOutput() va déjà le faire
+            // Mettre à jour directement l'affichage CSS via updateOutput
             updateOutput(false);
         }
 
         // Fonction pour comparer deux valeurs avec une tolérance pour les nombres
         function hasChanged(val1, val2, tolerance = 0.5) {
-            // Pour les nombres, utiliser une tolérance
-            if (typeof val1 === 'number' && typeof val2 === 'number') {
-                return Math.abs(val1 - val2) > tolerance;
+            // Convertir en nombres si possible pour assurer une comparaison cohérente
+            const num1 = typeof val1 === 'number' ? val1 : parseFloat(val1);
+            const num2 = typeof val2 === 'number' ? val2 : parseFloat(val2);
+            
+            // Si les deux valeurs peuvent être converties en nombres valides
+            if (!isNaN(num1) && !isNaN(num2)) {
+                return Math.abs(num1 - num2) > tolerance;
             }
-            // Pour les autres types, comparaison stricte
+            
+            // Pour les autres types ou si la conversion échoue, comparaison stricte
             return val1 !== val2;
         }
 
@@ -817,6 +886,18 @@
             // Réinitialiser le contrôle de rotation
             rotationSlider.value = 0;
             rotationValue.textContent = "0°";
+            
+            // Synchroniser les contrôleurs de dimensions avec les valeurs actuelles
+            const baseWidth = getCSSVariableNumeric('--card-base-width') || 95;
+            const ratio = getCSSVariableNumeric('--card-ratio') || 1.7;
+            const scaleFactor = getCSSVariableNumeric('--card-scale-factor') || 1;
+            
+            cardBaseWidth.value = baseWidth;
+            cardRatio.value = ratio;
+            cardScaleFactor.value = scaleFactor;
+            cardBaseWidthValue.textContent = baseWidth;
+            cardRatioValue.textContent = ratio;
+            cardScaleFactorValue.textContent = scaleFactor;
             
             // Adaptation spécifique par type de tirage
             switch(spreadType) {
@@ -903,22 +984,59 @@
                 // Si on est en mode déplacement, on n'affiche que le tirage actif
                 if (showOnlyActiveSpread && spreadType !== activeSpreadType) continue;
                 
-                // Ajouter un commentaire pour le type de tirage
-                css += `\n/* Variables pour le tirage ${spreads[spreadType].name} */\n`;
+                // Collecter les variables modifiés pour ce tirage
+                let spreadChanges = "";
+                let hasChangesInThisSpread = false;
                 
                 // Parcourir les cartes pour ce tirage
                 for (const card of spreads[spreadType].cards) {
-                    // Générer les variables de position au format standardisé
-                    let positionCSS = generatePositionCSS(spreadType, card);
+                    // Vérifier si la position existe dans cardPositions et initialCardPositions
+                    if (!cardPositions[spreadType] || 
+                        !cardPositions[spreadType][card.name] || 
+                        !initialCardPositions[spreadType] || 
+                        !initialCardPositions[spreadType][card.name]) {
+                        continue;
+                    }
                     
+                    const pos = cardPositions[spreadType][card.name];
+                    const initialPos = initialCardPositions[spreadType][card.name];
+                    
+                    // Vérifier si les valeurs de x, y ou rotation ont changé
+                    let positionCSS = "";
+                    
+                    // Vérifier si x a changé
+                    if (hasChanged(Math.round(pos.x), Math.round(initialPos.x))) {
+                        positionCSS += `--${spreadType}-position-${card.position}-x: ${Math.round(pos.x)}%;\n`;
+                    }
+                    
+                    // Vérifier si y a changé
+                    if (hasChanged(Math.round(pos.y), Math.round(initialPos.y))) {
+                        positionCSS += `--${spreadType}-position-${card.position}-y: ${Math.round(pos.y)}%;\n`;
+                    }
+                    
+                    // Vérifier si rotation a changé
+                    const rotation = pos.rotation || 0;
+                    const initialRotation = initialPos.rotation || 0;
+                    if (hasChanged(rotation, initialRotation)) {
+                        positionCSS += `--${spreadType}-position-${card.position}-rotation: ${rotation}deg;\n`;
+                    }
+                    
+                    // Si au moins une propriété a changé, ajouter à spreadChanges
                     if (positionCSS) {
-                        css += positionCSS;
+                        spreadChanges += positionCSS;
+                        hasChangesInThisSpread = true;
                         hasChangedValues = true;
                     }
                 }
+                
+                // N'ajouter le commentaire du tirage que si des modifications ont été faites
+                if (hasChangesInThisSpread) {
+                    css += `\n/* Variables modifiées pour le tirage ${spreads[spreadType].name} */\n`;
+                    css += spreadChanges;
+                }
             }
             
-            // Si aucune valeur n'a changé, afficher un message simple
+            // Si aucune valeur n'a changé, afficher un message par défaut
             if (!hasChangedValues) {
                 resetCSSOutput();
                 return;
@@ -969,18 +1087,44 @@
                 // Utiliser directement le contenu de la zone d'affichage qui contient déjà les variables modifiées
                 const modifiedCss = output.textContent;
                 
-                // Copier dans le presse-papier
-                navigator.clipboard.writeText(modifiedCss).catch(err => {
-                    console.error('Erreur lors de la copie: ', err);
-                });
+                if (modifiedCss.trim() === '' || modifiedCss.includes('Sélectionnez et déplacez les cartes')) {
+                    alert('Aucune modification à copier. Déplacez au moins une carte pour générer du CSS.');
+                    return;
+                }
                 
-                // Notification de copie
-                alert('CSS copié');
+                // Copier dans le presse-papier avec gestion d'erreur améliorée
+                navigator.clipboard.writeText(modifiedCss)
+                    .then(() => {
+                        alert('CSS copié avec succès');
+                    })
+                    .catch(err => {
+                        console.error('Erreur lors de la copie: ', err);
+                        alert('Erreur lors de la copie. Essayez de copier manuellement: Ctrl+A puis Ctrl+C');
+                        
+                        // Sélectionner le texte pour faciliter la copie manuelle
+                        const range = document.createRange();
+                        range.selectNodeContents(output);
+                        const selection = window.getSelection();
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    });
             });
         }
         
         // Démarrer l'application
         initApp();
+        
+        // Ajouter un message d'information au chargement
+        setTimeout(() => {
+            const welcomeMessage = 'Bienvenue dans l\'éditeur de positions de cartes!\n\n' +
+                '- Sélectionnez un type de tirage dans le menu déroulant\n' +
+                '- Déplacez les cartes à l\'aide de la souris\n' +
+                '- Ajustez la rotation avec le curseur\n' +
+                '- Les variables CSS modifiées s\'afficheront automatiquement\n' +
+                '- Seules les modifications par rapport aux valeurs initiales sont affichées\n\n' +
+                'Cliquez sur OK pour commencer.';
+            alert(welcomeMessage);
+        }, 500);
     </script>
 </body>
 </html> 
