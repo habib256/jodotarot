@@ -283,7 +283,6 @@
                     <label for="rotationSlider">Rotation: <span id="rotationValue" class="rotation-value">0°</span></label>
                     <input type="range" id="rotationSlider" min="0" max="360" value="0" step="5">
                 </div>
-                <button id="resetRotationBtn">Réinitialiser la rotation</button>
             </div>
             
             <div class="output-container">
@@ -366,7 +365,6 @@
         const posY = document.getElementById('posY');
         const rotationSlider = document.getElementById('rotationSlider');
         const rotationValue = document.getElementById('rotationValue');
-        const resetRotationBtn = document.getElementById('resetRotationBtn');
 
         /**
          * Fonctions utilitaires pour manipuler les variables CSS
@@ -554,28 +552,6 @@
             
             // Mise à jour immédiate
             updateOutput(true);
-        });
-        
-        // Réinitialiser la rotation
-        resetRotationBtn.addEventListener('click', function() {
-            if (!selectedCard) return;
-            
-            const name = selectedCard.dataset.name;
-            const spreadType = spreadSelect.value;
-            
-            // Réinitialiser la rotation
-            rotationSlider.value = 0;
-            rotationValue.textContent = "0°";
-            
-            // Appliquer la rotation à la carte
-            selectedCard.style.transform = `translate(-50%, -50%) rotate(0deg)`;
-            
-            // Sauvegarder la rotation
-            if (cardPositions[spreadType] && cardPositions[spreadType][name]) {
-                cardPositions[spreadType][name].rotation = 0;
-            }
-            
-            updateOutput();
         });
 
         // Fonction mise à jour avec option pour forcer un rendu immédiat et formatage optimisé
