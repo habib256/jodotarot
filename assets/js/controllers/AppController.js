@@ -43,6 +43,11 @@ class AppController {
       // Initialiser les contrôleurs
       this.initializeControllers();
       
+      // Charger le jeu de cartes
+      const state = this.stateManager.getState();
+      const deckToLoad = state.cardSet || 'set01';
+      await this.readingController.changeDeck(deckToLoad);
+      
       // Charger les ressources initiales
       await this.loadInitialResources();
       

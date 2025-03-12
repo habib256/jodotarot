@@ -178,28 +178,24 @@ class ConfigController {
   }
   
   /**
-   * Change le jeu de cartes utilisé
+   * Gère le changement de jeu de cartes
    * @param {Event} event - Événement de changement
    */
   handleCardSetChange(event) {
     const cardSet = event.target.value;
-    try {
-      // Annuler toute génération en cours
-      if (this.aiService && this.aiService.cancelCurrentInterpretation()) {
-        console.log('Génération annulée suite au changement de jeu de cartes');
-        // Suppression de l'affichage du message
-      }
-      
-      // Mettre à jour l'état
-      this.stateManager.setState({ cardSet });
-      
-      console.log(`✅ Jeu de cartes changé pour: ${cardSet}`);
-      
-      // Émettre un événement pour notifier le changement de jeu
-      document.dispatchEvent(new CustomEvent('deckId:changed', { detail: { deckId: cardSet } }));
-    } catch (error) {
-      console.error("Erreur lors du changement de jeu de cartes:", error);
+    
+    if (!cardSet) {
+      console.warn('⚠️ Valeur de jeu de cartes non spécifiée');
+      return;
     }
+    
+    // Mettre à jour l'état avec la nouvelle valeur de cardSet
+    this.stateManager.setState({ cardSet });
+    
+    console.log(`✅ Jeu de cartes changé pour: ${cardSet}`);
+    
+    // Déclencher un événement pour informer les autres composants
+    document.dispatchEvent(new CustomEvent('deckId:changed', { detail: { deckId: cardSet } }));
   }
   
   /**

@@ -79,11 +79,12 @@ class ReadingController {
       });
     }
     
-    // Écouter les changements de jeu de cartes
+    // Écouter les changements de jeu
     document.addEventListener('deckId:changed', async (event) => {
       console.log(`🎴 Changement de jeu détecté: ${event.detail.deckId}`);
+      
       try {
-        // Charger le nouveau jeu
+        // Mise à jour pour utiliser cardSet au lieu de deckId
         await this.changeDeck(event.detail.deckId);
         console.log(`✅ Nouveau jeu chargé: ${event.detail.deckId}`);
       } catch (error) {
@@ -188,7 +189,7 @@ class ReadingController {
           console.log(`📊 ${deck.getAllCards().length} cartes chargées au total`);
           
           // Mettre à jour l'état
-          this.stateManager.setState({ deckId: 'set01' });
+          this.stateManager.setState({ cardSet: 'set01' });
         } catch (error) {
           console.error("❌ Erreur lors du chargement du jeu par défaut:", error);
           // Afficher l'erreur dans l'interface
@@ -691,17 +692,16 @@ class ReadingController {
   }
   
   /**
-   * Change le jeu de cartes utilisé pour les tirages
+   * Change le jeu de cartes actuel
    * @param {string} deckId - Identifiant du nouveau jeu
    */
   async changeDeck(deckId) {
     try {
       console.log(`🔄 Chargement du jeu ${deckId}...`);
       
-      // Réinitialiser l'état actuel
-      this.currentReading = [];
+      // Vérifier que le jeu existe
+      if (!deckId) throw new Error('Identifiant de jeu non spécifié');
       
-      // Charger le nouveau jeu
       const newDeck = await this.deckService.loadDeck(deckId);
       if (!newDeck) {
         throw new Error(`Échec du chargement du jeu ${deckId}`);
@@ -709,15 +709,11 @@ class ReadingController {
       
       console.log(`✅ Jeu ${deckId} chargé avec succès - ${newDeck.getAllCards().length} cartes disponibles`);
       
-      // Réinitialiser l'affichage
-      this.showSpread(this.stateManager.getState().spreadType || 'cross');
+      // Mettre à jour l'état avec cardSet au lieu de deckId
+      this.stateManager.setState({ cardSet: deckId });
       
-      // Si un tirage a déjà été effectué, effectuer un nouveau tirage
-      const previousCardDrawn = this.stateManager.getState().currentCardsDrawn;
-      if (previousCardDrawn && previousCardDrawn !== '[]') {
-        console.log('🎴 Des cartes ont été tirées précédemment, mise à jour de l\'affichage...');
-        this.updateCardDisplay();
-      }
+      // Mettre à jour l'affichage si nécessaire
+      this.updateCardDisplay();
       
       return newDeck;
     } catch (error) {

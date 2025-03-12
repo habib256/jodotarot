@@ -8,200 +8,249 @@ L'intégration de l'intelligence artificielle est au cœur de JodoTarot, permett
 
 ```mermaid
 graph TD
-    A[ReadingController] -->|Demande interprétation| B[AIService]
-    B -->|Communication API| C[OpenAI API]
-    B -->|Communication locale| D[Ollama API]
-    B -->|Fallback| E[Prompt manuel]
-    B -->|Récupère données| F[StateManager]
-    G[ConfigController] -->|Configure modèles| B
-    H[Personas] -->|Fournit style| B
-    I[DeckService] -->|Fournit cartes tirées| B
+    A[AIService] -->|Appel API| B[OpenAI]
+    A -->|Appel API| C[Ollama]
+    A -->|Appel API| D[Anthropic]
+    A -->|Utilise| E[Prompt Builder]
+    F[ConfigController] -->|Configure| A
+    A -->|Stocke| G[Cache des Réponses]
+    H[ReadingController] -->|Requête| A
+    A -->|Récupère| I[Persona actif]
 ```
 
-### Composants Principaux
+## Fournisseurs d'IA Supportés
 
-1. **AIService** (`assets/js/services/AIService.js`, 883 lignes)
-   - Service central gérant toutes les interactions avec les modèles d'IA
-   - Interface unifiée indépendante du fournisseur d'IA utilisé
-   - Gestion des erreurs et des fallbacks
+JodoTarot prend en charge trois fournisseurs d'IA principaux :
 
-2. **Intégration OpenAI** (`assets/js/api.js`, section OpenAI)
-   - Communication avec l'API OpenAI
-   - Support de différents modèles (GPT-3.5, GPT-4, etc.)
-   - Gestion du rate-limiting et des erreurs spécifiques
+### 1. OpenAI
+- **Modèles disponibles** : GPT-4o, GPT-4, GPT-3.5-Turbo, GPT-4o-mini
+- **Configuration** : Nécessite une clé API valide
+- **Format** : Utilise l'API standard d'OpenAI avec streaming
 
-3. **Intégration Ollama** (`assets/js/api.js`, section Ollama)
-   - Communication avec l'API Ollama pour modèles locaux
-   - Détection automatique des modèles disponibles
-   - Optimisations pour exécution locale
+### 2. Ollama (Local)
+- **Modèles disponibles** : Tous les modèles installés localement via Ollama
+- **Configuration** : Nécessite une installation fonctionnelle d'Ollama sur la machine
+- **Format** : Utilise l'API compatible avec la spécification OpenAI
 
-4. **Système de Prompt** (`assets/js/prompt.js`, 72 lignes)
-   - Construction des prompts dynamiques pour l'IA
-   - Intégration des traductions et des styles des personas
-   - Personnalisation selon le type de tirage
+### 3. Anthropic
+- **Modèles disponibles** : Claude-3 Opus
+- **Configuration** : Nécessite une clé API valide
+- **Format** : Utilise l'API standard d'Anthropic
 
-## Fonctionnement du Système
+## Implémentation
 
-### 1. Initialisation et Configuration
+L'intégration IA est implémentée via plusieurs composants clés :
 
-L'initialisation du système d'IA se fait lors du chargement de l'application :
+### AIService
 
-```javascript
-// Extrait simplifié de l'initialisation
-const aiService = new AIService(stateManager, translationService);
-aiService.initialize()
-  .then(() => {
-    // Modèles détectés et configurés
-    renderAvailableModels(aiService.getAvailableModels());
-  })
-  .catch(error => {
-    // Gestion des erreurs d'initialisation
-    fallbackToPromptMode();
-  });
-```
-
-### 2. Processus d'Interprétation
-
-Le flux d'une demande d'interprétation suit ces étapes :
-
-1. **Préparation des données du tirage**
-   - Récupération des cartes tirées
-   - Positions dans le tirage
-   - Significations traditionnelles
-
-2. **Construction du prompt**
-   - Intégration du style du persona sélectionné
-   - Adaptation au type de tirage
-   - Inclusion des instructions spécifiques
-
-3. **Sélection du modèle d'IA**
-   - Priorité aux modèles configurés
-   - Fallback automatique si nécessaire
-
-4. **Envoi de la requête**
-   - Gestion des paramètres (température, etc.)
-   - Suivi de l'état de la requête
-
-5. **Traitement de la réponse**
-   - Parsing du contenu
-   - Formatage pour l'affichage
-   - Gestion des erreurs potentielles
-
-### 3. Exemple de Construction de Prompt
+Classe centrale gérant toutes les interactions avec les services d'IA, située dans `assets/js/services/AIService.js`.
 
 ```javascript
-// Extrait de prompt.js
-function buildTarotPrompt(cards, positions, persona, language) {
-  const basePrompt = getTranslation('tarotPromptBase', language);
-  const cardDetails = cards.map((card, index) => {
-    const position = positions[index];
-    return `${card.name} en position ${position.name} (${getTranslation(position.meaningKey, language)})`;
-  }).join('\n');
+class AIService {
+  constructor(stateManager) {
+    this.stateManager = stateManager;
+    this.apiKey = this.loadApiKey() || API_KEY;
+    this.interpreterCache = {};  // Cache pour éviter des appels redondants
+    // ...
+  }
   
-  const personaStyle = persona.getPromptStyle(language);
-  
-  return `${basePrompt}\n\nCartes tirées:\n${cardDetails}\n\n${personaStyle}`;
+  // Méthodes principales
+  async getInterpretation(question, cards, persona, language, spread) { /* ... */ }
+  async getOpenAIResponse(prompt, systemPrompts, model) { /* ... */ }
+  async getOllamaResponse(prompt, systemPrompts, model) { /* ... */ }
+  async getAnthropicResponse(prompt, systemPrompts, model) { /* ... */ }
+  async testModelAvailability(modelName) { /* ... */ }
 }
 ```
 
-## Gestion des Fournisseurs d'IA
+### Mécanisme de Construction des Prompts
 
-### OpenAI
-
-- **Modèles supportés** : GPT-3.5-turbo, GPT-4
-- **Configuration** : Clé API stockée localement
-- **Particularités** : 
-  - Meilleure qualité d'interprétation
-  - Nécessite une connexion internet
-  - Coût associé aux requêtes
-
-### Ollama
-
-- **Modèles supportés** : Llama2, Mistral, etc.
-- **Configuration** : Détection automatique des modèles installés
-- **Particularités** :
-  - Exécution locale (pas de connexion internet requise)
-  - Performance variable selon matériel
-  - Gratuit mais nécessite installation préalable
-
-### Mode Prompt Manuel
-
-- **Fonctionnement** : Affichage du prompt à l'utilisateur pour utilisation externe
-- **Utilisation** : Fallback en cas d'échec des autres méthodes
-- **Avantages** : Solution universelle sans dépendance
-
-## Personnalisation via Personas
-
-Chaque persona définit un style d'interprétation spécifique :
+Le système utilise un mécanisme sophistiqué pour générer des prompts adaptés à chaque modèle, persona et langue.
 
 ```javascript
-// Extrait de OraclePersona.js
-getPromptStyle(language) {
-  return getTranslation('oraclePromptStyle', language) + 
-    "\nTon style est mystique, sibyllin et empli de métaphores. " +
-    "Tu parles comme si tu voyais au-delà du voile de la réalité.";
+import { getPersonaPrompt } from './models/personas/index.js';
+import { getMetaPrompt, enrichirPromptContextuel } from './prompt.js';
+
+// Construction d'un prompt
+function buildPrompt(persona, cards, question, spreadType, language) {
+  // Obtenir le prompt spécifique au persona
+  const personaPrompt = getPersonaPrompt(persona, language);
+  
+  // Enrichir avec le contexte des cartes
+  const cardsContext = formatCardsForPrompt(cards, spreadType);
+  
+  // Ajouter le meta-prompt qui contient les instructions générales
+  const metaPrompt = getMetaPrompt(language);
+  
+  // Enrichir avec la question spécifique
+  return enrichirPromptContextuel(question, 
+    `${metaPrompt}\n${personaPrompt}\n${cardsContext}`, 
+    language);
 }
 ```
 
-Ces instructions stylistiques sont intégrées au prompt envoyé à l'IA, permettant d'obtenir des interprétations variées selon le persona choisi.
+### Gestion des Erreurs et Résilience
 
-## Gestion des Erreurs et Fallbacks
+Le système intègre des mécanismes robustes pour gérer les erreurs de connexion ou d'API :
 
-Le système implémente une cascade de fallbacks pour assurer la continuité de service :
+1. **Timeouts adaptés** : Délais appropriés pour chaque type d'opération
+2. **Retries automatiques** : Tentatives multiples en cas d'échec temporaire
+3. **Fallback entre modèles** : Possibilité de basculer vers un modèle alternatif
+4. **Détection de modèles incomplets** : Gestion des réponses tronquées
 
-1. Tentative avec le modèle principal configuré
-2. En cas d'échec, essai avec modèles alternatifs disponibles
-3. Si tous les modèles échouent, proposition du mode Prompt manuel
-4. Messages d'erreur explicites à l'utilisateur
+```javascript
+// Exemple de fetchWithRetry avec timeout
+async function fetchWithRetry(url, options, maxRetries = 2, timeoutMs = 5000) {
+  let retries = 0;
+  
+  while (retries <= maxRetries) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+      
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      return response;
+    } catch (error) {
+      retries++;
+      if (retries > maxRetries) throw error;
+      
+      console.warn(`Tentative #${retries} échouée, nouvel essai...`);
+      await new Promise(r => setTimeout(r, 1000));
+    }
+  }
+}
+```
 
-## Configuration et Paramètres
+## Configuration et Utilisation
 
-Les paramètres d'IA sont gérés via le ConfigController :
+### Initialisation du Service
 
-- Choix du fournisseur d'IA (OpenAI/Ollama)
-- Sélection du modèle spécifique
-- Paramètres de génération (température, tokens max)
-- Configuration des clés API
+```javascript
+// Exemple d'initialisation dans main.js
+import AIService from './services/AIService.js';
 
-Ces paramètres sont persistés dans le StateManager et restaurés entre les sessions.
+const stateManager = new StateManager();
+const aiService = new AIService(stateManager);
 
-## Optimisations Techniques
+// Vérification des modèles disponibles
+await aiService.checkAvailableModels();
+```
 
-### Performance
+### Exécution d'une Requête d'Interprétation
 
-- **Mise en cache des réponses** pour tirages similaires
-- **Gestion optimisée des tokens** pour réduire les coûts
-- **Streaming des réponses** pour améliorer l'expérience utilisateur
+```javascript
+// Exemple d'utilisation dans ReadingController
+async interpretReading() {
+  const state = this.stateManager.getState();
+  
+  try {
+    // Mettre à jour l'état pour indiquer le chargement
+    this.stateManager.setState({ isLoading: true });
+    
+    const interpretation = await this.aiService.getInterpretation(
+      state.question,
+      state.selectedCards,
+      state.persona,
+      state.language,
+      state.spreadType
+    );
+    
+    // Mettre à jour l'état avec l'interprétation
+    this.stateManager.setState({ 
+      interpretation,
+      isLoading: false
+    });
+    
+    // Afficher l'interprétation
+    this.displayInterpretation(interpretation);
+  } catch (error) {
+    console.error('Erreur lors de l\'interprétation:', error);
+    this.stateManager.setState({ 
+      error: error.message,
+      isLoading: false
+    });
+  }
+}
+```
 
-### Sécurité
+## Streaming des Réponses
 
-- **Stockage local** des clés API
-- **Validation des inputs** avant envoi à l'IA
-- **Sanitization des réponses** pour éviter injections
+JodoTarot utilise le streaming des réponses pour afficher les interprétations progressivement, améliorant l'expérience utilisateur :
 
-## Évolutions Futures
+```javascript
+async function streamResponse(response, outputElement) {
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    
+    buffer += decoder.decode(value, { stream: true });
+    
+    // Traiter les lignes complètes (format SSE)
+    const lines = buffer.split('\n');
+    buffer = lines.pop();
+    
+    for (const line of lines) {
+      if (line.startsWith('data: ')) {
+        const jsonStr = line.slice(6);
+        if (jsonStr === '[DONE]') continue;
+        
+        try {
+          const json = JSON.parse(jsonStr);
+          const content = json.choices[0]?.delta?.content || '';
+          if (content) {
+            outputElement.innerHTML += formatStreamingResponse(content);
+            scrollToBottom();
+          }
+        } catch (e) {
+          console.warn('Erreur de parsing JSON:', e);
+        }
+      }
+    }
+  }
+}
+```
 
-- Support de nouvelles API (Claude, etc.)
-- Interprétations multi-modales (avec images)
-- Amélioration de la contextualisation des tirages
-- Support avancé pour les arcanes mineurs
-- Système de mémoire pour les interprétations précédentes
+## Détection et Configuration des Modèles
 
-## Bonnes Pratiques
+Le système détecte automatiquement les modèles disponibles, particulièrement pour Ollama :
 
-Pour l'extension ou la modification du système d'IA :
+```javascript
+async function detectAvailableModels() {
+  // Modèles OpenAI et Anthropic toujours disponibles si API key présente
+  const models = {
+    openai: ['gpt-3.5-turbo', 'gpt-4', 'gpt-4o', 'gpt-4o-mini'],
+    anthropic: ['claude-3-opus-20240229'],
+    ollama: []
+  };
+  
+  // Tester la connexion à Ollama
+  try {
+    const ollamaTest = await verifierConnexionOllama();
+    if (ollamaTest.success) {
+      // Récupérer les modèles Ollama
+      models.ollama = await obtenirModelesOllama();
+    }
+  } catch (error) {
+    console.warn('Ollama non disponible:', error.message);
+  }
+  
+  return models;
+}
+```
 
-1. **Toujours utiliser AIService** comme point d'entrée
-2. **Respecter l'interface commune** pour ajouter de nouveaux fournisseurs
-3. **Gérer les cas d'erreur** à chaque niveau
-4. **Maintenir la séparation** entre construction de prompt et appel d'API
-5. **Documenter les particularités** de chaque modèle utilisé
+## Bonnes Pratiques pour l'Utilisation des APIs IA
 
-## Références
-
-- [Documentation OpenAI](https://platform.openai.com/docs/api-reference)
-- [Documentation Ollama](https://ollama.ai/library)
-- [Bonnes Pratiques](../standards/bonnes-pratiques.md)
-- [Gestionnaire d'État](state-manager.md)
-- [Système de Personas](personas.md)
-- [Construction des Prompts](construction-prompts.md) 
+1. **Gestion des clés API** : Stockage sécurisé, rotation périodique
+2. **Économie de tokens** : Optimisation des prompts pour réduire la consommation
+3. **Mise en cache** : Réutilisation des résultats pour les mêmes entrées
+4. **Monitoring** : Surveillance de l'utilisation et des erreurs
+5. **Gestion du quota** : Vérification préventive des limites de quotas 

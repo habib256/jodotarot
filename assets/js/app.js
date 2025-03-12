@@ -112,110 +112,19 @@ const cardsData = {
 
 /**
  * Fonction pour rechercher et charger les modèles Ollama locaux disponibles
+ * @deprecated Utiliser plutôt ConfigController.loadOllamaModels()
  */
 async function chargerModelesOllama() {
+  console.warn("Cette fonction est dépréciée. Utiliser ConfigController.loadOllamaModels() à la place.");
+  
+  // Importer le ConfigController si besoin
   try {
-    // Tester la connexion à Ollama
-    const connectivityResult = await testOllamaConnectivity();
-    
-    if (connectivityResult.success) {
-      // Si la connexion est établie, récupérer la liste des modèles disponibles
-      const modeles = await obtenirModelesOllama();
-      
-      // Récupérer la liste déroulante des modèles
-      const selectModele = document.getElementById('ia-model');
-      
-      // Sauvegarder le modèle actuellement sélectionné
-      const modelActuel = selectModele.value;
-      
-      // Vider la liste
-      while (selectModele.options.length > 0) {
-        selectModele.remove(0);
-      }
-      
-      // Ajouter l'option par défaut d'OpenAI
-      const optionGPT = document.createElement('option');
-      optionGPT.value = 'openai:gpt-4o';
-      optionGPT.textContent = 'GPT-4o (OpenAI)';
-      selectModele.appendChild(optionGPT);
-      
-      // Ajouter l'option 3.5 d'OpenAI
-      const optionGPT35 = document.createElement('option');
-      optionGPT35.value = 'openai:gpt-3.5-turbo';
-      optionGPT35.textContent = 'GPT-3.5 (OpenAI)';
-      selectModele.appendChild(optionGPT35);
-      
-      // Ajouter l'option Claude
-      const optionClaude = document.createElement('option');
-      optionClaude.value = 'anthropic:claude-3-opus-20240229';
-      optionClaude.textContent = 'Claude-3 Opus (Anthropic)';
-      selectModele.appendChild(optionClaude);
-      
-      // Ajouter les modèles Ollama disponibles
-      if (modeles && modeles.length > 0) {
-        // Trier les modèles par ordre alphabétique
-        modeles.sort((a, b) => a.name.localeCompare(b.name));
-        
-        modeles.forEach(modele => {
-          const option = document.createElement('option');
-          option.value = `ollama:${modele.name}`;
-          option.textContent = `${modele.name} (Ollama - Local)`;
-          selectModele.appendChild(option);
-        });
-        
-        console.log(`Modèles Ollama chargés: ${modeles.length} modèles trouvés.`);
-      } else {
-        console.warn('Aucun modèle Ollama disponible.');
-      }
-      
-      // Restaurer le modèle précédemment sélectionné, si disponible
-      if (Array.from(selectModele.options).some(option => option.value === modelActuel)) {
-        selectModele.value = modelActuel;
-      }
-      
-      // Afficher un message de statut positif
-      const statusElement = document.getElementById('status-message');
-      if (statusElement) {
-        statusElement.textContent = "Ollama connecté avec succès.";
-        statusElement.style.display = 'block';
-        statusElement.className = 'success-message';
-        
-        // Masquer le message après 3 secondes
-        setTimeout(() => {
-          statusElement.style.display = 'none';
-        }, 3000);
-      }
-    } else {
-      // En cas d'échec de connexion
-      console.warn('Connexion à Ollama échouée:', connectivityResult.message);
-      
-      // Afficher un message d'erreur
-      const statusElement = document.getElementById('status-message');
-      if (statusElement) {
-        statusElement.textContent = connectivityResult.message || "Impossible de se connecter au serveur Ollama.";
-        statusElement.style.display = 'block';
-        statusElement.className = 'error-message';
-        
-        // Ajouter des suggestions si disponibles
-        if (connectivityResult.suggestions && connectivityResult.suggestions.length > 0) {
-          const suggestionsText = connectivityResult.suggestions
-            .map(s => s.startsWith('warnings.') ? getTranslation(s, document.documentElement.lang) : s)
-            .join(' | ');
-          
-          statusElement.textContent += ` Suggestions: ${suggestionsText}`;
-        }
-      }
-    }
+    const ConfigController = await import('./controllers/ConfigController.js');
+    const configController = new ConfigController();
+    return await configController.loadOllamaModels();
   } catch (error) {
     console.error("Erreur lors du chargement des modèles Ollama:", error);
-    
-    // Afficher un message d'erreur
-    const statusElement = document.getElementById('status-message');
-    if (statusElement) {
-      statusElement.textContent = `Erreur: ${error.message}`;
-      statusElement.style.display = 'block';
-      statusElement.className = 'error-message';
-    }
+    return false;
   }
 }
 

@@ -84,6 +84,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     await stateManager.initialize();
     console.log('✅ État chargé avec succès');
     
+    // Définir le jeu de cartes par défaut si non défini
+    // Utilisez cardSet au lieu de deckId pour être cohérent avec le schéma d'état mis à jour
+    stateManager.setState({ cardSet: 'set01' });
+    
     // Créer les services après l'initialisation de l'état
     aiService = new AIService(stateManager);
     deckService = new DeckService(stateManager);
@@ -126,7 +130,7 @@ async function loadInitialResources() {
         await deckService.loadDeck('set01');
         console.log("✅ Jeu de cartes par défaut (set01) chargé avec succès");
       }
-      stateManager.setState({ deckId: 'set01' });
+      stateManager.setState({ cardSet: 'set01' });
     } catch (deckError) {
       console.error("❌ Erreur lors du chargement du jeu de cartes par défaut:", deckError);
       showErrorMessage('Erreur lors du chargement du jeu de cartes');

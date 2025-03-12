@@ -24,12 +24,8 @@ class StateManager {
       cardSet: {
         type: 'string',
         enum: ['set01', 'set02'],
-        default: 'set01'
-      },
-      deckId: {
-        type: 'string',
-        enum: ['set01', 'set02'],
-        default: 'set01'
+        default: 'set01',
+        description: 'Identifiant du jeu de cartes (anciennement séparé en cardSet et deckId)'
       },
       spreadType: {
         type: 'string',
@@ -326,15 +322,6 @@ class StateManager {
       // Tracer les mises à jour importantes
       if (importantUpdates.length > 0) {
         console.log('🔄 Mise à jour de clés importantes:', importantUpdates.map(key => `${key}: ${updates[key]}`));
-      }
-      
-      // Synchroniser cardSet et deckId si l'un des deux change
-      if (updates.cardSet && updates.cardSet !== this.state.cardSet) {
-        updates.deckId = updates.cardSet;
-        console.log(`🔄 Synchronisation automatique: deckId <- cardSet (${updates.cardSet})`);
-      } else if (updates.deckId && updates.deckId !== this.state.deckId) {
-        updates.cardSet = updates.deckId;
-        console.log(`🔄 Synchronisation automatique: cardSet <- deckId (${updates.deckId})`);
       }
       
       // Valider chaque mise à jour

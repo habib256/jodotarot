@@ -56,35 +56,28 @@ class StateManager {
 
 ## Domaines d'État
 
-L'état est organisé en domaines fonctionnels distincts :
+L'état est organisé dans une structure plate avec des propriétés spécifiques :
 
-1. **`config`** : Configuration générale de l'application
-   - Langue actuelle
-   - Préférences d'interface
-   - Configuration des API
+1. **Configuration générale**
+   - `language` : Langue actuelle (fr, en, es, de, it, zh)
+   - `persona` : Persona sélectionné pour l'interprétation
+   - `modelStatus` : État actuel du modèle d'IA
+   - `availableModels` : Liste des modèles disponibles par type
 
-2. **`reading`** : État du tirage courant
-   - Cartes tirées
-   - Type de tirage
-   - Persona sélectionné
-   - Question de l'utilisateur
+2. **Tirage courant**
+   - `cardSet` : Jeu de cartes sélectionné
+   - `spreadType` : Type de tirage (cross, horseshoe, love, celticCross)
+   - `selectedCards` : Cartes tirées
+   - `question` : Question de l'utilisateur
+   - `interpretation` : Interprétation générée
 
-3. **`ai`** : État des services d'IA
-   - Modèles disponibles
-   - Modèle sélectionné
-   - État de la connexion
-   - Historique des requêtes
-
-4. **`ui`** : État de l'interface utilisateur
-   - Sections visibles/cachées
-   - Mode d'affichage
-   - État des animations
-   - Positions de défilement
-
-5. **`history`** : Historique des tirages
-   - Tirages précédents
-   - Interprétations sauvegardées
-   - Favoris
+3. **Interface utilisateur**
+   - `isLoading` : Indique si une opération est en cours
+   - `error` : Message d'erreur éventuel
+   - `isCardEnlarged` : Indique si une carte est agrandie
+   - `enlargedCardId` : ID de la carte agrandie
+   - `currentSpreadType` : Type de tirage actuel
+   - `currentCardsDrawn` : Cartes actuellement tirées
 
 ## Utilisation du StateManager
 
@@ -93,22 +86,18 @@ L'état est organisé en domaines fonctionnels distincts :
 ```javascript
 // Extrait de l'initialisation dans main.js
 const stateManager = new StateManager();
-stateManager.registerValidator('config', 'language', validateLanguage);
-stateManager.registerValidator('reading', 'cards', validateCards);
-
-// Chargement initial des données
-stateManager.initialize();
+await stateManager.initialize();
 ```
 
 ### Lecture de l'État
 
 ```javascript
 // Obtenir une valeur
-const currentLanguage = stateManager.get('config', 'language');
-const drawnCards = stateManager.get('reading', 'cards');
+const currentLanguage = stateManager.getState().language;
+const drawnCards = stateManager.getState().selectedCards;
 
-// Vérifier l'existence
-if (stateManager.has('reading', 'interpretation')) {
+// Vérifier l'existence d'une propriété
+if (stateManager.getState().interpretation) {
   // ...
 }
 ```
@@ -117,27 +106,27 @@ if (stateManager.has('reading', 'interpretation')) {
 
 ```javascript
 // Définir une valeur
-stateManager.set('config', 'language', 'fr');
+stateManager.setState({ language: 'fr' });
 
-// Mettre à jour un objet
-stateManager.update('reading', 'cards', cards => [...cards, newCard]);
-
-// Réinitialiser un domaine
-stateManager.reset('reading');
+// Mettre à jour plusieurs propriétés
+stateManager.setState({ 
+  spreadType: 'cross',
+  question: 'Ma nouvelle question'
+});
 ```
 
 ### Abonnement aux Changements
 
 ```javascript
-// S'abonner aux changements de langue
-const languageSubscriberId = stateManager.subscribe('config', (domain, changes) => {
-  if ('language' in changes) {
-    updateUILanguage(changes.language);
+// S'abonner aux changements d'état
+const subscriberId = stateManager.subscribe((newState, oldState) => {
+  if (newState.language !== oldState.language) {
+    updateUILanguage(newState.language);
   }
 });
 
 // Se désabonner
-stateManager.unsubscribe('config', languageSubscriberId);
+stateManager.unsubscribe(subscriberId);
 ```
 
 ## Persistance des Données
