@@ -1,15 +1,23 @@
 /**
  * Service gérant les interactions avec différents modèles d'IA
  * Centralise les appels API et la gestion des réponses
+ * 
+ * IMPORTANT: Toutes les configurations doivent être importées depuis /assets/js/config.js
+ * Ne pas redéfinir de constantes de configuration ici - importer uniquement depuis config.js
  */
 import PERSONAS, { getPersonaPrompt } from '../models/personas/index.js';
 import { createSpread } from '../models/spreads/index.js';
-import { API_KEY, API_URL_OPENAI, API_URL_OLLAMA, API_URL_OLLAMA_TAGS, getOllamaModelFormat, DEBUG_LEVEL } from '../config.js';
+import { API_KEY, API_URL_OPENAI, API_URL_OLLAMA, API_URL_OLLAMA_TAGS, getOllamaModelFormat, DEBUG_LEVEL, TIMEOUTS } from '../config.js';
 import { getMetaPrompt, getEmphasisText, enrichirPromptContextuel } from '../prompt.js';
 import { testOllamaConnectivity } from '../api.js';
 
 class AIService {
-  constructor() {
+  /**
+   * @param {StateManager} stateManager - Instance du gestionnaire d'état
+   */
+  constructor(stateManager) {
+    this.stateManager = stateManager;
+    
     // D'abord, essayer de charger la clé API depuis le localStorage
     const savedApiKey = this.loadApiKey();
     
@@ -99,41 +107,23 @@ class AIService {
    */
   async testModelAvailability(modelName) {
     try {
-      console.log(`Test de disponibilité du modèle: ${modelName}`);
-      
-      // Résultat par défaut
       const result = {
         available: false,
-        status: 'error',
+        status: 'pending',
         modelName,
         message: '',
         details: {},
         suggestions: []
       };
-      
-      // Vérifier le format du modèle
-      if (!modelName) {
-        result.message = 'Aucun modèle spécifié';
-        return result;
-      }
-      
-      // Cas spécial pour le mode "prompt" : toujours disponible
-      if (modelName === 'prompt') {
-        result.available = true;
-        result.status = 'success';
-        result.message = 'Mode Prompt disponible';
-        return result;
-      }
-      
-      // Définir un timeout pour le test de connectivité
-      // Timeout plus long pour les modèles plus complexes comme llama3.1
-      const timeout = modelName.includes('llama3.1') ? 20000 : 10000; // 20 secondes pour llama3.1, 10 secondes pour les autres
+
+      // Utiliser les nouveaux timeouts configurés
+      const timeout = modelName.includes('llama3.1') ? TIMEOUTS.OLLAMA_MODEL_LOAD : TIMEOUTS.OLLAMA_CONNECT;
       
       // Gestion des modèles Ollama (y compris avec format llama3.1:latest)
       if (modelName.startsWith('ollama:') || modelName.includes(':')) {
         const ollamaModelName = modelName.startsWith('ollama:') 
           ? modelName.replace('ollama:', '') 
-          : modelName; // Pour gérer les cas comme llama3.1:latest directement
+          : modelName;
         
         try {
           // Utiliser Promise.race pour ajouter un timeout
@@ -153,102 +143,27 @@ class AIService {
           if (!availability.success) {
             result.suggestions.push('Vérifier que le serveur Ollama est bien démarré');
             result.suggestions.push('Vérifier que le modèle est correctement installé dans Ollama');
+            result.suggestions.push('Vérifier la mémoire système disponible');
           }
         } catch (error) {
-          console.warn(`Erreur lors du test de connectivité pour ${modelName}:`, error);
-          result.message = `Erreur lors du test du modèle: ${error.message}`;
-          result.suggestions.push('Vérifier que le serveur Ollama est bien démarré');
-          
-          // Si c'est un timeout, ajouter des suggestions spécifiques
-          if (error.message.includes('Timeout')) {
-            result.message = `Le serveur Ollama ne répond pas dans le délai imparti (${timeout/1000}s)`;
-            result.suggestions.push('Vérifier la charge du serveur Ollama');
-            result.suggestions.push('Augmenter le timeout dans les paramètres');
-          }
+          console.error('Erreur lors du test de connectivité pour', modelName, ':', error);
+          result.status = 'error';
+          result.message = error.message;
+          result.suggestions.push('Réessayer dans quelques instants');
+          result.suggestions.push('Vérifier la mémoire système disponible');
         }
-        
-        // Retourner explicitement le résultat pour les modèles Ollama
-        return result;
-      } else if (modelName.startsWith('openai/')) {
-        // Test de connectivité pour OpenAI
-        const modelId = modelName.replace('openai/', '');
-        result.details.type = 'openai';
-        result.details.modelId = modelId;
-        
-        if (!this.apiKey) {
-          result.message = 'Clé API OpenAI manquante';
-          result.suggestions.push('Configurer une clé API');
-          return result;
-        }
-        
-        try {
-          const response = await this.fetchWithRetry(
-            `${this.baseUrl.openai}/models`, 
-            {
-              headers: {
-                'Authorization': `Bearer ${this.apiKey}`,
-                'Content-Type': 'application/json'
-              }
-            },
-            1,  // maxRetries
-            5000 // timeoutMs: 5 secondes
-          );
-          
-          if (!response.ok) {
-            result.message = `Erreur OpenAI: ${response.status} ${response.statusText}`;
-            result.details.statusCode = response.status;
-            
-            // Suggestions spécifiques selon le code d'erreur
-            if (response.status === 401) {
-              result.suggestions.push('Vérifier la validité de la clé API');
-            } else if (response.status === 429) {
-              result.suggestions.push('Limite de requêtes atteinte, réessayer plus tard');
-            } else {
-              result.suggestions.push('Vérifier la connexion au service OpenAI');
-            }
-            
-            return result;
-          }
-          
-          // API accessible, vérifier si le modèle spécifique est disponible
-          const data = await response.json();
-          const availableModels = data.data || [];
-          const modelExists = availableModels.some(m => m.id === modelId);
-          
-          if (modelExists) {
-            result.available = true;
-            result.status = 'success';
-            result.message = `Modèle ${modelId} disponible`;
-          } else {
-            result.message = `Modèle ${modelId} non trouvé dans la liste des modèles disponibles`;
-            result.suggestions.push('Vérifier le nom du modèle spécifié');
-            result.suggestions.push('Utiliser un modèle standard comme gpt-3.5-turbo');
-          }
-          
-          return result;
-        } catch (error) {
-          result.message = `Erreur de connexion à OpenAI: ${error.message}`;
-          result.suggestions.push('Vérifier la connexion internet');
-          result.suggestions.push('Vérifier la disponibilité des serveurs OpenAI');
-          return result;
-        }
-        
-      } else {
-        // Type de modèle non reconnu
-        result.message = `Type de modèle non reconnu: ${modelName}`;
-        result.details.invalidPrefix = true;
-        result.suggestions.push('Utiliser un préfixe valide: openai/ ou ollama:');
-        return result;
       }
+      
+      return result;
     } catch (error) {
-      console.error(`Erreur lors du test de disponibilité pour ${modelName}:`, error);
+      console.error('Erreur lors du test de disponibilité du modèle:', error);
       return {
         available: false,
         status: 'error',
         modelName,
-        message: `Erreur inattendue: ${error.message}`,
-        details: { unexpectedError: true },
-        suggestions: ['Vérifier les logs pour plus de détails']
+        message: error.message,
+        details: {},
+        suggestions: ['Réessayer plus tard']
       };
     }
   }
@@ -516,7 +431,7 @@ class AIService {
    * @param {number} timeoutMs - Délai d'expiration en millisecondes
    * @return {Promise<Response>} - Promesse de réponse
    */
-  async fetchWithRetry(url, options, maxRetries = 2, timeoutMs = 15000) {
+  async fetchWithRetry(url, options, maxRetries = TIMEOUTS.MAX_RETRIES, timeoutMs = TIMEOUTS.OLLAMA_CONNECT) {
     let retries = 0;
     let lastError = null;
     

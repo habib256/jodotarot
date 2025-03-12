@@ -82,14 +82,24 @@
       
       <div class="select-group">
         <span class="select-label">Modèle d'IA :</span>
-        <select id="ia-model" class="select-dropdown">
-          <option value="prompt">📝 Prompt (Sans IA)</option>
-          <optgroup label="🧠 OpenAI">
-            <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
-            <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo</option>
-            <option value="openai/gpt-4o">GPT-4o</option>
-          </optgroup>
-        </select>
+        <div class="model-select-container">
+          <select id="ia-model" class="select-dropdown">
+            <option value="prompt">📝 Prompt (Sans IA)</option>
+            <optgroup label="🧠 OpenAI">
+              <option value="openai/gpt-4o">GPT-4o</option>
+              <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
+              <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo</option>
+            </optgroup>
+            <optgroup label="🤖 Ollama">
+              <option disabled>Chargement des modèles...</option>
+            </optgroup>
+          </select>
+          <div class="model-status-indicator" style="display: none;">
+            <span class="status-dot"></span>
+            <span class="status-text"></span>
+          </div>
+        </div>
+        <div class="model-warning-container"></div>
       </div>
     </div>
     

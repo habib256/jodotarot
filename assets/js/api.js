@@ -1,8 +1,11 @@
 /**
  * Module de gestion des appels API aux modèles d'IA
+ * 
+ * IMPORTANT: Toutes les configurations doivent être importées depuis /assets/js/config.js
+ * Ne pas redéfinir de constantes de configuration ici - importer uniquement depuis config.js
  */
 
-import { API_KEY, API_URL_OPENAI, API_URL_OLLAMA, API_URL_OLLAMA_TAGS, getOllamaModelFormat, DEBUG_LEVEL, SETTINGS } from './config.js';
+import { API_KEY, API_URL_OPENAI, API_URL_OLLAMA, API_URL_OLLAMA_TAGS, getOllamaModelFormat, DEBUG_LEVEL, SETTINGS, TIMEOUTS } from './config.js';
 import { getMetaPrompt, enrichirPromptContextuel } from './prompt.js';
 import PERSONAS, { getPersonaPrompt } from './models/personas/index.js';
 import { TRANSLATIONS, getTranslation } from './translations/index.js';
@@ -224,7 +227,7 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
       // Timeout pour chaque chunk de réponse
       let chunkPromise;
       let lastChunkTime = Date.now();
-      const chunkTimeout = 30000; // 30 secondes entre chaque chunk
+      const chunkTimeout = TIMEOUTS.OLLAMA_RESPONSE; // Utiliser le timeout configuré pour la réponse
       
       const checkTimeout = () => {
         const now = Date.now();
@@ -582,167 +585,103 @@ async function fetchWithRetry(url, options, maxRetries = 2, timeoutMs = 5000) {
 }
 
 /**
- * Teste la connectivité avec Ollama et vérifie la disponibilité d'un modèle spécifique
- * @param {string} modelName - Nom du modèle Ollama à tester
- * @return {Promise<Object>} - Résultat détaillé du test de connectivité
+ * Teste la connectivité avec le serveur Ollama et la disponibilité d'un modèle
+ * @param {string} modelName - Nom du modèle à tester (optionnel)
+ * @returns {Promise<Object>} - Résultat du test
  */
-async function testOllamaConnectivity(modelName) {
-  console.log("🔍 DEBUG - Test de connectivité Ollama pour le modèle:", modelName);
-  
+async function testOllamaConnectivity(modelName = null) {
   try {
-    // 1. Test de connectivité au serveur Ollama
-    console.log("🔍 DEBUG - Test ping serveur Ollama");
-    const connectivityResult = await verifierConnexionOllama();
-    
-    // Si le serveur n'est pas accessible, on renvoie l'erreur
-    if (!connectivityResult.connected) {
-      return {
-        status: 'error',
-        success: false,
-        message: 'connectivity.ollamaConnectionError',
-        details: connectivityResult,
-        suggestions: [
-          'warnings.installOllama'
-        ]
-      };
+    // 1. Vérifier d'abord les modèles déjà chargés
+    const loadedModels = await checkLoadedModels();
+    if (modelName && loadedModels.models) {
+      const isLoaded = loadedModels.models.some(m => m.name === modelName || m.model === modelName);
+      if (isLoaded) {
+        if (DEBUG_LEVEL > 0) {
+          console.log(`🔍 DEBUG - Modèle ${modelName} déjà chargé en mémoire`);
+        }
+        return {
+          success: true,
+          status: 'success',
+          modelName: modelName,
+          message: 'Modèle déjà chargé en mémoire',
+          details: { isLoaded: true },
+          suggestions: []
+        };
+      }
     }
-    
-    // Si aucun modèle n'est fourni, on s'arrête là avec un succès partiel
+
+    // 2. Test de ping du serveur
+    if (DEBUG_LEVEL > 0) {
+      console.log('🔍 DEBUG - Test ping serveur Ollama');
+    }
+
+    const pingResponse = await fetch(`${SETTINGS.OLLAMA_URL}/api/tags`, {
+      signal: AbortSignal.timeout(TIMEOUTS.OLLAMA_CONNECT)
+    });
+
+    if (!pingResponse.ok) {
+      throw new Error(`Serveur Ollama non accessible: ${pingResponse.status}`);
+    }
+
+    // Si aucun modèle spécifié, retourner le succès du ping
     if (!modelName) {
       return {
-        status: 'warning',
         success: true,
-        message: "Serveur Ollama accessible, mais aucun modèle spécifié pour le test",
-        details: connectivityResult,
-        suggestions: ['warnings.selectModel']
+        status: 'success',
+        message: 'Connectivité Ollama OK',
+        details: {},
+        suggestions: []
       };
     }
-    
-    // 2. Vérifier si le modèle demandé est disponible
-    console.log("🔍 DEBUG - Vérification disponibilité du modèle:", modelName);
-    const modelsData = connectivityResult.details;
-    
-    if (!modelsData || !modelsData.models) {
-      return {
-        status: 'warning',
-        success: true,
-        message: "Serveur Ollama accessible, mais impossible de récupérer la liste des modèles",
-        details: connectivityResult,
-        suggestions: [
-          'warnings.checkOllamaVersion',
-          'warnings.pullModelManually'
-        ]
-      };
+
+    // 3. Test rapide du modèle avec préchargement
+    if (DEBUG_LEVEL > 0) {
+      console.log(`🔍 DEBUG - Test rapide du modèle: ${modelName}`);
     }
-    
-    const modelExists = modelsData.models.some(m => m.name === modelName);
-    if (!modelExists) {
-      // Obtenir la liste des modèles disponibles pour suggérer des alternatives
-      const availableModels = modelsData.models.map(m => m.name).join(', ');
-      
-      return {
-        status: 'error',
-        success: false,
-        message: `Le modèle ${modelName} n'est pas disponible sur ce serveur Ollama`,
-        alternatives: modelsData.models.map(m => m.name),
-        details: {
-          requestedModel: modelName,
-          availableModels: modelsData.models
-        },
-        suggestions: [
-          'warnings.pullModel',
-          'warnings.selectDifferentModel'
-        ]
-      };
-    }
-    
-    // 3. Test rapide du modèle avec retry et timeout
-    console.log("🔍 DEBUG - Test rapide du modèle:", modelName);
+
     try {
-      const testResponse = await fetchWithRetry(
-        API_URL_OLLAMA, 
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: modelName,
-            messages: [{ role: "user", content: "Réponds simplement par 'OK' pour tester la connectivité." }],
-            stream: false
-          })
-        },
-        2,  // 2 tentatives
-        5000 // 5 secondes de timeout
-      );
-      
-      if (!testResponse.ok) {
+      const preloadResult = await preloadModel(modelName);
+      if (preloadResult.done_reason === 'load') {
+        if (DEBUG_LEVEL > 0) {
+          console.log(`🔍 DEBUG - Modèle ${modelName} chargé avec succès`);
+        }
         return {
-          status: 'error',
-          success: false,
-          message: `Test du modèle échoué (${testResponse.status}): ${testResponse.statusText}`,
-          details: {
-            statusCode: testResponse.status,
-            statusText: testResponse.statusText,
-            responseText: await testResponse.text().catch(() => 'Impossible de lire la réponse')
-          },
-          suggestions: [
-            'warnings.modelMayBeLoading',
-            'warnings.checkOllamaMemory',
-            'warnings.tryAgain'
-          ]
-        };
-      }
-      
-      try {
-        // Vérifier le contenu de la réponse
-        const responseData = await testResponse.json();
-        
-        console.log("🔍 DEBUG - Connectivité Ollama OK pour:", modelName);
-        return {
+          success: true,
           status: 'success',
-          success: true,
-          message: "Connectivité Ollama OK",
-          details: {
-            model: modelName,
-            response: responseData
-          }
-        };
-      } catch (jsonError) {
-        return {
-          status: 'warning',
-          success: true,
-          message: "Modèle accessible mais la réponse n'est pas au format JSON attendu",
-          details: {
-            error: jsonError.message,
-            responseText: await testResponse.text().catch(() => 'Impossible de lire la réponse')
-          },
-          suggestions: ['warnings.checkOllamaVersion']
+          modelName: modelName,
+          message: 'Modèle chargé avec succès',
+          details: { loadDuration: preloadResult.load_duration },
+          suggestions: []
         };
       }
-    } catch (fetchError) {
-      return {
-        status: 'error',
-        success: false,
-        message: `Erreur lors du test du modèle: ${fetchError.message}`,
-        details: {
-          error: fetchError.message,
-          timeout: fetchError.timeout,
-          type: fetchError.name
-        },
-        suggestions: [
-          'warnings.modelTooLarge',
-          'warnings.checkOllamaMemory',
-          'warnings.tryAgain'
-        ]
-      };
+    } catch (modelError) {
+      throw new Error(`Erreur lors du chargement du modèle: ${modelError.message}`);
     }
-  } catch (error) {
-    console.error("🔍 DEBUG - Erreur lors du test de connectivité Ollama:", error);
+
     return {
-      status: 'error',
+      success: true,
+      status: 'success',
+      modelName: modelName,
+      message: 'Connectivité Ollama OK',
+      details: {},
+      suggestions: []
+    };
+
+  } catch (error) {
+    console.error('Erreur lors du test de connectivité Ollama:', error);
+    
+    return {
       success: false,
-      message: `Erreur de connectivité: ${error.message}`,
-      details: error,
-      suggestions: ['warnings.unexpectedError', 'warnings.tryAgain']
+      status: 'error',
+      modelName: modelName,
+      message: error.name === 'TimeoutError' ? 
+        'Timeout lors du test de connectivité' : 
+        `Erreur de connectivité: ${error.message}`,
+      details: {},
+      suggestions: [
+        'Vérifier que le serveur Ollama est en cours d\'exécution',
+        'Vérifier la configuration réseau'
+      ]
     };
   }
 }
@@ -838,6 +777,58 @@ function getValueByPath(obj, path) {
   return undefined;
 }
 
+/**
+ * Vérifie l'état des modèles Ollama chargés en mémoire
+ * @returns {Promise<Object>} - Informations sur les modèles chargés
+ */
+async function checkLoadedModels() {
+  try {
+    const response = await fetch(`${SETTINGS.OLLAMA_URL}/api/ps`);
+    if (!response.ok) {
+      throw new Error(`Erreur HTTP: ${response.status}`);
+    }
+    const data = await response.json();
+    if (DEBUG_LEVEL > 0) {
+      console.log('🔍 DEBUG - Modèles chargés:', data.models);
+    }
+    return data;
+  } catch (error) {
+    console.error('Erreur lors de la vérification des modèles chargés:', error);
+    throw error;
+  }
+}
+
+/**
+ * Force le chargement d'un modèle en mémoire
+ * @param {string} modelName - Nom du modèle à charger
+ * @returns {Promise<Object>} - Résultat du chargement
+ */
+async function preloadModel(modelName) {
+  try {
+    const response = await fetch(`${SETTINGS.OLLAMA_URL}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: modelName,
+        messages: []
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Erreur HTTP: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    if (DEBUG_LEVEL > 0) {
+      console.log(`🔍 DEBUG - Préchargement du modèle ${modelName}:`, data);
+    }
+    return data;
+  } catch (error) {
+    console.error(`Erreur lors du préchargement du modèle ${modelName}:`, error);
+    throw error;
+  }
+}
+
 // Exporter les fonctions
 export {
   obtenirReponseGPT4O,
@@ -845,7 +836,9 @@ export {
   verifierConnexionOllama,
   enrichirPromptContextuel,
   logPrompt,
-  testOllamaConnectivity
+  testOllamaConnectivity,
+  checkLoadedModels,
+  preloadModel
 };
 
 // Remplacer par un service ou une fonction locale si nécessaire

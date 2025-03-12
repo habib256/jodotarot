@@ -3,6 +3,13 @@
  * Importe tous les styles nécessaires dans le bon ordre
  */
 
+/**
+ * Styles principaux de l'application JodoTarot
+ * 
+ * IMPORTANT: Toutes les variables CSS doivent être définies dans /assets/css/base/variables.css
+ * Ne pas redéfinir de variables ici - utiliser uniquement var(--variable-name)
+ */
+
 /* Base */
 @import 'base/variables.css';
 @import 'base/reset.css';

@@ -38,25 +38,46 @@ class StateManager {
       },
       iaModel: {
         type: 'string',
-        description: 'Modèle d\'IA à utiliser (format: "openai/MODEL_NAME" ou "ollama:MODEL_NAME")',
+        description: 'Modèle d\'IA à utiliser',
         validate: (value) => {
           if (!value) return false;
-          const normalizedValue = value.trim();
+          const normalizedValue = value.trim().toLowerCase();
           
-          // Cas spécial pour le mode "prompt"
+          // Validation du mode prompt
           if (normalizedValue === 'prompt') {
             return true;
           }
           
-          // Vérification simple de format
-          if (!normalizedValue.startsWith('openai/') && !normalizedValue.startsWith('ollama:')) {
-            console.warn(`Format de modèle invalide: ${normalizedValue}`);
-            return false;
+          // Validation des modèles OpenAI
+          if (normalizedValue.startsWith('openai/')) {
+            const modelName = normalizedValue.split('/')[1];
+            const validOpenAIModels = [
+              'gpt-3.5-turbo',
+              'gpt-4',
+              'gpt-4o',
+              'gpt-4o-mini'
+            ];
+            if (!validOpenAIModels.includes(modelName)) {
+              console.warn(`Modèle OpenAI non reconnu: ${modelName}`);
+              return false;
+            }
+            return true;
           }
           
-          return true;
+          // Validation des modèles Ollama
+          if (normalizedValue.startsWith('ollama:')) {
+            const modelName = normalizedValue.split(':')[1];
+            if (!modelName || modelName.length < 2) {
+              console.warn(`Nom de modèle Ollama invalide: ${modelName}`);
+              return false;
+            }
+            return true;
+          }
+          
+          console.warn(`Format de modèle invalide: ${normalizedValue}`);
+          return false;
         },
-        default: 'openai/gpt-3.5-turbo'
+        default: 'prompt' // Changement du défaut pour plus de sécurité
       },
       cards: {
         type: 'array',
@@ -139,10 +160,28 @@ class StateManager {
         nullable: true,
         default: null
       },
+      modelStatus: {
+        type: 'object',
+        description: 'État actuel du modèle d\'IA',
+        default: {
+          isLoading: false,
+          isConnected: false,
+          error: null,
+          lastCheck: null
+        }
+      },
       availableModels: {
-        type: 'set',
-        description: 'Ensemble des modèles Ollama disponibles (pour information uniquement, pas utilisé pour la validation)',
-        default: () => new Set()
+        type: 'object',
+        description: 'Liste des modèles disponibles par type',
+        default: {
+          ollama: [],
+          openai: [
+            'gpt-3.5-turbo',
+            'gpt-4',
+            'gpt-4o',
+            'gpt-4o-mini'
+          ]
+        }
       },
       currentSpreadType: {
         type: 'string',
@@ -375,42 +414,17 @@ class StateManager {
    * @return {string|null} - Le modèle validé ou null si invalide
    */
   validateIAModel(model) {
-    if (!model) return null;
+    if (!model) return 'prompt'; // Fallback vers le mode prompt
     
     // Normaliser le format du modèle
-    let normalizedModel = model.trim();
+    let normalizedModel = model.trim().toLowerCase();
     
-    // Accepter explicitement l'option "prompt"
-    if (normalizedModel === 'prompt') {
-      return normalizedModel;
+    // Validation via le schéma
+    const validation = this.validateValue('iaModel', normalizedModel);
+    if (!validation.isValid) {
+      console.warn(`Modèle invalide (${model}), passage en mode prompt`);
+      return 'prompt';
     }
-    
-    // Vérification basique du format
-    if (!normalizedModel.startsWith('openai/') && !normalizedModel.startsWith('ollama:')) {
-      console.warn(`Format de modèle invalide: ${normalizedModel} - doit commencer par 'openai/' ou 'ollama:' ou être 'prompt'`);
-      return null;
-    }
-    
-    // Validation spécifique aux modèles OpenAI
-    if (normalizedModel.startsWith('openai/')) {
-      // Liste des modèles OpenAI valides (à mettre à jour selon les besoins)
-      const validOpenAIModels = [
-        'openai/gpt-3.5-turbo',
-        'openai/gpt-4',
-        'openai/gpt-4o',
-        'openai/gpt-4o-mini'
-      ];
-      
-      // Vérifier si le modèle est dans la liste des modèles valides
-      // Ce n'est pas une vérification stricte - permet d'ajouter des modèles dynamiquement
-      if (!validOpenAIModels.includes(normalizedModel)) {
-        console.warn(`Modèle OpenAI non standard: ${normalizedModel}`);
-      }
-    }
-    
-    // Pour les modèles Ollama, nous ne validons pas strictement ici
-    // car ils sont détectés dynamiquement et peuvent changer
-    // selon l'installation de l'utilisateur
     
     return normalizedModel;
   }

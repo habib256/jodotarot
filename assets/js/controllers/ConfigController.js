@@ -552,6 +552,12 @@ class ConfigController {
     try {
       this.clearWarnings();
       
+      // Si c'est le mode prompt, ne rien faire
+      if (modelName === 'prompt') {
+        console.log('Mode Prompt sélectionné - pas de test de connectivité nécessaire');
+        return;
+      }
+      
       // Si aucun modèle n'est spécifié, ne rien faire
       if (!modelName) {
         console.warn('Tentative de test de connectivité sans modèle spécifié');
@@ -854,30 +860,61 @@ class ConfigController {
         return false;
       }
 
-      // Trouver ou créer le groupe Ollama
-      let ollamaOptgroup = this.elements.iaModelSelect.querySelector('optgroup[label="🤖 Ollama"]');
-      if (!ollamaOptgroup) {
-        console.log("Création du groupe Ollama");
-        ollamaOptgroup = document.createElement('optgroup');
-        ollamaOptgroup.label = "🤖 Ollama";
-        
-        // Trouver le groupe OpenAI pour insérer après
-        const openaiGroup = this.elements.iaModelSelect.querySelector('optgroup[label="OpenAI"]');
-        if (openaiGroup) {
-          openaiGroup.after(ollamaOptgroup);
-        } else {
-          this.elements.iaModelSelect.appendChild(ollamaOptgroup);
-        }
+      // Sauvegarder les options existantes importantes
+      const promptOption = Array.from(this.elements.iaModelSelect.options)
+        .find(option => option.value === 'prompt');
+      const openaiGroup = this.elements.iaModelSelect.querySelector('optgroup[label="🌐 OpenAI"]');
+
+      // Vider le select
+      this.elements.iaModelSelect.innerHTML = '';
+
+      // Restaurer l'option prompt en première position
+      if (promptOption) {
+        this.elements.iaModelSelect.appendChild(promptOption);
+      } else {
+        // Créer l'option prompt si elle n'existait pas
+        const newPromptOption = document.createElement('option');
+        newPromptOption.value = 'prompt';
+        newPromptOption.text = '📝 Prompt (Sans IA)';
+        this.elements.iaModelSelect.appendChild(newPromptOption);
       }
-      
-      // Marquer un modèle sélectionné avant de vider le groupe
-      const currentModelName = this.elements.iaModelSelect.value;
-      const isOllamaModelSelected = currentModelName && currentModelName.startsWith('ollama:');
-      
-      // Afficher un message de chargement
-      ollamaOptgroup.innerHTML = '<option disabled>Chargement des modèles Ollama...</option>';
-      
-      // Vérifier la cache - Éviter de recharger trop fréquemment
+
+      // Restaurer le groupe OpenAI s'il existait
+      if (openaiGroup) {
+        this.elements.iaModelSelect.appendChild(openaiGroup);
+      } else {
+        // Créer le groupe OpenAI s'il n'existait pas
+        const newOpenAIGroup = document.createElement('optgroup');
+        newOpenAIGroup.label = '🌐 OpenAI';
+        
+        // Ajouter les modèles OpenAI
+        const openaiModels = [
+          { value: 'openai/gpt-4', text: 'GPT-4' },
+          { value: 'openai/gpt-3.5-turbo', text: 'GPT-3.5 Turbo' }
+        ];
+        
+        openaiModels.forEach(model => {
+          const option = document.createElement('option');
+          option.value = model.value;
+          option.textContent = model.text;
+          newOpenAIGroup.appendChild(option);
+        });
+        
+        this.elements.iaModelSelect.appendChild(newOpenAIGroup);
+      }
+
+      // Créer ou mettre à jour le groupe Ollama
+      let ollamaGroup = this.elements.iaModelSelect.querySelector('optgroup[label="🤖 Ollama"]');
+      if (!ollamaGroup) {
+        ollamaGroup = document.createElement('optgroup');
+        ollamaGroup.label = '🤖 Ollama';
+        this.elements.iaModelSelect.appendChild(ollamaGroup);
+      }
+
+      // Afficher un message de chargement dans le groupe Ollama
+      ollamaGroup.innerHTML = '<option disabled>Chargement des modèles Ollama...</option>';
+
+      // Vérifier la cache
       const cacheKey = 'ollama_models_cache';
       const cacheTimeout = 60 * 1000; // 1 minute de cache
       const cachedData = localStorage.getItem(cacheKey);
@@ -890,7 +927,6 @@ class ConfigController {
           const cache = JSON.parse(cachedData);
           const now = Date.now();
           
-          // Utiliser le cache si pas trop ancien
           if (cache.timestamp && (now - cache.timestamp < cacheTimeout) && cache.models && Array.isArray(cache.models)) {
             ollamaModels = cache.models;
             usedCache = true;
@@ -898,147 +934,49 @@ class ConfigController {
           }
         } catch (e) {
           console.warn("Erreur lors de la lecture de la cache Ollama:", e);
-          // En cas d'erreur, on continue sans utiliser la cache
         }
       }
       
-      // Si pas de cache valide, récupérer les modèles frais
+      // Si pas de cache valide, récupérer les modèles
       if (!usedCache) {
-        // Définir un timeout pour le chargement des modèles
-        const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Timeout lors du chargement des modèles Ollama')), 10000);
-        });
-        
         try {
-          // Utiliser Promise.race pour limiter le temps d'attente
+          const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Timeout lors du chargement des modèles Ollama')), 10000);
+          });
+          
           const modelsPromise = this.aiService.getOllamaModels();
           ollamaModels = await Promise.race([modelsPromise, timeoutPromise]);
           
-          // Mettre à jour la cache
           localStorage.setItem(cacheKey, JSON.stringify({
             timestamp: Date.now(),
             models: ollamaModels
           }));
         } catch (error) {
           console.warn("Erreur lors du chargement des modèles Ollama:", error);
-          
-          // Afficher un message d'erreur
-          ollamaOptgroup.innerHTML = '<option disabled>Erreur de chargement des modèles</option>';
-          
-          // Afficher un avertissement avec un bouton pour réessayer
-          this.showModelWarning({
-            title: "Problème de chargement des modèles Ollama",
-            message: `Erreur: ${error.message}`,
-            suggestions: ["Vérifier que le serveur Ollama est démarré", "Vérifier votre connexion réseau"]
-          });
-          
-          // Si un modèle Ollama était sélectionné, mais pas de modèles, fallback sur OpenAI
-          if (isOllamaModelSelected) {
-            // Tester si OpenAI est disponible (a une clé API valide)
-            if (this.aiService.apiKey && this.aiService.apiKey !== "YOUR API KEY") {
-              this.selectDefaultOpenAIModel();
-            } else {
-              // Si OpenAI n'est pas disponible, utiliser le mode Prompt
-              this.selectPromptMode();
-            }
-          }
-          
+          ollamaGroup.innerHTML = '<option disabled>Erreur de chargement des modèles</option>';
           return false;
         }
       }
       
-      // Si aucun modèle n'a été trouvé (même après tentative)
-      if (!ollamaModels || ollamaModels.length === 0) {
-        console.warn("Aucun modèle Ollama trouvé");
-        ollamaOptgroup.innerHTML = '<option disabled>Aucun modèle Ollama trouvé</option>';
-        
-        // Afficher un message d'erreur avec instructions pour installer des modèles
-        this.showModelWarning({
-          title: "warnings.noOllamaModels",
-          message: "warnings.noOllamaModelsDetails",
-          suggestions: [
-            "warnings.installModel"
-          ]
-        });
-        
-        // Si un modèle Ollama était sélectionné, fallback sur OpenAI
-        if (isOllamaModelSelected) {
-          // Tester si OpenAI est disponible (a une clé API valide)
-          if (this.aiService.apiKey && this.aiService.apiKey !== "YOUR API KEY") {
-            this.selectDefaultOpenAIModel();
-          } else {
-            // Si OpenAI n'est pas disponible, utiliser le mode Prompt
-            this.selectPromptMode();
-          }
-        }
-        
-        return false;
+      // Mettre à jour le groupe Ollama avec les modèles disponibles
+      ollamaGroup.innerHTML = '';
+      
+      if (ollamaModels && ollamaModels.length > 0) {
+        ollamaModels
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .forEach(model => {
+            const option = document.createElement('option');
+            option.value = `ollama:${model.name}`;
+            option.textContent = model.name;
+            ollamaGroup.appendChild(option);
+          });
+      } else {
+        ollamaGroup.innerHTML = '<option disabled>Aucun modèle Ollama disponible</option>';
       }
-      
-      // Vider le groupe Ollama pour le remplir avec les nouveaux modèles
-      ollamaOptgroup.innerHTML = '';
-      
-      // Remplir le groupe avec les modèles disponibles, en triant alphabétiquement
-      ollamaModels
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .forEach(model => {
-          // Formater le nom pour l'affichage
-          const displayName = model.name.replace(/^ollama:/, '');
-          const optionValue = `ollama:${model.name}`;
-          
-          const option = document.createElement('option');
-          option.value = optionValue;
-          option.textContent = displayName;
-          
-          ollamaOptgroup.appendChild(option);
-          
-          // Conserver le modèle si précédemment sélectionné
-          if (currentModelName === optionValue) {
-            option.selected = true;
-          }
-        });
-      
-      // Ajouter les modèles au Set des modèles disponibles
-      const availableModels = new Set();
-      ollamaModels.forEach(model => {
-        availableModels.add(`ollama:${model.name}`);
-      });
-      
-      // Mettre à jour l'état avec les modèles disponibles
-      this.stateManager.setState({ availableModels });
-      
-      // Si aucun modèle n'est actuellement sélectionné ou si c'est un modèle OpenAI par défaut, 
-      // sélectionner le premier modèle Ollama
-      const currentModel = this.stateManager.getState().iaModel;
-      if (currentModel === 'openai/gpt-3.5-turbo' && ollamaModels.length > 0) {
-        this.selectFirstOllamaModel();
-      }
-      
+
       return true;
     } catch (error) {
       console.error("Erreur lors du chargement des modèles Ollama:", error);
-      const ollamaOptgroup = this.elements.iaModelSelect.querySelector('optgroup[label="🤖 Ollama"]');
-      if (ollamaOptgroup) {
-        ollamaOptgroup.innerHTML = '<option disabled>Erreur de connexion à Ollama</option>';
-      }
-      
-      // Afficher un message d'erreur
-      this.showModelWarning({
-        title: getTranslation('warnings.error', this.stateManager.getState().language),
-        message: error.message,
-        suggestions: [getTranslation('warnings.tryAgain', this.stateManager.getState().language)]
-      });
-      
-      const currentModelName = this.elements.iaModelSelect.value;
-      if (currentModelName && currentModelName.startsWith('ollama:')) {
-        // Tester si OpenAI est disponible (a une clé API valide)
-        if (this.aiService.apiKey && this.aiService.apiKey !== "YOUR API KEY") {
-          this.selectDefaultOpenAIModel();
-        } else {
-          // Si OpenAI n'est pas disponible, utiliser le mode Prompt
-          this.selectPromptMode();
-        }
-      }
       return false;
     }
   }
@@ -1080,10 +1018,36 @@ class ConfigController {
   
   /**
    * Synchronise l'interface utilisateur avec l'état actuel
-   * @param {Object} previousState - État précédent pour déterminer les changements
+   * @param {Object} previousState - État précédent pour comparaison
    */
   syncUIWithState(previousState = null) {
     const state = this.stateManager.getState();
+    
+    // S'assurer que l'option "prompt" existe toujours en première position
+    if (this.elements.iaModelSelect) {
+      let promptOption = Array.from(this.elements.iaModelSelect.options)
+        .find(option => option.value === 'prompt');
+      
+      if (!promptOption) {
+        console.log("Création de l'option Prompt");
+        promptOption = document.createElement('option');
+        promptOption.value = 'prompt';
+        promptOption.text = '📝 Prompt (Sans IA)';
+        
+        // L'insérer en première position
+        this.elements.iaModelSelect.insertBefore(
+          promptOption, 
+          this.elements.iaModelSelect.firstChild
+        );
+      } else if (promptOption.parentNode !== this.elements.iaModelSelect) {
+        // Si l'option existe mais n'est pas directement sous le select (par exemple dans un optgroup)
+        this.elements.iaModelSelect.insertBefore(
+          promptOption,
+          this.elements.iaModelSelect.firstChild
+        );
+      }
+    }
+
     console.log('🔄 Synchronisation de l\'UI avec l\'état:', {
       language: state.language,
       persona: state.persona,

@@ -24,12 +24,23 @@ const SETTINGS = {
   DEFAULT_LANGUAGE: "fr",        // Langue par défaut
   DEFAULT_DECK: "set01",         // Jeu de cartes par défaut
   DEFAULT_SPREAD: "cross",       // Type de tirage par défaut
-  DEFAULT_MODEL: "ollama:latest", // Modèle d'IA par défaut (utilise le dernier modèle disponible)
+  DEFAULT_MODEL: "ollama:llama3.1:latest", // Modèle d'IA par défaut (utilise llama3.1:latest)
   
   // Paramètres d'interface
   HIDE_PROMPT: false,      // Masquer le prompt envoyé à l'IA
   AUTO_SCROLL: true,       // Défilement automatique des interprétations
   DARK_MODE: false,        // Mode sombre
+};
+
+// Configuration des timeouts (en millisecondes)
+const TIMEOUTS = {
+  OLLAMA_CONNECT: 30000,    // 30 secondes pour la connexion initiale
+  OLLAMA_MODEL_LOAD: 60000, // 60 secondes pour le chargement du modèle
+  OLLAMA_RESPONSE: 120000,  // 120 secondes pour la génération de réponse
+  OLLAMA_CHECK: 5000,      // 5 secondes pour vérifier l'état des modèles
+  MAX_RETRIES: 3,          // Nombre maximum de tentatives
+  RETRY_DELAY: 1000,       // Délai entre les tentatives (1 seconde)
+  MODEL_LOAD_CHECK: 10000  // 10 secondes pour vérifier si un modèle est chargé
 };
 
 // Configuration pour l'API OpenAI
@@ -139,5 +150,6 @@ export {
   API_URL_OLLAMA_TAGS,
   DEBUG_LEVEL,
   SETTINGS,
-  getOllamaModelFormat
+  getOllamaModelFormat,
+  TIMEOUTS
 }; 

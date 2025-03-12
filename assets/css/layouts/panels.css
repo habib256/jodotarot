@@ -1,5 +1,8 @@
 /**
  * Styles pour les panneaux de l'application
+ * 
+ * IMPORTANT: Toutes les variables CSS doivent être définies dans /assets/css/base/variables.css
+ * Ne pas redéfinir de variables ici - utiliser uniquement var(--variable-name)
  */
 
 /* Variables spécifiques aux panneaux */
