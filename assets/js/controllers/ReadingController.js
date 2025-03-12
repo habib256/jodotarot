@@ -510,7 +510,7 @@ class ReadingController {
           <div class="prompt-display">
             <h3>${getTranslation('interpretation.noModelAvailable', language) || 'Aucun modèle IA disponible'}</h3>
             <p>${getTranslation('interpretation.promptDisplay', language) || "Voici le prompt qui aurait été envoyé à l'IA :"}</p>
-            <pre class="prompt-code">${prompt.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
+            <div class="raw-prompt-text">${prompt.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
           </div>
         `;
         

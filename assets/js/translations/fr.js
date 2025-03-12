@@ -192,7 +192,7 @@ const fr = {
     base: `Format obligatoire (400-450 mots):
 1) Réponse concise et complète en un message
 2) Utilise des émojis pertinents pour illustrer les concepts de tarot
-3) Formatage HTML uniquement: <h1>/<h2>/<h3> titres, <em>/<strong> importance, <blockquote> citations, <ul>/<li> listes
+3) Utilise uniquement le format markdown pour le formatage du texte
 4) Intègre l'aspect psychologique et symbolique des cartes
 5) Fais des connexions entre les cartes qui se complètent ou s'opposent
 6) Évite le jargon trop ésotérique pour rester accessible

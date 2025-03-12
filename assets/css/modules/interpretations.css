@@ -526,28 +526,24 @@
   margin-bottom: 10px;
 }
 
+/* Suppression des styles de formatage spécifiques aux éléments pre */
 .prompt-display pre {
-  background-color: #f1f3f5;
-  border: 1px solid #dee2e6;
-  border-radius: 4px;
-  padding: 15px;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  font-family: monospace;
-  font-size: 14px;
-  line-height: 1.5;
-  max-height: 400px;
-  overflow-y: auto;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  white-space: normal;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  max-height: none;
+  overflow: visible;
 }
 
-.prompt-display .system-prompts pre {
-  background-color: #e9f5ff;
-  border-color: #c5e1ff;
-}
-
+.prompt-display .system-prompts pre,
 .prompt-display .user-prompt pre {
-  background-color: #f0fff4;
-  border-color: #c6f6d5;
+  background-color: transparent;
+  border-color: transparent;
 }
 
 .prompt-note {
@@ -558,4 +554,31 @@
   border-radius: 4px;
   color: #856404;
   font-style: italic;
-} /* Styles pour le mode Prompt */
+}
+
+/* Style pour l'affichage des prompts sans formatage */
+.raw-prompt-text {
+  background-color: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  padding: 15px;
+  margin: 10px 0;
+  white-space: pre-line;
+  word-break: break-word;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1.5;
+  color: #333333;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.system-prompts .raw-prompt-text {
+  background-color: #fcfcfc;
+  border-color: #eeeeee;
+}
+
+.user-prompt .raw-prompt-text {
+  background-color: #fcfcfc;
+  border-color: #eeeeee;
+}

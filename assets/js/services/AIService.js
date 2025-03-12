@@ -255,7 +255,7 @@ class AIService {
         throw new Error('Les cartes et la question sont requises pour l\'interprétation');
       }
       
-      const systemPrompts = this.buildSystemPrompts(persona, language, spreadType);
+      const systemPrompts = await this.buildSystemPrompts(persona, language, spreadType);
       const prompt = this.buildPrompt(reading, question, language, spreadType);
       
       // Mode spécial "prompt" (Sans IA)
@@ -274,11 +274,11 @@ class AIService {
           <p>Voici le prompt qui aurait été envoyé à l'IA :</p>
           <div class="system-prompts">
             <h4>Prompts système :</h4>
-            <pre>${systemPrompts.map(p => p).join('\n\n---\n\n')}</pre>
+            <div class="raw-prompt-text">${systemPrompts.map(p => p).join('\n\n---\n\n')}</div>
           </div>
           <div class="user-prompt">
             <h4>Prompt utilisateur :</h4>
-            <pre>${prompt}</pre>
+            <div class="raw-prompt-text">${prompt}</div>
           </div>
           <p class="prompt-note">Note : Aucune connexion à l'IA n'a été effectuée. Pour obtenir une interprétation générée, veuillez sélectionner un modèle disponible.</p>
         </div>`;
@@ -341,29 +341,39 @@ class AIService {
   }
   
   /**
-   * Construit les prompts système pour l'IA
+   * Construit les prompts système pour le modèle d'IA
    * @param {string} persona - Persona choisi
    * @param {string} language - Langue
    * @param {string} spreadType - Type de tirage
-   * @return {Array} Liste des prompts système
+   * @return {Promise<Array>} Liste des prompts système
    */
-  buildSystemPrompts(persona, language, spreadType) {
-    // Récupérer le prompt spécifique au persona via getPersonaPrompt
-    // (maintenant enrichi avec les spécialisations grâce à notre amélioration de BasePersona)
-    const personaPrompt = getPersonaPrompt(persona, language, spreadType);
+  async buildSystemPrompts(persona, language, spreadType) {
+    console.log(`🔍 Chargement du prompt pour le persona: ${persona}, langue: ${language}, tirage: ${spreadType}`);
     
-    // Récupérer le métaprompt adapté à la langue
-    const metaPrompt = getMetaPrompt(language);
-    
-    // Prompts de base - le prompt du persona et le métaprompt
-    const basePrompts = [
-      // Le métaprompt pour définir les règles générales
-      metaPrompt,
-      // Le prompt principal du persona, déjà enrichi
-      personaPrompt
-    ];
-    
-    return basePrompts;
+    try {
+      // Récupérer le prompt spécifique au persona via getPersonaPrompt
+      // (maintenant enrichi avec les spécialisations grâce à notre amélioration de BasePersona)
+      const personaPrompt = await getPersonaPrompt(persona, language, spreadType);
+      
+      console.log('📋 Contenu du prompt persona:', personaPrompt);
+      
+      // Récupérer le métaprompt adapté à la langue
+      const metaPrompt = getMetaPrompt(language);
+      
+      // Prompts de base - le prompt du persona et le métaprompt
+      const basePrompts = [
+        // Le métaprompt pour définir les règles générales
+        metaPrompt,
+        // Le prompt principal du persona, déjà enrichi
+        personaPrompt
+      ];
+      
+      return basePrompts;
+    } catch (error) {
+      console.error("Erreur lors du chargement des prompts système:", error);
+      // Retourner au moins le métaprompt en cas d'erreur
+      return [getMetaPrompt(language)];
+    }
   }
   
   /**
