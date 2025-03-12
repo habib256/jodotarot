@@ -193,9 +193,8 @@ const en = {
 5) Make connections between cards that complement or oppose each other
 6) Avoid overly esoteric jargon to remain accessible
 7) End with practical advice and a suggested action
-8) No Markdown or plain text headings. No titles in this formatting style: ** **
-9) In English
-10) You must absolutely respond by embodying the chosen persona, with their specific style, vocabulary, and worldview`,
+8) In English
+9) You must absolutely respond by embodying the chosen persona, with their specific style, vocabulary, and worldview`,
     
     emphasis: `IMPORTANT: Your answer must be DIRECTLY and SPECIFICALLY related to this question.
 Focus on what the question precisely asks and adapt your interpretation

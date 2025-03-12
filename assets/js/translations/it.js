@@ -191,9 +191,8 @@ const it = {
 5) Crea connessioni tra carte che si completano o si oppongono
 6) Evita un gergo troppo esoterico per rimanere accessibile
 7) Concludi con un consiglio pratico e un suggerimento d'azione
-8) Niente Markdown o titoli in testo semplice. Nessun titolo in questo formato: ** **
-9) In italiano
-10) Devi assolutamente rispondere incarnando il personaggio scelto, con il suo stile specifico, il suo vocabolario e la sua visione del mondo`,
+8) In italiano
+9) Devi assolutamente rispondere incarnando il personaggio scelto, con il suo stile specifico, il suo vocabolario e la sua visione del mondo`,
     
     emphasis: `IMPORTANTE: La tua risposta deve essere DIRETTAMENTE e SPECIFICAMENTE collegata a questa domanda.
 Concentrati su ciò che la domanda chiede precisamente e adatta la tua interpretazione

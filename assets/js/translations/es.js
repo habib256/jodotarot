@@ -176,9 +176,8 @@ const es = {
 5) Establece conexiones entre cartas que se complementan o se oponen
 6) Evita el lenguaje excesivamente esotérico para ser accesible
 7) Finaliza con un consejo práctico y una sugerencia de acción
-8) No uses Markdown ni títulos en texto plano. No uses títulos en este formato: ** **
-9) En español
-10) Debes responder absolutamente encarnando al personaje elegido, con su estilo, vocabulario y visión del mundo específicos`,
+8) En español
+9) Debes responder absolutamente encarnando al personaje elegido, con su estilo, vocabulario y visión del mundo específicos`,
     
     emphasis: `IMPORTANTE: Tu respuesta debe estar DIRECTA y ESPECÍFICAMENTE relacionada con esta pregunta.
 Concéntrate en lo que la pregunta pide precisamente y adapta tu interpretación

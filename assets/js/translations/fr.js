@@ -197,9 +197,8 @@ const fr = {
 5) Fais des connexions entre les cartes qui se complètent ou s'opposent
 6) Évite le jargon trop ésotérique pour rester accessible
 7) Termine par un conseil pratique et une suggestion d'action
-8) PAS DE CODE MARKDOWN (**titre**,# Titre) Pas de passage à la ligne.
-9) Exprime toi intégralement en français
-10) Tu dois absolument répondre en incarnant le persona choisi, avec son style, son vocabulaire et sa vision du monde spécifiques`,
+8) Exprime toi intégralement en français
+9) Tu dois absolument répondre en incarnant le persona choisi, avec son style, son vocabulaire et sa vision du monde spécifiques`,
     
     emphasis: `IMPORTANT: Ta réponse doit être DIRECTEMENT et SPÉCIFIQUEMENT liée à cette question.
 Concentre-toi sur ce que la question demande précisément et adapte ton interprétation 

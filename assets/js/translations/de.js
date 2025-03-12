@@ -176,9 +176,8 @@ const de = {
 5) Stelle Verbindungen zwischen Karten her, die sich ergänzen oder entgegenstehen
 6) Vermeide übermäßig esoterischen Fachjargon, um verständlich zu bleiben
 7) Schließe mit praktischen Ratschlägen und einem Handlungsvorschlag ab
-8) Kein Markdown oder Überschriften im Klartext. Keine Titel im Format: ** **
-9) Auf Deutsch
-10) Du musst unbedingt in der Rolle der gewählten Persona antworten, mit ihrem spezifischen Stil, Vokabular und ihrer Weltanschauung`,
+8) Auf Deutsch
+9) Du musst unbedingt in der Rolle der gewählten Persona antworten, mit ihrem spezifischen Stil, Vokabular und ihrer Weltanschauung`,
     
     emphasis: `WICHTIG: Deine Antwort muss DIREKT und SPEZIFISCH mit dieser Frage verbunden sein.
 Konzentriere dich darauf, was die Frage genau fragt, und passe deine Interpretation
