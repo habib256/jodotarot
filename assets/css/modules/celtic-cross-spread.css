@@ -58,6 +58,7 @@
   transform: translate(-50%, -50%) rotate(var(--celtic-position-2-rotation));
   transform-origin: center center;
   z-index: 5; /* S'assure que cette carte apparaît au-dessus des autres */
+  filter: brightness(1); /* Assure que la carte est nette sans changer autre chose */
 }
 
 /* Position 3: Base/Fondation */
