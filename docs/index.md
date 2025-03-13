@@ -22,6 +22,8 @@ JodoTarot est une application web modulaire pour les tirages de tarot, construit
 ### 3. Interface Utilisateur
 - [Positionnement des cartes](ui/positionnement-cartes.md) - Système de positionnement des cartes dans les tirages
 - [Dimensions des cartes](ui/dimensions-cartes.md) - Système de dimensions spécifiques par type de tirage
+- [Rotation des cartes](ui/rotation-cartes.md) - Gestion des rotations et transformations des cartes
+- [Gestion des z-index](ui/z-index.md) - Ordre d'affichage et superposition des éléments
 
 ### 4. Outils et Conventions
 - [Éditeur de positions](tools/spread-editor.md) - Documentation de l'outil d'édition des positions de cartes

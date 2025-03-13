@@ -276,6 +276,11 @@ class CelticCrossSpread extends BaseSpread {
         positionElement.style.left = `var(--${this.key}-position-${position.position}-x)`;
         positionElement.style.top = `var(--${this.key}-position-${position.position}-y)`;
         
+        // Ajouter un z-index plus élevé spécifiquement pour la position 2
+        if (position.position === 2) {
+          positionElement.style.zIndex = '5'; // Assure que la carte 2 est au-dessus des autres
+        }
+        
         // Vérifier s'il existe une variable de rotation numérique
         const rotationVar = `--${this.key}-position-${position.position}-rotation`;
         const rotationValue = getComputedStyle(document.documentElement).getPropertyValue(rotationVar);
@@ -294,6 +299,11 @@ class CelticCrossSpread extends BaseSpread {
       else if (position.cssName) {
         positionElement.style.left = `var(--${this.key}-${position.cssName}-x)`;
         positionElement.style.top = `var(--${this.key}-${position.cssName}-y)`;
+        
+        // Ajouter un z-index plus élevé pour la position "challenge"
+        if (position.cssName === 'challenge') {
+          positionElement.style.zIndex = '5'; // Assure que la carte de défi est au-dessus des autres
+        }
         
         // Appliquer la rotation si spécifiée
         if (position.rotation) {
