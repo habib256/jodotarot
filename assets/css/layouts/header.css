@@ -11,29 +11,7 @@
   gap: var(--spacing-xl);
 }
 
-/* 1. Zone de menu - Contrôles de sélection */
-.selection-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  position: relative;
-  z-index: 5;
-  flex: 0.5;
-  min-width: 180px;
-  max-width: 240px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(240, 235, 250, 0.95));
-  padding: 15px;
-  border-radius: var(--border-radius-md);
-  box-shadow: 0 4px 12px rgba(107, 91, 149, 0.15);
-  border: 1px solid rgba(107, 91, 149, 0.25);
-}
-
-/* Suppression de l'effet de survol avec animation */
-.selection-controls:hover {
-  box-shadow: 0 4px 12px rgba(107, 91, 149, 0.15);
-}
-
-/* 2. Logo du persona */
+/* 1. Logo du persona - Maintenant premier élément */
 .logo-container {
   display: flex;
   justify-content: center;
@@ -85,6 +63,28 @@
 .logo-container img:hover {
   transform: scale(1.05);
   filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.25)) brightness(1.03);
+}
+
+/* 2. Zone de menu - Contrôles de sélection */
+.selection-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  z-index: 5;
+  flex: 0.5;
+  min-width: 180px;
+  max-width: 240px;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(240, 235, 250, 0.95));
+  padding: 15px;
+  border-radius: var(--border-radius-md);
+  box-shadow: 0 4px 12px rgba(107, 91, 149, 0.15);
+  border: 1px solid rgba(107, 91, 149, 0.25);
+}
+
+/* Suppression de l'effet de survol avec animation */
+.selection-controls:hover {
+  box-shadow: 0 4px 12px rgba(107, 91, 149, 0.15);
 }
 
 /* 3. Zone de titre et question */
@@ -171,14 +171,14 @@
     gap: var(--spacing-md);
   }
   
-  .selection-controls {
-    min-width: 120px;
-  }
-  
   .logo-container {
     width: 250px;
     height: 250px;
     margin: 0 var(--spacing-md);
+  }
+  
+  .selection-controls {
+    min-width: 120px;
   }
   
   .header-question {
@@ -198,18 +198,18 @@
     padding: var(--spacing-sm);
   }
   
+  .logo-container {
+    width: 200px;
+    height: 200px;
+    order: 1;
+    margin: var(--spacing-md) 0;
+  }
+  
   .selection-controls {
     width: 100%;
     max-width: 100%;
     min-width: unset;
-    order: 1;
-  }
-  
-  .logo-container {
-    width: 200px;
-    height: 200px;
     order: 2;
-    margin: var(--spacing-md) 0;
   }
   
   .header-question {
