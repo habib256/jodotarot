@@ -530,15 +530,25 @@
             
             console.log('Positions initiales et dimensions chargées:', cardPositions);
         }
-
+        
         // Fonction pour charger les dimensions des cartes depuis variables.css
         function loadCardDimensionsFromCSS() {
-            // Récupérer les dimensions depuis variables.css
-            const baseWidth = getCSSVariableNumeric('--card-base-width') || 95;
-            const ratio = getCSSVariableNumeric('--card-ratio') || 1.7;
-            const scaleFactor = getCSSVariableNumeric('--card-scale-factor') || 1;
+            // Toujours utiliser la valeur actuelle du sélecteur
+            const spreadType = spreadSelect.value;
+            console.log(`Chargement des dimensions pour ${spreadType} depuis loadCardDimensionsFromCSS`);
             
-            console.log('Chargement des dimensions depuis CSS:', { baseWidth, ratio, scaleFactor });
+            // Récupérer les dimensions spécifiques au tirage depuis variables.css
+            // Essayer d'abord les variables spécifiques au tirage
+            let baseWidth = getCSSVariableNumeric(`--${spreadType}-card-base-width`);
+            let ratio = getCSSVariableNumeric(`--${spreadType}-card-ratio`);
+            let scaleFactor = getCSSVariableNumeric(`--${spreadType}-card-scale-factor`);
+            
+            // Si les variables spécifiques n'existent pas, utiliser les variables globales
+            if (isNaN(baseWidth)) baseWidth = getCSSVariableNumeric('--card-base-width') || 95;
+            if (isNaN(ratio)) ratio = getCSSVariableNumeric('--card-ratio') || 1.7;
+            if (isNaN(scaleFactor)) scaleFactor = getCSSVariableNumeric('--card-scale-factor') || 1;
+            
+            console.log(`Dimensions chargées pour ${spreadType}:`, { baseWidth, ratio, scaleFactor });
             
             // Mettre à jour les curseurs
             cardBaseWidth.value = baseWidth;
@@ -551,6 +561,11 @@
             cardScaleFactorValue.textContent = scaleFactor;
             
             // Appliquer ces dimensions au document
+            document.documentElement.style.setProperty(`--${spreadType}-card-base-width`, `${baseWidth}px`);
+            document.documentElement.style.setProperty(`--${spreadType}-card-ratio`, ratio);
+            document.documentElement.style.setProperty(`--${spreadType}-card-scale-factor`, scaleFactor);
+            
+            // Appliquer aussi aux variables globales pour la compatibilité
             document.documentElement.style.setProperty('--card-base-width', `${baseWidth}px`);
             document.documentElement.style.setProperty('--card-ratio', ratio);
             document.documentElement.style.setProperty('--card-scale-factor', scaleFactor);
@@ -558,11 +573,18 @@
             // Générer le CSS pour les dimensions
             generateCardDimensionsCSS();
         }
-        
+
         // Fonction pour générer le CSS des dimensions des cartes
         function generateCardDimensionsCSS() {
+            const spreadType = spreadSelect.value;
             let css = "";
             
+            // Générer les variables spécifiques au tirage
+            css += `--${spreadType}-card-base-width: ${cardBaseWidth.value}px;\n`;
+            css += `--${spreadType}-card-ratio: ${cardRatio.value};\n`;
+            css += `--${spreadType}-card-scale-factor: ${cardScaleFactor.value};\n`;
+            
+            // Générer les variables globales pour la compatibilité
             css += `--card-base-width: ${cardBaseWidth.value}px;\n`;
             css += `--card-ratio: ${cardRatio.value};\n`;
             css += `--card-scale-factor: ${cardScaleFactor.value};\n`;
@@ -700,7 +722,7 @@
                 isDragging = false;
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
-                window.removeEventListener('blur', onWindowBlur);
+                document.removeEventListener('blur', onWindowBlur);
                 
                 // Retirer la mise en évidence de la sortie après un court délai
                 setTimeout(() => {
@@ -721,7 +743,7 @@
 
             document.addEventListener('mousemove', onMouseMove);
             document.addEventListener('mouseup', onMouseUp);
-            window.addEventListener('blur', onWindowBlur);
+            document.addEventListener('blur', onWindowBlur);
             
             // Empêcher la propagation de l'événement pour éviter des comportements indésirables
             e.preventDefault();
@@ -767,12 +789,24 @@
         const cardScaleFactorValue = document.getElementById('cardScaleFactorValue');
         
         // Charger les valeurs actuelles depuis les variables CSS
-        cardBaseWidth.value = getCSSVariableNumeric('--card-base-width') || 95;
-        cardRatio.value = getCSSVariableNumeric('--card-ratio') || 1.7;
-        cardScaleFactor.value = getCSSVariableNumeric('--card-scale-factor') || 1;
-        cardBaseWidthValue.textContent = cardBaseWidth.value;
-        cardRatioValue.textContent = cardRatio.value;
-        cardScaleFactorValue.textContent = cardScaleFactor.value;
+        // Au lieu de charger les variables globales, charger les variables spécifiques au tirage initial
+        // qui est celui sélectionné par défaut dans le menu déroulant
+        const initialSpreadType = spreadSelect.value;
+        let initialBaseWidth = getCSSVariableNumeric(`--${initialSpreadType}-card-base-width`);
+        let initialRatio = getCSSVariableNumeric(`--${initialSpreadType}-card-ratio`);
+        let initialScaleFactor = getCSSVariableNumeric(`--${initialSpreadType}-card-scale-factor`);
+        
+        // Si les variables spécifiques n'existent pas, utiliser les variables globales
+        if (isNaN(initialBaseWidth)) initialBaseWidth = getCSSVariableNumeric('--card-base-width') || 95;
+        if (isNaN(initialRatio)) initialRatio = getCSSVariableNumeric('--card-ratio') || 1.7;
+        if (isNaN(initialScaleFactor)) initialScaleFactor = getCSSVariableNumeric('--card-scale-factor') || 1;
+        
+        cardBaseWidth.value = initialBaseWidth;
+        cardRatio.value = initialRatio;
+        cardScaleFactor.value = initialScaleFactor;
+        cardBaseWidthValue.textContent = initialBaseWidth;
+        cardRatioValue.textContent = initialRatio;
+        cardScaleFactorValue.textContent = initialScaleFactor;
         
         // Variable pour le debounce
         let dimensionChangeTimeout = null;
@@ -796,8 +830,15 @@
         // Fonction de debounce pour éviter trop d'appels rapprochés
         function debounceDimensionChange() {
             clearTimeout(dimensionChangeTimeout);
+            const spreadType = spreadSelect.value;
             
             // Appliquer immédiatement les styles sans recalculer
+            // Variables spécifiques au tirage
+            document.documentElement.style.setProperty(`--${spreadType}-card-base-width`, `${cardBaseWidth.value}px`);
+            document.documentElement.style.setProperty(`--${spreadType}-card-ratio`, cardRatio.value);
+            document.documentElement.style.setProperty(`--${spreadType}-card-scale-factor`, cardScaleFactor.value);
+            
+            // Variables globales pour la compatibilité
             document.documentElement.style.setProperty('--card-base-width', `${cardBaseWidth.value}px`);
             document.documentElement.style.setProperty('--card-ratio', cardRatio.value);
             document.documentElement.style.setProperty('--card-scale-factor', cardScaleFactor.value);
@@ -821,6 +862,9 @@
             
             // Recharger le spread pour appliquer les nouvelles dimensions
             loadSpread();
+            
+            // Forcer une mise à jour de l'affichage CSS après le rechargement
+            updateOutput(false);
         }
         
         // Fonction pour générer les variables CSS des dimensions des cartes
@@ -890,10 +934,18 @@
             rotationSlider.value = 0;
             rotationValue.textContent = "0°";
             
-            // Synchroniser les contrôleurs de dimensions avec les valeurs actuelles
-            const baseWidth = getCSSVariableNumeric('--card-base-width') || 95;
-            const ratio = getCSSVariableNumeric('--card-ratio') || 1.7;
-            const scaleFactor = getCSSVariableNumeric('--card-scale-factor') || 1;
+            // Synchroniser les contrôleurs de dimensions avec les valeurs spécifiques au tirage
+            // Essayer d'abord de charger les dimensions spécifiques au tirage
+            let baseWidth = getCSSVariableNumeric(`--${spreadType}-card-base-width`);
+            let ratio = getCSSVariableNumeric(`--${spreadType}-card-ratio`);
+            let scaleFactor = getCSSVariableNumeric(`--${spreadType}-card-scale-factor`);
+            
+            // Si les dimensions spécifiques n'existent pas, utiliser les dimensions globales
+            if (isNaN(baseWidth)) baseWidth = getCSSVariableNumeric('--card-base-width') || 95;
+            if (isNaN(ratio)) ratio = getCSSVariableNumeric('--card-ratio') || 1.7;
+            if (isNaN(scaleFactor)) scaleFactor = getCSSVariableNumeric('--card-scale-factor') || 1;
+            
+            console.log(`Chargement des dimensions pour le tirage ${spreadType}:`, { baseWidth, ratio, scaleFactor });
             
             cardBaseWidth.value = baseWidth;
             cardRatio.value = ratio;
@@ -937,8 +989,8 @@
                 }
             });
             
-            // Assurer une dernière fois que le texte CSS est réinitialisé et forcer l'affichage
-            resetCSSOutput();
+            // Ne pas réinitialiser l'affichage CSS ici, car cela peut causer un écran blanc
+            // resetCSSOutput();
             output.classList.remove('updating');
         }
         
@@ -946,9 +998,8 @@
          * Réinitialise la zone d'affichage du CSS au message par défaut
          */
         function resetCSSOutput() {
-            // Message plus détaillé indiquant qu'un nouveau tirage a été chargé
-            const spreadName = spreads[spreadSelect.value].name;
-            output.textContent = `/* Tirage '${spreadName}' chargé ! \n * \n * Sélectionnez et déplacez les cartes pour générer le CSS du tirage.\n * Seules les modifications par rapport aux valeurs initiales seront affichées. \n */`;
+            // Ne pas vider complètement le contenu si des variables doivent être affichées
+            // La mise à jour complète sera gérée par updateOutput()
             
             // S'assurer que la classe 'updating' est retirée
             output.classList.remove('updating');
@@ -957,6 +1008,11 @@
             output.style.display = 'none';
             void output.offsetHeight;
             output.style.display = '';
+            
+            // Appeler updateOutput pour assurer que les dimensions des cartes sont affichées
+            if (output.textContent === '') {
+                updateOutput(false);
+            }
         }
         
         // Fonction mise à jour avec le nouveau format des variables standardisées
@@ -972,26 +1028,16 @@
             let hasChangedValues = false;
             let css = "";
             
-            // Dimensions des cartes - vérifier si modifiées
-            const initialBaseWidth = getCSSVariableNumeric('--card-base-width') || 95;
-            const initialRatio = getCSSVariableNumeric('--card-ratio') || 1.7;
-            const initialScaleFactor = getCSSVariableNumeric('--card-scale-factor') || 1;
+            // Traitement des dimensions des cartes
+            const spreadType = activeSpreadType;
             
-            // N'inclure les dimensions que si elles sont différentes des valeurs initiales
-            if (hasChanged(cardBaseWidth.value, initialBaseWidth)) {
-                css += `--card-base-width: ${cardBaseWidth.value}px;\n`;
-                hasChangedValues = true;
-            }
+            // Toujours afficher les dimensions courantes des cartes en premier
+            css += `/* Dimensions des cartes pour le tirage ${spreads[spreadType].name} */\n`;
+            css += `--${spreadType}-card-base-width: ${cardBaseWidth.value}px;\n`;
+            css += `--${spreadType}-card-ratio: ${cardRatio.value};\n`;
+            css += `--${spreadType}-card-scale-factor: ${cardScaleFactor.value};\n\n`;
             
-            if (hasChanged(cardRatio.value, initialRatio)) {
-                css += `--card-ratio: ${cardRatio.value};\n`;
-                hasChangedValues = true;
-            }
-            
-            if (hasChanged(cardScaleFactor.value, initialScaleFactor)) {
-                css += `--card-scale-factor: ${cardScaleFactor.value};\n`;
-                hasChangedValues = true;
-            }
+            hasChangedValues = true;
             
             // Parcourir tous les types de tirages disponibles
             for (const spreadType in spreads) {
@@ -1039,21 +1085,14 @@
                     if (positionCSS) {
                         spreadChanges += positionCSS;
                         hasChangesInThisSpread = true;
-                        hasChangedValues = true;
                     }
                 }
                 
                 // N'ajouter le commentaire du tirage que si des modifications ont été faites
                 if (hasChangesInThisSpread) {
-                    css += `\n/* Variables modifiées pour le tirage ${spreads[spreadType].name} */\n`;
+                    css += `/* Variables modifiées pour le tirage ${spreads[spreadType].name} */\n`;
                     css += spreadChanges;
                 }
-            }
-            
-            // Si aucune valeur n'a changé, afficher un message par défaut
-            if (!hasChangedValues) {
-                resetCSSOutput();
-                return;
             }
             
             // Mise à jour du texte de la zone d'affichage principale
@@ -1075,10 +1114,18 @@
         function initApp() {
             // Écouteurs d'événements principaux
             spreadSelect.addEventListener('change', function() {
-                // Réinitialiser explicitement la zone de texte CSS avant de charger le nouveau spread
-                resetCSSOutput();
-                // Puis charger le nouveau spread
+                // S'assurer de charger d'abord les dimensions du spread sélectionné
+                const newSpreadType = this.value;
+                console.log(`Changement de tirage vers ${newSpreadType}`);
+                
+                // Charger explicitement les dimensions des cartes pour ce tirage spécifique
+                loadCardDimensionsFromCSS();
+                
+                // Puis charger le nouveau spread avec les dimensions correctes
                 loadSpread();
+                
+                // Force une mise à jour de l'affichage CSS à la fin
+                updateOutput(false);
             });
             
             document.getElementById('resetBtn').addEventListener('click', () => {

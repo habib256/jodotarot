@@ -20,8 +20,8 @@
 .card-position.top, .card-position.left, .card-position.center, .card-position.right, .card-position.bottom,
 .top, .left, .center, .right, .bottom {
   position: absolute;
-  width: var(--card-width);
-  height: var(--card-height);
+  width: var(--cross-card-width);
+  height: var(--cross-card-height);
   display: flex;
   justify-content: center;
   align-items: center;

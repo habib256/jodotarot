@@ -17,11 +17,15 @@
 /* Positions des cartes */
 .celtic-cross-spread .card-position {
   position: absolute;
-  width: var(--card-width);
-  height: var(--card-height);
+  width: var(--celtic-card-width);
+  height: var(--celtic-card-height);
   display: flex;
   justify-content: center;
   align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: filter 0.2s ease-in-out, box-shadow 0.2s ease-in-out, z-index 0.1s ease, transform 0.2s ease-out;
+  filter: brightness(1);
+  backface-visibility: hidden; /* Améliore les performances des animations 3D */
 }
 
 /* Positionnement spécifique pour chaque carte */

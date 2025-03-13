@@ -18,14 +18,15 @@
 /* Positions des cartes */
 .love-spread .card-position {
   position: absolute;
-  width: var(--card-width);
-  height: var(--card-height);
+  width: var(--love-card-width);
+  height: var(--love-card-height);
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  transition: filter 0.2s ease-in-out, box-shadow 0.2s ease-in-out, z-index 0.1s ease;
-  filter: brightness(1);
+  border-radius: var(--border-radius-sm);
+  transform: translate(-50%, -50%);
+  transition: all 0.3s ease-in-out;
+  z-index: 1;
 }
 
 /* Positionnement spécifique pour chaque carte */

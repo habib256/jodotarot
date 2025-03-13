@@ -15,19 +15,28 @@
 }
 
 /* Positions des cartes */
-.horseshoe-spread .card-position {
+.horseshoe-spread .card-position, 
+.horseshoe-spread .past, 
+.horseshoe-spread .recent, 
+.horseshoe-spread .present,
+.horseshoe-spread .future, 
+.horseshoe-spread .outcome, 
+.horseshoe-spread .influences, 
+.horseshoe-spread .advice {
   position: absolute;
   width: var(--card-width);
   height: var(--card-height);
   display: flex;
   justify-content: center;
   align-items: center;
+  border-radius: var(--border-radius-sm);
+  backface-visibility: hidden; /* Améliore les performances des animations 3D */
+  transform: translate(-50%, -50%);
+  transition: filter 0.2s ease-in-out, box-shadow 0.2s ease-in-out, z-index 0.1s ease, transform 0.2s ease-out;
 }
 
 /* Positionnement spécifique pour chaque carte - Position 1 (Passé) */
 .horseshoe-spread .card-1,
-.horseshoe-spread .past,
-.horseshoe-spread .position-1,
 .horseshoe-spread .card-position-1 {
   left: var(--horseshoe-position-1-x);
   top: var(--horseshoe-position-1-y);
@@ -36,8 +45,6 @@
 
 /* Position 2 (Passé récent) */
 .horseshoe-spread .card-2,
-.horseshoe-spread .recent,
-.horseshoe-spread .position-2,
 .horseshoe-spread .card-position-2 {
   left: var(--horseshoe-position-2-x);
   top: var(--horseshoe-position-2-y);
@@ -46,8 +53,6 @@
 
 /* Position 3 (Présent) */
 .horseshoe-spread .card-3,
-.horseshoe-spread .present,
-.horseshoe-spread .position-3,
 .horseshoe-spread .card-position-3 {
   left: var(--horseshoe-position-3-x);
   top: var(--horseshoe-position-3-y);
@@ -56,8 +61,6 @@
 
 /* Position 4 (Futur proche) */
 .horseshoe-spread .card-4,
-.horseshoe-spread .future,
-.horseshoe-spread .position-4,
 .horseshoe-spread .card-position-4 {
   left: var(--horseshoe-position-4-x);
   top: var(--horseshoe-position-4-y);
@@ -66,8 +69,6 @@
 
 /* Position 5 (Résultat) */
 .horseshoe-spread .card-5,
-.horseshoe-spread .outcome,
-.horseshoe-spread .position-5,
 .horseshoe-spread .card-position-5 {
   left: var(--horseshoe-position-5-x);
   top: var(--horseshoe-position-5-y);
@@ -76,8 +77,6 @@
 
 /* Position 6 (Influences) */
 .horseshoe-spread .card-6,
-.horseshoe-spread .influences,
-.horseshoe-spread .position-6,
 .horseshoe-spread .card-position-6 {
   left: var(--horseshoe-position-6-x);
   top: var(--horseshoe-position-6-y);
@@ -86,8 +85,6 @@
 
 /* Position 7 (Conseil) */
 .horseshoe-spread .card-7,
-.horseshoe-spread .advice,
-.horseshoe-spread .position-7,
 .horseshoe-spread .card-position-7 {
   left: var(--horseshoe-position-7-x);
   top: var(--horseshoe-position-7-y);
@@ -127,4 +124,24 @@
   }
   
   /* Nous utilisons les variables de card-width et card-height de variables.css */
+}
+
+.horseshoe-spread .card-position, 
+.horseshoe-spread .past, 
+.horseshoe-spread .recent, 
+.horseshoe-spread .present,
+.horseshoe-spread .future, 
+.horseshoe-spread .outcome, 
+.horseshoe-spread .influences, 
+.horseshoe-spread .advice {
+  position: absolute;
+  width: var(--horseshoe-card-width);
+  height: var(--horseshoe-card-height);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: var(--border-radius-sm);
+  backface-visibility: hidden; /* Améliore les performances des animations 3D */
+  transform: translate(-50%, -50%);
+  transition: filter 0.2s ease-in-out, box-shadow 0.2s ease-in-out, z-index 0.1s ease, transform 0.2s ease-out;
 } 

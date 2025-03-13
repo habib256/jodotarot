@@ -177,3 +177,8 @@ L'application inclut un éditeur visuel (`tools/spread-editor.html`) permettant 
    - Utiliser `transform` pour les animations
    - Regrouper les changements de style
    - Éviter les calculs de position inutiles 
+
+## Voir Aussi
+
+- [Guide d'intégration de nouveaux types de tirages](../composants/integrer-nouveau-tirage.md)
+- [Dimensions spécifiques des cartes par type de tirage](dimensions-cartes.md) 
