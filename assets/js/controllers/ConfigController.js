@@ -791,9 +791,6 @@ class ConfigController {
     
     // Ensuite mettre à jour l'état
     this.stateManager.setState({ iaModel: promptMode });
-    
-    // Afficher un message d'information
-    this.showTemporaryMessage("Mode Prompt activé : aucun modèle d'IA n'est disponible", "warning", 5000);
   }
   
   /**
