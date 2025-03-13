@@ -205,7 +205,7 @@
 
   /* Positions pour Croix Celtique */
   /* Dimensions spécifiques au tirage de la croix celtique */
-  --celtic-card-base-width: 70px;      /* Largeur de base */
+  --celtic-card-base-width: 75px;      /* Largeur de base */
   --celtic-card-ratio: 1.7;                /* Ratio hauteur/largeur */
   --celtic-card-scale-factor: 1;  /* Facteur d'échelle réduit par défaut car plus de cartes */
   --celtic-card-width: calc(var(--celtic-card-base-width) * var(--celtic-card-scale-factor));
@@ -215,7 +215,7 @@
   --celtic-position-1-x: 39%;
   --celtic-position-1-y: 37%;
   /* Position 2: Défi (précédemment 'challenge') */
-  --celtic-position-2-x: 39%;
+  --celtic-position-2-x: 38%;
   --celtic-position-2-y: 46%;
   --celtic-position-2-rotation: 90deg;
   /* Position 3: Couronne (précédemment 'crown') */

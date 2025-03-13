@@ -254,26 +254,22 @@ class CelticCrossSpread extends BaseSpread {
    */
   initializeCardPositions() {
     if (!this.container) {
-      console.error('Aucun conteneur fourni pour initialiser les positions des cartes');
+      console.error('Conteneur non défini pour le tirage');
       return;
     }
     
+    // Vider le conteneur
     this.container.innerHTML = '';
+    this.container.className = 'celtic-cross-spread';
     
+    // Créer les positions de cartes
     this.cardPositions.forEach((position, index) => {
       const positionElement = document.createElement('div');
+      positionElement.className = `card-position ${this.getPositionClassName(index, position)}`;
       
-      // Ajouter classes sémantiques et numériques
-      positionElement.className = this.getPositionClassName(index, position) + ' empty';
+      // Assigner un data-attribute pour la position (utilisé pour le drag n drop et les interactions)
       positionElement.setAttribute('data-position', index);
-      positionElement.setAttribute('data-position-name', this.getPositionMeaning(index));
-      
-      const positionDescription = this.getPositionDescription(index);
-      if (positionDescription) {
-        positionElement.setAttribute('data-position-meaning', positionDescription);
-      }
-      
-      positionElement.style.position = 'absolute';
+      positionElement.setAttribute('data-position-name', position.name);
       
       // Utiliser la position numérique en priorité
       if (position.position) {
@@ -286,8 +282,10 @@ class CelticCrossSpread extends BaseSpread {
         
         if (rotationValue && rotationValue.trim() !== '') {
           positionElement.style.transform = `translate(-50%, -50%) rotate(${rotationValue})`;
+          positionElement.style.transformOrigin = 'center center'; // Assure que la rotation se fait autour du centre
         } else if (position.rotation) {
           positionElement.style.transform = `translate(-50%, -50%) rotate(${position.rotation}deg)`;
+          positionElement.style.transformOrigin = 'center center'; // Assure que la rotation se fait autour du centre
         } else {
           positionElement.style.transform = 'translate(-50%, -50%)';
         }
@@ -300,6 +298,7 @@ class CelticCrossSpread extends BaseSpread {
         // Appliquer la rotation si spécifiée
         if (position.rotation) {
           positionElement.style.transform = `translate(-50%, -50%) rotate(${position.rotation}deg)`;
+          positionElement.style.transformOrigin = 'center center'; // Assure que la rotation se fait autour du centre
         } else {
           positionElement.style.transform = 'translate(-50%, -50%)';
         }

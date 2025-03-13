@@ -73,55 +73,54 @@ class BaseSpread {
   initializeCardPositions() {
     // Vérifier si le conteneur existe
     if (!this.container) {
-      console.error('Aucun conteneur fourni pour initialiser les positions des cartes');
+      console.error('Conteneur non défini pour le tirage');
       return;
     }
     
-    // Nettoyer le conteneur existant pour éviter les doublons
+    // Vider le conteneur
     this.container.innerHTML = '';
     
-    // Créer des emplacements vides pour les cartes basés sur les positions définies
+    // Créer les emplacements pour les cartes
     this.cardPositions.forEach((position, index) => {
       const positionElement = document.createElement('div');
       
-      // Définir les classes
-      positionElement.className = this.getPositionClassName(index, position) + ' empty';
+      // Appliquer les classes de position appropriées
+      positionElement.className = `card-position ${this.getPositionClassName(index, position)} empty`;
       
-      // Ajouter les attributs de données
+      // Ajouter des attributs de données pour la gestion des événements
       positionElement.setAttribute('data-position', index);
       positionElement.setAttribute('data-position-name', this.getPositionMeaning(index));
       
-      // Ajouter la signification détaillée de la position
+      // Ajouter une description détaillée si disponible
       const positionDescription = this.getPositionDescription(index);
       if (positionDescription) {
         positionElement.setAttribute('data-position-meaning', positionDescription);
       }
       
-      // Appliquer le style de positionnement en utilisant les variables CSS
+      // Style de base
       positionElement.style.position = 'absolute';
       
-      // Stratégie d'application des positions:
-      // 1. Utiliser position numérique si disponible (nouveau standard)
-      // 2. Sinon utiliser cssName (pour compatibilité)
-      // 3. Sinon utiliser name (pour rétrocompatibilité)
-      
+      // Définir la position en utilisant les variables CSS
+      // Utiliser le système de positionnement numérique en priorité (position-1, position-2, etc.)
       if (position.position) {
-        // Nouveau standard - position numérique
         positionElement.style.left = `var(--${this.key}-position-${position.position}-x)`;
         positionElement.style.top = `var(--${this.key}-position-${position.position}-y)`;
         
-        // Ajouter la rotation si elle existe pour cette position numérique
+        // Vérifier s'il existe une variable de rotation
         const rotationVar = `--${this.key}-position-${position.position}-rotation`;
         const rotationValue = getComputedStyle(document.documentElement).getPropertyValue(rotationVar);
         
         if (rotationValue && rotationValue.trim() !== '') {
           positionElement.style.transform = `translate(-50%, -50%) rotate(${rotationValue})`;
+          positionElement.style.transformOrigin = 'center center'; // Assure que la rotation se fait autour du centre
         } else if (position.rotation) {
           positionElement.style.transform = `translate(-50%, -50%) rotate(${position.rotation}deg)`;
+          positionElement.style.transformOrigin = 'center center'; // Assure que la rotation se fait autour du centre
         } else {
           positionElement.style.transform = 'translate(-50%, -50%)';
         }
-      } else {
+      } 
+      else {
         // Ancien système - nom sémantique
         const cssPositionName = position.cssName || position.name;
         if (cssPositionName) {
@@ -134,8 +133,10 @@ class BaseSpread {
           
           if (rotationValue && rotationValue.trim() !== '') {
             positionElement.style.transform = `translate(-50%, -50%) rotate(${rotationValue})`;
+            positionElement.style.transformOrigin = 'center center'; // Assure que la rotation se fait autour du centre
           } else if (position.rotation) {
             positionElement.style.transform = `translate(-50%, -50%) rotate(${position.rotation}deg)`;
+            positionElement.style.transformOrigin = 'center center'; // Assure que la rotation se fait autour du centre
           } else {
             positionElement.style.transform = 'translate(-50%, -50%)';
           }

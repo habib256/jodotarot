@@ -18,6 +18,13 @@
   transition: all var(--transition-base);
 }
 
+/* Styles spécifiques pour les cartes dans la croix celtique */
+.celtic-cross-spread .card {
+  width: var(--celtic-card-width);
+  height: var(--celtic-card-height);
+  border-radius: calc(var(--celtic-card-width) * 0.05);
+}
+
 .card img {
   width: 100%;
   height: 100%;
@@ -101,6 +108,14 @@
   width: var(--card-width);
   height: var(--card-height);
   transition: all 0.3s ease;
+}
+
+/* Styles spécifiques pour les positions vides dans la croix celtique */
+.celtic-cross-spread .card-position.empty,
+.celtic-cross-spread .card-position:empty {
+  border: calc(var(--celtic-card-width) * 0.02) dashed var(--color-primary-light);
+  width: var(--celtic-card-width);
+  height: var(--celtic-card-height);
 }
 
 .card-position.empty:hover,

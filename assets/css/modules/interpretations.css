@@ -2,6 +2,9 @@
  * Styles pour la zone d'interprétation
  */
 
+/* Importer les variables si elles ne sont pas déjà disponibles */
+@import '../base/variables.css';
+
 /* Nouvelle structure à trois cadres */
 .interpretation-section {
   margin-bottom: 0.7rem;

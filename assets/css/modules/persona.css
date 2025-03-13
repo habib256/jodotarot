@@ -2,6 +2,9 @@
  * Styles spécifiques aux personas
  */
 
+/* Importer les variables si elles ne sont pas déjà disponibles */
+@import '../base/variables.css';
+
 /* Badge du persona actif */
 .persona-badge {
   display: inline-flex;

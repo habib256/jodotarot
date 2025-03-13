@@ -2,6 +2,9 @@
  * Styles pour les menus de sélection
  */
 
+/* Importer les variables si elles ne sont pas déjà disponibles */
+@import '../base/variables.css';
+
 .select-group {
   margin-bottom: var(--spacing-sm);
   width: 100%;
