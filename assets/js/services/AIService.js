@@ -129,20 +129,37 @@ class AIService {
         suggestions: []
       };
 
-      // Utiliser les nouveaux timeouts configurés
-      const timeout = modelName.includes('llama3.1') ? TIMEOUTS.OLLAMA_MODEL_LOAD : TIMEOUTS.OLLAMA_CONNECT;
+      // Augmenter les timeouts pour donner plus de temps au chargement des modèles
+      // Utiliser des timeouts plus longs, surtout pour les grands modèles
+      const timeout = modelName.includes('llama3.1') ? 
+        TIMEOUTS.OLLAMA_MODEL_LOAD * 2 : // Doubler le timeout pour les grands modèles
+        TIMEOUTS.OLLAMA_CONNECT * 1.5;   // Augmenter de 50% pour les autres modèles
       
-      // Gestion des modèles Ollama (y compris avec format llama3.1:latest)
-      if (modelName.startsWith('ollama:') || modelName.includes(':')) {
-        const ollamaModelName = modelName.startsWith('ollama:') 
-          ? modelName.replace('ollama:', '') 
-          : modelName;
+      console.log(`Teste du modèle ${modelName} avec un timeout de ${timeout}ms`);
+
+      // Détection améliorée des modèles Ollama
+      // Gestion des modèles Ollama avec différents formats
+      const isOllamaModel = 
+        modelName.startsWith('ollama:') || 
+        modelName.includes(':') ||
+        !modelName.startsWith('openai/');
+      
+      if (isOllamaModel) {
+        // Nettoyer le nom du modèle - supprimer les préfixes et éventuellement isoler le nom de base
+        let ollamaModelName = modelName;
+        
+        // Supprimer le préfixe ollama: s'il existe
+        if (ollamaModelName.startsWith('ollama:')) {
+          ollamaModelName = ollamaModelName.replace('ollama:', '');
+        }
+        
+        console.log(`Test de connectivité pour le modèle Ollama: ${ollamaModelName}`);
         
         try {
           // Utiliser Promise.race pour ajouter un timeout
           const availabilityPromise = testOllamaConnectivity(ollamaModelName);
           const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Timeout lors du test de connectivité')), timeout)
+            setTimeout(() => reject(new Error(`Timeout lors du test de connectivité après ${timeout}ms`)), timeout)
           );
           
           const availability = await Promise.race([availabilityPromise, timeoutPromise]);
@@ -152,11 +169,27 @@ class AIService {
           result.message = availability.message;
           result.details = availability.details || {};
           
+          // Ajouter plus d'informations de diagnostic
+          if (this.debugMode) {
+            console.log(`Résultat du test pour ${ollamaModelName}:`, availability);
+          }
+          
           // Suggérer des alternatives en cas d'échec
           if (!availability.success) {
             result.suggestions.push('Vérifier que le serveur Ollama est bien démarré');
             result.suggestions.push('Vérifier que le modèle est correctement installé dans Ollama');
             result.suggestions.push('Vérifier la mémoire système disponible');
+            
+            // Message spécifique selon le type d'erreur
+            if (availability.message && availability.message.includes('not found')) {
+              result.suggestions.unshift(`Modèle "${ollamaModelName}" non trouvé. Installez-le avec "ollama pull ${ollamaModelName}"`);
+            }
+            else if (availability.message && availability.message.includes('timeout')) {
+              result.suggestions.unshift('Le modèle prend trop de temps à charger, essayez un modèle plus petit');
+            }
+            else if (availability.message && availability.message.includes('connect')) {
+              result.suggestions.unshift('Impossible de se connecter au serveur Ollama. Vérifiez qu\'il est bien démarré');
+            }
           }
         } catch (error) {
           console.error('Erreur lors du test de connectivité pour', modelName, ':', error);
@@ -164,6 +197,13 @@ class AIService {
           result.message = error.message;
           result.suggestions.push('Réessayer dans quelques instants');
           result.suggestions.push('Vérifier la mémoire système disponible');
+          
+          // Ajouter plus d'informations pour le débogage
+          if (this.debugMode) {
+            console.log(`Détails d'erreur pour ${ollamaModelName}:`, error);
+            result.details.error = error.toString();
+            result.details.stack = error.stack;
+          }
         }
       }
       

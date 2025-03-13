@@ -188,42 +188,6 @@ class LoveSpread extends BaseSpread {
     
     return `${baseClass}${additionalClasses}`;
   }
-
-  /**
-   * Surcharge pour utiliser les noms CSS corrects
-   */
-  initializeCardPositions() {
-    if (!this.container) {
-      console.error('Aucun conteneur fourni pour initialiser les positions des cartes');
-      return;
-    }
-    
-    this.container.innerHTML = '';
-    
-    this.cardPositions.forEach((position, index) => {
-      const positionElement = document.createElement('div');
-      positionElement.className = this.getPositionClassName(index, position) + ' empty';
-      positionElement.setAttribute('data-position', index);
-      positionElement.setAttribute('data-position-name', this.getPositionMeaning(index));
-      
-      const positionDescription = this.getPositionDescription(index);
-      if (positionDescription) {
-        positionElement.setAttribute('data-position-meaning', positionDescription);
-      }
-      
-      positionElement.style.position = 'absolute';
-      
-      // Utiliser le nom CSS correct pour les variables de position
-      if (position.cssName) {
-        positionElement.style.left = `var(--${this.key}-${position.cssName}-x)`;
-        positionElement.style.top = `var(--${this.key}-${position.cssName}-y)`;
-      }
-      
-      this.container.appendChild(positionElement);
-    });
-    
-    this.addVisualElements();
-  }
 }
 
 export default LoveSpread; 
