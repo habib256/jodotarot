@@ -1,0 +1,73 @@
+/* Panneau d'interprétation */
+.interpretation-panel {
+  position: relative;
+  padding: 20px;
+  background-color: var(--color-background-light);
+  border-radius: var(--border-radius-md);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  flex: 1;
+  max-width: 100%;
+}
+
+/* En-tête de la section d'interprétation */
+.interpretation-header {
+  position: relative;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+/* Titre de l'interprétation */
+.interpretation-title {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--color-primary);
+  display: inline-block;
+}
+
+/* Bouton de copie - Positionnement absolu */
+.copy-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  background-color: var(--color-secondary-light);
+  color: var(--color-text);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Suppression du div header-actions qui pourrait causer des problèmes */
+.header-actions {
+  display: inline;
+}
+
+.copy-button:hover {
+  background-color: var(--color-secondary);
+}
+
+.copy-button:active {
+  transform: translateY(1px);
+}
+
+/* État de succès pour le bouton de copie */
+.copy-button.success {
+  background-color: var(--color-success);
+  color: white;
+}
+
+/* Animation pour l'icône */
+.copy-button i {
+  transition: transform 0.2s ease-in-out;
+}
+
+.copy-button:hover i {
+  transform: scale(1.1);
+} 

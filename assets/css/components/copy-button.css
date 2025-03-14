@@ -1,0 +1,61 @@
+/**
+ * Styles spécifiques pour le bouton de copie
+ * Ces styles sont intentionnellement séparés pour être chargés en dernier et avoir priorité
+ */
+
+/* En-tête de l'interprétation - Assure une disposition flex */
+.interpretation-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  width: 100% !important;
+  position: relative !important;
+  margin-bottom: 1rem !important;
+}
+
+/* Titre de l'interprétation - S'assure qu'il n'écrase pas la mise en page flex */
+.interpretation-title {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: inline-block !important;
+}
+
+/* Bouton de copie - S'assure qu'il est positionné à droite */
+.copy-button {
+  position: static !important;
+  margin-left: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  padding: 6px 12px !important;
+  background-color: var(--color-secondary-light) !important;
+  color: var(--color-text) !important;
+  border: none !important;
+  border-radius: var(--border-radius-sm) !important;
+  cursor: pointer !important;
+  font-size: 0.9rem !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.copy-button:hover {
+  background-color: var(--color-secondary) !important;
+}
+
+.copy-button:active {
+  transform: translateY(1px) !important;
+}
+
+/* État de succès pour le bouton de copie */
+.copy-button.success {
+  background-color: var(--color-success) !important;
+  color: white !important;
+}
+
+/* Animation pour l'icône */
+.copy-button i {
+  transition: transform 0.2s ease-in-out !important;
+}
+
+.copy-button:hover i {
+  transform: scale(1.1) !important;
+} 

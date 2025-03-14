@@ -164,6 +164,63 @@ function setupEventListeners() {
     console.error('Promesse rejetée non gérée:', event.reason);
     showErrorMessage(`Erreur asynchrone: ${event.reason}`);
   });
+  
+  // Ajouter l'écouteur pour le bouton de copie
+  const copyButton = document.getElementById('copy-button');
+  if (copyButton) {
+    console.log('Initialisation du bouton de copie');
+    copyButton.addEventListener('click', handleCopyButtonClick);
+  } else {
+    console.error('Bouton de copie non trouvé dans le DOM');
+  }
+}
+
+/**
+ * Gère le clic sur le bouton de copie
+ * Copie le contenu de l'interprétation ou du prompt dans le presse-papier
+ */
+async function handleCopyButtonClick() {
+  const copyButton = document.getElementById('copy-button');
+  const responseContent = document.querySelector('.response-content');
+  
+  if (!responseContent) return;
+  
+  try {
+    // Récupérer le texte à copier
+    let textToCopy = '';
+    
+    // Si nous sommes en mode prompt (sans IA), copier le prompt
+    const currentModel = stateManager.getState().iaModel;
+    if (currentModel === 'prompt') {
+      // Si le prompt est affiché, le copier
+      textToCopy = responseContent.textContent;
+    } else {
+      // Sinon, copier l'interprétation
+      textToCopy = responseContent.textContent;
+    }
+    
+    // Copier dans le presse-papier
+    await navigator.clipboard.writeText(textToCopy);
+    
+    // Afficher un retour visuel de succès
+    const originalText = copyButton.querySelector('span').textContent;
+    copyButton.classList.add('success');
+    copyButton.querySelector('span').textContent = 'Copié !';
+    
+    // Revenir à l'état normal après un délai
+    setTimeout(() => {
+      copyButton.classList.remove('success');
+      copyButton.querySelector('span').textContent = originalText;
+    }, 2000);
+    
+  } catch (error) {
+    console.error('Erreur lors de la copie :', error);
+    // Afficher un message d'erreur en cas d'échec
+    copyButton.querySelector('span').textContent = 'Erreur !';
+    setTimeout(() => {
+      copyButton.querySelector('span').textContent = 'Copier';
+    }, 2000);
+  }
 }
 
 /**
