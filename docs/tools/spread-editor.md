@@ -4,6 +4,32 @@
 
 L'éditeur de positions (`spread-editor.html`) est un outil visuel permettant de définir les positions et les dimensions des cartes pour chaque type de tirage. Il génère les variables CSS nécessaires qui peuvent ensuite être copiées dans le fichier `variables.css`.
 
+## Rôle dans l'Architecture
+
+L'éditeur de tirages est un outil de développement spécialisé crucial pour maintenir la cohérence visuelle entre les différents types de tirages. Il représente une solution élégante pour gérer les dispositions complexes de cartes tout en maintenant une approche basée sur CSS natif, sans dépendre de bibliothèques externes.
+
+**Fonctionnalités principales**:
+- **Interface glisser-déposer**: Positionnement précis des cartes par manipulation directe
+- **Contrôle de rotation**: Ajustement de l'angle de chaque carte avec contrôle fin
+- **Prévisualisation instantanée**: Aperçu en temps réel des modifications
+- **Génération automatique de CSS**: Production de code prêt à l'emploi
+- **Sauvegarde des positions**: Export/import des configurations pour partage facile
+- **Adaptation responsive**: Simulation des différentes tailles d'écran pour test
+
+L'éditeur utilise le même système de variables CSS que l'application principale, ce qui garantit une cohérence parfaite entre l'édition et l'affichage final. Pour chaque type de tirage (Croix, Fer à Cheval, Amour, Croix Celtique), il génère:
+
+1. Les variables de positionnement (`--card-position-X-top`, `--card-position-X-left`)
+2. Les variables de rotation (`--card-position-X-rotation`)
+3. Les variables de dimensions (`--card-position-X-width`, `--card-position-X-height`)
+
+**Flux de travail typique**:
+1. Ouvrir `spread-editor.html` dans le navigateur
+2. Sélectionner le type de tirage à modifier dans le menu déroulant
+3. Déplacer les cartes pour définir leur position exacte
+4. Ajuster la rotation avec les contrôles dédiés pour obtenir l'angle souhaité
+5. Copier le CSS généré dans le panneau de droite
+6. Coller le code dans le fichier `assets/css/base/variables.css`
+
 ## Fonctionnalités
 
 L'éditeur permet de :

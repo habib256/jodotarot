@@ -1,8 +1,95 @@
-# Vue d'Ensemble de l'Architecture
+# 🏗️ Architecture Technique de JodoTarot
 
-## Introduction
+## 📋 Vue d'ensemble
 
-JodoTarot est une application web modulaire pour les tirages de tarot, construite en JavaScript ES6. Elle permet de réaliser des tirages de tarot interprétés par une intelligence artificielle avec différents personas et styles d'interprétation.
+JodoTarot est construit avec une architecture modulaire en JavaScript ES6, suivant les principes du pattern MVC (Modèle-Vue-Contrôleur).
+
+## 🔧 Structure du Code
+
+### 📁 Organisation des Fichiers
+
+```
+jodotarot/
+├── assets/
+│   ├── js/
+│   │   ├── controllers/
+│   │   ├── models/
+│   │   ├── services/
+│   │   └── views/
+│   ├── css/
+│   └── images/
+├── docs/
+└── index.html
+```
+
+### 🎯 Composants Principaux
+
+#### Contrôleurs
+- `AppController.js` (217 lignes) : Contrôleur principal
+- `ReadingController.js` (869 lignes) : Gestion des tirages
+- `ConfigController.js` (1320 lignes) : Configuration
+
+#### Services
+- `AIService.js` (883 lignes) : Communication IA
+- `DeckService.js` (445 lignes) : Gestion des cartes
+- `UIService.js` (187 lignes) : Interface utilisateur
+
+#### Modèles
+- `spreads/` : Types de tirages
+  - `BaseSpread.js` : Classe de base
+  - `CrossSpread.js` : Tirage en croix
+  - `HorseshoeSpread.js` : Fer à cheval
+  - `LoveSpread.js` : Tirage amour
+  - `CelticCrossSpread.js` : Croix celtique
+
+## 🎨 Interface Utilisateur
+
+### Système CSS
+- `main.css` : Point d'entrée
+- Composants modulaires :
+  - `buttons.css`
+  - `cards.css`
+  - `forms.css`
+  - `modal.css`
+  - `warnings.css`
+
+### 🌍 Support Multilingue
+- 6 langues supportées
+- Fichiers de traduction par langue
+- Système de changement dynamique
+
+## 🔄 Gestion de l'État
+
+- `StateManager.js` : Gestion centralisée
+- Validation des données
+- Persistance des préférences
+- Système d'événements
+- Migrations automatiques
+
+## 🤖 Intégration IA
+
+### Modèles Supportés
+- OpenAI (GPT-3.5, GPT-4)
+- Ollama (modèles locaux)
+
+### Gestion des Prompts
+- Templates personnalisés par persona
+- Adaptation multilingue
+- Optimisation des réponses
+
+## 🔒 Sécurité
+
+- Gestion sécurisée des clés API
+- Validation des entrées
+- Protection contre les injections
+- Gestion des erreurs
+
+## 📈 Performance
+
+- Chargement asynchrone
+- Cache des réponses IA
+- Optimisation des images
+- Gestion efficace de la mémoire
 
 ## Architecture Globale
 

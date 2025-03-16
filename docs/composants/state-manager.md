@@ -4,6 +4,26 @@
 
 Le StateManager est le composant central de gestion d'état dans JodoTarot. Il agit comme une "source unique de vérité" pour l'ensemble de l'application, assurant la cohérence des données et leur persistance entre les sessions.
 
+## Rôle dans l'Architecture
+
+Le `StateManager` est l'élément central et nerveux de JodoTarot, agissant comme un "source unique de vérité" pour toute l'application. Voici ses fonctionnalités clés:
+
+- **Validation automatique des données**: Toutes les modifications d'état sont validées selon un schéma strict pour garantir la cohérence des données
+- **Pattern Observer**: Notification automatique des composants abonnés à chaque changement d'état
+- **Système d'événements**: Émission d'événements spécifiques (`iaModel:changed`, `cardSet:changed`, etc.) pour des réactions ciblées
+- **Persistance localStorage**: Sauvegarde automatique de l'état dans le stockage local du navigateur
+- **Migrations de données**: Conversion automatique des anciennes versions d'état lors des mises à jour de l'application
+- **Optimisation des performances**: Notification sélective uniquement lors de changements réels des valeurs
+- **Débogage intégré**: Journalisation détaillée des changements d'état pour faciliter le développement
+
+L'utilisation du StateManager dans JodoTarot suit un flux unidirectionnel:
+1. Les contrôleurs appellent `stateManager.setState()` pour mettre à jour l'état
+2. Le StateManager valide les changements et notifie les composants abonnés
+3. Les composants réagissent aux changements et mettent à jour l'interface utilisateur
+4. Les services utilisent `stateManager.getState()` pour accéder aux données actuelles
+
+Ce pattern évite les problèmes de synchronisation et garantit la cohérence des données dans toute l'application.
+
 ## Architecture du StateManager
 
 ```mermaid

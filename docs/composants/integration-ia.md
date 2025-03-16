@@ -51,6 +51,68 @@ const TIMEOUTS = {
 };
 ```
 
+## Mécanismes Avancés
+
+Le module d'API de JodoTarot intègre plusieurs mécanismes sophistiqués pour assurer une communication fiable avec les services d'IA:
+
+### Gestion intelligente des timeouts
+
+- **Timeouts différenciés par étape**: Différents timeouts sont configurés pour chaque phase (connexion, chargement du modèle, génération de réponse)
+- **Détection automatique d'inactivité**: Le système surveille l'arrivée des chunks de données et déclenche une erreur si aucune donnée n'est reçue pendant une période configurable
+- **Timers adaptatifs**: Les délais d'attente sont ajustés automatiquement selon le type de modèle (local vs cloud)
+
+### Système de retry automatique
+
+- **Tentatives multiples**: En cas d'erreur réseau, le système tente automatiquement de rétablir la connexion
+- **Délai exponentiel**: Le temps d'attente entre les tentatives augmente progressivement pour éviter de surcharger le serveur
+- **Paramètres configurables**: Le nombre maximal de tentatives et le délai initial sont définissables via les constantes TIMEOUTS
+
+### Détection et adaptation de format
+
+- **Reconnaissance automatique**: Le système détecte automatiquement le format de réponse selon le modèle d'IA utilisé
+- **Support multi-formats**: Prise en charge des formats spécifiques à OpenAI et des différentes versions d'Ollama
+- **Normalisation des réponses**: Les différents formats sont convertis en une structure unifiée pour simplifier l'utilisation
+
+### Cache optimisé des réponses
+
+```javascript
+// Système simple de cache pour les réponses
+const responseCache = new Map();
+
+// Exemple d'utilisation du cache
+const cacheKey = `${question}_${persona}_${modele}_${langue}`;
+if (responseCache.has(cacheKey) && !forceRefresh) {
+  return responseCache.get(cacheKey);
+}
+// ... génération de la réponse ...
+responseCache.set(cacheKey, response);
+```
+
+### Streaming efficace
+
+- Support complet du streaming pour toutes les API
+- Traitement en temps réel des chunks de données
+- Effet machine à écrire pour une expérience utilisateur fluide
+
+### Gestion robuste des erreurs
+
+```javascript
+try {
+  // Appel API
+} catch (error) {
+  // Analyse détaillée de l'erreur
+  if (error.message.includes('timeout')) {
+    // Gestion spécifique des timeouts
+  } else if (error.response?.status === 401) {
+    // Gestion des erreurs d'authentification
+  } else {
+    // Gestion des erreurs génériques
+  }
+}
+```
+
+Ces mécanismes permettent à JodoTarot de fonctionner de manière fiable même dans des conditions réseau difficiles ou avec des modèles d'IA ayant des temps de réponse variables.
+
 ## Communication avec Ollama
 
 ### Format de Requête

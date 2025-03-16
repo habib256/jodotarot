@@ -1,4 +1,106 @@
-# Positionnement des Cartes
+# 🎴 Types de Tirages et Positionnement des Cartes
+
+## 🌟 Vue d'ensemble
+
+JodoTarot propose quatre types de tirages différents, chacun avec son propre positionnement et sa signification particulière.
+
+## 📍 Types de Tirages
+
+### ✝️ Tirage en Croix (5 cartes)
+
+```
+       1
+    4  2  5
+       3
+```
+
+1. **Influences positives** : Forces et opportunités
+2. **Passé** : Événements et influences passés
+3. **Situation actuelle** : État présent
+4. **Futur** : Tendances et possibilités
+5. **Influences négatives** : Obstacles et défis
+
+### 🔄 Tirage en Fer à Cheval (7 cartes)
+
+```
+1  2  3
+   4
+5  6  7
+```
+
+1. **Situation actuelle**
+2. **Obstacles immédiats**
+3. **Influences inconscientes**
+4. **Conseils à suivre**
+5. **Influences extérieures**
+6. **Espoirs et craintes**
+7. **Résultat final**
+
+### 💝 Tirage de l'Amour (7 cartes)
+
+```
+   1  2
+3  4  5
+   6  7
+```
+
+1. **Vous** : Votre énergie
+2. **Partenaire** : Son énergie
+3. **Relation** : Ce qui vous lie
+4. **Obstacles** : Défis à surmonter
+5. **Désirs** : Attentes et souhaits
+6. **Situation actuelle**
+7. **Conseil** : Direction future
+
+### ☘️ Croix Celtique (10 cartes)
+
+```
+     4
+     1
+  5  2  6
+     3
+  7  8  9
+    10
+```
+
+1. **Situation actuelle**
+2. **Obstacle/Défi**
+3. **Base/Fondation**
+4. **Passé**
+5. **Couronne/Objectif**
+6. **Futur**
+7. **Vous-même**
+8. **Environnement**
+9. **Espoirs/Craintes**
+10. **Résultat final**
+
+## 🎯 Conseils d'Utilisation
+
+### Choix du Tirage
+- **Croix** : Questions générales et rapides
+- **Fer à Cheval** : Évolution d'une situation
+- **Amour** : Questions relationnelles
+- **Croix Celtique** : Analyse approfondie
+
+### Interprétation
+- Considérez la position de chaque carte
+- Observez les relations entre les cartes
+- Tenez compte de l'orientation
+- Intégrez le contexte de la question
+
+## 🔄 Aspects Techniques
+
+### Animation et Affichage
+- Transition fluide pour chaque carte
+- Zoom possible sur les cartes
+- Affichage adaptatif (responsive)
+- Support tactile pour mobile
+
+### Personnalisation
+- Choix du jeu de cartes
+- Options d'affichage
+- Paramètres d'animation
+- Mode d'interprétation
 
 ## Vue d'Ensemble
 
@@ -66,53 +168,6 @@ positionElement.className = this.getPositionClassName(index, position) + ' empty
 positionElement.setAttribute('data-position', index);
 positionElement.setAttribute('data-position-name', this.getPositionMeaning(index));
 positionElement.setAttribute('data-position-meaning', positionDescription);
-```
-
-## Types de Tirages
-
-### Croix Celtique
-
-```javascript
-this.cardPositions = [
-  { name: 'present', cssName: 'present', position: 1 },           // Situation actuelle
-  { name: 'challenge', cssName: 'challenge', rotation: 90, position: 2 }, // Défi/Obstacle
-  { name: 'foundation', cssName: 'foundation', position: 3 },     // Base/Fondation
-  { name: 'past', cssName: 'past', position: 4 },                // Passé récent
-  { name: 'crown', cssName: 'crown', position: 5 },              // Couronne/Résultat
-  { name: 'future', cssName: 'future', position: 6 },            // Futur immédiat
-  { name: 'self', cssName: 'self', position: 7 },                // Vous-même
-  { name: 'environment', cssName: 'environment', position: 8 },   // Environnement
-  { name: 'hopes', cssName: 'hopes', position: 9 },              // Espoirs/Craintes
-  { name: 'outcome', cssName: 'outcome', position: 10 }          // Résultat final
-];
-```
-
-### Tirage en Fer à Cheval
-
-```javascript
-this.cardPositions = [
-  { name: 'past', cssName: 'past', position: 1 },        // Passé lointain
-  { name: 'recent', cssName: 'recent', position: 2 },    // Passé récent
-  { name: 'present', cssName: 'present', position: 3 },  // Présent
-  { name: 'future', cssName: 'future', position: 4 },    // Futur proche
-  { name: 'outcome', cssName: 'outcome', position: 5 },  // Futur lointain
-  { name: 'advice', cssName: 'advice', position: 6 },    // Conseil
-  { name: 'summary', cssName: 'summary', position: 7 }   // Synthèse
-];
-```
-
-### Tirage Amour
-
-```javascript
-this.cardPositions = [
-  { name: 'self', cssName: 'you', position: 1 },           // Soi / Votre cœur
-  { name: 'partner', cssName: 'partner', position: 2 },    // Partenaire / Son cœur
-  { name: 'relationship', cssName: 'relationship', position: 3 }, // Relation actuelle
-  { name: 'obstacles', cssName: 'foundation', position: 4 },  // Obstacles à surmonter
-  { name: 'desires', cssName: 'past', position: 5 },       // Désirs secrets
-  { name: 'outcome', cssName: 'present', position: 6 },    // Résultat probable
-  { name: 'advice', cssName: 'future', position: 7 }       // Conseil final
-];
 ```
 
 ## Éditeur de Positions

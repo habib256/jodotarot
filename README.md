@@ -6,309 +6,51 @@
 
 JodoTarot est une application web élégante et intuitive qui vous permet de réaliser des tirages de tarot et d'obtenir des interprétations générées par intelligence artificielle. Inspirée par l'univers mystique du tarot, cette application combine l'art divinatoire traditionnel avec les technologies modernes d'IA pour vous offrir une expérience de consultation unique.
 
-[Lancer JodoTarot dans votre navigateur pour tester l'interface (Attention !! Sans IA, c'est juste le prompt)](https://habib256.github.io/jodotarot/index.html)  
+[Essayer JodoTarot](https://habib256.github.io/jodotarot/index.html) | [Documentation complète](docs/index.md)
 
-[Lancer l'éditeur de tirage css](https://habib256.github.io/jodotarot/spread-editor.html) 
+## 🚀 Guide rapide
+
+1. **Choisissez votre langue** dans le menu déroulant
+2. **Posez votre question** dans le champ dédié
+3. **Sélectionnez** votre persona, jeu de cartes et type de tirage
+4. **Cliquez sur "Tirer les cartes"**
+5. **Explorez** l'interprétation générée par l'IA
 
 ## 🌟 Fonctionnalités principales
 
-- 🎴 **Multiples modes de tirage**:
-  - **Tirage en croix** avec 5 cartes (influences positives, passé, situation actuelle, futur, influences négatives)
-  - **Tirage en fer à cheval** pour analyser la progression d'une situation
-  - **Tirage de l'amour** dédié aux questions sentimentales
-  - **Croix celtique** pour une analyse approfondie de 10 cartes
-- 🧠 **Interprétation par IA** de votre tirage en fonction de votre question
-- 👤 **Personnages variés** pour interpréter votre tirage (21 personas différents)
-- 🔄 **Flexibilité des modèles d'IA** (OpenAI et modèles locaux Ollama)
-- 📱 **Interface responsive** adaptée à tous les appareils
-- 🖼️ **Visualisation claire** des cartes et de leur signification dans le tirage
-- 🎨 **Choix de jeux de cartes** (Tarot de Marseille et Tarot Thiago Lehmann)
-- 🌍 **Support multilingue** (Français, Anglais, Espagnol, Allemand, Italien, Chinois)
-- 🔄 **Cache intégré** pour les réponses d'IA afin d'optimiser les performances
-- ⚡ **Streaming des réponses** en temps réel avec effet machine à écrire
-- 🚨 **Système d'avertissements** pour les erreurs de connexion et problèmes API
-- 🔍 **Tests de connectivité** automatiques pour les modèles d'IA
+- 🎴 **4 types de tirages** (Croix, Fer à cheval, Amour, Croix celtique)
+- 🧠 **Interprétation par IA** personnalisée
+- 👤 **21 personas uniques** pour des lectures variées
+- 🎨 **2 jeux de tarot** (Marseille et Thiago Lehmann)
+- 🌍 **6 langues** supportées
+- 🤖 **Modèles d'IA** flexibles (OpenAI et Ollama)
 
-## 🎭 Les personas disponibles
+## 🃏 Aperçu des jeux
 
-JodoTarot propose 21 personnages différents pour interpréter votre tirage. Chaque persona possède:
-- Un style d'expression unique
-- Une approche spécifique d'interprétation du tarot
-- Des **particularités langagières** distinctives (expressions typiques, vocabulaire spécifique, structures de phrases)
-- Des **citations** représentatives de sa tradition ou de sa pensée
+| <img src="assets/images/cards/marseille/13 La mort.png" alt="La Mort" width="200" /> | <img src="assets/images/cards/lehmann/17 Etoile.jpg" alt="L'Étoile" width="200" /> |
+|:-------------------------:|:-------------------------:|
+| **Tarot de Marseille** | **Tarot Thiago Lehmann** |
 
-### Arts Divinatoires:
-- 🔮 **Tarologue** - Expert des arts introspectifs inspiré par Jodorowsky, utilisant un langage métaphorique et poétique
-- ✨ **Oracle Mystique** - Porte-parole énigmatique des forces cosmiques s'exprimant par prophéties ambiguës
-- 🎯 **Voyante Gitane** - Diseuse de bonne aventure directe et colorée, mêlant expressions romanis et intuition brute
+## ⚙️ Installation rapide
 
-### Traditions Spirituelles:
-- ✝️ **Prêtre Exégète** - Interprète des textes sacrés chrétiens, reliant les symboles du tarot aux récits bibliques
-- ✡️ **Rabbin Kabbaliste** - Érudit associant les arcanes aux lettres hébraïques et sentiers de l'Arbre de Vie
-- ☪️ **Imam Soufi** - Guide spirituel explorant les miroirs de l'âme (nafs) et le chemin vers le divin
-- ☸️ **Dalaï-Lama** - Leader bouddhiste tibétain expliquant avec simplicité les causes de la souffrance et la voie du milieu
-- 🏛️ **Maître Franc-Maçon** - Sage utilisant les symboles maçonniques pour dévoiler les vérités universelles
+1. Clonez ce dépôt
+2. Configurez votre clé API dans `assets/js/config.js`
+3. Ouvrez `index.html` dans votre navigateur
 
-### Traditions Ésotériques:
-- 🌙 **Sorcière Ancestrale** - Gardienne des savoirs païens reliant le tirage aux cycles naturels
-- ⚗️ **Alchimiste Ésotérique** - Maître identifiant les phases alchimiques (nigredo, albedo, rubedo) dans les arcanes
-- 🌟 **Mage Élémentaliste** - Expert des quatre éléments analysant leurs influences dans le tirage
+Pour plus de détails sur l'installation et la configuration, consultez notre [guide technique](docs/index.md).
 
-### Psychanalystes:
-- 🛋️ **Sigmund Freud** - Père de la psychanalyse interprétant les symboles comme manifestations de l'inconscient
-- ☯️ **Carl Gustav Jung** - Explorateur des archétypes et du processus d'individuation révélés par les cartes
-- 🔄 **Jacques Lacan** - Théoricien structuraliste décryptant le Réel-Symbolique-Imaginaire dans le tirage
-- 👶 **Françoise Dolto** - Spécialiste de l'enfance analysant l'image inconsciente du corps et les schémas relationnels
+## 🔧 Besoin d'aide ?
 
-### Philosophes et Sages:
-- 🧠 **Socrate** - Maître de la maïeutique guidant vers la connaissance de soi par le questionnement
-- 👑 **Roi Salomon** - Figure de sagesse biblique offrant discernement et jugement équilibré
-- 📚 **Michel de Montaigne** - Humaniste explorant les contradictions humaines avec nuance et introspection
-- 🛡️ **Don Quichotte** - Idéaliste transformant le tirage en quête chevaleresque et aventure extraordinaire
+- Consultez notre [guide de dépannage](docs/troubleshooting.md)
+- Explorez la [documentation complète](docs/index.md)
+- Découvrez nos [personas](docs/composants/personas.md)
 
-### Entités Spéciales:
-- 💀 **Mortrarion** - Liche antique révélant des vérités brutales avec un mépris délibéré
-- ☯️ **No EGO man** - Conscience non-duelle transcendant les dualités et dissolvant les questions plutôt que d'y répondre
+## 📝 Licence
 
-## 🃏 Les jeux de tarot
-
-L'application propose deux jeux complets des 22 arcanes majeurs:
-
-### Tarot de Marseille (set01)
-Le jeu traditionnel avec ses illustrations classiques.
-
-### Tarot Thiago Lehmann (set02)
-Une interprétation artistique moderne des arcanes.
-
-## 🌍 Langues disponibles
-
-JodoTarot prend en charge 6 langues différentes:
-
-- 🇫🇷 **Français** (langue par défaut)
-- 🇬🇧 **Anglais**
-- 🇪🇸 **Espagnol**
-- 🇩🇪 **Allemand**
-- 🇮🇹 **Italien**
-- 🇨🇳 **Chinois**
-
-
-## 🔮 Types de tirages disponibles
-
-### Tirage en Croix (Cross Spread)
-Un tirage classique à 5 cartes qui examine la situation à travers différentes perspectives :
-- Influences positives
-- Passé
-- Situation actuelle
-- Futur
-- Influences négatives
-
-### Tirage en Fer à Cheval (Horseshoe Spread)
-Un tirage à 7 cartes qui suit l'évolution d'une situation :
-- Situation actuelle
-- Obstacles immédiats
-- Influences inconscientes
-- Conseils à suivre
-- Influences extérieures
-- Espoirs et craintes
-- Résultat final
-
-### Tirage de l'Amour (Love Spread)
-Un tirage spécialisé à 7 cartes pour les questions relationnelles et sentimentales :
-- Vous (votre énergie)
-- Partenaire (son énergie)
-- Relation (ce qui vous lie)
-- Obstacles (défis à surmonter)
-- Désirs (passé/attentes)
-- Résultat (présent/situation actuelle)
-- Conseil (futur/direction)
-
-### Croix Celtique (Celtic Cross Spread)
-Un tirage approfondi à 10 cartes qui offre une lecture très complète de la situation :
-- Situation actuelle
-- Obstacle/Défi
-- Base/Fondation
-- Passé
-- Couronne/Objectif
-- Futur
-- Vous-même
-- Environnement
-- Espoirs/Craintes
-- Résultat final
-
-## 🤖 Modèles d'IA supportés
-
-### OpenAI (nécessite une clé API):
-- GPT-4o Mini
-- GPT-3.5 Turbo (par défaut si Ollama n'est pas disponible)
-- GPT-4o
-
-### Ollama (modèles locaux):
-- Tous les modèles installés sur votre serveur Ollama local sont automatiquement détectés
-- Premier modèle Ollama disponible utilisé par défaut si le serveur est accessible
-- Support optimisé pour différentes familles de modèles (llama, mistral, phi, gemma, etc.)
-
-## 🚀 Comment utiliser JodoTarot
-
-1. **Choisissez votre langue** dans le menu déroulant en haut à gauche
-2. **Posez votre question** dans le champ dédié
-3. **Choisissez votre persona**, le **jeu de cartes**, le **mode de tirage** et le **modèle d'IA** souhaités
-4. **Cliquez sur "Tirer les cartes"**
-5. **Contemplez** le tirage qui s'affiche
-6. **Lisez l'interprétation** générée par l'IA dans le style du persona choisi
-7. **Cliquez sur une carte** pour l'agrandir et mieux l'observer
-
-## 📸 Exemple de tirage
-
-Voici un exemple de tirage en croix avec son interprétation complète:
-
-<img src="screenshot.png" alt="Exemple de tirage en croix JodoTarot"  />
-
-*L'image montre un tirage complet avec l'interprétation de chaque carte et leur signification dans les différentes positions: influences positives (La Force), passé (Le Chariot), situation actuelle (La Papesse), futur (La Roue) et influences négatives (L'Étoile).*
-
-## 💡 Conseils d'utilisation
-
-- Formulez des questions ouvertes et personnelles pour obtenir des interprétations plus pertinentes
-- Expérimentez avec différents personas pour découvrir diverses perspectives sur votre tirage
-- Les modèles plus avancés comme GPT-4o offrent généralement des interprétations plus nuancées
-- Essayez les deux jeux de cartes pour voir lequel résonne le plus avec vous
-- Expérimentez les différents types de tirages en fonction de vos questions
-- Prenez le temps de méditer sur chaque carte avant de lire l'interprétation complète
-
-
-## 🙏 Remerciements
-
-- Inspiré par l'univers symbolique d'Alejandro Jodorowsky
-- Personas créés spécifiquement pour cette application
-- Technologie propulsée par les API OpenAI et Ollama
+JodoTarot est distribué sous licence GNU General Public License v3.0.
 
 ---
 
 *"Le tarot ne prédit pas l'avenir, il aide à le créer." – Alejandro Jodorowsky*
 
----
-
-## 🔮 Exemples d'arcanes de tarot
-
-| <img src="assets/images/set01/13 La mort.png" alt="Carte de La Mort - Tarot de Marseille" width="250" /> | <img src="assets/images/set02/17 Etoile.jpg" alt="Carte de L'Étoile - Tarot Thiago Lehmann" width="250" /> | <img src="assets/images/set02/00 Le fou.jpg" alt="Carte du Fou - Tarot Thiago Lehmann" width="250" /> |
-|:-------------------------:|:-------------------------:|:-------------------------:|
-| **XIII - La Mort**<br>Tarot de Marseille | **XVII - L'Étoile**<br>Tarot Thiago Lehmann | **0 - Le Fou**<br>Tarot Thiago Lehmann |
-
 Développé avec ❤️ pour les amateurs de tarot et d'exploration intérieure.
-
-
-## ⚙️ Installation et configuration
-
-1. Clonez ce dépôt sur votre serveur
-2. Ouvrez le fichier `assets/js/config.js` et configurez votre clé API OpenAI: `const API_KEY = "Your OpenAI KEY";`
-3. Pour utiliser les modèles Ollama, assurez-vous que le serveur Ollama est en cours d'exécution sur `http://localhost:11434`
-4. Ouvrez `index.html` dans votre navigateur ou déployez l'application sur un serveur web
-
-## 🔧 Caractéristiques techniques
-
-- Application entièrement modulaire en JavaScript ES6
-- Architecture orientée composants avec séparation claire des responsabilités:
-  - `main.js` (203 lignes): Point d'entrée et initialisation de l'application
-  - `app.js` (228 lignes): Gestion des événements et de l'interaction utilisateur
-  - `api.js` (864 lignes): Communication avec les API d'IA (OpenAI et Ollama)
-  - `ui.js` (255 lignes): Gestion de l'interface utilisateur
-  - `prompt.js` (72 lignes): Gestion des prompts IA
-  - `config.js` (143 lignes): Configuration globale de l'application
-
-- Architecture MVC claire avec:
-  - **Contrôleurs** pour la logique métier:
-    - `AppController.js` (217 lignes): Contrôleur principal de l'application
-    - `ReadingController.js` (869 lignes): Contrôleur de lecture de tarot
-    - `ConfigController.js` (1320 lignes): Contrôleur de configuration
-  - **Services** pour la gestion des ressources:
-    - `AIService.js` (883 lignes): Service d'intelligence artificielle
-    - `DeckService.js` (445 lignes): Service de gestion du jeu de cartes
-    - `UIService.js` (187 lignes): Service d'interface utilisateur
-  - **Modèles** pour les données:
-    - `spreads/`: Types de tirages disponibles
-      - `BaseSpread.js` (331 lignes): Classe de base pour tous les tirages
-      - `CrossSpread.js` (141 lignes): Tirage en Croix
-      - `HorseshoeSpread.js` (184 lignes): Tirage en Fer à Cheval
-      - `LoveSpread.js` (216 lignes): Tirage de l'Amour
-      - `CelticCrossSpread.js` (295 lignes): Croix Celtique
-    - `personas/`: 21 personas différents avec leurs styles d'interprétation uniques
-    - `cards/`: Définition des cartes et de leurs significations
-
-- Système CSS modulaire et extensible:
-  - `main.css` (79 lignes): Point d'entrée des styles
-  - Composants réutilisables:
-    - `buttons.css` (119 lignes): Styles des boutons
-    - `cards.css` (170 lignes): Styles des cartes
-    - `forms.css` (170 lignes): Styles des formulaires
-    - `modal.css` (168 lignes): Fenêtres modales
-    - `warnings.css` (167 lignes): Messages d'avertissement
-  - Modules spécifiques pour chaque type de tirage
-  - Variables CSS centralisées pour les couleurs et positions
-
-- Support multilingue complet:
-  - 6 langues supportées avec fichiers de traduction dédiés:
-    - Français (246 lignes)
-    - Anglais (246 lignes)
-    - Espagnol (166 lignes)
-    - Allemand (166 lignes)
-    - Italien (166 lignes)
-    - Chinois (167 lignes)
-
-- Gestionnaire d'état centralisé:
-  - `StateManager.js` (816 lignes): Gestion de l'état global de l'application
-  - Validation stricte des données
-  - Persistance des préférences utilisateur
-  - Système d'événements pour la synchronisation UI/État
-  - Migrations automatiques entre versions
-
-## 📝 Licence
-
-JodoTarot est distribué sous licence GNU General Public License v3.0. Vous êtes libre de:
-- Utiliser le logiciel
-
-Voir le fichier [LICENSE](LICENSE) pour plus de détails.
-
-## 🔧 Dépannage
-
-### Problèmes courants et solutions
-
-1. **"Erreur de connexion à l'API OpenAI"**
-   - Vérifiez que votre clé API est correcte et possède des crédits suffisants
-   - Assurez-vous que votre connexion internet fonctionne correctement
-   - Utilisez le test de connectivité intégré pour valider l'état de la connexion
-
-2. **"Impossible de se connecter à Ollama"**
-   - Vérifiez que le serveur Ollama est bien lancé: `ollama serve`
-   - Assurez-vous qu'Ollama écoute sur le port 11434
-   - Vérifiez que vous avez au moins un modèle installé: `ollama list`
-   - Utilisez le bouton de test pour vérifier automatiquement la connexion
-
-3. **"Le tirage ne s'affiche pas correctement"**
-   - Essayez de rafraîchir la page
-   - Vérifiez que JavaScript est activé dans votre navigateur
-   - Assurez-vous que le chemin vers les images est correct
-   - Vérifiez les erreurs dans la console développeur (F12)
-
-4. **"L'interprétation est coupée ou incomplète"**
-   - Vérifiez votre connexion internet
-   - Essayez un autre modèle d'IA
-   - Si vous utilisez un modèle local, assurez-vous qu'il a suffisamment de RAM
-   - Vous pouvez annuler et recommencer la génération avec le bouton dédié
-
-5. **"Problèmes avec le changement de langue"**
-   - Assurez-vous que la page est entièrement chargée avant de changer de langue
-   - Si certains textes ne sont pas traduits, rafraîchissez la page
-   - Vérifiez que le modèle d'IA que vous utilisez est compatible avec la langue sélectionnée
-   - Pour les modèles locaux Ollama, assurez-vous qu'ils peuvent générer du contenu dans la langue choisie
-
-## 🔄 Mises à jour futures envisageables
-
-- Support pour les arcanes mineurs (jeu complet de 78 cartes)
-- Possibilité de sauvegarder et partager vos tirages
-- Thèmes visuels alternatifs pour l'interface comme un mode sombre
-- Intégration d'autres modèles d'IA locaux
-- Rajout de la gestion des Oracles et du Yi King
-- Permettre à l'IA de lire les images des cartes pour identifier les particularités symboliques spécifiques à chaque set
-- Amélioration des performances sur appareils mobiles
-- Optimisation du streaming des réponses
-- Interface de personnalisation des prompts système
-- Visualisation avancée avec animations des relations entre cartes
