@@ -125,114 +125,193 @@ export class TarotCard {
 }
 
 /**
+ * Configuration unifiée des jeux de cartes
+ */
+export const cardSetConfigs = {
+  set01: {
+    id: 'set01',
+    name: 'Tarot Marseille',
+    path: 'assets/images/cards/marseille',
+    extension: 'png',
+    majorCount: 22,
+    minorCount: 0,
+    supportsMinor: false,
+    cardNames: {
+      0: 'Le_fou',
+      1: 'Bateleur',
+      2: 'Papesse',
+      3: 'Imperatrice',
+      4: 'Empereur',
+      5: 'Pape',
+      6: 'Les_amoureux',
+      7: 'Chariot',
+      8: 'Justice',
+      9: 'Ermite',
+      10: 'La_roue',
+      11: 'Force',
+      12: 'Le_pendu',
+      13: 'La_mort',
+      14: 'Temperance',
+      15: 'Diable',
+      16: 'La_Tour',
+      17: 'Etoile',
+      18: 'La_lune',
+      19: 'Le_soleil',
+      20: 'Le_jugement',
+      21: 'Le_monde',
+      22: 'Dos_de_carte'
+    }
+  },
+  set02: {
+    id: 'set02',
+    name: 'Tarot Thiago Lehmann',
+    path: 'assets/images/cards/lehmann',
+    extension: 'jpg',
+    majorCount: 22,
+    minorCount: 0,
+    supportsMinor: false,
+    cardNames: {
+      0: 'Le_fou',
+      1: 'Bateleur',
+      2: 'Papesse',
+      3: 'Imperatrice',
+      4: 'Empereur',
+      5: 'Pape',
+      6: 'Les_amoureux',
+      7: 'Chariot',
+      8: 'Justice',
+      9: 'Ermite',
+      10: 'La_roue',
+      11: 'Force',
+      12: 'Le_pendu',
+      13: 'La_mort',
+      14: 'Temperance',
+      15: 'Diable',
+      16: 'La_Tour',
+      17: 'Etoile',
+      18: 'La_lune',
+      19: 'Le_soleil',
+      20: 'Le_jugement',
+      21: 'Le_monde',
+      22: 'Dos_de_carte'
+    }
+  },
+  set03: {
+    id: 'set03',
+    name: 'Tarot Renaissance',
+    path: 'assets/images/cards/renaissance',
+    extension: 'png',
+    majorCount: 22,
+    minorCount: 0,
+    supportsMinor: false,
+    cardNames: {
+      0: 'Le_fou',
+      1: 'Bateleur',
+      2: 'Papesse',
+      3: 'Imperatrice',
+      4: 'Empereur',
+      5: 'Pape',
+      6: 'Les_amoureux',
+      7: 'Chariot',
+      8: 'Justice',
+      9: 'Ermite',
+      10: 'La_roue',
+      11: 'Force',
+      12: 'Le_pendu',
+      13: 'La_mort',
+      14: 'Temperance',
+      15: 'Diable',
+      16: 'La_Tour',
+      17: 'Etoile',
+      18: 'La_lune',
+      19: 'Le_soleil',
+      20: 'Le_jugement',
+      21: 'Le_monde',
+      22: 'Dos_de_carte'
+    }
+  },
+  set04: {
+    id: 'set04',
+    name: 'Tarot Rick & Morty',
+    path: 'assets/images/cards/rick&morty',
+    extension: 'png',
+    majorCount: 22,
+    minorCount: 0,
+    supportsMinor: false,
+    cardNames: {
+      0: 'Le_fou',
+      1: 'Bateleur',
+      2: 'Papesse',
+      3: 'Imperatrice',
+      4: 'Empereur',
+      5: 'Pape',
+      6: 'Les_amoureux',
+      7: 'Chariot',
+      8: 'Justice',
+      9: 'Ermite',
+      10: 'La_roue',
+      11: 'Force',
+      12: 'Le_pendu',
+      13: 'La_mort',
+      14: 'Temperance',
+      15: 'Diable',
+      16: 'La_Tour',
+      17: 'Etoile',
+      18: 'La_lune',
+      19: 'Le_soleil',
+      20: 'Le_jugement',
+      21: 'Le_monde',
+      22: 'Dos_de_carte'
+    }
+  }
+};
+
+/**
+ * Génère les cartes pour un jeu spécifique
+ * @param {string} setId - Identifiant du jeu
+ * @returns {Array} Liste des cartes
+ */
+function generateCards(setId) {
+  const config = cardSetConfigs[setId];
+  if (!config) {
+    throw new Error(`Jeu non trouvé: ${setId}`);
+  }
+
+  const cards = [];
+  for (let i = 0; i <= config.majorCount; i++) {
+    const cardName = config.cardNames[i];
+    const fileName = `${String(i).padStart(2, '0')}_${cardName}.${config.extension}`;
+    const imagePath = `${config.path}/${fileName}`;
+    
+    cards.push(new TarotCard(
+      `M${String(i).padStart(2, '0')}`,
+      cardName,
+      imagePath
+    ));
+  }
+
+  return cards;
+}
+
+/**
  * Informations sur les cartes du jeu Marseille
  */
-export const marseilleCards = [
-  new TarotCard('M00', 'fool', 'assets/images/cards/marseille/00_Le_fou.png'),
-  new TarotCard('M01', 'magician', 'assets/images/cards/marseille/01_Bateleur.png'),
-  new TarotCard('M02', 'high_priestess', 'assets/images/cards/marseille/02_Papesse.png'),
-  new TarotCard('M03', 'empress', 'assets/images/cards/marseille/03_Imperatrice.png'),
-  new TarotCard('M04', 'emperor', 'assets/images/cards/marseille/04_Empereur.png'),
-  new TarotCard('M05', 'hierophant', 'assets/images/cards/marseille/05_Pape.png'),
-  new TarotCard('M06', 'lovers', 'assets/images/cards/marseille/06_Les_amoureux.png'),
-  new TarotCard('M07', 'chariot', 'assets/images/cards/marseille/07_Chariot.png'),
-  new TarotCard('M08', 'justice', 'assets/images/cards/marseille/08_Justice.png'),
-  new TarotCard('M09', 'hermit', 'assets/images/cards/marseille/09_Ermite.png'),
-  new TarotCard('M10', 'wheel_of_fortune', 'assets/images/cards/marseille/10_La_roue.png'),
-  new TarotCard('M11', 'strength', 'assets/images/cards/marseille/11_Force.png'),
-  new TarotCard('M12', 'hanged_man', 'assets/images/cards/marseille/12_Le_pendu.png'),
-  new TarotCard('M13', 'death', 'assets/images/cards/marseille/13_La_mort.png'),
-  new TarotCard('M14', 'temperance', 'assets/images/cards/marseille/14_Temperance.png'),
-  new TarotCard('M15', 'devil', 'assets/images/cards/marseille/15_Diable.png'),
-  new TarotCard('M16', 'tower', 'assets/images/cards/marseille/16_La_Tour.png'),
-  new TarotCard('M17', 'star', 'assets/images/cards/marseille/17_Etoile.png'),
-  new TarotCard('M18', 'moon', 'assets/images/cards/marseille/18_La_lune.png'),
-  new TarotCard('M19', 'sun', 'assets/images/cards/marseille/19_Le_soleil.png'),
-  new TarotCard('M20', 'judgement', 'assets/images/cards/marseille/20_Le_jugement.png'),
-  new TarotCard('M21', 'world', 'assets/images/cards/marseille/21_Le_monde.png'),
-  new TarotCard('M22', 'back', 'assets/images/cards/marseille/22_Dos_de_carte.png')
-];
+export const marseilleCards = generateCards('set01');
 
 /**
  * Informations sur les cartes du jeu Thiago Lehmann
  */
-export const lehmannCards = [
-  new TarotCard('M00', 'Le Fou', 'assets/images/cards/lehmann/00_Le_fou.jpg'),
-  new TarotCard('M01', 'Le Bateleur', 'assets/images/cards/lehmann/01_Bateleur.jpg'),
-  new TarotCard('M02', 'La Papesse', 'assets/images/cards/lehmann/02_Papesse.jpg'),
-  new TarotCard('M03', 'L\'Impératrice', 'assets/images/cards/lehmann/03_Imperatrice.jpg'),
-  new TarotCard('M04', 'L\'Empereur', 'assets/images/cards/lehmann/04_Empereur.jpg'),
-  new TarotCard('M05', 'Le Pape', 'assets/images/cards/lehmann/05_Pape.jpg'),
-  new TarotCard('M06', 'Les Amoureux', 'assets/images/cards/lehmann/06_Les_amoureux.jpg'),
-  new TarotCard('M07', 'Le Chariot', 'assets/images/cards/lehmann/07_Chariot.jpg'),
-  new TarotCard('M08', 'La Justice', 'assets/images/cards/lehmann/08_Justice.jpg'),
-  new TarotCard('M09', 'L\'Ermite', 'assets/images/cards/lehmann/09_Ermite.jpg'),
-  new TarotCard('M10', 'La Roue de Fortune', 'assets/images/cards/lehmann/10_La_roue.jpg'),
-  new TarotCard('M11', 'La Force', 'assets/images/cards/lehmann/11_Force.jpg'),
-  new TarotCard('M12', 'Le Pendu', 'assets/images/cards/lehmann/12_Le_pendu.jpg'),
-  new TarotCard('M13', 'La Mort', 'assets/images/cards/lehmann/13_La_mort.jpg'),
-  new TarotCard('M14', 'La Tempérance', 'assets/images/cards/lehmann/14_Temperance.jpg'),
-  new TarotCard('M15', 'Le Diable', 'assets/images/cards/lehmann/15_Diable.jpg'),
-  new TarotCard('M16', 'La Tour', 'assets/images/cards/lehmann/16_La_Tour.jpg'),
-  new TarotCard('M17', 'L\'Étoile', 'assets/images/cards/lehmann/17_Etoile.jpg'),
-  new TarotCard('M18', 'La Lune', 'assets/images/cards/lehmann/18_La_lune.jpg'),
-  new TarotCard('M19', 'Le Soleil', 'assets/images/cards/lehmann/19_Le_soleil.jpg'),
-  new TarotCard('M20', 'Le Jugement', 'assets/images/cards/lehmann/20_Le_jugement.jpg'),
-  new TarotCard('M21', 'Le Monde', 'assets/images/cards/lehmann/21_Le_monde.jpg'),
-  new TarotCard('M22', 'Dos de carte', 'assets/images/cards/lehmann/22_Dos_de_carte.jpg')
-];
+export const lehmannCards = generateCards('set02');
 
 /**
  * Informations sur les cartes du jeu Renaissance
  */
-export const renaissanceCards = [
-  new TarotCard('M00', 'Le Fou', 'assets/images/cards/renaissance/00_Le_fou.png'),
-  new TarotCard('M01', 'Le Bateleur', 'assets/images/cards/renaissance/01_Bateleur.png'),
-  new TarotCard('M02', 'La Papesse', 'assets/images/cards/renaissance/02_Papesse.png'),
-  new TarotCard('M03', 'L\'Impératrice', 'assets/images/cards/renaissance/03_Imperatrice.png'),
-  new TarotCard('M04', 'L\'Empereur', 'assets/images/cards/renaissance/04_Empereur.png'),
-  new TarotCard('M05', 'Le Pape', 'assets/images/cards/renaissance/05_Pape.png'),
-  new TarotCard('M06', 'Les Amoureux', 'assets/images/cards/renaissance/06_Les_amoureux.png'),
-  new TarotCard('M07', 'Le Chariot', 'assets/images/cards/renaissance/07_Chariot.png'),
-  new TarotCard('M08', 'La Justice', 'assets/images/cards/renaissance/08_Justice.png'),
-  new TarotCard('M09', 'L\'Ermite', 'assets/images/cards/renaissance/09_Ermite.png'),
-  new TarotCard('M10', 'La Roue de Fortune', 'assets/images/cards/renaissance/10_La_roue.png'),
-  new TarotCard('M11', 'La Force', 'assets/images/cards/renaissance/11_Force.png'),
-  new TarotCard('M12', 'Le Pendu', 'assets/images/cards/renaissance/12_Le_pendu.png'),
-  new TarotCard('M13', 'La Mort', 'assets/images/cards/renaissance/13_La_mort.png'),
-  new TarotCard('M14', 'La Tempérance', 'assets/images/cards/renaissance/14_Temperance.png'),
-  new TarotCard('M15', 'Le Diable', 'assets/images/cards/renaissance/15_Diable.png'),
-  new TarotCard('M16', 'La Tour', 'assets/images/cards/renaissance/16_La_Tour.png'),
-  new TarotCard('M17', 'L\'Étoile', 'assets/images/cards/renaissance/17_Etoile.png'),
-  new TarotCard('M18', 'La Lune', 'assets/images/cards/renaissance/18_La_lune.png'),
-  new TarotCard('M19', 'Le Soleil', 'assets/images/cards/renaissance/19_Le_soleil.png'),
-  new TarotCard('M20', 'Le Jugement', 'assets/images/cards/renaissance/20_Le_jugement.png'),
-  new TarotCard('M21', 'Le Monde', 'assets/images/cards/renaissance/21_Le_monde.png'),
-  new TarotCard('M22', 'Dos de carte', 'assets/images/cards/renaissance/22_Dos_de_carte.png')
-];
+export const renaissanceCards = generateCards('set03');
 
 /**
  * Informations sur les cartes du jeu Rick&Morty
  */
-export const rickAndMortyCards = [
-  new TarotCard('M00', 'Le Fou', 'assets/images/cards/rick&morty/00_Le_fou.png'),
-  new TarotCard('M01', 'Le Bateleur', 'assets/images/cards/rick&morty/01_Bateleur.png'),
-  new TarotCard('M02', 'La Papesse', 'assets/images/cards/rick&morty/02_Papesse.png'),
-  new TarotCard('M03', 'L\'Impératrice', 'assets/images/cards/rick&morty/03_Imperatrice.png'),
-  new TarotCard('M04', 'L\'Empereur', 'assets/images/cards/rick&morty/04_Empereur.png'),
-  new TarotCard('M05', 'Le Pape', 'assets/images/cards/rick&morty/05_Pape.png'),
-  new TarotCard('M06', 'Les Amoureux', 'assets/images/cards/rick&morty/06_Les_amoureux.png'),
-  new TarotCard('M07', 'Le Chariot', 'assets/images/cards/rick&morty/07_Chariot.png'),
-  new TarotCard('M08', 'La Justice', 'assets/images/cards/rick&morty/08_Justice.png'),
-  new TarotCard('M09', 'L\'Ermite', 'assets/images/cards/rick&morty/09_Ermite.png'),
-  new TarotCard('M10', 'La Roue de Fortune', 'assets/images/cards/rick&morty/10_La_roue.png'),
-  new TarotCard('M11', 'La Force', 'assets/images/cards/rick&morty/11_Force.png'),
-  new TarotCard('M12', 'Le Pendu', 'assets/images/cards/rick&morty/12_Le_pendu.png'),
-  new TarotCard('M13', 'La Mort', 'assets/images/cards/rick&morty/13_La_mort.png'),
-  new TarotCard('M14', 'La Tempérance', 'assets/images/cards/rick&morty/14_Temperance.png'),
-  new TarotCard('M15', 'Le Diable', 'assets/images/cards/rick&morty/15_Diable.png'),
-  new TarotCard('M16', 'La Tour', 'assets/images/cards/rick&morty/16_La_Tour.png')
-];
+export const rickAndMortyCards = generateCards('set04');
 
 /**
  * Significations des arcanes majeurs à l'endroit
@@ -316,7 +395,7 @@ export const cardSets = {
     id: 'set04',
     name: 'Tarot Rick & Morty',
     cards: rickAndMortyCards,
-    backCardIndex: null // Pas encore de dos de carte
+    backCardIndex: 22
   }
 };
 

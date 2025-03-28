@@ -189,10 +189,12 @@ class ConfigController {
       return;
     }
     
+    console.log(`🔄 Changement de jeu de cartes détecté: ${cardSet}`);
+    
     // Mettre à jour l'état avec la nouvelle valeur de cardSet
     this.stateManager.setState({ cardSet });
     
-    console.log(`✅ Jeu de cartes changé pour: ${cardSet}`);
+    console.log(`✅ Jeu de cartes changé et sauvegardé dans localStorage: ${cardSet}`);
     
     // Déclencher un événement pour informer les autres composants
     document.dispatchEvent(new CustomEvent('deckId:changed', { detail: { deckId: cardSet } }));

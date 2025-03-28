@@ -23,7 +23,7 @@ class StateManager {
       },
       cardSet: {
         type: 'string',
-        enum: ['set01', 'set02', 'set03'],
+        enum: ['set01', 'set02', 'set03', 'set04'],
         default: 'set01',
         description: 'Identifiant du jeu de cartes (anciennement séparé en cardSet et deckId)'
       },

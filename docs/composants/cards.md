@@ -32,6 +32,7 @@ Le système de cartes de JodoTarot est conçu pour gérer les différents jeux d
 - Tarot Marseille (set01)
 - Tarot Thiago Lehmann (set02)
 - Tarot Renaissance (set03)
+- Tarot Rick & Morty (set04)
 
 ### Configuration des Jeux
 ```javascript

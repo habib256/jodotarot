@@ -44,64 +44,64 @@ class CrossSpread extends BaseSpread {
     // Significations des positions
     this.positionMeanings = {
       'fr': {
-        0: 'Situation actuelle',
-        1: 'Ce qui influence',
-        2: 'Passé',
-        3: 'Futur',
-        4: 'Résultat'
+        1: 'Situation actuelle',
+        2: 'Ce qui influence',
+        3: 'Passé',
+        4: 'Futur',
+        5: 'Résultat'
       },
       'en': {
-        0: 'Current situation',
-        1: 'What influences',
-        2: 'Past',
-        3: 'Future',
-        4: 'Outcome'
+        1: 'Current situation',
+        2: 'What influences',
+        3: 'Past',
+        4: 'Future',
+        5: 'Outcome'
       },
       'es': {
-        0: 'Situación actual',
-        1: 'Lo que influye',
-        2: 'Pasado',
-        3: 'Futuro',
-        4: 'Resultado'
+        1: 'Situación actual',
+        2: 'Lo que influye',
+        3: 'Pasado',
+        4: 'Futuro',
+        5: 'Resultado'
       },
       'de': {
-        0: 'Aktuelle Situation',
-        1: 'Was beeinflusst',
-        2: 'Vergangenheit',
-        3: 'Zukunft',
-        4: 'Ergebnis'
+        1: 'Aktuelle Situation',
+        2: 'Was beeinflusst',
+        3: 'Vergangenheit',
+        4: 'Zukunft',
+        5: 'Ergebnis'
       },
       'it': {
-        0: 'Situazione attuale',
-        1: 'Ciò che influenza',
-        2: 'Passato',
-        3: 'Futuro',
-        4: 'Risultato'
+        1: 'Situazione attuale',
+        2: 'Ciò che influenza',
+        3: 'Passato',
+        4: 'Futuro',
+        5: 'Risultato'
       },
       'zh': {
-        0: '当前情况',
-        1: '影响因素',
-        2: '过去',
-        3: '未来',
-        4: '结果'
+        1: '当前情况',
+        2: '影响因素',
+        3: '过去',
+        4: '未来',
+        5: '结果'
       }
     };
     
     // Descriptions détaillées des positions avec significations étendues
     this.positionDescriptions = {
       'fr': {
-        0: 'Représente l\'essence même de la situation ou du problème actuel. C\'est le cœur du tirage, ce qui préoccupe le consultant en ce moment précis.',
-        1: 'Montre les forces, les énergies ou les personnes qui influencent directement la situation. Ces influences peuvent être conscientes ou inconscientes, positives ou négatives.',
-        2: 'Révèle les événements ou les influences du passé qui ont conduit à la situation actuelle. Indique les causes ou les racines du problème ou de la question.',
-        3: 'Indique comment la situation va évoluer dans un avenir proche si la trajectoire actuelle est maintenue. Montre les tendances émergentes et les développements probables.',
-        4: 'Représente le résultat final ou la résolution du problème. C\'est la synthèse de toutes les énergies du tirage et la conclusion vers laquelle tout converge.'
+        1: 'Représente l\'essence même de la situation ou du problème actuel. C\'est le cœur du tirage, ce qui préoccupe le consultant en ce moment précis.',
+        2: 'Montre les forces, les énergies ou les personnes qui influencent directement la situation. Ces influences peuvent être conscientes ou inconscientes, positives ou négatives.',
+        3: 'Révèle les événements ou les influences du passé qui ont conduit à la situation actuelle. Indique les causes ou les racines du problème ou de la question.',
+        4: 'Indique comment la situation va évoluer dans un avenir proche si la trajectoire actuelle est maintenue. Montre les tendances émergentes et les développements probables.',
+        5: 'Représente le résultat final ou la résolution du problème. C\'est la synthèse de toutes les énergies du tirage et la conclusion vers laquelle tout converge.'
       },
       'en': {
-        0: 'Represents the very essence of the current situation or problem. It is the heart of the reading, what concerns the consultant at this precise moment.',
-        1: 'Shows the forces, energies, or people who directly influence the situation. These influences can be conscious or unconscious, positive or negative.',
-        2: 'Reveals past events or influences that led to the current situation. Indicates the causes or roots of the problem or question.',
-        3: 'Indicates how the situation will evolve in the near future if the current trajectory is maintained. Shows emerging trends and likely developments.',
-        4: 'Represents the final outcome or resolution of the problem. It is the synthesis of all the energies of the reading and the conclusion towards which everything converges.'
+        1: 'Represents the very essence of the current situation or problem. It is the heart of the reading, what concerns the consultant at this precise moment.',
+        2: 'Shows the forces, energies, or people who directly influence the situation. These influences can be conscious or unconscious, positive or negative.',
+        3: 'Reveals past events or influences that led to the current situation. Indicates the causes or roots of the problem or question.',
+        4: 'Indicates how the situation will evolve in the near future if the current trajectory is maintained. Shows emerging trends and likely developments.',
+        5: 'Represents the final outcome or resolution of the problem. It is the synthesis of all the energies of the reading and the conclusion towards which everything converges.'
       }
     };
   }

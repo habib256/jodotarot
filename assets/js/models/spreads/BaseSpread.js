@@ -52,7 +52,7 @@ class BaseSpread {
    */
   getPositionMeaning(positionIndex) {
     const positions = this.positionMeanings[this.language] || this.positionMeanings['fr'] || {};
-    return positions[positionIndex] || `Position ${positionIndex + 1}`;
+    return positions[positionIndex + 1] || `Position ${positionIndex + 1}`;
   }
   
   /**
