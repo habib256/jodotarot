@@ -1,12 +1,40 @@
 # Documentation Technique de JodoTarot
 
-## Réorganisation de la Documentation
+## Structure du Projet
 
-La documentation technique de JodoTarot a été réorganisée pour améliorer la lisibilité, la maintenance et l'accessibilité des informations. L'ancien fichier monolithique `codestructure.md` a été divisé en plusieurs documents plus spécifiques et organisés dans une structure de dossiers thématiques.
+Le projet JodoTarot est organisé selon une architecture modulaire avec la structure suivante :
 
-## Structure de la Documentation
+```
+jodotarot/
+├── assets/                    # Ressources statiques
+│   ├── css/                  # Styles CSS
+│   ├── images/               # Images et ressources graphiques
+│   └── js/                   # Code JavaScript
+│       ├── controllers/      # Contrôleurs de l'application
+│       ├── models/          # Modèles de données
+│       ├── services/        # Services (API, IA, etc.)
+│       ├── translations/    # Fichiers de traduction
+│       ├── utils/           # Utilitaires
+│       ├── api.js           # Gestion des API externes
+│       ├── app.js           # Point d'entrée de l'application
+│       ├── config.js        # Configuration globale
+│       ├── main.js          # Module principal
+│       ├── prompt.js        # Gestion des prompts
+│       └── ui.js            # Interface utilisateur
+├── docs/                     # Documentation technique
+│   ├── architecture/        # Documentation de l'architecture
+│   ├── composants/         # Documentation des composants
+│   ├── standards/          # Standards et conventions
+│   ├── tools/              # Documentation des outils
+│   └── ui/                 # Documentation de l'interface
+├── index.html              # Page principale
+├── spread-editor.html      # Éditeur de positions
+└── README.md               # Documentation générale
+```
 
-La documentation est maintenant organisée selon la structure suivante :
+## Organisation de la Documentation
+
+La documentation technique est organisée en sections thématiques pour faciliter la navigation et la maintenance :
 
 ```
 docs/
@@ -32,17 +60,13 @@ docs/
 - Chaque section contient des documents spécifiques à un aspect du projet
 - Des liens entre les documents facilitent la navigation entre les sections connexes
 
-## Avantages de cette Nouvelle Organisation
+## Avantages de cette Organisation
 
 1. **Documents plus courts et ciblés** : Chaque fichier traite d'un sujet spécifique
 2. **Navigation simplifiée** : Structure logique facilitant la recherche d'informations
 3. **Maintenance plus facile** : Mise à jour de sections spécifiques sans toucher à l'ensemble
 4. **Meilleure visibilité** : Découverte facilitée des différents aspects du projet
 5. **Évolutivité** : Ajout simple de nouvelles sections sans réorganisation majeure
-
-## Correspondance avec l'Ancien Document
-
-L'ancien fichier `codestructure.md` reste disponible pour référence, mais son contenu a été redistribué dans les nouveaux documents selon la logique thématique.
 
 ## Recommandations pour les Contributions
 

@@ -21,15 +21,19 @@ JodoTarot est une application web élégante et intuitive qui vous permet de ré
 - 🎴 **4 types de tirages** (Croix, Fer à cheval, Amour, Croix celtique)
 - 🧠 **Interprétation par IA** personnalisée
 - 👤 **21 personas uniques** pour des lectures variées
-- 🎨 **2 jeux de tarot** (Marseille et Thiago Lehmann)
+- 🎨 **4 jeux de tarot** (Marseille, Thiago Lehmann, Renaissance, Rick & Morty)
 - 🌍 **6 langues** supportées
 - 🤖 **Modèles d'IA** flexibles (OpenAI et Ollama)
 
 ## 🃏 Aperçu des jeux
 
-| <img src="assets/images/cards/marseille/13 La mort.png" alt="La Mort" width="200" /> | <img src="assets/images/cards/lehmann/17 Etoile.jpg" alt="L'Étoile" width="200" /> |
+| <img src="assets/images/cards/marseille/13_La_mort.png" alt="La Mort" width="200" /> | <img src="assets/images/cards/renaissance/13_La_mort.png" alt="La Mort" width="200" /> |
 |:-------------------------:|:-------------------------:|
-| **Tarot de Marseille** | **Tarot Thiago Lehmann** |
+| **Tarot de Marseille** | **Tarot Renaissance** |
+
+| <img src="assets/images/cards/rick&morty/13_La_mort.png" alt="La Mort" width="200" /> | <img src="assets/images/cards/lehmann/17_Etoile.jpg" alt="L'Étoile" width="200" /> |
+|:-------------------------:|:-------------------------:|
+| **Tarot Rick & Morty** | **Tarot Thiago Lehmann** |
 
 ## ⚙️ Installation rapide
 
