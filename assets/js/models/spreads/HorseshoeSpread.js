@@ -46,80 +46,80 @@ class HorseshoeSpread extends BaseSpread {
     // Significations des positions
     this.positionMeanings = {
       'fr': {
-        0: 'Passé lointain',
-        1: 'Passé récent',
-        2: 'Présent',
-        3: 'Futur proche',
-        4: 'Futur lointain / Résultat',
-        5: 'Influences extérieures',
-        6: 'Conseil'
+        1: 'Passé lointain',
+        2: 'Passé récent',
+        3: 'Présent',
+        4: 'Futur proche',
+        5: 'Futur lointain / Résultat',
+        6: 'Influences extérieures',
+        7: 'Conseil'
       },
       'en': {
-        0: 'Distant past',
-        1: 'Recent past',
-        2: 'Present',
-        3: 'Near future',
-        4: 'Distant future / Outcome',
-        5: 'External influences',
-        6: 'Advice'
+        1: 'Distant past',
+        2: 'Recent past',
+        3: 'Present',
+        4: 'Near future',
+        5: 'Distant future / Outcome',
+        6: 'External influences',
+        7: 'Advice'
       },
       'es': {
-        0: 'Pasado distante',
-        1: 'Pasado reciente',
-        2: 'Presente',
-        3: 'Futuro cercano',
-        4: 'Futuro distante / Resultado',
-        5: 'Influencias externas',
-        6: 'Consejo'
+        1: 'Pasado distante',
+        2: 'Pasado reciente',
+        3: 'Presente',
+        4: 'Futuro cercano',
+        5: 'Futuro distante / Resultado',
+        6: 'Influencias externas',
+        7: 'Consejo'
       },
       'de': {
-        0: 'Ferne Vergangenheit',
-        1: 'Jüngste Vergangenheit',
-        2: 'Gegenwart',
-        3: 'Nahe Zukunft',
-        4: 'Ferne Zukunft / Ergebnis',
-        5: 'Externe Einflüsse',
-        6: 'Ratschlag'
+        1: 'Ferne Vergangenheit',
+        2: 'Jüngste Vergangenheit',
+        3: 'Gegenwart',
+        4: 'Nahe Zukunft',
+        5: 'Ferne Zukunft / Ergebnis',
+        6: 'Externe Einflüsse',
+        7: 'Ratschlag'
       },
       'it': {
-        0: 'Passato lontano',
-        1: 'Passato recente',
-        2: 'Presente',
-        3: 'Futuro vicino',
-        4: 'Futuro lontano / Risultato',
-        5: 'Influenze esterne',
-        6: 'Consiglio'
+        1: 'Passato lontano',
+        2: 'Passato recente',
+        3: 'Presente',
+        4: 'Futuro vicino',
+        5: 'Futuro lontano / Risultato',
+        6: 'Influenze esterne',
+        7: 'Consiglio'
       },
       'zh': {
-        0: '远古过去',
-        1: '近期过去',
-        2: '现在',
-        3: '不久的将来',
-        4: '遥远的未来/结果',
-        5: '外部影响',
-        6: '建议'
+        1: '远古过去',
+        2: '近期过去',
+        3: '现在',
+        4: '不久的将来',
+        5: '遥远的未来/结果',
+        6: '外部影响',
+        7: '建议'
       }
     };
     
     // Descriptions détaillées des positions avec significations étendues
     this.positionDescriptions = {
       'fr': {
-        0: 'Révèle les fondations de la situation, les événements ou influences qui se sont produits il y a longtemps mais qui continuent à façonner les circonstances actuelles. Montre les origines profondes.',
-        1: 'Représente les événements récents qui ont directement conduit à la situation présente. Ce sont les causes immédiates ou les déclencheurs de la problématique actuelle.',
-        2: 'Montre l\'état actuel de la situation, l\'énergie dominante du moment et les défis immédiats auxquels le consultant est confronté. C\'est le point central du tirage.',
-        3: 'Indique les développements qui vont se manifester dans un avenir proche, typiquement dans les semaines à venir. Montre les tendances émergentes et la direction immédiate.',
-        4: 'Représente le résultat à long terme ou la destination finale vers laquelle la situation évolue. Révèle comment les choses vont se résoudre si la trajectoire actuelle est maintenue.',
-        5: 'Met en lumière les personnes, circonstances ou forces extérieures qui affectent la situation mais sur lesquelles le consultant n\'a que peu ou pas de contrôle direct.',
-        6: 'Offre une guidance spirituelle ou pratique sur la meilleure façon d\'aborder la situation. Suggère des actions ou des attitudes spécifiques qui aideront à atteindre un résultat favorable.'
+        1: 'Révèle les fondations de la situation, les événements ou influences qui se sont produits il y a longtemps mais qui continuent à façonner les circonstances actuelles. Montre les origines profondes.',
+        2: 'Représente les événements récents qui ont directement conduit à la situation présente. Ce sont les causes immédiates ou les déclencheurs de la problématique actuelle.',
+        3: 'Montre l\'état actuel de la situation, l\'énergie dominante du moment et les défis immédiats auxquels le consultant est confronté. C\'est le point central du tirage.',
+        4: 'Indique les développements qui vont se manifester dans un avenir proche, typiquement dans les semaines à venir. Montre les tendances émergentes et la direction immédiate.',
+        5: 'Représente le résultat à long terme ou la destination finale vers laquelle la situation évolue. Révèle comment les choses vont se résoudre si la trajectoire actuelle est maintenue.',
+        6: 'Met en lumière les personnes, circonstances ou forces extérieures qui affectent la situation mais sur lesquelles le consultant n\'a que peu ou pas de contrôle direct.',
+        7: 'Offre une guidance spirituelle ou pratique sur la meilleure façon d\'aborder la situation. Suggère des actions ou des attitudes spécifiques qui aideront à atteindre un résultat favorable.'
       },
       'en': {
-        0: 'Reveals the foundations of the situation, events or influences that occurred long ago but continue to shape current circumstances. Shows the deep origins.',
-        1: 'Represents recent events that have directly led to the present situation. These are the immediate causes or triggers of the current issue.',
-        2: 'Shows the current state of the situation, the dominant energy of the moment, and the immediate challenges facing the consultant. This is the central point of the reading.',
-        3: 'Indicates developments that will manifest in the near future, typically in the coming weeks. Shows emerging trends and immediate direction.',
-        4: 'Represents the long-term outcome or final destination toward which the situation is evolving. Reveals how things will resolve if the current trajectory is maintained.',
-        5: 'Highlights people, circumstances, or external forces that affect the situation but over which the consultant has little or no direct control.',
-        6: 'Offers spiritual or practical guidance on the best way to approach the situation. Suggests specific actions or attitudes that will help achieve a favorable outcome.'
+        1: 'Reveals the foundations of the situation, events or influences that occurred long ago but continue to shape current circumstances. Shows the deep origins.',
+        2: 'Represents recent events that have directly led to the present situation. These are the immediate causes or triggers of the current issue.',
+        3: 'Shows the current state of the situation, the dominant energy of the moment, and the immediate challenges facing the consultant. This is the central point of the reading.',
+        4: 'Indicates developments that will manifest in the near future, typically in the coming weeks. Shows emerging trends and immediate direction.',
+        5: 'Represents the long-term outcome or final destination toward which the situation is evolving. Reveals how things will resolve if the current trajectory is maintained.',
+        6: 'Highlights people, circumstances, or external forces that affect the situation but over which the consultant has little or no direct control.',
+        7: 'Offers spiritual or practical guidance on the best way to approach the situation. Suggests specific actions or attitudes that will help achieve a favorable outcome.'
       }
     };
   }

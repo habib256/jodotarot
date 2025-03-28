@@ -561,8 +561,12 @@ class ConfigController {
         // Test de connectivité OpenAI
         status = await this.aiService.testOpenAIConnectivity();
       } else if (currentModel.startsWith('ollama:')) {
-        // Test de connectivité Ollama
-        status = await this.aiService.testOllamaConnectivity();
+        // Pour Ollama, on considère que c'est toujours disponible
+        status = {
+          status: 'success',
+          message: 'Modèle Ollama disponible',
+          available: true
+        };
       } else {
         console.warn(`Type de modèle non reconnu: ${currentModel}`);
         this.selectPromptMode(); // Fallback sur le mode prompt

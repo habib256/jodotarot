@@ -19,6 +19,7 @@ JodoTarot est une application web modulaire pour les tirages de tarot, construit
 - [Gestionnaire d'état](composants/state-manager.md) - Gestion de l'état global de l'application
 - [Système de traduction](composants/traduction.md) - Support multilingue
 - [Système de cartes](composants/cards.md) - Gestion des jeux de cartes et des tirages
+- [Générateur de descriptions](composants/reading-description-generator.md) - Génération des descriptions de tirages
 
 ### 3. Interface Utilisateur
 - [Positionnement des cartes](ui/positionnement-cartes.md) - Système de positionnement des cartes dans les tirages
@@ -48,7 +49,7 @@ JodoTarot est une application web modulaire pour les tirages de tarot, construit
 - Gestion optimisée du défilement
 - Affichage HTML dans l'interprétation
 - Système de cartes robuste avec validation
-- Système de descriptions détaillées des positions
+- Système de descriptions détaillées des positions sans redondance
 - Gestion des éléments visuels spécifiques par tirage
 
 ### En Développement
