@@ -2,8 +2,15 @@
  * Service gérant les interactions avec différents modèles d'IA
  * Centralise les appels API et la gestion des réponses
  * 
- * IMPORTANT: Toutes les configurations doivent être importées depuis /assets/js/config.js
- * Ne pas redéfinir de constantes de configuration ici - importer uniquement depuis config.js
+ * @class AIService
+ * @description Service principal pour la gestion des interactions avec les modèles d'IA
+ * @property {StateManager} stateManager - Instance du gestionnaire d'état
+ * @property {string} apiKey - Clé API pour les services d'IA
+ * @property {string} defaultModel - Modèle d'IA par défaut
+ * @property {Object} baseUrl - URLs de base pour les différents services
+ * @property {boolean} debugMode - Mode de débogage
+ * @property {AbortController} currentController - Contrôleur pour annuler les requêtes
+ * @property {boolean} isGenerating - État de génération en cours
  */
 import PERSONAS, { getPersonaPrompt } from '../models/personas/index.js';
 import { createSpread } from '../models/spreads/index.js';
@@ -13,9 +20,15 @@ import { testOllamaConnectivity } from '../api.js';
 
 class AIService {
   /**
+   * Crée une instance du service d'IA
    * @param {StateManager} stateManager - Instance du gestionnaire d'état
+   * @throws {Error} Si le stateManager n'est pas fourni
    */
   constructor(stateManager) {
+    if (!stateManager) {
+      throw new Error('Le StateManager est requis pour initialiser AIService');
+    }
+    
     this.stateManager = stateManager;
     
     // D'abord, essayer de charger la clé API depuis le localStorage
@@ -38,6 +51,20 @@ class AIService {
     
     // Flag indiquant si une génération est en cours
     this.isGenerating = false;
+  }
+  
+  /**
+   * Gère une erreur d'annulation
+   * @param {Error} error - L'erreur à gérer
+   * @returns {boolean} True si c'était une erreur d'annulation
+   */
+  handleAbortError(error) {
+    if (error.name === 'AbortError') {
+      console.log('Interprétation annulée par l\'utilisateur');
+      this.isGenerating = false;
+      return true;
+    }
+    return false;
   }
   
   /**
@@ -271,18 +298,87 @@ class AIService {
   }
   
   /**
+   * Gère les erreurs d'API de manière uniforme
+   * @param {Error} error - L'erreur à gérer
+   * @param {string} service - Le nom du service ('openai' ou 'ollama')
+   * @returns {Error} L'erreur formatée
+   */
+  handleApiError(error, service) {
+    console.error(`Erreur lors de l'appel à ${service}:`, error);
+    
+    let errorMessage = `Erreur lors de la communication avec ${service}`;
+    
+    if (error.message.includes('timeout')) {
+      errorMessage = `Le temps de réponse de ${service} a dépassé la limite`;
+    } else if (error.message.includes('connect')) {
+      errorMessage = `Impossible de se connecter à ${service}`;
+    } else if (error.message.includes('401') || error.message.includes('403')) {
+      errorMessage = `Erreur d'authentification avec ${service}`;
+    } else if (error.message.includes('429')) {
+      errorMessage = `Limite de requêtes atteinte pour ${service}`;
+    }
+    
+    return new Error(errorMessage);
+  }
+  
+  /**
+   * Gère les logs de débogage de manière uniforme
+   * @param {string} message - Le message à logger
+   * @param {Object} [data] - Les données à logger
+   * @param {string} [level='info'] - Le niveau de log ('info', 'warn', 'error')
+   */
+  debugLog(message, data = null, level = 'info') {
+    if (!this.debugMode) return;
+    
+    const emoji = {
+      info: '🔍',
+      warn: '⚠️',
+      error: '❌'
+    }[level] || '🔍';
+    
+    console[level](`${emoji} ${message}`);
+    if (data) {
+      console[level](data);
+    }
+  }
+  
+  /**
    * Obtient l'interprétation d'un tirage de tarot
    * @param {Array} reading - Les cartes tirées
    * @param {string} question - La question posée
    * @param {string} persona - Le persona sélectionné
    * @param {string} model - Le modèle d'IA à utiliser
-   * @param {string} language - La langue (par défaut: 'fr')
-   * @param {string} spreadType - Le type de tirage
-   * @param {Function} onChunk - Callback pour le streaming (optionnel)
-   * @return {Promise<string>} L'interprétation du tirage
+   * @param {string} [language='fr'] - La langue de l'interprétation
+   * @param {string} [spreadType='cross'] - Le type de tirage
+   * @param {Function} [onChunk] - Callback pour le streaming de la réponse
+   * @returns {Promise<string>} L'interprétation du tirage
+   * @throws {Error} Si les paramètres sont invalides ou si une erreur survient
    */
   async getInterpretation(reading, question, persona, model, language = 'fr', spreadType = 'cross', onChunk = null) {
     try {
+      // Validation des paramètres obligatoires
+      if (!reading || !Array.isArray(reading) || reading.length === 0) {
+        throw new Error('Le tirage doit contenir au moins une carte');
+      }
+      
+      if (!question || typeof question !== 'string' || question.trim().length === 0) {
+        throw new Error('La question est requise pour l\'interprétation');
+      }
+      
+      if (!persona || typeof persona !== 'string') {
+        throw new Error('Le persona est requis pour l\'interprétation');
+      }
+      
+      if (!model || typeof model !== 'string') {
+        throw new Error('Le modèle d\'IA est requis pour l\'interprétation');
+      }
+      
+      // Validation de la langue
+      if (!language || typeof language !== 'string') {
+        console.warn('Langue invalide, utilisation du français par défaut');
+        language = 'fr';
+      }
+      
       // Annuler toute interprétation en cours
       this.cancelCurrentInterpretation();
       
@@ -348,10 +444,7 @@ class AIService {
           try {
             response = await this.getOllamaStreamingResponse(prompt, systemPrompts, model, onChunk, this.currentController.signal);
           } catch (error) {
-            // Si l'erreur est due à une annulation, ne pas rejeter mais retourner
-            if (error.name === 'AbortError') {
-              console.log('Interprétation annulée par l\'utilisateur');
-              this.isGenerating = false;
+            if (this.handleAbortError(error)) {
               return "";
             }
             throw error;
@@ -367,7 +460,23 @@ class AIService {
     } catch (error) {
       this.isGenerating = false;
       console.error("Erreur lors de l'obtention de l'interprétation:", error);
-      throw error;
+      
+      if (this.handleAbortError(error)) {
+        return "";
+      }
+      
+      // Gestion plus détaillée des erreurs
+      let errorMessage = "Une erreur est survenue lors de l'interprétation.";
+      
+      if (!this.apiKey && model.startsWith('openai/')) {
+        errorMessage = "La clé API OpenAI n'est pas configurée.";
+      } else if (error.message.includes('timeout')) {
+        errorMessage = "Le temps de réponse a dépassé la limite.";
+      } else if (error.message.includes('connect')) {
+        errorMessage = "Impossible de se connecter au service d'IA.";
+      }
+      
+      throw new Error(errorMessage);
     }
   }
   
@@ -379,30 +488,22 @@ class AIService {
    * @return {Promise<Array>} Liste des prompts système
    */
   async buildSystemPrompts(persona, language, spreadType) {
-    console.log(`🔍 Chargement du prompt pour le persona: ${persona}, langue: ${language}, tirage: ${spreadType}`);
+    this.debugLog(`Chargement du prompt pour le persona: ${persona}, langue: ${language}, tirage: ${spreadType}`);
     
     try {
-      // Récupérer le prompt spécifique au persona via getPersonaPrompt
-      // (maintenant enrichi avec les spécialisations grâce à notre amélioration de BasePersona)
       const personaPrompt = await getPersonaPrompt(persona, language, spreadType);
+      this.debugLog('Contenu du prompt persona:', personaPrompt);
       
-      console.log('📋 Contenu du prompt persona:', personaPrompt);
-      
-      // Récupérer le métaprompt adapté à la langue
       const metaPrompt = getMetaPrompt(language);
       
-      // Prompts de base - le prompt du persona et le métaprompt
       const basePrompts = [
-        // Le métaprompt pour définir les règles générales
         metaPrompt,
-        // Le prompt principal du persona, déjà enrichi
         personaPrompt
       ];
       
       return basePrompts;
     } catch (error) {
-      console.error("Erreur lors du chargement des prompts système:", error);
-      // Retourner au moins le métaprompt en cas d'erreur
+      this.debugLog("Erreur lors du chargement des prompts système:", error, 'error');
       return [getMetaPrompt(language)];
     }
   }
@@ -431,8 +532,8 @@ class AIService {
     // Générer une description détaillée du tirage avec les cartes
     const spreadDescription = spreadInstance.generateReadingDescription(true);
     
-    // Construction du prompt de base
-    let promptBase = `${spreadDescription}`;
+    // Construction du prompt de base avec toutes les informations sur les cartes
+    let promptBase = `${spreadDescription}\n\n`;
     
     // Enrichir le prompt avec la question et le texte d'emphase
     return enrichirPromptContextuel(question, promptBase, language);
@@ -453,13 +554,10 @@ class AIService {
     try {
       const systemContent = systemPrompts.join('\n');
       
-      // Format des messages pour OpenAI
       const messages = [
         { role: 'system', content: systemContent },
         { role: 'user', content: prompt }
       ];
-      
-      // Supprimer les logs détaillés
       
       const response = await fetch(API_URL_OPENAI, {
         method: 'POST',
@@ -479,13 +577,9 @@ class AIService {
       }
       
       const data = await response.json();
-      
-      // Supprimer les logs détaillés
-      
       return data.choices[0]?.message?.content || '';
     } catch (error) {
-      console.error('Erreur lors de l\'appel à OpenAI:', error);
-      throw error;
+      throw this.handleApiError(error, 'OpenAI');
     }
   }
   
@@ -563,30 +657,19 @@ class AIService {
    * @return {Promise<string>} La réponse générée
    */
   async getOllamaResponse(prompt, systemPrompts, model) {
-    // Construction du payload pour l'API chat
-    const systemContent = systemPrompts.join('\n');
-    const payload = {
-      model: model.replace('ollama:', ''), // Supprimer le préfixe "ollama:" si présent
-      messages: [
-        { role: 'system', content: systemContent },
-        { role: 'user', content: prompt }
-      ],
-      stream: false
-    };
-    
-    console.log("🔍 DEBUG getOllamaResponse - Payload:", JSON.stringify(payload, null, 2));
-    
     try {
-      // Obtenir le format de réponse pour ce modèle
-      const modelNameWithoutPrefix = model.replace('ollama:', '');
-      const modelFormat = getOllamaModelFormat(modelNameWithoutPrefix);
-      const responseKey = modelFormat.responseKey || "message.content";
+      const systemContent = systemPrompts.join('\n');
+      const payload = {
+        model: model.replace('ollama:', ''),
+        messages: [
+          { role: 'system', content: systemContent },
+          { role: 'user', content: prompt }
+        ],
+        stream: false
+      };
       
-      if (this.debugMode) {
-        console.log(`🔍 DEBUG getOllamaResponse - Format détecté pour ${modelNameWithoutPrefix}: ${modelFormat.description || responseKey}`);
-      }
+      this.debugLog("Payload Ollama:", payload);
       
-      // Utiliser fetchWithRetry pour une meilleure résilience
       const response = await this.fetchWithRetry(
         API_URL_OLLAMA, 
         {
@@ -594,25 +677,24 @@ class AIService {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         },
-        2,  // maxRetries
-        20000 // timeoutMs: 20 secondes
+        2,
+        20000
       );
       
-      console.log("🔍 DEBUG getOllamaResponse - Statut réponse:", response.status);
+      this.debugLog("Statut réponse Ollama:", response.status);
       
-      // Traiter la réponse
       const data = await response.json();
-      if (this.debugMode) {
-        console.log("🔍 DEBUG getOllamaResponse - Réponse reçue:", data);
-      }
+      this.debugLog("Réponse Ollama reçue:", data);
       
-      // Utiliser la méthode centralisée pour extraire le contenu
-      const responseContent = this.extractResponseContent(data, responseKey, modelNameWithoutPrefix);
+      const modelNameWithoutPrefix = model.replace('ollama:', '');
+      const modelFormat = getOllamaModelFormat(modelNameWithoutPrefix);
+      const responseKey = modelFormat.responseKey || "message.content";
       
-      return responseContent;
+      this.debugLog(`Format détecté pour ${modelNameWithoutPrefix}: ${modelFormat.description || responseKey}`);
+      
+      return this.extractResponseContent(data, responseKey, modelNameWithoutPrefix);
     } catch (error) {
-      console.error('Erreur lors de l\'appel à Ollama après plusieurs tentatives:', error);
-      throw error;
+      throw this.handleApiError(error, 'Ollama');
     }
   }
   
@@ -733,232 +815,11 @@ class AIService {
     
     // Mode debug pour diagnostiquer les réponses
     if (this.debugMode) {
-      console.log(`🔍 DEBUG extractResponseContent - Structure de données pour ${modelName}:`, data);
+      console.log(`Réponse brute du modèle ${modelName}:`, data);
     }
     
-    // 1. Essayer d'extraire selon le chemin défini dans le format du modèle
-    try {
-      const parts = responseKey.split('.');
-      let content = data;
-      
-      for (const part of parts) {
-        if (!content || typeof content !== 'object') {
-          if (this.debugMode) {
-            console.warn(`⚠️ Chemin ${responseKey} interrompu à "${part}" pour le modèle ${modelName}`);
-          }
-          break;
-        }
-        content = content[part];
-      }
-      
-      if (content && typeof content === 'string') {
-        if (this.debugMode) {
-          console.log(`✅ Contenu extrait avec chemin "${responseKey}" pour le modèle ${modelName}`);
-        }
-        return content;
-      }
-    } catch (e) {
-      console.warn(`Erreur lors de l'extraction via ${responseKey}:`, e.message);
-    }
-    
-    // 2. Tentatives de récupération par ordre de priorité
-    // Format message.content (API chat standard)
-    if (data.message && data.message.content) {
-      if (this.debugMode) {
-        console.log(`ℹ️ Contenu extrait depuis message.content pour ${modelName}`);
-      }
-      return data.message.content;
-    }
-    
-    // Format response (certains modèles Ollama)
-    if (data.response) {
-      if (this.debugMode) {
-        console.log(`ℹ️ Contenu extrait depuis response pour ${modelName}`);
-      }
-      return data.response;
-    }
-    
-    // Format content (certains modèles Ollama expérimentaux)
-    if (data.content) {
-      if (this.debugMode) {
-        console.log(`ℹ️ Contenu extrait depuis content pour ${modelName}`);
-      }
-      return data.content;
-    }
-    
-    // Format spécifique llama3.1
-    if (modelName.includes('llama3.1') && data.choices && data.choices.length > 0) {
-      const choice = data.choices[0];
-      
-      if (choice.message && choice.message.content) {
-        if (this.debugMode) {
-          console.log(`ℹ️ Contenu extrait depuis choices[0].message.content pour ${modelName}`);
-        }
-        return choice.message.content;
-      }
-      
-      if (choice.content) {
-        if (this.debugMode) {
-          console.log(`ℹ️ Contenu extrait depuis choices[0].content pour ${modelName}`);
-        }
-        return choice.content;
-      }
-      
-      if (choice.text) {
-        if (this.debugMode) {
-          console.log(`ℹ️ Contenu extrait depuis choices[0].text pour ${modelName}`);
-        }
-        return choice.text;
-      }
-    }
-    
-    // 3. Tentative désespérée: chercher un champ qui pourrait contenir du texte
-    const excludedKeys = ['model', 'id', 'object', 'created', 'usage', 'system_fingerprint'];
-    
-    for (const key of Object.keys(data)) {
-      // Ignorer les champs de métadonnées qui ne devraient pas contenir le contenu principal
-      if (excludedKeys.includes(key)) continue;
-      
-      const value = data[key];
-      if (typeof value === 'string' && value.length > 10) {
-        if (this.debugMode) {
-          console.warn(`⚠️ Fallback: contenu extrait depuis champ "${key}" pour ${modelName}`);
-        }
-        return value;
-      }
-      
-      // Vérifier également les objets imbriqués de premier niveau
-      if (value && typeof value === 'object') {
-        for (const subKey of Object.keys(value)) {
-          const subValue = value[subKey];
-          if (typeof subValue === 'string' && subValue.length > 10) {
-            if (this.debugMode) {
-              console.warn(`⚠️ Fallback: contenu extrait depuis champ "${key}.${subKey}" pour ${modelName}`);
-            }
-            return subValue;
-          }
-        }
-      }
-    }
-    
-    // 4. Échec total: retourner une chaîne vide ou un message d'erreur
-    console.error(`❌ Impossible d'extraire le contenu pour le modèle ${modelName}. Format de réponse inconnu:`, data);
-    return "";
-  }
-  
-  /**
-   * Teste la connectivité avec Ollama
-   * @returns {Promise<Object>} Résultat du test avec des informations détaillées
-   */
-  async testOllamaConnectivity() {
-    // Le mode "prompt" est une option spéciale qui :
-    // 1. Ne nécessite aucune connectivité réseau
-    // 2. Est toujours considéré comme disponible
-    // 3. Permet de continuer à utiliser l'application sans IA
-    // 4. Sert de solution de secours en cas de problème de connexion
-    if (this.stateManager?.getState()?.iaModel === 'prompt') {
-      return {
-        status: 'success',
-        success: true,
-        message: 'Mode Prompt toujours disponible',
-        details: { mode: 'prompt' },
-        suggestions: []
-      };
-    }
-
-    try {
-      // Utiliser la fonction améliorée de l'API
-      const result = await testOllamaConnectivity();
-      return result;
-    } catch (error) {
-      console.error("Erreur lors du test de connectivité Ollama:", error);
-      return {
-        status: 'error',
-        success: false,
-        message: `Erreur lors du test de connectivité: ${error.message}`,
-        details: error,
-        suggestions: ['warnings.unexpectedError', 'warnings.tryAgain']
-      };
-    }
-  }
-
-  /**
-   * Méthode utilitaire centralisée pour la gestion des erreurs
-   * @param {Error} error - L'erreur attrapée
-   * @param {string} context - Contexte dans lequel l'erreur s'est produite
-   * @param {boolean} rethrow - Si true, l'erreur sera relancée après traitement
-   * @returns {Object|null} - Un objet d'erreur formaté ou null
-   */
-  handleServiceError(error, context, rethrow = false) {
-    // Standardiser le format de l'erreur
-    const errorInfo = {
-      message: error.message || 'Erreur inconnue',
-      context: context,
-      timestamp: new Date().toISOString(),
-      type: error.name || 'Error',
-      stack: this.debugMode ? error.stack : null
-    };
-    
-    // Log de l'erreur avec contexte
-    console.error(`AIService - Erreur dans ${context}:`, errorInfo);
-    
-    // Mettre à jour l'état
-    this.isGenerating = false;
-    
-    // Relancer l'erreur si demandé
-    if (rethrow) {
-      throw error;
-    }
-    
-    return errorInfo;
-  }
-
-  /**
-   * Traiter les erreurs spécifiques à l'API OpenAI
-   * @param {Error} error - L'erreur d'origine
-   * @param {string} context - Contexte dans lequel l'erreur s'est produite
-   * @returns {string} - Message d'erreur utilisateur
-   */
-  handleOpenAIError(error, context) {
-    let userMessage = "Une erreur est survenue lors de la communication avec OpenAI.";
-    
-    // Vérifier si c'est une erreur de clé API ou d'authentification
-    if (error.message && (
-        error.message.includes('API key') ||
-        error.message.includes('authentication') ||
-        error.message.includes('401')
-    )) {
-      userMessage = "Erreur d'authentification OpenAI. Vérifiez votre clé API.";
-      
-      // Réinitialiser la clé API dans le localStorage
-      localStorage.removeItem('openai_api_key');
-    }
-    
-    this.handleServiceError(error, context);
-    return userMessage;
-  }
-
-  /**
-   * Traiter les erreurs spécifiques à Ollama
-   * @param {Error} error - L'erreur d'origine
-   * @param {string} context - Contexte dans lequel l'erreur s'est produite
-   * @returns {string} - Message d'erreur utilisateur
-   */
-  handleOllamaError(error, context) {
-    let userMessage = "Une erreur est survenue lors de la communication avec Ollama.";
-    
-    // Vérifier si c'est une erreur de connexion
-    if (error.message && (
-        error.message.includes('network') ||
-        error.message.includes('fetch') ||
-        error.message.includes('connect')
-    )) {
-      userMessage = "Impossible de se connecter à Ollama. Vérifiez que le service est bien lancé.";
-    }
-    
-    this.handleServiceError(error, context);
-    return userMessage;
+    // ... existing code ...
   }
 }
 
-export default AIService; 
+export default AIService;

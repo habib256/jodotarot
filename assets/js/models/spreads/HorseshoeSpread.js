@@ -133,65 +133,6 @@ class HorseshoeSpread extends BaseSpread {
     horseshoeShape.className = 'horseshoe-shape';
     this.container.appendChild(horseshoeShape);
   }
-  
-  /**
-   * Génère une description du tirage en fer à cheval pour l'interprétation
-   * @return {string} Description formatée du tirage
-   */
-  generateReadingDescription() {
-    if (!this.cards || this.cards.length === 0) {
-      return '';
-    }
-    
-    let description = `Tirage en Fer à Cheval:\n\n`;
-    
-    this.cards.forEach((card, index) => {
-      const position = this.getPositionMeaning(index);
-      const orientation = card.orientation === 'upright' ? 
-        (this.language === 'fr' ? 'à l\'endroit' : 'upright') : 
-        (this.language === 'fr' ? 'renversée' : 'reversed');
-        
-      description += `${position}: ${card.name} (${orientation})\n`;
-    });
-    
-    return description;
-  }
-  
-  /**
-   * Retourne la description détaillée d'une position
-   * @param {number} positionIndex - Indice de la position (0-indexé)
-   * @return {string} Description détaillée de la position
-   */
-  getPositionDescription(positionIndex) {
-    // Retourne une chaîne vide pour désactiver l'affichage des descriptions
-    return '';
-  }
-  
-  // Implémentation de la méthode pour utiliser les noms des positions comme classes
-  /**
-   * Surcharge la méthode pour utiliser les noms spécifiques (past, recent, etc.)
-   * et également les numéros de position pour une standardisation
-   * @param {number} positionIndex - Indice de la position
-   * @param {Object} positionData - Données de la position
-   * @return {string} Nom de classe CSS
-   */
-  getPositionClassName(positionIndex, positionData) {
-    // Assurer que la classe card-position est toujours incluse, puis ajouter le nom spécifique comme classe additionnelle
-    const baseClass = super.getPositionClassName(positionIndex, positionData);
-    let additionalClasses = '';
-    
-    // Ajouter classe basée sur le nom sémantique (pour compatibilité)
-    if (positionData.name) {
-      additionalClasses += ` ${positionData.name}`;
-    }
-    
-    // Ajouter classe basée sur le numéro de position (nouveau standard)
-    if (positionData.position) {
-      additionalClasses += ` position-${positionData.position} card-position-${positionData.position}`;
-    }
-    
-    return `${baseClass}${additionalClasses}`;
-  }
 }
 
 export default HorseshoeSpread; 

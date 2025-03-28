@@ -107,43 +107,7 @@ class CrossSpread extends BaseSpread {
   }
   
   /**
-   * Surcharge la méthode pour utiliser les noms spécifiques (center, top, etc.)
-   * et également les numéros de position pour une standardisation
-   * @param {number} positionIndex - Indice de la position
-   * @param {Object} positionData - Données de la position
-   * @return {string} Nom de classe CSS
-   */
-  getPositionClassName(positionIndex, positionData) {
-    // Assurer que la classe card-position est toujours incluse, puis ajouter le nom spécifique comme classe additionnelle
-    const baseClass = super.getPositionClassName(positionIndex, positionData);
-    let additionalClasses = '';
-    
-    // Ajouter classe basée sur le nom sémantique (pour compatibilité)
-    if (positionData.name) {
-      additionalClasses += ` ${positionData.name}`;
-    }
-    
-    // Ajouter classe basée sur le numéro de position (nouveau standard)
-    if (positionData.position) {
-      additionalClasses += ` position-${positionData.position} card-position-${positionData.position}`;
-    }
-    
-    return `${baseClass}${additionalClasses}`;
-  }
-  
-  /**
-   * Retourne la description détaillée d'une position
-   * @param {number} positionIndex - Indice de la position (0-indexé)
-   * @return {string} Description détaillée de la position
-   */
-  getPositionDescription(positionIndex) {
-    // Retourne une chaîne vide pour désactiver l'affichage des descriptions
-    return '';
-  }
-  
-  /**
    * Ajoute des éléments visuels spécifiques au tirage en croix
-   * Peut être utilisé pour ajouter des lignes de connexion ou d'autres décorations
    */
   addVisualElements() {
     // Le tirage en croix n'a pas besoin d'éléments visuels supplémentaires

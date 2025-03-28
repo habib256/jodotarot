@@ -2,6 +2,8 @@
  * Classe de base pour tous les types de tirages
  * Définit l'interface commune et les fonctionnalités partagées
  */
+import ReadingDescriptionGenerator from './ReadingDescriptionGenerator.js';
+
 class BaseSpread {
   /**
    * @param {string} key - Identifiant unique du type de tirage
@@ -59,13 +61,122 @@ class BaseSpread {
    * Retourne la classe CSS à utiliser pour une position de carte
    * Peut être surchargée par les classes enfants pour des comportements spécifiques
    * @param {number} positionIndex - Indice de la position
-   * @param {Object} positionData - Données de la position
    * @return {string} Nom de classe CSS
    */
-  getPositionClassName(positionIndex, positionData) {
+  getPositionClassName(positionIndex) {
     return `card-position card-${positionIndex + 1}`;
   }
   
+  /**
+   * Configure le style d'une position de carte
+   * @param {HTMLElement} positionElement - L'élément de position
+   * @param {Object} position - Les données de position
+   * @private
+   */
+  _configurePositionStyle(positionElement, position) {
+    positionElement.style.position = 'absolute';
+    
+    if (position.position) {
+      positionElement.style.left = `var(--${this.key}-position-${position.position}-x)`;
+      positionElement.style.top = `var(--${this.key}-position-${position.position}-y)`;
+      
+      const rotationVar = `--${this.key}-position-${position.position}-rotation`;
+      const rotationValue = getComputedStyle(document.documentElement).getPropertyValue(rotationVar);
+      
+      positionElement.style.transform = rotationValue?.trim() 
+        ? `translate(-50%, -50%) rotate(${rotationValue})`
+        : `translate(-50%, -50%) rotate(${position.rotation || 0}deg)`;
+    } else {
+      const cssPositionName = position.cssName || position.name;
+      if (cssPositionName) {
+        positionElement.style.left = `var(--${this.key}-${cssPositionName}-x)`;
+        positionElement.style.top = `var(--${this.key}-${cssPositionName}-y)`;
+        
+        const rotationVar = `--${this.key}-${cssPositionName}-rotation`;
+        const rotationValue = getComputedStyle(document.documentElement).getPropertyValue(rotationVar);
+        
+        positionElement.style.transform = rotationValue?.trim() 
+          ? `translate(-50%, -50%) rotate(${rotationValue})`
+          : `translate(-50%, -50%) rotate(${position.rotation || 0}deg)`;
+      }
+    }
+    
+    positionElement.style.transformOrigin = 'center center';
+  }
+  
+  /**
+   * Crée un élément de carte
+   * @param {Object} card - Les données de la carte
+   * @param {number} index - L'index de la position
+   * @returns {HTMLElement} L'élément de carte créé
+   * @private
+   */
+  _createCardElement(card, index) {
+    const cardElement = document.createElement('div');
+    cardElement.className = `card ${card.orientation}`;
+    cardElement.setAttribute('data-card-id', card.id);
+    cardElement.setAttribute('data-card-name', card.name);
+    cardElement.setAttribute('data-position', index);
+    
+    // Image de la carte
+    const cardImage = document.createElement('img');
+    cardImage.src = card.imageUrl;
+    cardImage.alt = card.name;
+    
+    cardElement.appendChild(cardImage);
+    return cardElement;
+  }
+
+  /**
+   * Crée un élément de position
+   * @param {Object} position - Les données de position
+   * @param {number} index - L'index de la position
+   * @returns {HTMLElement} L'élément de position créé
+   * @private
+   */
+  _createPositionElement(position, index) {
+    const positionElement = document.createElement('div');
+    
+    // Appliquer les classes de position appropriées
+    positionElement.className = `${this.getPositionClassName(index)} empty`;
+    
+    // Ajouter des attributs de données pour la gestion des événements
+    positionElement.setAttribute('data-position', index);
+    positionElement.setAttribute('data-position-name', this.getPositionMeaning(index));
+    
+    // Ajouter une description détaillée si disponible
+    const positionDescription = this.getPositionDescription(index);
+    if (positionDescription) {
+      positionElement.setAttribute('data-position-meaning', positionDescription);
+    }
+    
+    // Ajouter des attributs pour la description de la carte
+    positionElement.setAttribute('data-card-name', '');
+    positionElement.setAttribute('data-card-description', '');
+    
+    // Configurer le style de la position
+    this._configurePositionStyle(positionElement, position);
+    
+    return positionElement;
+  }
+
+  /**
+   * Met à jour les attributs de description d'une position
+   * @param {HTMLElement} positionElement - L'élément de position
+   * @param {Object} card - La carte à cette position
+   * @param {number} index - L'index de la position
+   * @private
+   */
+  _updatePositionDescription(positionElement, card, index) {
+    if (!positionElement || !card) return;
+    
+    // Mettre à jour le nom de la carte
+    positionElement.setAttribute('data-card-name', card.name);
+    
+    // Mettre à jour la description détaillée
+    positionElement.setAttribute('data-card-description', this.getPositionDescription(index, card));
+  }
+
   /**
    * Initialise les positions des cartes dans l'interface
    * Utilise les variables CSS pour le positionnement
@@ -82,69 +193,7 @@ class BaseSpread {
     
     // Créer les emplacements pour les cartes
     this.cardPositions.forEach((position, index) => {
-      const positionElement = document.createElement('div');
-      
-      // Appliquer les classes de position appropriées
-      positionElement.className = `card-position ${this.getPositionClassName(index, position)} empty`;
-      
-      // Ajouter des attributs de données pour la gestion des événements
-      positionElement.setAttribute('data-position', index);
-      positionElement.setAttribute('data-position-name', this.getPositionMeaning(index));
-      
-      // Ajouter une description détaillée si disponible
-      const positionDescription = this.getPositionDescription(index);
-      if (positionDescription) {
-        positionElement.setAttribute('data-position-meaning', positionDescription);
-      }
-      
-      // Style de base
-      positionElement.style.position = 'absolute';
-      
-      // Définir la position en utilisant les variables CSS
-      // Utiliser le système de positionnement numérique en priorité (position-1, position-2, etc.)
-      if (position.position) {
-        positionElement.style.left = `var(--${this.key}-position-${position.position}-x)`;
-        positionElement.style.top = `var(--${this.key}-position-${position.position}-y)`;
-        
-        // Vérifier s'il existe une variable de rotation
-        const rotationVar = `--${this.key}-position-${position.position}-rotation`;
-        const rotationValue = getComputedStyle(document.documentElement).getPropertyValue(rotationVar);
-        
-        if (rotationValue && rotationValue.trim() !== '') {
-          positionElement.style.transform = `translate(-50%, -50%) rotate(${rotationValue})`;
-          positionElement.style.transformOrigin = 'center center'; // Assure que la rotation se fait autour du centre
-        } else if (position.rotation) {
-          positionElement.style.transform = `translate(-50%, -50%) rotate(${position.rotation}deg)`;
-          positionElement.style.transformOrigin = 'center center'; // Assure que la rotation se fait autour du centre
-        } else {
-          positionElement.style.transform = 'translate(-50%, -50%)';
-        }
-      } 
-      else {
-        // Ancien système - nom sémantique
-        const cssPositionName = position.cssName || position.name;
-        if (cssPositionName) {
-          positionElement.style.left = `var(--${this.key}-${cssPositionName}-x)`;
-          positionElement.style.top = `var(--${this.key}-${cssPositionName}-y)`;
-          
-          // Vérifier s'il existe une variable de rotation pour cette position
-          const rotationVar = `--${this.key}-${cssPositionName}-rotation`;
-          const rotationValue = getComputedStyle(document.documentElement).getPropertyValue(rotationVar);
-          
-          if (rotationValue && rotationValue.trim() !== '') {
-            positionElement.style.transform = `translate(-50%, -50%) rotate(${rotationValue})`;
-            positionElement.style.transformOrigin = 'center center'; // Assure que la rotation se fait autour du centre
-          } else if (position.rotation) {
-            positionElement.style.transform = `translate(-50%, -50%) rotate(${position.rotation}deg)`;
-            positionElement.style.transformOrigin = 'center center'; // Assure que la rotation se fait autour du centre
-          } else {
-            positionElement.style.transform = 'translate(-50%, -50%)';
-          }
-        }
-      }
-      
-      // Ajouter au DOM
-      this.container.appendChild(positionElement);
+      this.container.appendChild(this._createPositionElement(position, index));
     });
     
     // Ajouter des éléments visuels supplémentaires spécifiques à chaque tirage
@@ -221,7 +270,7 @@ class BaseSpread {
     }
     
     // Vérifier si les positions des cartes existent déjà
-    const positionsExist = this.cardPositions.some((position, index) => {
+    const positionsExist = this.cardPositions.some((_, index) => {
       return !!this.getPositionElement(index);
     });
     
@@ -266,31 +315,33 @@ class BaseSpread {
       // Supprimer la classe 'empty' puisque la position va contenir une carte
       positionElement.classList.remove('empty');
       
-      // Créer l'élément de carte
-      const cardElement = document.createElement('div');
-      cardElement.className = `card ${card.orientation}`;
-      cardElement.setAttribute('data-card-id', card.id);
-      cardElement.setAttribute('data-card-name', card.name);
-      cardElement.setAttribute('data-position', index);
-      
-      // Image de la carte
-      const cardImage = document.createElement('img');
-      cardImage.src = card.imageUrl;
-      cardImage.alt = card.name;
-      
-      cardElement.appendChild(cardImage);
+      // Créer et ajouter l'élément de carte
+      const cardElement = this._createCardElement(card, index);
       positionElement.appendChild(cardElement);
+      
+      // Mettre à jour les descriptions
+      this._updatePositionDescription(positionElement, card, index);
     });
   }
   
   /**
    * Méthode à surcharger par les classes enfants pour fournir une description détaillée des positions
    * @param {number} positionIndex - Indice de la position
+   * @param {Object} card - La carte à cette position
    * @return {string|null} Description détaillée ou null
    */
-  getPositionDescription(positionIndex) {
-    // Désactivation complète des descriptions détaillées
-    return '';
+  getPositionDescription(positionIndex, card = null) {
+    if (!card) return '';
+    
+    // Description de base de la carte
+    let description = '';
+    
+    // Ajouter la suite si disponible
+    if (card.suit) {
+      description += `Suite: ${card.suit}`;
+    }
+    
+    return description;
   }
   
   /**
@@ -299,60 +350,19 @@ class BaseSpread {
    * @return {string} Description formatée du tirage
    */
   generateReadingDescription(includeDetailedDescriptions = true) {
+    console.log('BaseSpread.generateReadingDescription appelé');
+    console.log('Cartes disponibles:', this.cards);
+    console.log('Langue:', this.language);
+    
     if (!this.cards || this.cards.length === 0) {
+      console.warn('Aucune carte disponible pour la description');
       return '';
     }
     
-    let description = '';
+    const generator = new ReadingDescriptionGenerator(this, this.language);
+    const description = generator.generateReadingDescription(includeDetailedDescriptions);
     
-    // En-tête du tirage
-    if (this.language === 'fr') {
-      description += `Tirage ${this.getName()} (${this.cards.length} cartes):\n\n`;
-    } else {
-      description += `${this.getName()} Spread (${this.cards.length} cards):\n\n`;
-    }
-    
-    // Description générale du tirage
-    const spreadDesc = this.getDescription();
-    if (spreadDesc) {
-      description += `${spreadDesc}\n\n`;
-    }
-    
-    // Description des cartes et de leurs positions
-    for (let i = 0; i < this.cards.length; i++) {
-      const card = this.cards[i];
-      const positionName = this.getPositionMeaning(i);
-      const orientation = card.orientation === 'upright' ? 
-        (this.language === 'fr' ? 'à l\'endroit' : 'upright') : 
-        (this.language === 'fr' ? 'renversée' : 'reversed');
-      
-      // Information principale de la carte
-      description += `${i+1}. ${positionName}: ${card.name} (${orientation})`;
-      
-      // Ajouter des informations sur l'arcane si disponibles
-      if (card.arcana) {
-        const arcanaText = this.language === 'fr' 
-          ? (card.arcana === 'major' ? 'Arcane majeur' : 'Arcane mineur') 
-          : (card.arcana === 'major' ? 'Major Arcana' : 'Minor Arcana');
-        description += ` - ${arcanaText}`;
-      }
-      
-      // Ajouter des informations sur la suite si disponibles
-      if (card.suit) {
-        description += ` - ${card.suit}`;
-      }
-      
-      description += '\n';
-      
-      // Ajouter une description de la position
-      const positionDescription = this.getPositionDescription(i);
-      if (includeDetailedDescriptions && positionDescription) {
-        description += `   ${positionDescription}\n`;
-      }
-      
-      description += '\n';
-    }
-    
+    console.log('Description générée:', description);
     return description;
   }
 }
