@@ -18,6 +18,7 @@ JodoTarot est une application web modulaire pour les tirages de tarot, construit
 - [Construction des Prompts](composants/construction-prompts.md) - Méthode détaillée de création des prompts
 - [Gestionnaire d'état](composants/state-manager.md) - Gestion de l'état global de l'application
 - [Système de traduction](composants/traduction.md) - Support multilingue
+- [Système de cartes](composants/cards.md) - Gestion des jeux de cartes et des tirages
 
 ### 3. Interface Utilisateur
 - [Positionnement des cartes](ui/positionnement-cartes.md) - Système de positionnement des cartes dans les tirages
@@ -42,6 +43,7 @@ JodoTarot est une application web modulaire pour les tirages de tarot, construit
 - 21 personas différents
 - Gestion optimisée du défilement
 - Affichage HTML dans l'interprétation
+- Système de cartes robuste avec validation
 
 ### En Développement
 - Support des arcanes mineurs
@@ -49,6 +51,7 @@ JodoTarot est une application web modulaire pour les tirages de tarot, construit
 - Mode sombre
 - Analyse d'images par IA
 - Amélioration des performances mobiles
+- Système de sélection de cartes
 
 ## 🛠️ Contribuer
 Pour contribuer au projet, veuillez consulter les guides techniques et respecter les conventions de code documentées dans cette section.
@@ -60,7 +63,8 @@ Pour une meilleure compréhension de la documentation :
 1. Commencez par la [Vue d'ensemble de l'architecture](architecture/vue-ensemble.md)
 2. Explorez le [Flux de données](architecture/flux-donnees.md) pour comprendre comment circulent les informations
 3. Familiarisez-vous avec le [Gestionnaire d'état](composants/state-manager.md) qui est au cœur du système
-4. Consultez les [Bonnes pratiques](standards/bonnes-pratiques.md) avant de contribuer au code
+4. Consultez le [Système de cartes](composants/cards.md) pour comprendre la gestion des jeux et des tirages
+5. Consultez les [Bonnes pratiques](standards/bonnes-pratiques.md) avant de contribuer au code
 
 ## 🔗 Ressources Complémentaires
 

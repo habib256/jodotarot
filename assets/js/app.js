@@ -98,11 +98,12 @@ function generateCardSet(setId) {
     const name = config.names[cardId];
     
     return {
-      id: i,
+      id: `M${cardId}`, // Format MXX requis par la validation
       name: name,
       imageUrl: `assets/images/cards/${config.directory}/${cardId} ${name}.${config.extension}`,
       backImageUrl: `assets/images/cards/${config.directory}/22 Dos de carte.${config.extension}`,
-      keywords: []
+      keywords: [],
+      position: 'upright' // Position par défaut requise par la validation
     };
   });
 }

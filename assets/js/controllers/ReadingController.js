@@ -180,18 +180,18 @@ class ReadingController {
     try {
       // Vérifier si un jeu est déjà chargé
       let deck = this.deckService.getCurrentDeck();
+      const state = this.stateManager.getState();
+      const currentCardSet = state.cardSet;
+
       if (!deck) {
-        console.log("🃏 Aucun jeu chargé au démarrage, chargement du jeu par défaut (set01)...");
+        console.log(`🃏 Aucun jeu chargé au démarrage, chargement du jeu ${currentCardSet || 'set01'}...`);
         try {
-          // Tenter de charger le jeu par défaut
-          deck = await this.deckService.loadDeck('set01');
-          console.log("✅ Jeu de cartes 'set01' chargé avec succès");
+          // Charger le jeu actuel ou le jeu par défaut
+          deck = await this.deckService.loadDeck(currentCardSet || 'set01');
+          console.log(`✅ Jeu de cartes '${currentCardSet || 'set01'}' chargé avec succès`);
           console.log(`📊 ${deck.getAllCards().length} cartes chargées au total`);
-          
-          // Mettre à jour l'état
-          this.stateManager.setState({ cardSet: 'set01' });
         } catch (error) {
-          console.error("❌ Erreur lors du chargement du jeu par défaut:", error);
+          console.error(`❌ Erreur lors du chargement du jeu ${currentCardSet || 'set01'}:`, error);
           // Afficher l'erreur dans l'interface
           if (this.elements.interpretationsDiv) {
             this.elements.interpretationsDiv.innerHTML = `
@@ -274,23 +274,26 @@ class ReadingController {
   serializeCard(card) {
     console.log('Sérialisation de la carte:', card);
     
-    if (!card || typeof card !== 'object') {
-      console.error('Erreur: tentative de sérialiser une carte invalide:', card);
-      return null;
+    // S'assurer que l'ID est au format MXX
+    let cardId = card.id;
+    if (!cardId || !cardId.match(/^M\d{2}$/)) {
+      if (card.rank !== undefined) {
+        cardId = `M${card.rank.toString().padStart(2, '0')}`;
+      } else {
+        console.warn('⚠️ Impossible de générer un ID valide pour la carte:', card);
+        return null;
+      }
     }
     
-    // Utiliser directement la propriété number qui est toujours présente et déjà un nombre
-    const cardId = card.number;
-    
-    const serialized = {
+    const serializedCard = {
       id: cardId,
-      name: String(card.name || ''),
-      imageUrl: String(card.imageUrl || ''),
-      position: card.orientation || card.position || 'upright'
+      name: card.name,
+      imageUrl: card.image || card.imageUrl,
+      position: card.orientation || 'upright'
     };
     
-    console.log('Carte sérialisée:', serialized);
-    return serialized;
+    console.log('Carte sérialisée:', serializedCard);
+    return serializedCard;
   }
   
   /**
@@ -362,11 +365,12 @@ class ReadingController {
       
       // Si aucun jeu n'est chargé, charger le jeu par défaut (set01)
       if (!deck) {
-        console.log("Aucun jeu chargé, chargement du jeu par défaut (set01)...");
+        const currentCardSet = state.cardSet;
+        console.log(`Aucun jeu chargé, chargement du jeu ${currentCardSet || 'set01'}...`);
         try {
-          deck = await this.deckService.loadDeck('set01');
+          deck = await this.deckService.loadDeck(currentCardSet || 'set01');
         } catch (loadError) {
-          console.error("Erreur lors du chargement du jeu par défaut:", loadError);
+          console.error(`Erreur lors du chargement du jeu ${currentCardSet || 'set01'}:`, loadError);
           throw new Error('Impossible de charger le jeu de cartes. Veuillez rafraîchir la page et réessayer.');
         }
       }

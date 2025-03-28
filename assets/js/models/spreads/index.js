@@ -12,7 +12,7 @@ const SPREADS = {
   cross: CrossSpread,
   horseshoe: HorseshoeSpread,
   love: LoveSpread,
-  celtic: CelticCrossSpread
+  celticCross: CelticCrossSpread
 };
 
 /**

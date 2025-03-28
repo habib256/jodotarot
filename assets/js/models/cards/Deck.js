@@ -2,6 +2,8 @@
  * Classe représentant un jeu de cartes de tarot
  * Gère le mélange et le tirage des cartes
  */
+import { ARCANE_TYPES } from './index.js';
+
 class Deck {
   /**
    * @param {string} deckId - Identifiant du jeu de cartes
@@ -27,73 +29,66 @@ class Deck {
    * Réinitialise le jeu en remettant toutes les cartes non tirées
    */
   reset() {
-    this.cards = [...this.originalCards];
+    // Réinitialiser les cartes tirées
     this.drawnCards = [];
+    
+    // Réinitialiser le jeu avec toutes les cartes sauf le dos
+    this.cards = this.originalCards.filter(card => !card.isBack());
+    
+    // Mélanger le jeu
+    this.shuffle();
   }
   
   /**
    * Mélange les cartes du jeu
-   * @param {boolean} includeReversed - Si true, certaines cartes seront retournées aléatoirement
    */
-  shuffle(includeReversed = true) {
-    // Algorithme de Fisher-Yates pour mélanger
+  shuffle() {
     for (let i = this.cards.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [this.cards[i], this.cards[j]] = [this.cards[j], this.cards[i]];
-    }
-    
-    // Déterminer aléatoirement l'orientation des cartes
-    if (includeReversed) {
-      this.cards = this.cards.map(card => {
-        const cardCopy = { ...card };
-        // 50% de chance d'être à l'endroit ou renversée
-        cardCopy.orientation = Math.random() < 0.5 ? 'upright' : 'reversed';
-        return cardCopy;
-      });
-    } else {
-      // Toutes les cartes à l'endroit
-      this.cards = this.cards.map(card => {
-        const cardCopy = { ...card };
-        cardCopy.orientation = 'upright';
-        return cardCopy;
-      });
     }
   }
   
   /**
    * Tire une carte du jeu
-   * @return {Object|null} La carte tirée ou null si le jeu est vide
+   * @param {boolean} [randomOrientation=false] - Si true, la carte peut être renversée
+   * @returns {Object|null} La carte tirée ou null si le jeu est vide
    */
-  drawCard() {
+  drawCard(randomOrientation = false) {
     if (this.cards.length === 0) {
-      console.warn(`Impossible de tirer une carte: jeu ${this.deckId} vide!`);
       return null;
     }
     
-    const card = this.cards.pop();
-    if (!card) {
-      console.error(`Erreur: carte nulle extraite du jeu ${this.deckId}!`);
-      return null;
+    // Trouver la prochaine carte qui n'est pas le dos
+    let cardIndex = this.cards.findIndex(card => !card.isBack());
+    if (cardIndex === -1) {
+      return null; // Aucune carte disponible sauf le dos
     }
     
-    console.log(`Carte tirée: ${card.name} (${card.imageUrl})`);
+    // Retirer la carte du jeu
+    const card = this.cards.splice(cardIndex, 1)[0];
     this.drawnCards.push(card);
+    
+    // Ajouter l'orientation si demandée
+    if (randomOrientation) {
+      card.orientation = Math.random() < 0.5 ? 'upright' : 'reversed';
+    }
+    
     return card;
   }
   
   /**
-   * Tire un nombre spécifique de cartes
+   * Tire plusieurs cartes du jeu
    * @param {number} count - Nombre de cartes à tirer
-   * @return {Array} Les cartes tirées
+   * @param {boolean} [randomOrientation=false] - Si true, les cartes peuvent être renversées
+   * @returns {Array} Les cartes tirées
    */
-  drawCards(count) {
+  drawCards(count, randomOrientation = false) {
     const drawn = [];
-    for (let i = 0; i < count; i++) {
-      const card = this.drawCard();
+    for (let i = 0; i < count && this.cards.length > 0; i++) {
+      const card = this.drawCard(randomOrientation);
       if (card) {
         drawn.push(card);
-      } else {
-        break; // Plus de cartes disponibles
       }
     }
     return drawn;
@@ -150,6 +145,47 @@ class Deck {
     return this.originalCards.find(card => 
       card.name.toLowerCase() === cardName.toLowerCase()
     ) || null;
+  }
+  
+  /**
+   * Obtient le nombre total de cartes dans le jeu
+   * @returns {number} Nombre total de cartes
+   */
+  getTotalCount() {
+    return this.originalCards.length;
+  }
+  
+  /**
+   * Filtre les cartes par type d'arcane
+   * @param {string} arcanaType - Type d'arcane (major ou minor)
+   * @returns {Array} Cartes filtrées
+   */
+  filterByArcana(arcanaType) {
+    return this.cards.filter(card => card.arcana === arcanaType);
+  }
+  
+  /**
+   * Obtient les cartes majeures
+   * @returns {Array} Cartes majeures
+   */
+  getMajorCards() {
+    return this.filterByArcana(ARCANE_TYPES.MAJOR);
+  }
+  
+  /**
+   * Obtient les cartes mineures
+   * @returns {Array} Cartes mineures
+   */
+  getMinorCards() {
+    return this.filterByArcana(ARCANE_TYPES.MINOR);
+  }
+  
+  /**
+   * Vérifie si le jeu contient des arcanes mineurs
+   * @returns {boolean} True si le jeu contient des arcanes mineurs
+   */
+  hasMinorArcana() {
+    return this.getMinorCards().length > 0;
   }
 }
 

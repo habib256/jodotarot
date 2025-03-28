@@ -23,7 +23,7 @@ class StateManager {
       },
       cardSet: {
         type: 'string',
-        enum: ['set01', 'set02'],
+        enum: ['set01', 'set02', 'set03'],
         default: 'set01',
         description: 'Identifiant du jeu de cartes (anciennement séparé en cardSet et deckId)'
       },
@@ -78,53 +78,29 @@ class StateManager {
       cards: {
         type: 'array',
         validate: (value) => {
-          // Vérification détaillée avec rapports d'erreurs
-          console.log('🔍 Validation de cards:', value);
+          if (!Array.isArray(value)) return false;
           
-          // 1. Vérifier si c'est un tableau
-          if (!Array.isArray(value)) {
-            console.error('❌ Cards n\'est pas un tableau:', value);
-            console.error('❌ Type de cards:', typeof value);
-            console.error('❌ Chaîne stringifiée:', JSON.stringify(value));
-            return false;
+          for (const card of value) {
+            if (!card || typeof card !== 'object') return false;
+            
+            // Si la carte n'a pas d'ID, essayer de le générer à partir du nom
+            if (!card.id) {
+              const cardNumber = this.getCardNumberFromName(card.name);
+              if (cardNumber !== null) {
+                card.id = `M${cardNumber.toString().padStart(2, '0')}`;
+              } else {
+                return false;
+              }
+            }
+            
+            if (!card.name || typeof card.name !== 'string') return false;
+            if (!card.imageUrl || typeof card.imageUrl !== 'string') return false;
+            if (!card.position || !['upright', 'reversed'].includes(card.position)) {
+              card.position = 'upright';
+            }
           }
           
-          console.log('✅ Cards est bien un tableau de longueur', value.length);
-          
-          // 2. Vérifier chaque carte
-          let allValid = true;
-          value.forEach((card, index) => {
-            console.log(`🔍 Vérification de la carte ${index}:`, card);
-            
-            if (!card || typeof card !== 'object') {
-              console.error(`❌ Carte ${index} n'est pas un objet:`, card);
-              allValid = false;
-              return;
-            }
-            
-            // Vérifier les propriétés requises
-            if (card.id === undefined) {
-              console.error(`❌ Carte ${index} n'a pas d'id:`, card);
-              allValid = false;
-            }
-            
-            if (typeof card.name !== 'string') {
-              console.error(`❌ Carte ${index} n'a pas de nom valide:`, card.name);
-              allValid = false;
-            }
-            
-            if (typeof card.imageUrl !== 'string') {
-              console.error(`❌ Carte ${index} n'a pas d'imageUrl valide:`, card.imageUrl);
-              allValid = false;
-            }
-          });
-          
-          // 3. Retourner le résultat (toujours vrai pour éviter le blocage complet)
-          if (!allValid) {
-            console.warn('⚠️ Des problèmes ont été détectés avec les cartes, mais nous continuons');
-          }
-          
-          return true; // Toujours retourner true pour éviter les blocages
+          return true;
         },
         default: []
       },
@@ -821,6 +797,110 @@ class StateManager {
       delete newData.oldProperty;
     }
     return newData;
+  }
+
+  validateCards(cards) {
+    console.log('🔍 Validation de cards:', cards);
+    
+    if (!Array.isArray(cards)) {
+      console.error('❌ Cards n\'est pas un tableau:', cards);
+      return false;
+    }
+    
+    console.log('✅ Cards est bien un tableau de longueur', cards.length);
+    
+    for (let i = 0; i < cards.length; i++) {
+      const card = cards[i];
+      console.log(`🔍 Vérification de la carte ${i}:`, card);
+      
+      if (!card || typeof card !== 'object') {
+        console.error(`❌ Carte ${i} n'est pas un objet valide:`, card);
+        return false;
+      }
+      
+      if (!card.id || !card.id.match(/^M\d{2}$/)) {
+        console.error(`❌ Carte ${i} n'a pas d'id valide:`, card);
+        return false;
+      }
+      
+      if (!card.name || typeof card.name !== 'string') {
+        console.error(`❌ Carte ${i} n'a pas de nom valide:`, card);
+        return false;
+      }
+      
+      if (!card.imageUrl || typeof card.imageUrl !== 'string') {
+        console.error(`❌ Carte ${i} n'a pas d'URL d'image valide:`, card);
+        return false;
+      }
+      
+      if (!card.position || !['upright', 'reversed'].includes(card.position)) {
+        console.error(`❌ Carte ${i} n'a pas de position valide:`, card);
+        return false;
+      }
+    }
+    
+    return true;
+  }
+
+  validateCardsArray(value) {
+    if (!Array.isArray(value)) return false;
+    
+    for (const card of value) {
+      if (!card || typeof card !== 'object') return false;
+      
+      // Si la carte n'a pas d'ID, essayer de le générer à partir du nom
+      if (!card.id) {
+        const cardNumber = this.getCardNumberFromName(card.name);
+        if (cardNumber !== null) {
+          card.id = `M${cardNumber.toString().padStart(2, '0')}`;
+        } else {
+          return false;
+        }
+      }
+      
+      if (!card.name || typeof card.name !== 'string') return false;
+      if (!card.imageUrl || typeof card.imageUrl !== 'string') return false;
+      if (!card.position || !['upright', 'reversed'].includes(card.position)) {
+        card.position = 'upright';
+      }
+    }
+    
+    return true;
+  }
+
+  /**
+   * Obtient le numéro d'une carte à partir de son nom
+   * @param {string} name - Nom de la carte
+   * @returns {number|null} Numéro de la carte ou null si non trouvé
+   */
+  getCardNumberFromName(name) {
+    const cardNumbers = {
+      'Le fou': 0,
+      'Bateleur': 1,
+      'Papesse': 2,
+      'Imperatrice': 3,
+      'Empereur': 4,
+      'Pape': 5,
+      'Les amoureux': 6,
+      'Chariot': 7,
+      'Justice': 8,
+      'Ermite': 9,
+      'La roue': 10,
+      'Force': 11,
+      'Le pendu': 12,
+      'La mort': 13,
+      'Temperance': 14,
+      'Diable': 15,
+      'La Tour': 16,
+      'Etoile': 17,
+      'La lune': 18,
+      'Le soleil': 19,
+      'Le jugement': 20,
+      'Le monde': 21,
+      'Dos de carte': 22
+    };
+    
+    return cardNumbers[name] !== undefined ? cardNumbers[name] : null;
   }
 }
 

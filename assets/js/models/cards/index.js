@@ -3,62 +3,198 @@
  * Centralise toutes les informations sur les cartes
  */
 
+// Constantes pour les types d'arcanes
+export const ARCANE_TYPES = {
+  MAJOR: 'major',
+  MINOR: 'minor'
+};
+
+// Constantes pour les suites des arcanes mineurs
+export const MINOR_SUITS = {
+  WANDS: 'wands',
+  CUPS: 'cups',
+  SWORDS: 'swords',
+  PENTACLES: 'pentacles'
+};
+
+// Constantes pour les rangs des arcanes mineurs
+export const MINOR_RANKS = {
+  ACE: 'ace',
+  TWO: 'two',
+  THREE: 'three',
+  FOUR: 'four',
+  FIVE: 'five',
+  SIX: 'six',
+  SEVEN: 'seven',
+  EIGHT: 'eight',
+  NINE: 'nine',
+  TEN: 'ten',
+  PAGE: 'page',
+  KNIGHT: 'knight',
+  QUEEN: 'queen',
+  KING: 'king'
+};
+
+/**
+ * Classe pour représenter une carte de tarot
+ */
+export class TarotCard {
+  constructor(id, name, image, arcana = ARCANE_TYPES.MAJOR, suit = null, rank = null) {
+    this.id = id;
+    this.name = name;
+    this.image = image;
+    this.arcana = arcana;
+    this.suit = suit;
+    this.rank = rank;
+    this.orientation = 'upright'; // Orientation par défaut
+  }
+
+  // Générateur d'ID unique pour les cartes
+  static generateId(arcana, suit, rank) {
+    if (arcana === ARCANE_TYPES.MAJOR) {
+      return `M${rank.padStart(2, '0')}`; // M00 pour Le Fou, M21 pour Le Monde
+    } else {
+      return `${suit[0].toUpperCase()}${rank[0].toUpperCase()}`; // WK pour Roi de Bâtons
+    }
+  }
+
+  // Générateur de nom de fichier standardisé
+  static generateFileName(arcana, suit, rank, name) {
+    if (arcana === ARCANE_TYPES.MAJOR) {
+      return `${rank.padStart(2, '0')} ${name}`;
+    } else {
+      return `${rank} of ${suit}`;
+    }
+  }
+
+  // Obtient le nom complet de la carte
+  getFullName() {
+    if (this.arcana === ARCANE_TYPES.MAJOR) {
+      return this.name;
+    } else {
+      return `${this.rank} of ${this.suit}`;
+    }
+  }
+
+  // Vérifie si c'est une carte majeure
+  isMajor() {
+    return this.arcana === ARCANE_TYPES.MAJOR;
+  }
+
+  // Vérifie si c'est une carte mineure
+  isMinor() {
+    return this.arcana === ARCANE_TYPES.MINOR;
+  }
+
+  // Vérifie si c'est le dos de carte
+  isBack() {
+    return this.id === 'M22';
+  }
+
+  // Clone la carte
+  clone() {
+    const clonedCard = new TarotCard(
+      this.id,
+      this.name,
+      this.image,
+      this.arcana,
+      this.suit,
+      this.rank
+    );
+    
+    // Copier les attributs supplémentaires
+    clonedCard.orientation = this.orientation;
+    clonedCard.imageUrl = this.imageUrl || this.image;
+    
+    return clonedCard;
+  }
+}
+
 /**
  * Informations sur les cartes du jeu Marseille
  */
 export const marseilleCards = [
-  { id: "00", name: "Le fou", image: "assets/images/set01/00 Le fou.png" },
-  { id: "01", name: "Bateleur", image: "assets/images/set01/01 Bateleur.png" },
-  { id: "02", name: "Papesse", image: "assets/images/set01/02 Papesse.png" },
-  { id: "03", name: "Imperatrice", image: "assets/images/set01/03 Imperatrice.png" },
-  { id: "04", name: "Empereur", image: "assets/images/set01/04 Empereur.png" },
-  { id: "05", name: "Pape", image: "assets/images/set01/05 Pape.png" },
-  { id: "06", name: "Les amoureux", image: "assets/images/set01/06 Les amoureux.png" },
-  { id: "07", name: "Chariot", image: "assets/images/set01/07 Chariot.png" },
-  { id: "08", name: "Justice", image: "assets/images/set01/08 Justice.png" },
-  { id: "09", name: "Ermite", image: "assets/images/set01/09 Ermite.png" },
-  { id: "10", name: "La roue", image: "assets/images/set01/10 La roue.png" },
-  { id: "11", name: "Force", image: "assets/images/set01/11 Force.png" },
-  { id: "12", name: "Le pendu", image: "assets/images/set01/12 Le pendu.png" },
-  { id: "13", name: "La mort", image: "assets/images/set01/13 La mort.png" },
-  { id: "14", name: "Temperance", image: "assets/images/set01/14 Temperance.png" },
-  { id: "15", name: "Diable", image: "assets/images/set01/15 Diable.png" },
-  { id: "16", name: "La Tour", image: "assets/images/set01/16 La Tour.png" },
-  { id: "17", name: "Etoile", image: "assets/images/set01/17 Etoile.png" },
-  { id: "18", name: "La lune", image: "assets/images/set01/18 La lune.png" },
-  { id: "19", name: "Le soleil", image: "assets/images/set01/19 Le soleil.png" },
-  { id: "20", name: "Le jugement", image: "assets/images/set01/20 Le jugement.png" },
-  { id: "21", name: "Le monde", image: "assets/images/set01/21 Le monde.png" },
-  { id: "22", name: "Dos de carte", image: "assets/images/set01/22 Dos de carte.png" }
+  new TarotCard('M00', 'Le fou', 'assets/images/set01/00 Le fou.png'),
+  new TarotCard('M01', 'Bateleur', 'assets/images/set01/01 Bateleur.png'),
+  new TarotCard('M02', 'Papesse', 'assets/images/set01/02 Papesse.png'),
+  new TarotCard('M03', 'Imperatrice', 'assets/images/set01/03 Imperatrice.png'),
+  new TarotCard('M04', 'Empereur', 'assets/images/set01/04 Empereur.png'),
+  new TarotCard('M05', 'Pape', 'assets/images/set01/05 Pape.png'),
+  new TarotCard('M06', 'Les amoureux', 'assets/images/set01/06 Les amoureux.png'),
+  new TarotCard('M07', 'Chariot', 'assets/images/set01/07 Chariot.png'),
+  new TarotCard('M08', 'Justice', 'assets/images/set01/08 Justice.png'),
+  new TarotCard('M09', 'Ermite', 'assets/images/set01/09 Ermite.png'),
+  new TarotCard('M10', 'La roue', 'assets/images/set01/10 La roue.png'),
+  new TarotCard('M11', 'Force', 'assets/images/set01/11 Force.png'),
+  new TarotCard('M12', 'Le pendu', 'assets/images/set01/12 Le pendu.png'),
+  new TarotCard('M13', 'La mort', 'assets/images/set01/13 La mort.png'),
+  new TarotCard('M14', 'Temperance', 'assets/images/set01/14 Temperance.png'),
+  new TarotCard('M15', 'Diable', 'assets/images/set01/15 Diable.png'),
+  new TarotCard('M16', 'La Tour', 'assets/images/set01/16 La Tour.png'),
+  new TarotCard('M17', 'Etoile', 'assets/images/set01/17 Etoile.png'),
+  new TarotCard('M18', 'La lune', 'assets/images/set01/18 La lune.png'),
+  new TarotCard('M19', 'Le soleil', 'assets/images/set01/19 Le soleil.png'),
+  new TarotCard('M20', 'Le jugement', 'assets/images/set01/20 Le jugement.png'),
+  new TarotCard('M21', 'Le monde', 'assets/images/set01/21 Le monde.png'),
+  new TarotCard('M22', 'Dos de carte', 'assets/images/set01/22 Dos de carte.png')
 ];
 
 /**
  * Informations sur les cartes du jeu Thiago Lehmann
  */
 export const lehmannCards = [
-  { id: "00", name: "Le fou", image: "assets/images/set02/00 Le fou.jpg" },
-  { id: "01", name: "Bateleur", image: "assets/images/set02/01 Bateleur.jpg" },
-  { id: "02", name: "Papesse", image: "assets/images/set02/02 Papesse.jpg" },
-  { id: "03", name: "Imperatrice", image: "assets/images/set02/03 Imperatrice.jpg" },
-  { id: "04", name: "Empereur", image: "assets/images/set02/04 Empereur.jpg" },
-  { id: "05", name: "Pape", image: "assets/images/set02/05 Pape.jpg" },
-  { id: "06", name: "Les amoureux", image: "assets/images/set02/06 Les amoureux.jpg" },
-  { id: "07", name: "Chariot", image: "assets/images/set02/07 Chariot.jpg" },
-  { id: "08", name: "Justice", image: "assets/images/set02/08 Justice.jpg" },
-  { id: "09", name: "Ermite", image: "assets/images/set02/09 Ermite.jpg" },
-  { id: "10", name: "La roue", image: "assets/images/set02/10 La roue.jpg" },
-  { id: "11", name: "Force", image: "assets/images/set02/11 Force.jpg" },
-  { id: "12", name: "Le pendu", image: "assets/images/set02/12 Le pendu.jpg" },
-  { id: "13", name: "La mort", image: "assets/images/set02/13 La mort.jpg" },
-  { id: "14", name: "Temperance", image: "assets/images/set02/14 Temperance.jpg" },
-  { id: "15", name: "Diable", image: "assets/images/set02/15 Diable.jpg" },
-  { id: "16", name: "La Tour", image: "assets/images/set02/16 La Tour.jpg" },
-  { id: "17", name: "Etoile", image: "assets/images/set02/17 Etoile.jpg" },
-  { id: "18", name: "La lune", image: "assets/images/set02/18 La lune.jpg" },
-  { id: "19", name: "Le soleil", image: "assets/images/set02/19 Le soleil.jpg" },
-  { id: "20", name: "Le jugement", image: "assets/images/set02/20 Le jugement.jpg" },
-  { id: "21", name: "Le monde", image: "assets/images/set02/21 Le monde.jpg" },
-  { id: "22", name: "Dos de carte", image: "assets/images/set02/22 Dos de carte.png" }
+  new TarotCard('M00', 'Le fou', 'assets/images/set02/00 Le fou.jpg'),
+  new TarotCard('M01', 'Bateleur', 'assets/images/set02/01 Bateleur.jpg'),
+  new TarotCard('M02', 'Papesse', 'assets/images/set02/02 Papesse.jpg'),
+  new TarotCard('M03', 'Imperatrice', 'assets/images/set02/03 Imperatrice.jpg'),
+  new TarotCard('M04', 'Empereur', 'assets/images/set02/04 Empereur.jpg'),
+  new TarotCard('M05', 'Pape', 'assets/images/set02/05 Pape.jpg'),
+  new TarotCard('M06', 'Les amoureux', 'assets/images/set02/06 Les amoureux.jpg'),
+  new TarotCard('M07', 'Chariot', 'assets/images/set02/07 Chariot.jpg'),
+  new TarotCard('M08', 'Justice', 'assets/images/set02/08 Justice.jpg'),
+  new TarotCard('M09', 'Ermite', 'assets/images/set02/09 Ermite.jpg'),
+  new TarotCard('M10', 'La roue', 'assets/images/set02/10 La roue.jpg'),
+  new TarotCard('M11', 'Force', 'assets/images/set02/11 Force.jpg'),
+  new TarotCard('M12', 'Le pendu', 'assets/images/set02/12 Le pendu.jpg'),
+  new TarotCard('M13', 'La mort', 'assets/images/set02/13 La mort.jpg'),
+  new TarotCard('M14', 'Temperance', 'assets/images/set02/14 Temperance.jpg'),
+  new TarotCard('M15', 'Diable', 'assets/images/set02/15 Diable.jpg'),
+  new TarotCard('M16', 'La Tour', 'assets/images/set02/16 La Tour.jpg'),
+  new TarotCard('M17', 'Etoile', 'assets/images/set02/17 Etoile.jpg'),
+  new TarotCard('M18', 'La lune', 'assets/images/set02/18 La lune.jpg'),
+  new TarotCard('M19', 'Le soleil', 'assets/images/set02/19 Le soleil.jpg'),
+  new TarotCard('M20', 'Le jugement', 'assets/images/set02/20 Le jugement.jpg'),
+  new TarotCard('M21', 'Le monde', 'assets/images/set02/21 Le monde.jpg'),
+  new TarotCard('M22', 'Dos de carte', 'assets/images/set02/22 Dos de carte.png')
+];
+
+/**
+ * Informations sur les cartes du jeu Renaissance
+ */
+export const renaissanceCards = [
+  new TarotCard('M00', 'Le fou', 'assets/images/cards/renaissance/Le fou.png'),
+  new TarotCard('M01', 'Bateleur', 'assets/images/cards/renaissance/Bateleur.png'),
+  new TarotCard('M02', 'Papesse', 'assets/images/cards/renaissance/Papesse.png'),
+  new TarotCard('M03', 'Imperatrice', 'assets/images/cards/renaissance/Imperatrice.png'),
+  new TarotCard('M04', 'Empereur', 'assets/images/cards/renaissance/Empereur.png'),
+  new TarotCard('M05', 'Pape', 'assets/images/cards/renaissance/Pape.png'),
+  new TarotCard('M06', 'Les amoureux', 'assets/images/cards/renaissance/Les amoureux.png'),
+  new TarotCard('M07', 'Chariot', 'assets/images/cards/renaissance/Chariot.png'),
+  new TarotCard('M08', 'Justice', 'assets/images/cards/renaissance/Justice.png'),
+  new TarotCard('M09', 'Ermite', 'assets/images/cards/renaissance/Ermite.png'),
+  new TarotCard('M10', 'La roue', 'assets/images/cards/renaissance/La roue.png'),
+  new TarotCard('M11', 'Force', 'assets/images/cards/renaissance/Force.png'),
+  new TarotCard('M12', 'Le pendu', 'assets/images/cards/renaissance/Le pendu.png'),
+  new TarotCard('M13', 'La mort', 'assets/images/cards/renaissance/La mort.png'),
+  new TarotCard('M14', 'Temperance', 'assets/images/cards/renaissance/Temperance.png'),
+  new TarotCard('M15', 'Diable', 'assets/images/cards/renaissance/Diable.png'),
+  new TarotCard('M16', 'La Tour', 'assets/images/cards/renaissance/La Tour.png'),
+  new TarotCard('M17', 'Etoile', 'assets/images/cards/renaissance/Etoile.png'),
+  new TarotCard('M18', 'La lune', 'assets/images/cards/renaissance/La lune.png'),
+  new TarotCard('M19', 'Le soleil', 'assets/images/cards/renaissance/Le soleil.png'),
+  new TarotCard('M20', 'Le jugement', 'assets/images/cards/renaissance/Le jugement.png'),
+  new TarotCard('M21', 'Le monde', 'assets/images/cards/renaissance/Le monde.png'),
+  new TarotCard('M22', 'Dos de carte', 'assets/images/cards/renaissance/Dos de carte.png')
 ];
 
 /**
@@ -131,6 +267,12 @@ export const cardSets = {
     id: 'set02',
     name: 'Tarot Thiago Lehmann',
     cards: lehmannCards,
+    backCardIndex: 22
+  },
+  set03: {
+    id: 'set03',
+    name: 'Tarot Renaissance',
+    cards: renaissanceCards,
     backCardIndex: 22
   }
 };
