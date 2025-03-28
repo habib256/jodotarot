@@ -802,131 +802,137 @@ class ConfigController {
   syncUIWithState(previousState = null) {
     const state = this.stateManager.getState();
     
-    // S'assurer que l'option "prompt" existe toujours en première position
-    if (this.elements.iaModelSelect) {
-      let promptOption = Array.from(this.elements.iaModelSelect.options)
-        .find(option => option.value === 'prompt');
-      
-      if (!promptOption) {
-        console.log("Création de l'option Prompt");
-        promptOption = document.createElement('option');
-        promptOption.value = 'prompt';
-        promptOption.text = '📝 Prompt (Sans IA)';
-        
-        // L'insérer en première position
-        this.elements.iaModelSelect.insertBefore(
-          promptOption, 
-          this.elements.iaModelSelect.firstChild
-        );
-      } else if (promptOption.parentNode !== this.elements.iaModelSelect) {
-        // Si l'option existe mais n'est pas directement sous le select (par exemple dans un optgroup)
-        this.elements.iaModelSelect.insertBefore(
-          promptOption,
-          this.elements.iaModelSelect.firstChild
-        );
-      }
-    }
-
-    console.log('🔄 Synchronisation de l\'UI avec l\'état:', {
-      language: state.language,
-      persona: state.persona,
-      cardSet: state.cardSet,
-      spreadType: state.spreadType,
-      iaModel: state.iaModel
-    });
+    // Mise à jour des sélecteurs
+    this.updateSelectors(state, previousState);
     
-    // Vérifier que tous les éléments DOM existent
-    if (!this.elements.languageSelect || !this.elements.personaSelect || 
-        !this.elements.cardSetSelect || !this.elements.spreadTypeSelect || 
-        !this.elements.iaModelSelect || !this.elements.personaLogo) {
-      console.error('❌ Certains éléments DOM sont manquants pour la synchronisation UI/État');
-      return;
-    }
-    
-    // Mise à jour des sélecteurs uniquement si nécessaire
-    if (!previousState || previousState.language !== state.language) {
-      console.log(`🔤 Mise à jour du sélecteur de langue: ${state.language}`);
-      
-      // Vérifier si la valeur est une option valide
-      if (this.isValidOption(this.elements.languageSelect, state.language)) {
-        this.elements.languageSelect.value = state.language;
-        this.updateDropdownOptions(state.language);
-      } else {
-        console.warn(`⚠️ Langue invalide dans l'état: ${state.language}`);
-      }
-    }
-    
-    if (!previousState || previousState.persona !== state.persona) {
-      console.log(`👤 Mise à jour du sélecteur de persona: ${state.persona}`);
-      
-      if (this.isValidOption(this.elements.personaSelect, state.persona)) {
-        this.elements.personaSelect.value = state.persona;
-        this.updatePersonaLogo(state.persona);
-      } else {
-        console.warn(`⚠️ Persona invalide dans l'état: ${state.persona}`);
-      }
-    }
-    
-    if (!previousState || previousState.cardSet !== state.cardSet) {
-      console.log(`🃏 Mise à jour du sélecteur de jeu de cartes: ${state.cardSet}`);
-      
-      if (this.isValidOption(this.elements.cardSetSelect, state.cardSet)) {
-        this.elements.cardSetSelect.value = state.cardSet;
-      } else {
-        console.warn(`⚠️ Jeu de cartes invalide dans l'état: ${state.cardSet}`);
-      }
-    }
-    
-    if (!previousState || previousState.spreadType !== state.spreadType) {
-      console.log(`🔀 Mise à jour du sélecteur de type de tirage: ${state.spreadType}`);
-      
-      if (this.isValidOption(this.elements.spreadTypeSelect, state.spreadType)) {
-        this.elements.spreadTypeSelect.value = state.spreadType;
-        this.updateAppTitle();
-      } else {
-        console.warn(`⚠️ Type de tirage invalide dans l'état: ${state.spreadType}`);
-      }
-    }
-    
-    if (!previousState || previousState.iaModel !== state.iaModel) {
-      console.log(`🤖 Mise à jour du sélecteur de modèle IA: ${state.iaModel}`);
-      
-      // Cas spécial pour le mode "prompt"
-      if (state.iaModel === 'prompt') {
-        // S'assurer que l'option prompt existe ou la créer si nécessaire
-        let promptOption = Array.from(this.elements.iaModelSelect.options)
-          .find(option => option.value === 'prompt');
-        
-        if (!promptOption) {
-          console.log("Création de l'option Prompt");
-          promptOption = document.createElement('option');
-          promptOption.value = 'prompt';
-          promptOption.text = '📝 Prompt (Sans IA)';
-          
-          // L'insérer en première position
-          this.elements.iaModelSelect.insertBefore(
-            promptOption, 
-            this.elements.iaModelSelect.firstChild
-          );
-        }
-        
-        this.elements.iaModelSelect.value = 'prompt';
-      }
-      else if (this.isValidOption(this.elements.iaModelSelect, state.iaModel)) {
-        this.elements.iaModelSelect.value = state.iaModel;
-      } else {
-        console.warn(`⚠️ Modèle IA invalide dans l'état: ${state.iaModel}`);
-        
-        // Si le modèle est invalide, basculer sur l'option "prompt" par défaut
-        if (this.isValidOption(this.elements.iaModelSelect, 'prompt')) {
-          console.log("Basculement sur le mode Prompt en raison d'un modèle invalide");
-          this.elements.iaModelSelect.value = 'prompt';
-          this.stateManager.setState({ iaModel: 'prompt' });
-        }
-      }
-    }
+    // Mise à jour des autres éléments UI
+    this.updateOtherUIElements(state);
     
     console.log('✅ Synchronisation UI/État terminée');
+  }
+  
+  /**
+   * Met à jour les sélecteurs avec l'état actuel
+   * @param {Object} state - État actuel
+   * @param {Object} previousState - État précédent (optionnel)
+   */
+  updateSelectors(state, previousState = null) {
+    // Fonction helper pour mettre à jour un sélecteur
+    const updateSelector = (selector, value, key) => {
+      if (!selector) return;
+      
+      // Vérifier si la valeur est une option valide
+      if (this.isValidOption(selector, value)) {
+        selector.value = value;
+        console.log(`✅ Mise à jour du sélecteur ${key}: ${value}`);
+      } else {
+        console.warn(`⚠️ Valeur invalide pour ${key}: ${value}`);
+      }
+    };
+
+    // Mise à jour de la langue
+    if (!previousState || previousState.language !== state.language) {
+      updateSelector(this.elements.languageSelect, state.language, 'language');
+      this.updateDropdownOptions(state.language);
+    }
+
+    // Mise à jour du persona
+    if (!previousState || previousState.persona !== state.persona) {
+      updateSelector(this.elements.personaSelect, state.persona, 'persona');
+      this.updatePersonaLogo(state.persona);
+    }
+
+    // Mise à jour du jeu de cartes
+    if (!previousState || previousState.cardSet !== state.cardSet) {
+      updateSelector(this.elements.cardSetSelect, state.cardSet, 'cardSet');
+    }
+
+    // Mise à jour du type de tirage
+    if (!previousState || previousState.spreadType !== state.spreadType) {
+      updateSelector(this.elements.spreadTypeSelect, state.spreadType, 'spreadType');
+      this.updateAppTitle();
+    }
+
+    // Mise à jour du modèle IA
+    if (!previousState || previousState.iaModel !== state.iaModel) {
+      this.updateModelSelector(state.iaModel);
+    }
+  }
+  
+  /**
+   * Met à jour le sélecteur de modèle IA
+   * @param {string} model - Modèle IA sélectionné
+   */
+  updateModelSelector(model) {
+    if (!this.elements.iaModelSelect) return;
+
+    // Cas spécial pour le mode "prompt"
+    if (model === 'prompt') {
+      this.ensurePromptOption();
+      this.elements.iaModelSelect.value = 'prompt';
+      console.log('✅ Mode Prompt sélectionné');
+      return;
+    }
+
+    // Vérifier si le modèle est une option valide
+    if (this.isValidOption(this.elements.iaModelSelect, model)) {
+      this.elements.iaModelSelect.value = model;
+      console.log(`✅ Modèle IA sélectionné: ${model}`);
+    } else {
+      console.warn(`⚠️ Modèle IA invalide: ${model}`);
+      // Basculer sur le mode prompt par défaut
+      if (this.isValidOption(this.elements.iaModelSelect, 'prompt')) {
+        console.log('🔄 Basculement sur le mode Prompt');
+        this.elements.iaModelSelect.value = 'prompt';
+        this.stateManager.setState({ iaModel: 'prompt' });
+      }
+    }
+  }
+  
+  /**
+   * S'assure que l'option "prompt" existe dans le sélecteur de modèle IA
+   */
+  ensurePromptOption() {
+    let promptOption = Array.from(this.elements.iaModelSelect.options)
+      .find(option => option.value === 'prompt');
+
+    if (!promptOption) {
+      console.log('➕ Ajout de l\'option Prompt');
+      promptOption = document.createElement('option');
+      promptOption.value = 'prompt';
+      promptOption.text = '📝 Prompt (Sans IA)';
+      this.elements.iaModelSelect.insertBefore(
+        promptOption,
+        this.elements.iaModelSelect.firstChild
+      );
+    }
+  }
+  
+  /**
+   * Met à jour les autres éléments UI
+   * @param {Object} state - État actuel
+   */
+  updateOtherUIElements(state) {
+    // Mise à jour du titre de l'application
+    this.updateAppTitle();
+
+    // Mise à jour des logos et icônes
+    this.updatePersonaLogo(state.persona);
+  }
+  
+  /**
+   * Met à jour les avertissements de connectivité
+   * @param {Object} state - État actuel
+   */
+  updateConnectivityWarnings(state) {
+    // Si c'est le mode prompt, ne pas afficher d'avertissement
+    if (state.iaModel === 'prompt') {
+      this.clearWarnings();
+      return;
+    }
+
+    // Tester la connectivité du modèle actuel
+    this.testModelConnectivity();
   }
   
   /**
