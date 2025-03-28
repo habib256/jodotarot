@@ -274,10 +274,14 @@ class ReadingController {
   serializeCard(card) {
     console.log('Sérialisation de la carte:', card);
     
-    // S'assurer que l'ID est au format MXX
+    // Gérer les différents types d'IDs de cartes
     let cardId = card.id;
-    if (!cardId || !cardId.match(/^M\d{2}$/)) {
-      if (card.rank !== undefined) {
+    if (!cardId) {
+      if (card.type === 'minor') {
+        // Pour les cartes mineures, utiliser le format MSUIT_RANK
+        cardId = `M${card.suit}_${card.rank}`;
+      } else if (card.rank !== undefined) {
+        // Pour les cartes majeures, utiliser le format MXX
         cardId = `M${card.rank.toString().padStart(2, '0')}`;
       } else {
         console.warn('⚠️ Impossible de générer un ID valide pour la carte:', card);
@@ -287,9 +291,12 @@ class ReadingController {
     
     const serializedCard = {
       id: cardId,
-      name: card.name,
+      name: card.translationKey || card.name,
       imageUrl: card.image || card.imageUrl,
-      position: card.orientation || 'upright'
+      position: card.orientation || 'upright',
+      type: card.type || 'major',
+      suit: card.suit,
+      rank: card.rank
     };
     
     console.log('Carte sérialisée:', serializedCard);
@@ -706,6 +713,17 @@ class ReadingController {
       // Vérifier que le jeu existe
       if (!deckId) throw new Error('Identifiant de jeu non spécifié');
       
+      // Sauvegarder l'état actuel
+      const currentState = this.stateManager.getState();
+      const currentSpreadType = currentState.spreadType || 'cross';
+      const currentCards = this.currentReading || [];
+      
+      // Mettre à jour l'interface pour indiquer le chargement
+      if (this.elements.loadingAnimations) {
+        this.elements.loadingAnimations.style.display = 'block';
+      }
+      
+      // Charger le nouveau jeu
       const newDeck = await this.deckService.loadDeck(deckId);
       if (!newDeck) {
         throw new Error(`Échec du chargement du jeu ${deckId}`);
@@ -713,18 +731,31 @@ class ReadingController {
       
       console.log(`✅ Jeu ${deckId} chargé avec succès - ${newDeck.getAllCards().length} cartes disponibles`);
       
-      // Mettre à jour l'état avec cardSet au lieu de deckId
-      this.stateManager.setState({ cardSet: deckId });
+      // Mettre à jour l'état
+      this.stateManager.setState({ 
+        cardSet: deckId,
+        error: null // Réinitialiser les erreurs précédentes
+      });
       
-      // Mettre à jour l'affichage si nécessaire
+      // Réinitialiser le tirage actuel
+      this.currentReading = [];
+      
+      // Mettre à jour l'affichage
       this.updateCardDisplay();
+      
+      // Restaurer le type de tirage et réinitialiser le currentSpread
+      this.showSpread(currentSpreadType);
+      this.updateSpreadDisplay(currentSpreadType);
+      
+      // Cacher l'animation de chargement
+      if (this.elements.loadingAnimations) {
+        this.elements.loadingAnimations.style.display = 'none';
+      }
       
       return newDeck;
     } catch (error) {
-      console.error(`❌ Erreur lors du changement de jeu ${deckId}:`, error);
-      this.stateManager.setState({
-        error: `Erreur lors du chargement du jeu ${deckId}: ${error.message}`
-      });
+      console.error(`❌ Erreur lors du chargement du jeu ${deckId}:`, error);
+      this.stateManager.setState({ error: error.message });
       throw error;
     }
   }
@@ -746,22 +777,40 @@ class ReadingController {
     console.log(`🔄 Mise à jour de l'affichage avec le jeu ${currentDeck.deckId}`);
     
     // Si nous avons des cartes tirées, les mettre à jour
-    if (this.currentReading.length > 0) {
-      // Pour chaque carte dans la lecture actuelle, mettre à jour son URL d'image
-      // en fonction du jeu de cartes actuel
-      this.currentReading = this.currentReading.map(card => {
-        // Trouver la carte correspondante dans le jeu actuel
-        const freshCard = currentDeck.getCardById(card.id);
-        if (freshCard) {
-          // Créer une copie de la carte avec l'URL d'image mise à jour
-          return {
-            ...card,
-            imageUrl: freshCard.imageUrl,
-            backImageUrl: freshCard.backImageUrl
-          };
+    if (this.currentReading && this.currentReading.length > 0) {
+      // Filtrer et mettre à jour les cartes
+      this.currentReading = this.currentReading.filter(card => {
+        // Pour les cartes majeures, chercher par ID simple
+        if (card.type === 'major' || !card.type) {
+          const freshCard = currentDeck.getCardById(card.id);
+          if (freshCard) {
+            // Mettre à jour l'URL de l'image
+            card.imageUrl = freshCard.imageUrl;
+            card.backImageUrl = freshCard.backImageUrl;
+            return true;
+          }
         }
-        return card;
+        // Pour les cartes mineures, vérifier si le jeu supporte les cartes mineures
+        else if (card.type === 'minor') {
+          const deckInfo = this.deckService.availableDecks[currentDeck.deckId];
+          if (deckInfo && deckInfo.supportsMinor) {
+            const freshCard = currentDeck.getCardById(card.id);
+            if (freshCard) {
+              card.imageUrl = freshCard.imageUrl;
+              card.backImageUrl = freshCard.backImageUrl;
+              return true;
+            }
+          }
+        }
+        return false;
       });
+      
+      // Si toutes les cartes ont été filtrées, réinitialiser le tirage
+      if (this.currentReading.length === 0) {
+        console.log("⚠️ Aucune carte valide trouvée dans le nouveau jeu, réinitialisation du tirage");
+        this.currentReading = [];
+        this.stateManager.setState({ cards: [] });
+      }
     }
     
     // Mettre à jour l'état avec les cartes actuelles

@@ -3,6 +3,7 @@
  */
 import Deck from '../models/cards/Deck.js';
 import { TarotCard, ARCANE_TYPES, MINOR_SUITS, MINOR_RANKS } from '../models/cards/index.js';
+import { getTranslation } from '../translations/index.js';
 
 class DeckService {
   constructor() {
@@ -13,15 +14,15 @@ class DeckService {
     this.availableDecks = {
       'set01': {
         id: 'set01',
-        name: 'Tarot Marseille',
+        name: 'Marseille',
         path: 'assets/images/cards/marseille',
         majorCount: 22,
         minorCount: 56,
-        supportsMinor: false // Ce jeu ne supporte que les arcanes majeurs
+        supportsMinor: false
       },
       'set02': {
         id: 'set02',
-        name: 'Tarot Thiago Lehmann',
+        name: 'Lehmann',
         path: 'assets/images/cards/lehmann',
         majorCount: 22,
         minorCount: 56,
@@ -29,11 +30,19 @@ class DeckService {
       },
       'set03': {
         id: 'set03',
-        name: 'Tarot Renaissance',
+        name: 'Renaissance',
         path: 'assets/images/cards/renaissance',
         majorCount: 22,
         minorCount: 0,
-        supportsMinor: false // Uniquement arcanes majeurs
+        supportsMinor: false
+      },
+      'set04': {
+        id: 'set04',
+        name: 'Rick & Morty',
+        path: 'assets/images/cards/rick&morty',
+        majorCount: 16,
+        minorCount: 0,
+        supportsMinor: false
       }
     };
   }
@@ -61,82 +70,86 @@ class DeckService {
    * @returns {Promise<Deck>} Le jeu de cartes chargé
    */
   async loadDeck(deckId) {
+    console.log(`🔄 Début du chargement du jeu ${deckId}`);
+    
     if (this.isDeckLoaded(deckId)) {
       return this.decks[deckId];
     }
 
     const deckInfo = this.availableDecks[deckId];
     if (!deckInfo) {
-      throw new Error(`Jeu de cartes non trouvé: ${deckId}`);
+      console.error(`❌ Jeu ${deckId} non trouvé dans les jeux disponibles`);
+      throw new Error(`Jeu ${deckId} non trouvé`);
     }
 
-    // Charger les cartes majeures
-    const majorCards = await this.fetchMajorCards(deckId);
-    
-    // Charger les cartes mineures si supportées
-    let minorCards = [];
-    if (deckInfo.supportsMinor) {
-      minorCards = await this.fetchMinorCards(deckId);
+    console.log(`📊 Informations sur le jeu ${deckId}:`, deckInfo);
+
+    try {
+      // Charger les cartes majeures
+      const majorCards = await this.fetchMajorCards(deckId);
+      console.log(`🎴 Cartes majeures chargées pour ${deckId}:`, majorCards);
+      
+      // Créer le jeu
+      const deck = new Deck(deckId, majorCards);
+      this.decks[deckId] = deck;
+      this.currentDeckId = deckId;
+
+      // Vérifier que toutes les images sont accessibles
+      console.log(`🔍 Vérification des images pour le jeu ${deckId}...`);
+      for (const card of majorCards) {
+        try {
+          console.log(`🖼️ Tentative de chargement de l'image: ${card.image}`);
+          const response = await fetch(card.image);
+          if (!response.ok) {
+            throw new Error(`Image non trouvée: ${card.image}`);
+          }
+          console.log(`✅ Image chargée avec succès: ${card.image}`);
+        } catch (error) {
+          console.error(`❌ Erreur lors du chargement de l'image ${card.image}:`, error);
+          throw new Error(`Impossible de charger l'image de la carte ${card.name}`);
+        }
+      }
+
+      console.log(`✅ Jeu ${deckId} chargé avec succès`);
+      return deck;
+    } catch (error) {
+      console.error(`❌ Erreur lors du chargement du jeu ${deckId}:`, error);
+      throw new Error(`Échec du chargement du jeu ${deckId}: ${error.message}`);
     }
-
-    // Créer le jeu complet
-    const deck = new Deck(deckId, [...majorCards, ...minorCards]);
-    this.decks[deckId] = deck;
-    this.currentDeckId = deckId;
-
-    return deck;
   }
   
   /**
-   * Charge les arcanes majeurs d'un jeu
-   * @param {string} deckId - Identifiant du jeu
-   * @returns {Promise<Array>} Liste des cartes majeures
+   * Récupère les cartes majeures pour un jeu donné
+   * @param {string} deckId - L'identifiant du jeu
+   * @returns {Promise<TarotCard[]>} Les cartes majeures
    */
   async fetchMajorCards(deckId) {
-    const deckInfo = this.availableDecks[deckId];
-    const cards = [];
+    const game = this.availableDecks[deckId];
+    if (!game) {
+      throw new Error(`Jeu non trouvé: ${deckId}`);
+    }
 
-    // Charger les 22 arcanes majeurs (sans le dos de carte)
-    for (let i = 0; i < 22; i++) {
-      const cardNumber = i.toString().padStart(2, '0');
-      const name = this.getMajorCardName(i);
-      const fileName = TarotCard.generateFileName(ARCANE_TYPES.MAJOR, null, cardNumber, name);
-      const imagePath = `${deckInfo.path}/${fileName}.${deckId === 'set02' ? 'jpg' : 'png'}`;
-      
+    const cards = [];
+    for (let i = 0; i < game.majorCount; i++) {
+      const fileName = this.generateFileName(deckId, i);
+      const imagePath = `${game.path}/${fileName}`;
       const card = new TarotCard(
-        `M${cardNumber}`,
-        name,
-        imagePath,
-        ARCANE_TYPES.MAJOR,
-        null,
-        i
+        `M${String(i).padStart(2, '0')}`,
+        this.getMajorCardName(i, deckId),
+        imagePath
       );
-      
-      // S'assurer que la carte a tous les attributs nécessaires
-      card.orientation = 'upright';
-      card.imageUrl = imagePath;
-      card.position = 'upright';
-      
       cards.push(card);
     }
 
-    // Créer le dos de carte séparément (sera utilisé plus tard pour la sélection)
+    // Ajouter le dos de carte
+    const backFileName = this.generateFileName(deckId, game.majorCount);
+    const backImagePath = `${game.path}/${backFileName}`;
     const backCard = new TarotCard(
-      'M22',
-      'Dos de carte',
-      `${deckInfo.path}/Dos de carte.${deckId === 'set02' ? 'jpg' : 'png'}`,
-      ARCANE_TYPES.MAJOR,
-      null,
-      22
+      `M${String(game.majorCount).padStart(2, '0')}`,
+      'back',
+      backImagePath
     );
-    
-    backCard.orientation = 'upright';
-    backCard.imageUrl = backCard.image;
-    backCard.position = 'upright';
-    backCard.isBackCard = true; // Marquer explicitement que c'est le dos de carte
-    
-    // Ne pas ajouter le dos de carte au tableau des cartes de tirage
-    // Il sera géré séparément pour la future fonctionnalité de sélection
+    cards.push(backCard);
 
     return cards;
   }
@@ -173,34 +186,114 @@ class DeckService {
   /**
    * Obtient le nom d'un arcane majeur par son numéro
    * @param {number} number - Numéro de l'arcane
+   * @param {string} deckId - Identifiant du jeu
    * @returns {string} Nom de l'arcane
    */
-  getMajorCardName(number) {
-    const names = {
-      0: 'Le fou',
-      1: 'Bateleur',
-      2: 'Papesse',
-      3: 'Imperatrice',
-      4: 'Empereur',
-      5: 'Pape',
-      6: 'Les amoureux',
-      7: 'Chariot',
-      8: 'Justice',
-      9: 'Ermite',
-      10: 'La roue',
-      11: 'Force',
-      12: 'Le pendu',
-      13: 'La mort',
-      14: 'Temperance',
-      15: 'Diable',
-      16: 'La Tour',
-      17: 'Etoile',
-      18: 'La lune',
-      19: 'Le soleil',
-      20: 'Le jugement',
-      21: 'Le monde'
+  getMajorCardName(number, deckId) {
+    const deckInfo = this.availableDecks[deckId];
+    if (!deckInfo) {
+      throw new Error(`Jeu non trouvé: ${deckId}`);
+    }
+
+    // Mapping des noms de fichiers pour chaque jeu
+    const cardNames = {
+      'set01': { // Marseille
+        0: 'Le_fou',
+        1: 'Bateleur',
+        2: 'Papesse',
+        3: 'Imperatrice',
+        4: 'Empereur',
+        5: 'Pape',
+        6: 'Les_amoureux',
+        7: 'Chariot',
+        8: 'Justice',
+        9: 'Ermite',
+        10: 'La_roue',
+        11: 'Force',
+        12: 'Le_pendu',
+        13: 'La_mort',
+        14: 'Temperance',
+        15: 'Diable',
+        16: 'La_Tour',
+        17: 'Etoile',
+        18: 'La_lune',
+        19: 'Le_soleil',
+        20: 'Le_jugement',
+        21: 'Le_monde',
+        22: 'Dos_de_carte'
+      },
+      'set02': { // Lehmann
+        0: 'Le_fou',
+        1: 'Bateleur',
+        2: 'Papesse',
+        3: 'Imperatrice',
+        4: 'Empereur',
+        5: 'Pape',
+        6: 'Les_amoureux',
+        7: 'Chariot',
+        8: 'Justice',
+        9: 'Ermite',
+        10: 'La_roue',
+        11: 'Force',
+        12: 'Le_pendu',
+        13: 'La_mort',
+        14: 'Temperance',
+        15: 'Diable',
+        16: 'La_Tour',
+        17: 'Etoile',
+        18: 'La_lune',
+        19: 'Le_soleil',
+        20: 'Le_jugement',
+        21: 'Le_monde',
+        22: 'Dos_de_carte'
+      },
+      'set03': { // Renaissance
+        0: 'Le_fou',
+        1: 'Bateleur',
+        2: 'Papesse',
+        3: 'Imperatrice',
+        4: 'Empereur',
+        5: 'Pape',
+        6: 'Les_amoureux',
+        7: 'Chariot',
+        8: 'Justice',
+        9: 'Ermite',
+        10: 'La_roue',
+        11: 'Force',
+        12: 'Le_pendu',
+        13: 'La_mort',
+        14: 'Temperance',
+        15: 'Diable',
+        16: 'La_Tour',
+        17: 'Etoile',
+        18: 'La_lune',
+        19: 'Le_soleil',
+        20: 'Le_jugement',
+        21: 'Le_monde',
+        22: 'Dos_de_carte'
+      },
+      'set04': { // Rick & Morty
+        0: 'Le_fou',
+        1: 'Bateleur',
+        2: 'Papesse',
+        3: 'Imperatrice',
+        4: 'Empereur',
+        5: 'Pape',
+        6: 'Les_amoureux',
+        7: 'Chariot',
+        8: 'Justice',
+        9: 'Ermite',
+        10: 'La_roue',
+        11: 'Force',
+        12: 'Le_pendu',
+        13: 'La_mort',
+        14: 'Temperance',
+        15: 'Diable',
+        16: 'La_Tour'
+      }
     };
-    return names[number] || `Arcane ${number}`;
+
+    return cardNames[deckId]?.[number] || `arcane_${number}`;
   }
   
   /**
@@ -444,6 +537,26 @@ class DeckService {
     };
     
     return baseMeanings[suit]?.[number] || "Signification inconnue";
+  }
+
+  /**
+   * Génère le nom de fichier pour une carte
+   * @param {string} deckId - Identifiant du jeu
+   * @param {number} index - Index de la carte
+   * @returns {string} Nom du fichier
+   */
+  generateFileName(deckId, index) {
+    const deckInfo = this.availableDecks[deckId];
+    if (!deckInfo) {
+      throw new Error(`Jeu non trouvé: ${deckId}`);
+    }
+
+    const extension = deckId === 'set02' ? 'jpg' : 'png';
+    const paddedIndex = String(index).padStart(2, '0');
+    const fileName = `${paddedIndex}_${this.getMajorCardName(index, deckId)}.${extension}`;
+    
+    console.log(`📄 Nom de fichier généré pour ${deckId}: ${fileName}`);
+    return fileName;
   }
 }
 

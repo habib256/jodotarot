@@ -109,17 +109,26 @@ async function loadInitialResources() {
     document.getElementById('spread-type').value = 'cross';
     stateManager.setState({ spreadType: 'cross' });
     
-    // Charger le jeu de cartes par défaut (set01)
+    // Afficher l'animation de chargement
+    const loadingAnimations = document.getElementById('loading-animations');
+    if (loadingAnimations) {
+      loadingAnimations.style.display = 'block';
+    }
+    
+    // Charger le jeu de cartes sélectionné dans l'état
     try {
+      const state = stateManager.getState();
+      const selectedCardSet = state.cardSet;
+      
       // Vérifier si le jeu est déjà chargé pour éviter les doublons
-      if (!deckService.isDeckLoaded('set01')) {
-        await deckService.loadDeck('set01');
-        console.log("✅ Jeu de cartes par défaut (set01) chargé avec succès");
+      if (!deckService.isDeckLoaded(selectedCardSet)) {
+        await deckService.loadDeck(selectedCardSet);
+        console.log(`✅ Jeu de cartes '${selectedCardSet}' chargé avec succès`);
       }
-      stateManager.setState({ cardSet: 'set01' });
     } catch (deckError) {
-      console.error("❌ Erreur lors du chargement du jeu de cartes par défaut:", deckError);
+      console.error("❌ Erreur lors du chargement du jeu de cartes:", deckError);
       showErrorMessage('Erreur lors du chargement du jeu de cartes');
+      throw deckError;
     }
     
     // Mettre à jour le titre de l'application
@@ -143,8 +152,34 @@ async function loadInitialResources() {
         configController.selectPromptMode();
       }
     }
+    
+    // Cacher l'animation de chargement
+    if (loadingAnimations) {
+      loadingAnimations.style.display = 'none';
+    }
+    
+    return true;
   } catch (error) {
     console.error('Erreur lors du chargement des ressources:', error);
+    
+    // Afficher l'erreur dans l'interface
+    const errorContainer = document.createElement('div');
+    errorContainer.className = 'error-message';
+    errorContainer.innerHTML = `
+      <h3>Erreur d'initialisation</h3>
+      <p>Une erreur est survenue lors du chargement de l'application.</p>
+      <p>Détails: ${error.message}</p>
+      <button onclick="window.location.reload()">Recharger la page</button>
+    `;
+    
+    document.body.appendChild(errorContainer);
+    
+    // Cacher l'animation de chargement
+    const loadingAnimations = document.getElementById('loading-animations');
+    if (loadingAnimations) {
+      loadingAnimations.style.display = 'none';
+    }
+    
     throw error;
   }
 }

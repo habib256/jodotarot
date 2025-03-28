@@ -269,6 +269,34 @@ Chaque aspect de ton interprétation doit répondre à un aspect de cette questi
   sections: {
     reading: "Tirage",
     interpretations: "Interprétation"
+  },
+  
+  cards: {
+    major_arcana: {
+      fool: "Le Fou",
+      magician: "Le Bateleur",
+      high_priestess: "La Papesse",
+      empress: "L'Impératrice",
+      emperor: "L'Empereur",
+      hierophant: "Le Pape",
+      lovers: "Les Amoureux",
+      chariot: "Le Chariot",
+      justice: "La Justice",
+      hermit: "L'Ermite",
+      wheel_of_fortune: "La Roue de Fortune",
+      strength: "La Force",
+      hanged_man: "Le Pendu",
+      death: "La Mort",
+      temperance: "La Tempérance",
+      devil: "Le Diable",
+      tower: "La Tour",
+      star: "L'Étoile",
+      moon: "La Lune",
+      sun: "Le Soleil",
+      judgement: "Le Jugement",
+      world: "Le Monde",
+      back: "Dos de carte"
+    }
   }
 };
 
