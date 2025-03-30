@@ -44,7 +44,7 @@ graph TD
 - **Persistance** : Sauvegarde automatique dans le localStorage
 - **Validation** : Vérification de la validité des données avant mise à jour
 - **Immutabilité** : Modifications contrôlées pour éviter les effets de bord
-- **Segmentation** : Organisation de l'état en domaines fonctionnels
+- **Segmentation** : Organisation de l'état en propriétés fonctionnelles
 
 ## Structure du Code
 
@@ -54,54 +54,74 @@ Le StateManager est implémenté dans `assets/js/utils/StateManager.js` (907 lig
 // Structure simplifiée de StateManager
 class StateManager {
   constructor() {
-    this.state = {};
-    this.subscribers = {};
-    this.validators = {};
-    this.loadFromStorage();
+    this.schema = {/* Schéma de validation */};
+    this.state = this.getDefaultState();
+    this.listeners = [];
+    this.STATE_VERSION = '1.0.0';
   }
   
   // Méthodes principales
-  get(domain, key) { /* ... */ }
-  set(domain, key, value) { /* ... */ }
-  subscribe(domain, callback) { /* ... */ }
-  unsubscribe(domain, callbackId) { /* ... */ }
+  async initialize() { /* ... */ }
+  getState() { /* ... */ }
+  setState(updates) { /* ... */ }
+  subscribe(listener) { /* ... */ }
   
-  // Méthodes auxiliaires
-  validate(domain, key, value) { /* ... */ }
-  notifySubscribers(domain) { /* ... */ }
-  loadFromStorage() { /* ... */ }
-  saveToStorage() { /* ... */ }
+  // Méthodes de validation
+  validateValue(key, value) { /* ... */ }
+  validateState(state) { /* ... */ }
+  validateCards(cards) { /* ... */ }
+  
+  // Méthodes de gestion d'état
+  getDefaultState() { /* ... */ }
+  isEqual(a, b) { /* ... */ }
+  notifyListeners(changes) { /* ... */ }
+  emitChangeEvents(changedValues) { /* ... */ }
+  
+  // Méthodes de persistance
+  persistState() { /* ... */ }
+  restoreState() { /* ... */ }
+  applyRestoredState(data) { /* ... */ }
+  
+  // Méthodes de sérialisation
+  serializeState(state) { /* ... */ }
+  deserializeState(serialized) { /* ... */ }
+  
+  // Méthodes de migration
+  migrateState(version, data) { /* ... */ }
 }
 ```
 
-## Domaines d'État
+## Propriétés d'État
 
-L'état est organisé dans une structure plate avec des propriétés spécifiques :
+L'état est organisé dans une structure plate avec des propriétés spécifiques définies dans le schéma :
 
 1. **Configuration générale**
    - `language` : Langue actuelle (fr, en, es, de, it, zh)
    - `persona` : Persona sélectionné pour l'interprétation
-   - `modelStatus` : État actuel du modèle d'IA
-   - `availableModels` : Liste des modèles disponibles par type
+   - `cardSet` : Jeu de cartes sélectionné (set01, set02, set03, set04)
+   - `spreadType` : Type de tirage (cross, horseshoe, love, celticCross)
+   - `iaModel` : Modèle d'IA à utiliser (prompt, openai/*, ollama:*)
 
 2. **Tirage courant**
-   - `cardSet` : Jeu de cartes sélectionné
-   - `spreadType` : Type de tirage (cross, horseshoe, love, celticCross)
-   - `selectedCards` : Cartes tirées
+   - `cards` : Tableau des cartes tirées
    - `question` : Question de l'utilisateur
-   - `interpretation` : Interprétation générée
+   - `interpretation` : Objet contenant l'interprétation générée
 
 3. **Interface utilisateur**
    - `isLoading` : Indique si une opération est en cours
    - `error` : Message d'erreur éventuel
    - `isCardEnlarged` : Indique si une carte est agrandie
    - `enlargedCardId` : ID de la carte agrandie
+
+4. **État du modèle d'IA**
+   - `modelStatus` : État actuel du modèle d'IA (isLoading, isConnected, error, lastCheck)
+   - `availableModels` : Liste des modèles disponibles par type (ollama, openai)
    - `currentSpreadType` : Type de tirage actuel
-   - `currentCardsDrawn` : Cartes actuellement tirées
+   - `currentCardsDrawn` : Cartes actuellement tirées (format JSON)
 
-## Utilisation du StateManager
+## Initialisation
 
-### Initialisation
+Le StateManager s'initialise de manière asynchrone, en restaurant d'abord l'état depuis localStorage s'il existe :
 
 ```javascript
 // Extrait de l'initialisation dans main.js
@@ -109,15 +129,71 @@ const stateManager = new StateManager();
 await stateManager.initialize();
 ```
 
+## Validation des Données
+
+Le StateManager implémente un système de validation complet pour assurer l'intégrité des données :
+
+```javascript
+// Exemple de validation d'une valeur
+validateValue(key, value) {
+  const config = this.schema[key];
+  if (!config) {
+    return { isValid: false, error: `Propriété inconnue: ${key}` };
+  }
+
+  // Vérifier si la valeur peut être null
+  if (value === null && config.nullable) {
+    return { isValid: true, value: null };
+  }
+
+  // Vérifier le type
+  if (config.type === 'array' && !Array.isArray(value)) {
+    return { isValid: false, error: `Type invalide pour ${key}, array attendu` };
+  }
+  
+  // Validation personnalisée
+  if (config.validate && !config.validate(value)) {
+    return { isValid: false, error: `Validation échouée pour ${key}` };
+  }
+
+  return { isValid: true, value };
+}
+```
+
+Validation spécifique pour les cartes :
+
+```javascript
+validateCards(cards) {
+  if (!Array.isArray(cards)) return false;
+  
+  for (let i = 0; i < cards.length; i++) {
+    const card = cards[i];
+    
+    if (!card || typeof card !== 'object') return false;
+    if (!card.id || !card.id.match(/^M\d{2}$/)) return false;
+    if (!card.name || typeof card.name !== 'string') return false;
+    if (!card.imageUrl || typeof card.imageUrl !== 'string') return false;
+    if (!card.position || !['upright', 'reversed'].includes(card.position)) return false;
+  }
+  
+  return true;
+}
+```
+
+## Utilisation du StateManager
+
 ### Lecture de l'État
 
 ```javascript
-// Obtenir une valeur
-const currentLanguage = stateManager.getState().language;
-const drawnCards = stateManager.getState().selectedCards;
+// Obtenir l'état complet
+const state = stateManager.getState();
+
+// Accéder à des propriétés spécifiques
+const currentLanguage = state.language;
+const drawnCards = state.cards;
 
 // Vérifier l'existence d'une propriété
-if (stateManager.getState().interpretation) {
+if (state.interpretation) {
   // ...
 }
 ```
@@ -131,7 +207,8 @@ stateManager.setState({ language: 'fr' });
 // Mettre à jour plusieurs propriétés
 stateManager.setState({ 
   spreadType: 'cross',
-  question: 'Ma nouvelle question'
+  question: 'Ma nouvelle question',
+  cards: []
 });
 ```
 
@@ -139,198 +216,193 @@ stateManager.setState({
 
 ```javascript
 // S'abonner aux changements d'état
-const subscriberId = stateManager.subscribe((newState, oldState) => {
-  if (newState.language !== oldState.language) {
-    updateUILanguage(newState.language);
+const unsubscribe = stateManager.subscribe((state, changes) => {
+  // Réagir aux changements
+  if ('language' in changes) {
+    updateUILanguage(state.language);
+  }
+  
+  if ('cards' in changes) {
+    renderCards(state.cards);
   }
 });
 
 // Se désabonner
-stateManager.unsubscribe(subscriberId);
+unsubscribe();
 ```
 
 ## Persistance des Données
 
-Le StateManager utilise le localStorage pour persister l'état entre les sessions :
+Le StateManager sauvegarde automatiquement l'état dans localStorage après chaque changement :
 
 ```javascript
-// Sauvegarde dans localStorage
-saveToStorage() {
-  const serializedState = {};
-  for (const domain in this.state) {
-    // Filtrer les données à ne pas sauvegarder
-    if (this.persistentDomains.includes(domain)) {
-      serializedState[domain] = this.state[domain];
-    }
-  }
-  
-  localStorage.setItem('jodotarot_state', JSON.stringify(serializedState));
-}
-
-// Chargement depuis localStorage
-loadFromStorage() {
+persistState() {
   try {
-    const saved = localStorage.getItem('jodotarot_state');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      for (const domain in parsed) {
-        this.state[domain] = {...parsed[domain]};
-      }
-    }
+    // Ne pas persister les états temporaires
+    const stateToPersist = {...this.state};
+    const temporaryKeys = ['isLoading', 'error', 'isCardEnlarged', 'enlargedCardId'];
+    temporaryKeys.forEach(key => delete stateToPersist[key]);
+    
+    // Convertir les types spéciaux pour la sérialisation
+    const serializedState = {
+      version: this.STATE_VERSION,
+      timestamp: Date.now(),
+      data: this.serializeState(stateToPersist)
+    };
+    
+    // Sauvegarde dans localStorage
+    localStorage.setItem('jodotarot_state', JSON.stringify(serializedState));
+    
+    return true;
   } catch (error) {
-    console.error('Erreur lors du chargement de l\'état:', error);
+    console.error('Erreur lors de la sauvegarde de l\'état:', error);
+    return false;
   }
 }
 ```
 
-## Validation des Données
-
-Le StateManager implémente un système de validation pour assurer l'intégrité des données :
+La restauration se fait au démarrage:
 
 ```javascript
-// Enregistrement d'un validateur
-registerValidator(domain, key, validatorFn) {
-  if (!this.validators[domain]) {
-    this.validators[domain] = {};
-  }
-  this.validators[domain][key] = validatorFn;
-}
-
-// Validation avant mise à jour
-validate(domain, key, value) {
-  if (this.validators[domain] && this.validators[domain][key]) {
-    return this.validators[domain][key](value);
-  }
-  return true;
-}
-```
-
-Exemples de validateurs :
-
-```javascript
-// Validateur de langue
-function validateLanguage(language) {
-  const supportedLanguages = ['fr', 'en', 'es', 'de', 'it', 'zh'];
-  return supportedLanguages.includes(language);
-}
-
-// Validateur de cartes
-function validateCards(cards) {
-  if (!Array.isArray(cards)) return false;
-  return cards.every(card => 
-    typeof card === 'object' && 'id' in card && 'name' in card
-  );
-}
-```
-
-## Gestion des Transactions
-
-Pour les mises à jour complexes impliquant plusieurs modifications, le StateManager fournit un mécanisme de transaction :
-
-```javascript
-// Exemple de transaction
-stateManager.transaction(() => {
-  stateManager.set('reading', 'cards', selectedCards);
-  stateManager.set('reading', 'spreadType', 'cross');
-  stateManager.set('reading', 'timestamp', Date.now());
-});
-```
-
-Cela permet d'éviter des notifications intermédiaires et d'assurer que les abonnés ne reçoivent qu'une seule notification lorsque l'état est stable.
-
-## Intégration avec les Services et Contrôleurs
-
-### Controllers
-
-```javascript
-// Exemple d'utilisation dans ReadingController
-class ReadingController {
-  constructor(stateManager, deckService, aiService) {
-    this.stateManager = stateManager;
-    this.deckService = deckService;
-    this.aiService = aiService;
+restoreState() {
+  try {
+    const savedState = localStorage.getItem('jodotarot_state');
+    if (!savedState) return false;
     
-    // Abonnement aux changements
-    this.stateSubscription = stateManager.subscribe('reading', 
-      this.handleStateChange.bind(this)
-    );
-  }
-  
-  performReading(spreadType) {
-    const cards = this.deckService.drawCards(spreadType);
-    this.stateManager.set('reading', 'cards', cards);
-    this.stateManager.set('reading', 'spreadType', spreadType);
-    this.stateManager.set('reading', 'timestamp', Date.now());
-  }
-  
-  handleStateChange(domain, changes) {
-    // Réagir aux changements d'état
-    if ('cards' in changes && 'spreadType' in changes) {
-      this.updateUI(changes.cards, changes.spreadType);
+    const parsed = JSON.parse(savedState);
+    if (!parsed || !parsed.data) return false;
+    
+    const version = parsed.version || '0.0.0';
+    
+    // Vérifier la version pour les migrations
+    if (version !== this.STATE_VERSION) {
+      const migratedData = this.migrateState(version, parsed.data);
+      this.applyRestoredState(migratedData);
+    } else {
+      this.applyRestoredState(parsed.data);
     }
+    
+    return true;
+  } catch (error) {
+    console.error('Erreur lors de la restauration de l\'état:', error);
+    return false;
   }
 }
 ```
 
-### Services
+## Sérialisation et Désérialisation
+
+Le StateManager gère intelligemment la sérialisation des types spéciaux :
 
 ```javascript
-// Exemple d'utilisation dans AIService
-class AIService {
-  constructor(stateManager) {
-    this.stateManager = stateManager;
-    this.modelCache = new Map();
-    
-    // Initialisation de l'état AI
-    if (!stateManager.has('ai', 'models')) {
-      stateManager.set('ai', 'models', []);
+serializeState(state) {
+  const serialized = {};
+  
+  for (const [key, value] of Object.entries(state)) {
+    if (value instanceof Set) {
+      serialized[key] = {
+        __type: 'Set',
+        value: Array.from(value)
+      };
+    } else if (Array.isArray(value)) {
+      serialized[key] = {
+        __type: 'Array',
+        value: value
+      };
+    } else if (value instanceof Date) {
+      serialized[key] = {
+        __type: 'Date',
+        value: value.toISOString()
+      };
+    } else if (value === undefined) {
+      continue;
+    } else {
+      serialized[key] = value;
     }
   }
   
-  async detectAvailableModels() {
-    const models = await this.fetchModels();
-    this.stateManager.set('ai', 'models', models);
-    return models;
+  return serialized;
+}
+
+deserializeState(serialized) {
+  const deserialized = {};
+  
+  for (const [key, value] of Object.entries(serialized)) {
+    if (value && typeof value === 'object' && '__type' in value) {
+      switch (value.__type) {
+        case 'Set':
+          deserialized[key] = new Set(value.value);
+          break;
+        case 'Array':
+          deserialized[key] = value.value;
+          break;
+        case 'Date':
+          deserialized[key] = new Date(value.value);
+          break;
+        default:
+          deserialized[key] = value;
+      }
+    } else {
+      deserialized[key] = value;
+    }
   }
   
-  async interpretReading() {
-    const cards = this.stateManager.get('reading', 'cards');
-    const spreadType = this.stateManager.get('reading', 'spreadType');
-    const persona = this.stateManager.get('config', 'selectedPersona');
-    
-    // ... logique d'interprétation ...
-    
-    this.stateManager.set('reading', 'interpretation', interpretation);
-  }
+  return deserialized;
 }
 ```
 
-## Optimisations
+## Migrations de Données
 
-Le StateManager inclut plusieurs optimisations :
-
-1. **Comparaison intelligente** : Évite les notifications si la valeur n'a pas changé
-2. **Mise à jour sélective** : Notifie uniquement pour les champs modifiés
-3. **Memoization** : Cache des résultats de calculs dépendant de l'état
-4. **Debouncing** : Limite la fréquence des sauvegardes dans le localStorage
-5. **Lazy Loading** : Chargement à la demande de certains domaines d'état volumineux
-
-## Débogage et Monitoring
-
-Le StateManager intègre des fonctionnalités pour faciliter le débogage :
+Le StateManager supporte les migrations pour les changements de version :
 
 ```javascript
-// Activer le mode debug
-stateManager.enableDebug();
+migrateState(version, data) {
+  if (version === this.STATE_VERSION) {
+    return data;
+  }
+  
+  switch (version) {
+    case '0.9.0':
+      // Migration de 0.9.0 vers 1.0.0
+      data = this.migrate_0_9_0_to_1_0_0(data);
+      break;
+    default:
+      console.warn(`Version inconnue ${version}, utilisation des données telles quelles`);
+  }
+  
+  return data;
+}
+```
 
-// Logger les changements d'état
-stateManager.on('change', (domain, key, oldValue, newValue) => {
-  console.log(`[StateManager] ${domain}.${key} changed:`, 
-              { old: oldValue, new: newValue });
-});
+## Événements du StateManager
 
-// Exporter l'état actuel
-const stateSnapshot = stateManager.export();
+Le StateManager émet des événements DOM pour les changements d'état :
+
+```javascript
+emitChangeEvents(changedValues) {
+  for (const [key, value] of Object.entries(changedValues)) {
+    const eventName = `${key}:changed`;
+    
+    // Émettre l'événement spécifique
+    document.dispatchEvent(new CustomEvent(eventName, {
+      detail: { [key]: value, state: this.state }
+    }));
+    
+    // Pour iaModel, émettre un événement supplémentaire
+    if (key === 'iaModel') {
+      document.dispatchEvent(new CustomEvent('iaModelUI:update', {
+        detail: { model: value, state: this.state }
+      }));
+    }
+  }
+  
+  // Émettre un événement global
+  if (Object.keys(changedValues).length > 0) {
+    document.dispatchEvent(new CustomEvent('state:changed', {
+      detail: { changes: changedValues, state: this.state }
+    }));
+  }
+}
 ```
 
 ## Bonnes Pratiques
@@ -338,12 +410,12 @@ const stateSnapshot = stateManager.export();
 Pour travailler efficacement avec le StateManager :
 
 1. **Accès Centralisé** : Toujours passer par le StateManager pour les données partagées
-2. **Segmentation Logique** : Organiser l'état en domaines cohérents
-3. **Validation Stricte** : Utiliser des validateurs pour tous les champs critiques
-4. **Réactions Minimalistes** : Dans les abonnements, ne réagir qu'aux changements pertinents
-5. **Transactions** : Regrouper les modifications liées en transactions
-6. **Immutabilité** : Ne jamais modifier directement les objets obtenus du StateManager
-7. **Désabonnement** : Toujours se désabonner quand un composant est détruit
+2. **Validation** : Utiliser le schéma de validation pour tous les champs
+3. **Immutabilité** : Ne jamais modifier directement les objets obtenus du StateManager
+4. **Abonnements Ciblés** : Dans les abonnements, ne réagir qu'aux changements pertinents
+5. **Désabonnement** : Toujours se désabonner quand un composant est détruit
+6. **Événements** : Utiliser les événements spécifiques pour des réactions ciblées
+7. **Débogage** : Consulter les logs du StateManager pour suivre les changements d'état
 
 ## Références
 
@@ -374,8 +446,9 @@ Le StateManager utilise un schéma de validation strict pour chaque propriété 
   },
   cardSet: {
     type: 'string',
-    enum: ['set01', 'set02'],
-    default: 'set01'
+    enum: ['set01', 'set02', 'set03', 'set04'],
+    default: 'set01',
+    description: 'Identifiant du jeu de cartes (anciennement séparé en cardSet et deckId)'
   },
   spreadType: {
     type: 'string',
@@ -384,11 +457,21 @@ Le StateManager utilise un schéma de validation strict pour chaque propriété 
   },
   iaModel: {
     type: 'string',
+    description: 'Modèle d\'IA à utiliser',
     validate: (value) => {
       // Validation des modèles OpenAI et Ollama
       // Voir implémentation complète dans le code
     },
     default: 'prompt'
-  }
+  },
+  cards: {
+    type: 'array',
+    validate: (value) => {
+      // Validation des cartes
+      // Voir implémentation complète dans le code
+    },
+    default: []
+  },
+  // Autres propriétés...
 }
 ```

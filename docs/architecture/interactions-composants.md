@@ -50,8 +50,10 @@ class ReadingController {
     const cards = this.deckService.drawCards(spreadType);
     
     // Mise à jour de l'état centralisé
-    this.stateManager.set('reading', 'cards', cards);
-    this.stateManager.set('reading', 'spreadType', spreadType);
+    this.stateManager.setState({ 
+      cards: cards,
+      spreadType: spreadType
+    });
   }
 }
 
@@ -60,10 +62,10 @@ class AIService {
   constructor(stateManager) {
     this.stateManager = stateManager;
     
-    // Abonnement aux changements pertinents
-    this.stateManager.subscribe('reading', (domain, changes) => {
+    // Abonnement aux changements d'état
+    this.unsubscribe = this.stateManager.subscribe((state, changes) => {
       if (changes.cards && changes.spreadType) {
-        this.prepareInterpretation(changes.cards, changes.spreadType);
+        this.prepareInterpretation(state.cards, state.spreadType);
       }
     });
   }
@@ -105,15 +107,21 @@ Dans certains cas, les composants s'appellent directement via leurs API publique
 ```javascript
 // Appel direct à l'API d'un service
 class ReadingController {
-  interpretReading() {
-    const cards = this.stateManager.get('reading', 'cards');
-    const persona = this.stateManager.get('config', 'selectedPersona');
+  getInterpretation() {
+    const state = this.stateManager.getState();
+    const cards = state.cards;
+    const persona = state.persona;
     
     // Appel direct au service
-    this.aiService.generateInterpretation(cards, persona)
-      .then(interpretation => {
-        this.stateManager.set('reading', 'interpretation', interpretation);
-      });
+    this.aiService.getInterpretation(
+      cards,
+      this.currentQuestion,
+      persona,
+      state.iaModel,
+      state.language
+    ).then(interpretation => {
+      this.stateManager.setState({ interpretation: interpretation });
+    });
   }
 }
 ```
@@ -135,13 +143,13 @@ sequenceDiagram
     RC->>DS: drawCards(spreadType)
     DS->>DS: shuffleDeck()
     DS->>RC: cards
-    RC->>SM: set('reading.cards', cards)
-    SM->>US: notify('reading')
+    RC->>SM: setState({cards, spreadType})
+    SM->>US: notify(state, changes)
     US->>User: Affiche cartes
-    SM->>AIS: notify('reading')
+    SM->>AIS: notify(state, changes)
     AIS->>AIS: prepareInterpretation()
-    AIS->>SM: set('reading.interpretation', result)
-    SM->>US: notify('reading')
+    AIS->>SM: setState({interpretation})
+    SM->>US: notify(state, changes)
     US->>User: Affiche interprétation
 ```
 
@@ -156,10 +164,10 @@ sequenceDiagram
     participant US as UIService
     
     User->>CC: Change langue
-    CC->>SM: set('config.language', 'en')
-    SM->>TS: notify('config')
+    CC->>SM: setState({language: 'en'})
+    SM->>TS: notify(state, changes)
     TS->>TS: loadTranslations('en')
-    SM->>US: notify('config')
+    SM->>US: notify(state, changes)
     US->>User: Met à jour UI
 ```
 
@@ -172,22 +180,20 @@ JodoTarot utilise l'injection de dépendances pour créer des interactions flexi
 ```javascript
 // Dans main.js - Initialisation avec injection de dépendances
 const stateManager = new StateManager();
-const translationService = new TranslationService(stateManager);
+const aiService = new AIService(stateManager);
 const deckService = new DeckService(stateManager);
-const aiService = new AIService(stateManager, translationService);
-const uiService = new UIService(stateManager, translationService);
+const uiService = new UIService();
 
 const configController = new ConfigController(
   stateManager, 
-  translationService, 
+  aiService, 
   uiService
 );
 
 const readingController = new ReadingController(
   stateManager, 
   deckService, 
-  aiService, 
-  uiService
+  aiService
 );
 
 const appController = new AppController(
@@ -205,35 +211,40 @@ appController.initialize();
 Le système d'abonnement du StateManager permet des interactions réactives :
 
 ```javascript
-// Abonnement à plusieurs domaines avec filtrage
+// Abonnement simple avec filtrage
 class InterpretationComponent {
   constructor(stateManager) {
     this.stateManager = stateManager;
     
-    // Abonnement multi-domaines
-    this.stateManager.subscribeMulti(
-      ['reading', 'config'], 
+    // Système d'abonnement simple
+    this.unsubscribe = this.stateManager.subscribe(
       this.handleStateChanges.bind(this)
     );
   }
   
-  handleStateChanges(domains, changes) {
+  handleStateChanges(state, changes) {
     // Réagir uniquement aux changements pertinents
-    if (changes.reading && changes.reading.cards) {
-      this.updateCardDisplay(changes.reading.cards);
+    if ('cards' in changes) {
+      this.updateCardDisplay(state.cards);
     }
     
-    if (changes.config && changes.config.language) {
-      this.updateLanguage(changes.config.language);
+    if ('language' in changes) {
+      this.updateLanguage(state.language);
     }
     
-    // Interaction combinée entre domaines
-    if (changes.reading && changes.reading.interpretation && 
-        changes.config && changes.config.displayMode) {
+    // Interaction combinée entre propriétés
+    if ('interpretation' in changes && 'displayMode' in state) {
       this.renderInterpretation(
-        changes.reading.interpretation,
-        changes.config.displayMode
+        state.interpretation,
+        state.displayMode
       );
+    }
+  }
+  
+  // Nettoyage pour éviter les fuites mémoire
+  destroy() {
+    if (this.unsubscribe) {
+      this.unsubscribe();
     }
   }
 }
@@ -263,28 +274,34 @@ class UIService {
 
 ## Gestion des Conflits et Synchronisation
 
-### Transactions pour les Mises à Jour Atomiques
+### Mises à Jour Atomiques
 
 Pour éviter les états incohérents lors de mises à jour multiples :
 
 ```javascript
-// Utilisation des transactions pour les mises à jour groupées
-stateManager.transaction(() => {
-  stateManager.set('reading', 'cards', selectedCards);
-  stateManager.set('reading', 'spreadType', spreadType);
-  stateManager.set('reading', 'timestamp', Date.now());
+// Utilisation de setState pour les mises à jour atomiques
+this.stateManager.setState({
+  cards: selectedCards,
+  spreadType: spreadType,
+  timestamp: Date.now()
 });
 ```
 
 ### Priorités des Notifications
 
-Le StateManager implémente un système de priorité pour les notifications :
+Le StateManager gère efficacement les notifications pour tous les abonnés :
 
 ```javascript
-// Définition des priorités pour les abonnements
-stateManager.subscribe('reading', callback, { priority: 10 }); // Priorité élevée
-stateManager.subscribe('reading', anotherCallback, { priority: 5 }); // Priorité moyenne
-stateManager.subscribe('reading', yetAnotherCallback, { priority: 1 }); // Priorité basse
+// Gestion des notifications dans StateManager
+notifyListeners(changes = {}) {
+  this.listeners.forEach(listener => {
+    try {
+      listener(this.state, changes);
+    } catch (error) {
+      console.error('❌ Erreur dans un écouteur d\'état:', error);
+    }
+  });
+}
 ```
 
 ## Interactions avec les Systèmes Externes
@@ -296,26 +313,46 @@ L'AIService coordonne les interactions avec les API externes :
 ```javascript
 // Interaction avec système externe
 class AIService {
-  async interpretReading() {
-    const cards = this.stateManager.get('reading', 'cards');
-    const prompt = this.buildPrompt(cards);
-    
+  async getInterpretation(reading, question, persona, model, language, spreadType, onChunk) {
     try {
       // Notification d'état de chargement
-      this.stateManager.set('ui', 'isLoading', true);
+      this.stateManager.setState({ isLoading: true });
+      
+      // Créer un AbortController pour pouvoir annuler la requête
+      this.currentController = new AbortController();
+      this.isGenerating = true;
       
       // Interaction avec système externe
-      const response = await this.apiClient.generateCompletion(prompt);
+      const response = await this.sendRequest(
+        reading,
+        question, 
+        persona,
+        model,
+        language,
+        spreadType,
+        this.currentController.signal,
+        onChunk
+      );
       
       // Mise à jour de l'état avec résultat externe
-      this.stateManager.set('reading', 'interpretation', response.text);
-      this.stateManager.set('reading', 'status', 'completed');
+      this.isGenerating = false;
+      
+      return response;
     } catch (error) {
+      // Vérifier si c'est une annulation par l'utilisateur
+      if (this.handleAbortError(error)) {
+        throw error; // Propager l'erreur d'annulation
+      }
+      
       // Gestion des erreurs d'interaction
-      this.stateManager.set('reading', 'error', error.message);
-      this.stateManager.set('reading', 'status', 'error');
+      console.error('Erreur lors de l\'interprétation:', error);
+      this.stateManager.setState({ 
+        error: error.message,
+        isLoading: false
+      });
+      throw error;
     } finally {
-      this.stateManager.set('ui', 'isLoading', false);
+      this.stateManager.setState({ isLoading: false });
     }
   }
 }
@@ -327,17 +364,17 @@ L'application interagit également avec les API du navigateur :
 
 ```javascript
 // Interaction avec les API du navigateur
-class ConfigService {
+class ConfigController {
   detectSystemPreferences() {
     // Détection du mode sombre
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      this.stateManager.set('config', 'theme', 'dark');
+      this.stateManager.setState({ theme: 'dark' });
     }
     
     // Détection de la langue du navigateur
     const browserLang = navigator.language.split('-')[0];
     if (this.supportedLanguages.includes(browserLang)) {
-      this.stateManager.set('config', 'language', browserLang);
+      this.stateManager.setState({ language: browserLang });
     }
   }
 }
@@ -360,7 +397,8 @@ class AppController {
   // Coordination des interactions entre contrôleurs
   startNewReading() {
     // Vérification de l'état de configuration
-    const isConfigValid = this.configController.validateCurrentConfig();
+    const state = this.stateManager.getState();
+    const isConfigValid = state.language && state.persona && state.iaModel;
     
     if (isConfigValid) {
       // Transition entre contrôleurs
@@ -378,28 +416,39 @@ class AppController {
 Le système d'abonnement du StateManager implémente le pattern Observer :
 
 ```javascript
-// Implémentation simplifiée du pattern Observer
+// Implémentation du pattern Observer dans StateManager
 class StateManager {
-  subscribe(domain, callback) {
-    if (!this.subscribers[domain]) {
-      this.subscribers[domain] = [];
-    }
-    
-    const subscriberId = this.nextSubscriberId++;
-    this.subscribers[domain].push({
-      id: subscriberId,
-      callback
-    });
-    
-    return subscriberId;
+  constructor() {
+    this.state = this.getDefaultState();
+    this.listeners = [];
   }
   
-  notifySubscribers(domain, changes) {
-    if (this.subscribers[domain]) {
-      this.subscribers[domain].forEach(subscriber => {
-        subscriber.callback(domain, changes);
-      });
+  subscribe(listener) {
+    if (typeof listener !== 'function') {
+      console.error('❌ L\'écouteur doit être une fonction');
+      return () => {}; // Retourner une fonction vide en cas d'erreur
     }
+    
+    // Ajouter l'écouteur au tableau
+    this.listeners.push(listener);
+    
+    // Retourner une fonction de désabonnement
+    return () => {
+      const index = this.listeners.indexOf(listener);
+      if (index !== -1) {
+        this.listeners.splice(index, 1);
+      }
+    };
+  }
+  
+  notifyListeners(changes = {}) {
+    this.listeners.forEach(listener => {
+      try {
+        listener(this.state, changes);
+      } catch (error) {
+        console.error('❌ Erreur dans un écouteur d\'état:', error);
+      }
+    });
   }
 }
 ```
@@ -420,21 +469,19 @@ class ReadingCommand {
   
   execute() {
     // Sauvegarde de l'état précédent pour undo
-    this.previousState = {
-      cards: this.stateManager.get('reading', 'cards'),
-      spreadType: this.stateManager.get('reading', 'spreadType')
-    };
+    this.previousState = this.stateManager.getState();
     
     // Exécution de la commande
     const cards = this.deckService.drawCards(this.spreadType);
-    this.stateManager.set('reading', 'cards', cards);
-    this.stateManager.set('reading', 'spreadType', this.spreadType);
+    this.stateManager.setState({
+      cards: cards,
+      spreadType: this.spreadType
+    });
   }
   
   undo() {
     if (this.previousState) {
-      this.stateManager.set('reading', 'cards', this.previousState.cards);
-      this.stateManager.set('reading', 'spreadType', this.previousState.spreadType);
+      this.stateManager.setState(this.previousState);
     }
   }
 }
@@ -456,7 +503,8 @@ Pour les interactions fréquentes :
 // Debouncing pour éviter les interactions trop fréquentes
 class UIService {
   constructor() {
-    this.debouncedUpdateLayout = debounce(this.updateLayout, 250);
+    // Création d'une fonction debounced
+    this.debouncedUpdateLayout = this.debounce(this.updateLayout.bind(this), 250);
     
     window.addEventListener('resize', () => {
       this.debouncedUpdateLayout();
@@ -479,24 +527,26 @@ class UIService {
 
 ```javascript
 // Exemple conceptuel - Non implémenté dans la version actuelle
-function getInterpretation(cards, spreadType) {
-  // La mise en cache pourrait être implémentée comme ceci
-  const cacheKey = this.getCacheKey(cards, spreadType);
-  
-  // Vérification si résultat en cache
-  if (this.interpretationCache && this.interpretationCache.has(cacheKey)) {
-    return this.interpretationCache.get(cacheKey);
+class AIService {
+  getInterpretationWithCache(cards, spreadType) {
+    // La mise en cache pourrait être implémentée comme ceci
+    const cacheKey = this.getCacheKey(cards, spreadType);
+    
+    // Vérification si résultat en cache
+    if (this.interpretationCache && this.interpretationCache.has(cacheKey)) {
+      return this.interpretationCache.get(cacheKey);
+    }
+    
+    // Sinon, générer une nouvelle interprétation
+    const interpretation = this.generateInterpretation(cards, spreadType);
+    
+    // Mettre en cache pour future utilisation
+    if (this.interpretationCache) {
+      this.interpretationCache.set(cacheKey, interpretation);
+    }
+    
+    return interpretation;
   }
-  
-  // Sinon, générer une nouvelle interprétation
-  const interpretation = this.generateInterpretation(cards, spreadType);
-  
-  // Mettre en cache pour future utilisation
-  if (this.interpretationCache) {
-    this.interpretationCache.set(cacheKey, interpretation);
-  }
-  
-  return interpretation;
 }
 ```
 
@@ -517,23 +567,31 @@ Cette approche pourrait être implémentée dans de futures versions pour améli
 JodoTarot inclut des outils pour tracer les interactions :
 
 ```javascript
-// Activation du mode debug des interactions
-stateManager.on('interaction', (source, target, type, data) => {
-  console.log(`[Interaction] ${source} → ${target} (${type})`, data);
-});
+// Traçage des changements d'état dans le StateManager
+setState(updates) {
+  try {
+    // ... validation et traitement ...
+    
+    // Log des changements importants
+    const importantKeys = ['language', 'persona', 'cardSet', 'spreadType', 'iaModel'];
+    const importantUpdates = Object.keys(updates).filter(key => importantKeys.includes(key));
 
-// Journalisation des interactions dans un service
-class AIService {
-  async interpretReading() {
-    stateManager.logInteraction('AIService', 'API', 'request', { 
-      timestamp: Date.now() 
-    });
+    if (importantUpdates.length > 0) {
+      console.log('🔄 Mise à jour de clés importantes:', importantUpdates.map(key => `${key}: ${updates[key]}`));
+    }
     
-    // ... logique d'interprétation ...
+    // ... mise à jour de l'état ...
     
-    stateManager.logInteraction('AIService', 'StateManager', 'update', {
-      interpretation
-    });
+    // Log des changements effectifs
+    if (Object.keys(changedValues).length > 0) {
+      const importantChanges = Object.keys(changedValues).filter(key => importantKeys.includes(key));
+      if (importantChanges.length > 0) {
+        console.log('✅ Changements effectifs de clés importantes:', importantChanges.map(key => `${key}: ${changedValues[key]}`));
+      }
+    }
+  } catch (error) {
+    console.error('❌ Erreur lors de la mise à jour de l\'état:', error);
+    throw error;
   }
 }
 ```

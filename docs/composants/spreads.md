@@ -18,41 +18,70 @@ La classe de base qui définit l'interface commune et les fonctionnalités parta
 - `description` : Descriptions localisées du tirage
 - `cardPositions` : Définition des positions des cartes
 - `positionMeanings` : Significations localisées des positions
-- `positionDescriptions` : Descriptions détaillées localisées des positions
+- `positionDescriptions` : Descriptions détaillées localisées des positions (optionnel)
 
 #### Méthodes principales
 - `getName()` : Retourne le nom localisé du tirage
 - `getDescription()` : Retourne la description localisée du tirage
 - `getCardCount()` : Retourne le nombre de cartes nécessaires
-- `getPositionMeaning()` : Retourne la signification localisée d'une position
-- `getPositionDescription()` : Retourne la description détaillée d'une position
-- `getPositionClassName()` : Génère les classes CSS pour une position
+- `getPositionMeaning(positionIndex)` : Retourne la signification localisée d'une position
+- `getPositionDescription(positionIndex, card)` : Retourne la description détaillée d'une position
+- `getPositionClassName(positionIndex)` : Génère les classes CSS pour une position
+- `getPositionElement(positionIndex)` : Trouve l'élément DOM correspondant à une position
 - `initializeCardPositions()` : Initialise les positions des cartes dans l'interface
+- `draw(deck)` : Effectue un tirage avec le jeu de cartes spécifié
+- `reset()` : Réinitialise l'affichage du tirage
 - `render()` : Rend le tirage dans le conteneur
-- `generateReadingDescription()` : Génère une description formatée du tirage
-- `addVisualElements()` : Ajoute des éléments visuels spécifiques au tirage
+- `generateReadingDescription(includeDetailedDescriptions)` : Génère une description formatée du tirage
+- `addVisualElements()` : Ajoute des éléments visuels spécifiques au tirage (à implémenter par les classes enfants)
 
-### Tirages Spécifiques
+#### Méthodes privées
+- `_configurePositionStyle(positionElement, position)` : Configure le style d'une position de carte
+- `_createCardElement(card, index)` : Crée un élément de carte
+- `_createPositionElement(position, index)` : Crée un élément de position
+- `_updatePositionDescription(positionElement, card, index)` : Met à jour la description d'une position
 
-#### CelticCrossSpread
-- 10 cartes disposées en croix celtique traditionnelle
-- Éléments visuels : lignes de la croix
-- Positions spécifiques avec significations particulières
+### Types de Tirages Disponibles
+
+Le système comprend actuellement 4 types de tirages, accessibles via la fonction `createSpread()` :
+
+```javascript
+// Objet contenant tous les types de tirages indexés par leur clé
+const SPREADS = {
+  cross: CrossSpread,
+  horseshoe: HorseshoeSpread,
+  love: LoveSpread,
+  celticCross: CelticCrossSpread
+};
+```
 
 #### CrossSpread
-- 5 cartes disposées en croix simple
-- Structure centrée avec positions cardinales
-- Pas d'éléments visuels supplémentaires
+- **Clé** : `cross`
+- **Cartes** : 5 cartes disposées en croix simple
+- **Positions** : centre, haut, gauche, droite, bas
+- **Structure** : Centrée avec positions cardinales
+- **Description** : Un tirage en croix à 5 cartes pour une vision complète de la situation, du problème, de l'influence du passé, de l'avenir et du résultat.
 
 #### HorseshoeSpread
-- 7 cartes disposées en fer à cheval
-- Élément visuel : forme du fer à cheval
-- Progression temporelle de gauche à droite
+- **Clé** : `horseshoe`
+- **Cartes** : 7 cartes disposées en fer à cheval
+- **Positions** : passé lointain, passé récent, présent, futur proche, futur lointain/résultat, influences extérieures, conseil
+- **Élément visuel** : Forme de fer à cheval
+- **Description** : Un tirage en fer à cheval à 7 cartes, idéal pour explorer le passé, le présent et le futur d'une situation, avec des éléments sur les influences et les obstacles.
 
 #### LoveSpread
-- 7 cartes disposées en forme de cœur
-- Focus sur les aspects relationnels
-- Pas d'éléments visuels supplémentaires
+- **Clé** : `love`
+- **Cartes** : 7 cartes disposées selon les positions spécifiques
+- **Positions** : votre cœur, son cœur, relation actuelle, obstacles à surmonter, désirs secrets, résultat probable, conseil final
+- **Focus** : Aspects relationnels et émotionnels
+- **Description** : Un tirage spécial pour l'amour et les relations avec 7 cartes, explorant les sentiments, les désirs et les obstacles.
+
+#### CelticCrossSpread
+- **Clé** : `celticCross`
+- **Cartes** : 10 cartes disposées en croix celtique traditionnelle
+- **Positions** : situation actuelle, défi/obstacle, base/fondation, passé récent, couronne/objectif, futur immédiat, vous-même, environnement/influences, espoirs/craintes, résultat final
+- **Éléments visuels** : Lignes de la croix
+- **Description** : Le tirage traditionnel de la Croix Celtique à 10 cartes, offrant une lecture complète avec des informations sur la situation, les obstacles, les influences passées et futures.
 
 ## Système de Positionnement
 
@@ -60,24 +89,42 @@ La classe de base qui définit l'interface commune et les fonctionnalités parta
 Chaque position est définie par un objet avec les propriétés suivantes :
 ```javascript
 {
-  name: 'nom_semantique',      // Nom descriptif de la position
-  cssName: 'nom_css',          // Nom utilisé pour les classes CSS
-  position: 1,                 // Numéro de position (1-indexé)
-  rotation: 90                 // Rotation optionnelle en degrés
+  name: 'present',       // Nom sémantique de la position
+  cssName: 'present',    // Nom utilisé pour les classes CSS
+  position: 1,           // Numéro de position (1-indexé)
+  rotation: 0            // Rotation optionnelle en degrés
 }
 ```
 
-### Système de Classes CSS
-Les positions utilisent un système de classes CSS standardisé :
-- `card-position` : Classe de base
-- `card-{index}` : Classe pour l'index de la carte
-- `{nom_semantique}` : Classe basée sur le nom sémantique
-- `position-{numero}` : Classe pour le numéro de position
-- `card-position-{numero}` : Classe alternative pour le numéro de position
+### Positionnement via CSS
+Les positions utilisent des variables CSS pour le positionnement précis :
+```javascript
+// Configuration du style de position
+positionElement.style.left = `var(--${this.key}-position-${position.position}-x)`;
+positionElement.style.top = `var(--${this.key}-position-${position.position}-y)`;
+```
+
+Ou alternativement avec le nom CSS :
+```javascript
+const cssPositionName = position.cssName || position.name;
+positionElement.style.left = `var(--${this.key}-${cssPositionName}-x)`;
+positionElement.style.top = `var(--${this.key}-${cssPositionName}-y)`;
+```
+
+### Rotation des Cartes
+La rotation est appliquée via des variables CSS ou des valeurs explicites :
+```javascript
+const rotationVar = `--${this.key}-position-${position.position}-rotation`;
+const rotationValue = getComputedStyle(document.documentElement).getPropertyValue(rotationVar);
+
+positionElement.style.transform = rotationValue?.trim() 
+  ? `translate(-50%, -50%) rotate(${rotationValue})`
+  : `translate(-50%, -50%) rotate(${position.rotation || 0}deg)`;
+```
 
 ## Support Multilingue
 
-Le système supporte nativement 6 langues :
+Le système supporte nativement 6 langues pour les noms, descriptions et significations des positions :
 - Français (fr)
 - Anglais (en)
 - Espagnol (es)
@@ -85,35 +132,53 @@ Le système supporte nativement 6 langues :
 - Italien (it)
 - Chinois (zh)
 
-Chaque élément (noms, descriptions, significations) est disponible dans toutes les langues supportées.
+Exemple de structure multilingue pour un tirage :
+```javascript
+// Noms localisés du tirage
+this.name = {
+  'fr': 'Croix',
+  'en': 'Cross',
+  'es': 'Cruz',
+  'de': 'Kreuz',
+  'it': 'Croce',
+  'zh': '十字'
+};
 
-## Bonnes Pratiques
+// Significations des positions localisées
+this.positionMeanings = {
+  'fr': {
+    1: 'Situation actuelle',
+    2: 'Ce qui influence',
+    // ...
+  },
+  'en': {
+    1: 'Current situation',
+    2: 'What influences',
+    // ...
+  },
+  // Autres langues...
+};
+```
 
-1. **Définition des Positions**
-   - Toujours inclure un nom sémantique et un nom CSS
-   - Utiliser des numéros de position séquentiels
-   - Documenter les rotations si nécessaires
+## Génération de descriptions
 
-2. **Descriptions**
-   - Fournir des descriptions détaillées pour chaque position
-   - Maintenir la cohérence des descriptions entre les langues
-   - Inclure des informations contextuelles pertinentes
+Le système utilise la classe `ReadingDescriptionGenerator` pour créer des descriptions textuelles structurées des tirages :
 
-3. **Éléments Visuels**
-   - Limiter les éléments visuels aux éléments essentiels
-   - Utiliser des classes CSS standardisées
-   - Assurer la compatibilité mobile
-
-4. **Localisation**
-   - Maintenir toutes les chaînes de caractères dans les objets de traduction
-   - Fournir des traductions pour toutes les langues supportées
-   - Utiliser des clés de traduction cohérentes
+```javascript
+generateReadingDescription(includeDetailedDescriptions = true) {
+  const generator = new ReadingDescriptionGenerator(this, this.language);
+  return generator.generateReadingDescription(includeDetailedDescriptions);
+}
+```
 
 ## Exemple d'Utilisation
 
 ```javascript
 // Création d'un tirage
 const spread = createSpread('celtic', containerElement, 'fr');
+
+// Initialisation du tirage (positions vides)
+spread.initializeCardPositions();
 
 // Tirage des cartes
 const cards = spread.draw(deck);
@@ -123,4 +188,56 @@ spread.render();
 
 // Génération de la description
 const description = spread.generateReadingDescription(true);
-``` 
+```
+
+## Création d'un nouveau type de tirage
+
+Pour créer un nouveau type de tirage, suivez ces étapes :
+
+1. Créez une classe héritant de `BaseSpread`
+2. Définissez les noms et descriptions localisés
+3. Configurez les positions des cartes avec `cardPositions`
+4. Définissez les significations des positions avec `positionMeanings`
+5. Implémentez `addVisualElements()` si nécessaire
+6. Ajoutez le tirage à l'objet `SPREADS` dans `index.js`
+
+```javascript
+class MyCustomSpread extends BaseSpread {
+  constructor(container, language = 'fr') {
+    super('custom', container, language);
+    
+    // Définir les propriétés spécifiques...
+    this.name = { 'fr': 'Mon Tirage', 'en': 'My Spread' };
+    this.description = { 'fr': 'Description...', 'en': 'Description...' };
+    this.cardPositions = [ /* positions */ ];
+    this.positionMeanings = { /* significations */ };
+  }
+  
+  // Surcharger des méthodes si nécessaire...
+  addVisualElements() {
+    // Ajouter des éléments visuels spécifiques
+  }
+}
+```
+
+## Bonnes Pratiques
+
+1. **Définition des Positions**
+   - Utilisez des noms sémantiques cohérents
+   - Fournissez toujours un nom CSS (ou utilisez le même que le nom sémantique)
+   - Utilisez des numéros de position séquentiels
+   - Documentez les rotations nécessaires
+
+2. **Descriptions de Positions**
+   - Fournissez des descriptions détaillées pour chaque position
+   - Maintenez la cohérence des descriptions entre les langues
+   - Utilisez `getPositionDescription()` pour générer des descriptions basées sur la carte
+
+3. **Éléments Visuels**
+   - Implémentez `addVisualElements()` pour les éléments visuels spécifiques au tirage
+   - Utilisez des classes CSS standardisées
+   - Assurez la compatibilité avec les écrans de différentes tailles
+
+4. **Variables CSS**
+   - Suivez le format de nommage `--${key}-position-${number}-x/y/rotation`
+   - Ou `--${key}-${cssName}-x/y/rotation` pour les positions spéciales 

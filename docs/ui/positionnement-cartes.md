@@ -2,238 +2,252 @@
 
 ## 🌟 Vue d'ensemble
 
-JodoTarot propose quatre types de tirages différents, chacun avec son propre positionnement et sa signification particulière.
+JodoTarot propose quatre types de tirages différents, chacun avec son propre positionnement et sa signification particulière. Le système de positionnement utilise des variables CSS standardisées et une approche uniforme pour tous les types de tirages.
 
 ## 📍 Types de Tirages
 
 ### ✝️ Tirage en Croix (5 cartes)
 
 ```
-       1
-    4  2  5
-       3
+       2
+    3  1  4
+       5
 ```
 
-1. **Influences positives** : Forces et opportunités
-2. **Passé** : Événements et influences passés
-3. **Situation actuelle** : État présent
-4. **Futur** : Tendances et possibilités
-5. **Influences négatives** : Obstacles et défis
+1. **Centrale (Position 1)**: Situation actuelle
+2. **Haute (Position 2)**: Ce qui influence
+3. **Gauche (Position 3)**: Passé
+4. **Droite (Position 4)**: Futur
+5. **Basse (Position 5)**: Résultat
 
 ### 🔄 Tirage en Fer à Cheval (7 cartes)
 
 ```
-1  2  3
-   4
-5  6  7
+1     5
+  3     7
+2  4  6
 ```
 
-1. **Situation actuelle**
-2. **Obstacles immédiats**
-3. **Influences inconscientes**
-4. **Conseils à suivre**
-5. **Influences extérieures**
-6. **Espoirs et craintes**
-7. **Résultat final**
+1. **Passé lointain (Position 1)**: Les origines de la situation
+2. **Passé récent (Position 2)**: Événements récents influençant la situation
+3. **Présent (Position 3)**: La situation actuelle
+4. **Futur proche (Position 4)**: Ce qui arrive bientôt
+5. **Résultat probable (Position 5)**: Aboutissement si la trajectoire reste inchangée
+6. **Influences externes (Position 6)**: Facteurs extérieurs affectant la situation
+7. **Conseil (Position 7)**: Guidance pour améliorer le résultat
 
 ### 💝 Tirage de l'Amour (7 cartes)
 
 ```
-   1  2
-3  4  5
-   6  7
+  2
+1   3 4
+  6 5 7
 ```
 
-1. **Vous** : Votre énergie
-2. **Partenaire** : Son énergie
-3. **Relation** : Ce qui vous lie
-4. **Obstacles** : Défis à surmonter
-5. **Désirs** : Attentes et souhaits
-6. **Situation actuelle**
-7. **Conseil** : Direction future
+1. **Vous (Position 1)**: Votre position dans la relation
+2. **Partenaire (Position 2)**: La position de votre partenaire
+3. **Dynamique relationnelle (Position 3)**: Comment vous interagissez
+4. **Obstacles (Position 4)**: Ce qui doit être surmonté
+5. **Désirs secrets (Position 5)**: Ce que vous désirez vraiment
+6. **Situation présente (Position 6)**: État actuel de la relation
+7. **Conseils (Position 7)**: Direction à prendre
 
 ### ☘️ Croix Celtique (10 cartes)
 
 ```
-     4
-     1
-  5  2  6
-     3
-  7  8  9
-    10
+     5
+  4  1  6
+     2
+3       7
+     8
+  9    10
 ```
 
-1. **Situation actuelle**
-2. **Obstacle/Défi**
-3. **Base/Fondation**
-4. **Passé**
-5. **Couronne/Objectif**
-6. **Futur**
-7. **Vous-même**
-8. **Environnement**
-9. **Espoirs/Craintes**
-10. **Résultat final**
+1. **Présent (Position 1)**: Situation actuelle
+2. **Défi (Position 2)**: Obstacle ou défi immédiat (souvent placé en croix)
+3. **Couronne (Position 3)**: Objectif ou idéal
+4. **Fondation (Position 4)**: Base de la situation
+5. **Passé (Position 5)**: Influences passées
+6. **Futur (Position 6)**: Ce qui est à venir
+7. **Soi (Position 7)**: Votre attitude/position
+8. **Environnement (Position 8)**: Influences extérieures
+9. **Espoirs (Position 9)**: Espérances ou craintes
+10. **Résultat (Position 10)**: Résultat final
 
 ## 🎯 Conseils d'Utilisation
 
 ### Choix du Tirage
-- **Croix** : Questions générales et rapides
-- **Fer à Cheval** : Évolution d'une situation
-- **Amour** : Questions relationnelles
-- **Croix Celtique** : Analyse approfondie
+- **Croix** : Questions générales et rapides (5 cartes)
+- **Fer à Cheval** : Évolution d'une situation dans le temps (7 cartes)
+- **Amour** : Questions relationnelles et dynamiques interpersonnelles (7 cartes)
+- **Croix Celtique** : Analyse approfondie et détaillée (10 cartes)
 
 ### Interprétation
-- Considérez la position de chaque carte
-- Observez les relations entre les cartes
-- Tenez compte de l'orientation
-- Intégrez le contexte de la question
+- Considérez la position spécifique de chaque carte
+- Observez les relations entre les cartes adjacentes
+- Tenez compte de l'orientation (à l'endroit ou renversée)
+- Intégrez le contexte de la question posée
 
 ## 🔄 Aspects Techniques
 
-### Animation et Affichage
-- Transition fluide pour chaque carte
-- Zoom possible sur les cartes
-- Affichage adaptatif (responsive)
-- Support tactile pour mobile
+### Système de Positionnement
 
-### Personnalisation
-- Choix du jeu de cartes
-- Options d'affichage
-- Paramètres d'animation
-- Mode d'interprétation
+JodoTarot utilise un système de positionnement standardisé basé sur des variables CSS et des identifiants numériques :
 
-## Vue d'Ensemble
+1. Chaque position est identifiée par un numéro (1, 2, 3...)
+2. Les positions utilisent des pourcentages pour une adaptation responsive
+3. Les variables CSS suivent une convention de nommage uniforme
 
-Le système de positionnement des cartes dans JodoTarot utilise une approche hybride combinant :
-1. Un système numérique standardisé (nouveau standard)
-2. Un système sémantique (pour rétrocompatibilité)
+### Structure de Base
 
-## Structure de Base
+#### Définition des Positions dans le Code
 
-### Définition des Positions
-
-Chaque position de carte est définie avec les propriétés suivantes :
+Dans le code JavaScript (classes de tirages), les positions sont définies comme suit :
 
 ```javascript
-{
-  name: 'present',           // Nom sémantique
-  cssName: 'present',        // Nom pour les variables CSS (legacy)
-  position: 1,              // Numéro de position (nouveau standard)
-  rotation: 0               // Rotation en degrés (optionnel)
-}
+// Exemple de définition dans BaseSpread.js
+this.cardPositions = [
+  { name: 'present', position: 1 },
+  { name: 'challenge', position: 2, rotation: 90 },
+  // Autres positions...
+];
 ```
 
-### Variables CSS
+#### Variables CSS de Positionnement
 
-Les positions sont définies via des variables CSS suivant deux formats :
+Les positions sont déterminées par des variables CSS suivant une convention de nommage standardisée :
 
 ```css
-/* Format numérique (nouveau standard) */
---${spreadType}-position-${number}-x: 40%;
---${spreadType}-position-${number}-y: 40%;
---${spreadType}-position-${number}-rotation: 0deg;
-
-/* Format sémantique (legacy) */
---${spreadType}-${name}-x: 40%;
---${spreadType}-${name}-y: 40%;
---${spreadType}-${name}-rotation: 0deg;
+/* Format standard pour les positions */
+--cross-position-1-x: 50%;           /* Position horizontale */
+--cross-position-1-y: 50%;           /* Position verticale */
+--cross-position-2-rotation: 90deg;   /* Rotation (si nécessaire) */
 ```
 
-## Implémentation
+Chaque type de tirage utilise son propre préfixe :
+- `--cross-` pour le Tirage en Croix
+- `--horseshoe-` pour le Fer à Cheval
+- `--love-` pour le Tirage de l'Amour
+- `--celtic-` pour la Croix Celtique
 
-### Classes CSS
+### Classes CSS et Rendu
 
-Les positions utilisent plusieurs classes pour assurer la compatibilité :
+Le système utilise principalement deux types de classes :
 
 ```css
+/* Classes de position */
 .card-position {
   /* Styles de base pour toutes les positions */
   position: absolute;
-  transition: all 0.3s ease;
+  transform: translate(-50%, -50%);
 }
 
-/* Classes de position */
-.card-${index + 1}              /* Position numérique de base */
-.position-${position}           /* Nouveau standard numérique */
-.card-position-${position}      /* Alternative numérique */
-.${name}                        /* Nom sémantique */
+.card-1, .card-2, .card-3 {
+  /* Positions spécifiques basées sur les numéros */
+}
 ```
 
-### Positionnement dans le DOM
+#### Exemple de Rendu HTML
 
-```javascript
-// Exemple de création d'une position
-const positionElement = document.createElement('div');
-positionElement.className = this.getPositionClassName(index, position) + ' empty';
-positionElement.setAttribute('data-position', index);
-positionElement.setAttribute('data-position-name', this.getPositionMeaning(index));
-positionElement.setAttribute('data-position-meaning', positionDescription);
+```html
+<!-- Exemple pour une position dans le tirage en croix -->
+<div class="card-position card-1" data-position="0" data-position-name="Situation actuelle">
+  <div class="card upright">
+    <!-- Contenu de la carte -->
+  </div>
+</div>
 ```
 
-## Éditeur de Positions
+## 🔧 Éditeur de Positions
 
-L'application inclut un éditeur visuel (`tools/spread-editor.html`) permettant de :
-- Définir visuellement les positions des cartes
-- Générer les variables CSS correspondantes
-- Tester les positions en temps réel
-- Sauvegarder les configurations
+JodoTarot inclut un éditeur visuel (`spread-editor.html`) permettant de configurer les positions des cartes de manière intuitive.
+
+### Fonctionnalités de l'Éditeur
+
+- **Glisser-déposer** des cartes pour définir leurs positions
+- **Contrôle de rotation** avec un curseur (0° à 360°)
+- **Prévisualisation instantanée** des changements
+- **Génération automatique** des variables CSS
+- **Personnalisation des dimensions** spécifiques à chaque tirage
 
 ### Utilisation de l'Éditeur
 
-1. Ouvrir `tools/spread-editor.html`
-2. Sélectionner le type de tirage à éditer
-3. Déplacer les cartes à la position souhaitée
-4. Ajuster les rotations si nécessaire
-5. Générer et copier le CSS résultant
+1. Ouvrir `spread-editor.html` dans un navigateur
+2. Sélectionner le type de tirage à modifier
+3. Déplacer les cartes pour définir leurs positions
+4. Ajuster la rotation des cartes si nécessaire
+5. Ajuster les dimensions si besoin
+6. Copier le CSS généré avec le bouton "Copier CSS"
+7. Coller le code dans `assets/css/base/variables.css`
 
-### Format de Sortie
+### Format des Variables Générées
 
 ```css
 /* Variables générées par l'éditeur */
-:root {
-  /* Croix Celtique */
-  --celtic-position-1-x: 40%;
-  --celtic-position-1-y: 40%;
-  --celtic-position-2-x: 40%;
-  --celtic-position-2-y: 40%;
-  --celtic-position-2-rotation: 90deg;
-  /* ... */
-  
-  /* Fer à Cheval */
-  --horseshoe-position-1-x: 20%;
-  --horseshoe-position-1-y: 50%;
-  /* ... */
-  
-  /* Tirage Amour */
-  --love-position-1-x: 30%;
-  --love-position-1-y: 40%;
-  /* ... */
-}
+
+/* Dimensions des cartes pour le tirage Tirage en Croix */
+--cross-card-base-width: 95px;
+--cross-card-ratio: 1.7;
+--cross-card-scale-factor: 1;
+
+/* Variables modifiées pour le tirage Tirage en Croix */
+--cross-position-1-x: 50%;
+--cross-position-1-y: 50%;
+--cross-position-2-x: 50%;
+--cross-position-2-y: 20%;
+--cross-position-3-x: 25%;
+--cross-position-3-y: 50%;
 ```
 
-## Bonnes Pratiques
+Pour plus de détails sur l'éditeur, consultez la [documentation de l'éditeur de positions](../tools/spread-editor.md).
 
-1. **Nommage**
-   - Utiliser le nouveau système numérique pour les nouvelles implémentations
-   - Maintenir la compatibilité avec les noms sémantiques
-   - Documenter les significations des positions
+## 📏 Relation avec les Dimensions des Cartes
 
-2. **Positionnement**
-   - Centrer les cartes avec `transform: translate(-50%, -50%)`
-   - Utiliser des pourcentages pour les positions
-   - Appliquer les rotations après le centrage
+Le positionnement des cartes est étroitement lié à leurs dimensions. Chaque type de tirage possède ses propres dimensions optimisées :
 
-3. **Accessibilité**
-   - Fournir des attributs `data-position-name` et `data-position-meaning`
-   - Maintenir un ordre logique dans le DOM
-   - Assurer une navigation clavier cohérente
+```css
+/* Dimensions spécifiques par tirage */
+--cross-card-base-width: 95px;       /* Tirage en Croix */
+--horseshoe-card-base-width: 95px;   /* Fer à Cheval */
+--love-card-base-width: 95px;        /* Tirage de l'Amour */
+--celtic-card-base-width: 75px;      /* Croix Celtique - plus petit */
+```
 
-4. **Performance**
-   - Utiliser `transform` pour les animations
-   - Regrouper les changements de style
-   - Éviter les calculs de position inutiles 
+Pour plus d'informations sur les dimensions, consultez la [documentation des dimensions des cartes](dimensions-cartes.md).
 
-## Voir Aussi
+## ✅ Bonnes Pratiques
 
-- [Guide d'intégration de nouveaux types de tirages](../composants/integrer-nouveau-tirage.md)
-- [Dimensions spécifiques des cartes par type de tirage](dimensions-cartes.md) 
+### Positionnement Optimal
+
+1. **Aération visuelle**
+   - Laisser suffisamment d'espace entre les cartes
+   - Éviter les chevauchements excessifs (sauf si intentionnel)
+   - Adapter la taille des cartes au nombre de positions
+
+2. **Responsive Design**
+   - Utiliser des pourcentages pour toutes les positions
+   - Éviter les valeurs extrêmes (< 10% ou > 90%)
+   - Tester sur différentes tailles d'écran
+
+3. **Rotation des Cartes**
+   - Limiter la rotation aux cas nécessaires (ex: carte "défi" dans la Croix Celtique)
+   - Utiliser des angles standards (0°, 90°, 180°, 270°) pour une meilleure lisibilité
+   - S'assurer que la rotation n'affecte pas négativement la lisibilité
+
+### Implémentation
+
+1. **Variables standardisées**
+   - Toujours utiliser le format `--${spreadType}-position-${number}-x/y/rotation`
+   - Ne définir que les variables qui diffèrent des valeurs par défaut
+   - Documenter les changements significatifs
+
+2. **Performance**
+   - Utiliser `transform` pour les animations et le positionnement
+   - Privilégier les propriétés qui ne déclenchent pas de reflow
+   - Limiter le nombre de media queries et de conditions
+
+## 🔗 Voir Aussi
+
+- [Dimensions spécifiques des cartes](dimensions-cartes.md)
+- [Documentation de l'éditeur de positions](../tools/spread-editor.md)
+- [Standards pour les positions de cartes](../standards/card-positions.md) 

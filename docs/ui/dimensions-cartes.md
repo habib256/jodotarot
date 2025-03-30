@@ -2,19 +2,20 @@
 
 ## Vue d'Ensemble
 
-JodoTarot utilise maintenant un système permettant de définir des dimensions de cartes spécifiques à chaque type de tirage. Cette amélioration offre une plus grande flexibilité visuelle, permettant d'adapter la taille et les proportions des cartes en fonction du nombre de cartes et de la disposition de chaque tirage.
+JodoTarot utilise un système permettant de définir des dimensions de cartes spécifiques à chaque type de tirage. Cette approche offre une flexibilité visuelle optimale, permettant d'adapter la taille et les proportions des cartes en fonction du nombre de cartes et de la disposition de chaque tirage.
 
 ## Motivation
 
 Différents types de tirages nécessitent différentes tailles de cartes pour une expérience utilisateur optimale :
 
-- Les tirages avec beaucoup de cartes (comme la Croix Celtique) peuvent bénéficier de cartes plus petites
+- Les tirages avec beaucoup de cartes (comme la Croix Celtique) bénéficient de cartes plus petites
 - Les tirages plus simples (comme la Croix) peuvent utiliser des cartes plus grandes
-- Certains arrangements visuels peuvent nécessiter des proportions de cartes différentes
+- Certains arrangements visuels nécessitent des proportions de cartes différentes
+- La densité visuelle varie selon le type de tirage
 
 ## Structure des Variables CSS
 
-Pour chaque type de tirage, nous définissons désormais trois variables essentielles :
+Pour chaque type de tirage, nous définissons trois variables fondamentales :
 
 ```css
 /* Exemple pour le tirage en croix */
@@ -29,111 +30,177 @@ Pour chaque type de tirage, nous définissons désormais trois variables essenti
 
 ### Variables Par Type de Tirage
 
-Chaque type de tirage possède son propre ensemble de variables :
+Chaque type de tirage possède son ensemble de variables dimensionnelles, tout en conservant la même structure de nommage :
 
-#### Tirage en Croix
+#### Tirage en Croix (5 cartes)
 ```css
---cross-card-base-width
---cross-card-ratio
---cross-card-scale-factor
---cross-card-width
---cross-card-height
+--cross-card-base-width: 95px;
+--cross-card-ratio: 1.7;
+--cross-card-scale-factor: 1;
 ```
 
-#### Tirage en Fer à Cheval
+#### Tirage en Fer à Cheval (7 cartes)
 ```css
---horseshoe-card-base-width
---horseshoe-card-ratio
---horseshoe-card-scale-factor
---horseshoe-card-width
---horseshoe-card-height
+--horseshoe-card-base-width: 95px;
+--horseshoe-card-ratio: 1.7;
+--horseshoe-card-scale-factor: 1;
 ```
 
-#### Tirage de l'Amour
+#### Tirage de l'Amour (7 cartes)
 ```css
---love-card-base-width
---love-card-ratio
---love-card-scale-factor
---love-card-width
---love-card-height
+--love-card-base-width: 95px;
+--love-card-ratio: 1.7;
+--love-card-scale-factor: 1;
 ```
 
-#### Tirage de la Croix Celtique
+#### Croix Celtique (10 cartes)
 ```css
---celtic-card-base-width
---celtic-card-ratio
---celtic-card-scale-factor
---celtic-card-width
---celtic-card-height
+--celtic-card-base-width: 75px;      /* Taille réduite par défaut */
+--celtic-card-ratio: 1.7;
+--celtic-card-scale-factor: 1;
 ```
 
 ## Valeurs par Défaut
 
-Par défaut, tous les tirages héritent des valeurs globales :
+Par défaut, les variables globales sont définies comme suit :
 
 ```css
---card-base-width: 95px;          /* Taille de base pour mobile */
---card-ratio: 1.7;                /* Ratio hauteur/largeur constant */
---card-scale-factor: 1;           /* Facteur d'échelle de base */
+--card-base-width: 95px;          /* Taille de base standard */
+--card-ratio: 1.7;                /* Ratio hauteur/largeur standard */
+--card-scale-factor: 1;           /* Facteur d'échelle standard */
 ```
 
-La Croix Celtique est une exception, avec un facteur d'échelle réduit par défaut pour accommoder le plus grand nombre de cartes :
+Les tirages héritent généralement de ces valeurs, sauf pour la Croix Celtique qui utilise une largeur de base plus petite (75px) pour accommoder ses 10 cartes.
+
+Ces valeurs sont également adaptées automatiquement selon la taille de l'écran via des media queries.
+
+## Media Queries et Adaptation Responsive
+
+Les dimensions des cartes s'adaptent automatiquement aux différentes tailles d'écran grâce aux media queries :
 
 ```css
---celtic-card-scale-factor: var(--card-scale-factor) * 0.85;
+@media (min-width: 576px) {
+  :root {
+    --card-base-width: 80px;
+    --card-scale-large: 3.5;
+  }
+}
+
+@media (min-width: 768px) {
+  :root {
+    --card-base-width: 90px;
+    --card-scale-large: 4;
+  }
+}
+
+@media (min-width: 992px) {
+  :root {
+    --card-base-width: 100px;
+    --card-scale-large: 4.5;
+  }
+}
+
+@media (min-width: 1200px) {
+  :root {
+    --card-base-width: 110px;
+    --card-scale-large: 5;
+  }
+}
+
+@media (min-width: 1400px) {
+  :root {
+    --card-base-width: 120px;
+    --card-scale-large: 5.5;
+  }
+}
+
+/* Adaptation à l'orientation */
+@media (orientation: landscape) {
+  :root {
+    --card-scale-large: calc(var(--card-scale-large) * 0.8);
+  }
+}
+
+/* Adaptation aux écrans très hauts */
+@media (min-height: 1000px) {
+  :root {
+    --card-scale-factor: 1.2;
+  }
+}
 ```
 
 ## Modification des Dimensions
 
-Pour modifier les dimensions des cartes d'un tirage spécifique, deux approches sont possibles :
+Pour modifier les dimensions des cartes d'un tirage spécifique, deux approches sont disponibles :
 
 ### 1. Utiliser l'Éditeur de Positions
 
-L'éditeur de positions des cartes (`spread-editor.html`) permet de modifier visuellement les dimensions des cartes et génère le CSS correspondant.
+L'éditeur de positions (`spread-editor.html`) offre une interface visuelle pour ajuster les dimensions :
+
+- Sélectionnez le type de tirage dans le menu déroulant
+- Utilisez les curseurs pour ajuster :
+  - Largeur de base (de 60px à 150px)
+  - Ratio hauteur/largeur (de 1.4 à 2.0)
+  - Facteur d'échelle (de 0.8 à 1.5)
+- Copiez le CSS généré avec le bouton "Copier CSS"
+- Collez ce code dans `assets/css/base/variables.css`
 
 ### 2. Modifier Directement les Variables CSS
 
-Vous pouvez également modifier directement les variables dans le fichier `assets/css/base/variables.css` :
+Vous pouvez aussi modifier manuellement les variables dans `assets/css/base/variables.css` :
 
 ```css
-/* Exemple : Rendre les cartes du tirage de l'amour plus grandes */
---love-card-base-width: 110px;
+/* Exemple : Personnaliser le tirage de l'amour */
+--love-card-base-width: 100px;
 --love-card-ratio: 1.8;
 --love-card-scale-factor: 1.1;
 ```
 
-## Compatibilité
+## Compatibilité et Utilisation
 
-Pour assurer la compatibilité avec le code existant, les variables globales (`--card-width`, `--card-height`, etc.) sont toujours maintenues. Cependant, chaque module de tirage utilise maintenant les variables spécifiques :
+Les variables spécifiques sont utilisées dans les modules CSS correspondants, tout en conservant la compatibilité avec le code existant :
 
 ```css
-/* Dans cross-spread.css */
-.card-position {
+/* Exemple pour le tirage en croix */
+.cross-spread .card-position {
   width: var(--cross-card-width);
   height: var(--cross-card-height);
 }
 
-/* Dans horseshoe-spread.css */
-.card-position {
+/* Exemple pour le tirage en fer à cheval */
+.horseshoe-spread .card-position {
   width: var(--horseshoe-card-width);
   height: var(--horseshoe-card-height);
 }
 ```
 
-## Exemple d'Utilisation
+## Conseils d'Optimisation
 
-Si vous souhaitez créer un nouveau type de tirage avec des dimensions personnalisées, suivez ce modèle :
+Pour obtenir les meilleurs résultats visuels selon le type de tirage :
 
-1. Définissez les variables de dimensions dans `variables.css` :
+- **Croix Celtique (10 cartes)** : Utilisez des cartes plus petites (75-85px) avec un facteur d'échelle réduit (0.8-0.9)
+- **Tirage en Croix (5 cartes)** : Utilisez la taille standard (95-100px) avec un facteur d'échelle normal (1.0)
+- **Tirages verticaux** : Augmentez le ratio hauteur/largeur (1.8-2.0)
+- **Tirages denses** : Réduisez le facteur d'échelle (0.8-0.9) pour éviter les chevauchements excessifs
+
+## Exemple pour un Nouveau Tirage
+
+Si vous souhaitez créer un nouveau type de tirage avec des dimensions personnalisées :
+
+1. Définissez les variables dans `variables.css` :
 ```css
 --nouveau-tirage-card-base-width: 90px;
 --nouveau-tirage-card-ratio: 1.65;
 --nouveau-tirage-card-scale-factor: 0.95;
+```
+
+2. Définissez les variables calculées :
+```css
 --nouveau-tirage-card-width: calc(var(--nouveau-tirage-card-base-width) * var(--nouveau-tirage-card-scale-factor));
 --nouveau-tirage-card-height: calc(var(--nouveau-tirage-card-width) * var(--nouveau-tirage-card-ratio));
 ```
 
-2. Utilisez ces variables dans le CSS du module :
+3. Utilisez ces variables dans votre module CSS :
 ```css
 .nouveau-tirage .card-position {
   width: var(--nouveau-tirage-card-width);
@@ -141,14 +208,8 @@ Si vous souhaitez créer un nouveau type de tirage avec des dimensions personnal
 }
 ```
 
-## Architecture Technique
+## Relation avec les Positions des Cartes
 
-Le système s'appuie sur trois composants clés :
+Les dimensions des cartes sont complémentaires aux positions des cartes (voir [documentation des positions](../standards/card-positions.md)). Pour une expérience utilisateur optimale, ces deux aspects doivent être configurés harmonieusement.
 
-1. **Variables CSS Spécifiques** définies dans `variables.css`
-2. **Modules CSS** adaptés pour utiliser ces variables spécifiques
-3. **Éditeur de Positions** modifié pour gérer les dimensions par type de tirage
-
-## Considérations Responsives
-
-Les dimensions spécifiques respectent toujours les media queries définies dans `variables.css`. La taille des cartes s'adapte donc automatiquement aux différentes tailles d'écran. 
+L'éditeur de positions permet de configurer les deux aspects simultanément (voir [documentation de l'éditeur](../tools/spread-editor.md)). 

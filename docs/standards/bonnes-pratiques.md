@@ -314,24 +314,47 @@ class EventEmitter {
 
 ## Internationalisation
 
-### 1. Textes
+### 1. Exemple d'utilisation
 
 ```javascript
-const translations = {
-  fr: {
-    welcome: 'Bienvenue',
-    error: 'Erreur: {{message}}'
-  }
-};
+// Import de la fonction de traduction
+import { getTranslation } from './translations/index.js';
+
+// Utilisation simple avec clé et langue
+const titre = getTranslation('header.question', 'fr');
+
+// Utilisation avec paramètres de substitution
+const message = getTranslation('interpretation.loadingWithModel', 'fr', { 
+  model: 'GPT-4', 
+  persona: 'Tarologue' 
+});
+
+// Mise à jour des éléments d'interface
+document.getElementById('question-label').textContent = getTranslation('header.question', langue);
+document.querySelector('h1').textContent = getTranslation('app.title', langue);
+
+// Obtention d'un prompt pour l'IA dans la langue appropriée
+function getMetaPrompt(langue = 'fr') {
+  return getTranslation('metaprompt.base', langue);
+}
 ```
 
-### 2. Formatage
+### 2. Format des Textes
 
 ```javascript
-function formatMessage(key, params) {
-  let message = translations[currentLang][key];
-  return message.replace(/\{\{(\w+)\}\}/g, (_, key) => params[key]);
-}
+// Dans le fichier de traduction fr.js
+export default {
+  header: {
+    question: "Votre question :",
+    drawButton: "Tirer les cartes"
+  },
+  interpretation: {
+    loadingWithModel: "Analyse du tirage avec {model} interprété par un {persona}...",
+    error: {
+      api: "Erreur API: {0}"
+    }
+  }
+};
 ```
 
 ## Débogage

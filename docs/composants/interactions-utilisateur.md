@@ -13,21 +13,32 @@ Le `UIService` est le service central pour la gestion des interactions UI :
 ```javascript
 class UIService {
   constructor() {
-    // Initialisation des gestionnaires d'événements globaux
+    // Initialiser les gestionnaires d'événements globaux
     this.initGlobalEvents();
     
-    // Écoute des événements d'état
+    // Écouter l'événement de disponibilité de l'état
     document.addEventListener('stateManager:ready', this.handleStateReady.bind(this));
+    
+    // Écouter les changements globaux d'état
     document.addEventListener('state:changed', this.handleStateChanged.bind(this));
   }
   
   handleStateReady(event) {
+    console.log('🔄 UIService: État disponible, synchronisation de l\'interface');
     this.synchronizeUIWithState(event.detail.state);
   }
   
   handleStateChanged(event) {
     const { changes, state } = event.detail;
     this.synchronizeUIWithState(state, changes);
+  }
+  
+  synchronizeUIWithState(state, changes = null) {
+    // Vérifier les propriétés critiques et les synchroniser avec l'UI
+    this.ensureInterpretationPanelVisibility();
+    
+    // Synchroniser d'autres éléments d'interface selon les besoins
+    this.updateStatusIndicators(state);
   }
 }
 ```
@@ -50,9 +61,41 @@ class AppController {
     this.readingController = null;
     this.configController = null;
     
-    // Synchronisation avec l'état
+    // Écouter les changements d'état pour mettre à jour l'UI
     this.stateManager.subscribe(this.handleStateChange.bind(this));
+    
+    // Synchroniser l'UI avec l'état restauré
     this.syncUIWithState();
+  }
+  
+  handleStateChange(state) {
+    // Mettre à jour le titre du document en fonction du type de tirage
+    let title = 'JodoTarot';
+    
+    switch (state.spreadType) {
+      case 'cross':
+        title += ' - Tirage en Croix';
+        break;
+      case 'horseshoe':
+        title += ' - Tirage en Fer à Cheval';
+        break;
+      case 'love':
+        title += ' - Tarot de l\'Amour';
+        break;
+      case 'celticCross':
+        title += ' - Croix Celtique';
+        break;
+    }
+    
+    document.title = title;
+    
+    // Mettre à jour la visibilité des messages d'erreur
+    if (state.error) {
+      this.showError(state.error);
+    }
+    
+    // Afficher/masquer le spinner de chargement
+    this.updateLoadingState(state.isLoading);
   }
 }
 ```
@@ -65,8 +108,25 @@ Le `ConfigController` gère les interactions de configuration :
 class ConfigController {
   constructor(stateManager, aiService, uiService) {
     this.stateManager = stateManager;
+    this.aiService = aiService;
+    this.uiService = uiService;
     
-    // Abonnement aux changements d'état
+    // Éléments DOM
+    this.elements = {
+      languageSelect: document.getElementById('language'),
+      personaSelect: document.getElementById('persona'),
+      cardSetSelect: document.getElementById('card-set'),
+      spreadTypeSelect: document.getElementById('spread-type'),
+      iaModelSelect: document.getElementById('ia-model'),
+      appTitle: document.getElementById('app-title'),
+      personaLogo: document.getElementById('persona-logo'),
+      warningContainer: document.getElementById('connectivity-warning') || this.createWarningContainer()
+    };
+    
+    // Initialiser les écouteurs d'événements
+    this.initEventListeners();
+    
+    // S'abonner aux changements d'état pour maintenir l'UI synchronisée
     this.stateManager.subscribe((newState, changes = {}) => {
       this.syncUIWithState();
       
@@ -82,7 +142,7 @@ class ConfigController {
       }
     });
     
-    // Gestion spécifique des modèles IA
+    // Écouter l'événement spécifique pour la mise à jour du menu déroulant des modèles IA
     document.addEventListener('iaModelUI:update', (event) => {
       this.updateModelSelectUI(event.detail.model);
     });
@@ -118,11 +178,25 @@ L'état de l'interface est géré via le StateManager avec les propriétés suiv
   },
   modelStatus: {
     type: 'object',
+    description: 'État actuel du modèle d\'IA',
     default: {
       isLoading: false,
       isConnected: false,
       error: null,
       lastCheck: null
+    }
+  },
+  availableModels: {
+    type: 'object',
+    description: 'Liste des modèles disponibles par type',
+    default: {
+      ollama: [],
+      openai: [
+        'gpt-3.5-turbo',
+        'gpt-4',
+        'gpt-4o',
+        'gpt-4o-mini'
+      ]
     }
   }
 }
@@ -131,18 +205,39 @@ L'état de l'interface est géré via le StateManager avec les propriétés suiv
 ### Gestion des États de Chargement
 
 ```javascript
-// Exemple de gestion d'état de chargement
-async performAction() {
+// Exemple de gestion d'état de chargement dans le ConfigController
+async handleModelChange(event) {
+  const model = event.target.value;
   try {
-    this.stateManager.setState({ isLoading: true });
-    await this.someAsyncOperation();
+    // Commencer le chargement
+    this.stateManager.setState({ 
+      modelStatus: { 
+        isLoading: true,
+        isConnected: false,
+        error: null 
+      } 
+    });
+    
+    // Vérifier la connectivité
+    const testResult = await this.testModelConnectivity(model);
+    
+    // Mettre à jour l'état avec le résultat
+    this.stateManager.setState({ 
+      iaModel: model,
+      modelStatus: { 
+        isLoading: false,
+        isConnected: testResult.success,
+        error: testResult.success ? null : testResult.message,
+        lastCheck: new Date().toISOString()
+      } 
+    });
   } catch (error) {
     this.stateManager.setState({ 
-      error: error.message 
-    });
-  } finally {
-    this.stateManager.setState({ 
-      isLoading: false 
+      modelStatus: { 
+        isLoading: false,
+        isConnected: false,
+        error: error.message 
+      } 
     });
   }
 }
@@ -163,6 +258,7 @@ async performAction() {
 - `card:deselected` : Carte désélectionnée
 - `card:flip:start` : Début d'animation de retournement
 - `card:flip:end` : Fin d'animation de retournement
+- `deckId:changed` : Changement de jeu de cartes
 
 ### Événements de Tirage
 
@@ -181,59 +277,96 @@ async performAction() {
 ### Exemple de Flux
 
 ```javascript
-// 1. Interaction utilisateur
-buttonElement.addEventListener('click', () => {
+// 1. Interaction utilisateur - Exemple de changement de langue
+languageSelect.addEventListener('change', (event) => {
+  const language = event.target.value;
+  
   // 2. Mise à jour de l'état
-  stateManager.setState({ 
-    isCardEnlarged: true,
-    enlargedCardId: cardId 
-  });
+  this.stateManager.setState({ language });
 });
 
-// 3. Écouteur d'état
-stateManager.subscribe((newState, changes) => {
-  if ('isCardEnlarged' in changes) {
-    updateCardDisplay(
-      newState.isCardEnlarged,
-      newState.enlargedCardId
-    );
+// 3. Écouteur d'état dans ConfigController
+this.stateManager.subscribe((newState, changes = {}) => {
+  // 4. Réactions aux changements spécifiques
+  if (changes.language) {
+    this.updateUILanguage(newState.language);
   }
 });
 ```
 
-## Accessibilité
+## Notifications et Retours Utilisateur
 
-### Gestion du Focus
+### Affichage des Erreurs
+
+Le UIService fournit des méthodes pour afficher des notifications et erreurs:
 
 ```javascript
-// Exemple de gestion du focus pour les cartes
-function handleCardSelection(cardElement) {
-  // Mettre à jour l'état
-  stateManager.setState({ 
-    selectedCardId: cardElement.dataset.cardId 
-  });
+showError(message, isApi = false, duration = 5000) {
+  // Créer/récupérer le conteneur d'erreur
+  let errorContainer = document.querySelector('.error-container');
+  if (!errorContainer) {
+    errorContainer = document.createElement('div');
+    errorContainer.className = 'error-container';
+    document.body.appendChild(errorContainer);
+  }
   
-  // Gérer le focus
-  cardElement.setAttribute('tabindex', '0');
-  cardElement.focus();
+  // Créer le message d'erreur
+  const errorElement = document.createElement('div');
+  errorElement.className = `error-message ${isApi ? 'api-error' : ''}`;
+  errorElement.textContent = message;
   
-  // Annoncer la sélection
-  announceCardSelection(cardElement.dataset.cardName);
+  // Ajouter au conteneur
+  errorContainer.appendChild(errorElement);
+  
+  // Animation et disparition automatique
+  setTimeout(() => {
+    errorElement.classList.add('visible');
+  }, 10);
+  
+  if (duration > 0) {
+    setTimeout(() => {
+      errorElement.classList.remove('visible');
+      setTimeout(() => errorElement.remove(), 300);
+    }, duration);
+  }
+  
+  return errorElement;
 }
 ```
 
-### Annonces pour Lecteurs d'Écran
+### Notifications Temporaires
 
 ```javascript
-function announceCardSelection(cardName) {
-  const announcement = document.createElement('div');
-  announcement.setAttribute('aria-live', 'polite');
-  announcement.textContent = `Carte ${cardName} sélectionnée`;
-  document.body.appendChild(announcement);
+showNotification(message, type = 'info', duration = 3000) {
+  let container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    container.style.position = 'fixed';
+    container.style.top = '20px';
+    container.style.right = '20px';
+    container.style.zIndex = '10000';
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.gap = '10px';
+    document.body.appendChild(container);
+  }
   
+  const toast = document.createElement('div');
+  toast.className = 'toast notification-' + type;
+  toast.innerText = message;
+  toast.style.opacity = '0';
+  toast.style.transition = 'opacity 0.5s ease';
+  container.appendChild(toast);
+  
+  // Animation et disparition automatique
+  void toast.offsetWidth;
+  toast.style.opacity = '1';
+
   setTimeout(() => {
-    document.body.removeChild(announcement);
-  }, 1000);
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 500);
+  }, duration);
 }
 ```
 

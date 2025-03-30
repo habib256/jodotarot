@@ -16,9 +16,14 @@ Un prompt complet est composé de plusieurs parties :
 ## Assemblage du Prompt
 
 ```javascript
+// Dans AIService.js, méthode getInterpretation
+const systemPrompts = await this.buildSystemPrompts(persona, language, spreadType);
+const prompt = this.buildPrompt(reading, question, language, spreadType);
+
+// Pour le mode streaming d'Ollama
 const fullPrompt = [
-  ...systemPrompts,  // Instructions générales
-  prompt            // Question et contexte
+  ...systemPrompts,
+  prompt
 ].join('\n\n');
 ```
 
@@ -27,10 +32,22 @@ const fullPrompt = [
 Les prompts système définissent le cadre général de l'interprétation :
 
 ```javascript
-const systemPrompts = [
-  getMetaPrompt(language),      // Instructions générales
-  getPersonaPrompt(persona)     // Personnalité de l'interprète
-];
+// Dans AIService.js, méthode buildSystemPrompts
+async buildSystemPrompts(persona, language, spreadType) {
+  try {
+    const personaPrompt = await getPersonaPrompt(persona, language, spreadType);
+    const metaPrompt = getMetaPrompt(language);
+    
+    const basePrompts = [
+      metaPrompt,
+      personaPrompt
+    ];
+    
+    return basePrompts;
+  } catch (error) {
+    return [getMetaPrompt(language)];
+  }
+}
 ```
 
 ### 2. Prompt Principal
@@ -41,46 +58,93 @@ Le prompt principal combine :
 - Le contexte spécifique
 
 ```javascript
-const prompt = buildPrompt(reading, question, language, spreadType);
+// Dans AIService.js, méthode buildPrompt
+buildPrompt(reading, question, language, spreadType = 'cross') {
+  // Créer une instance temporaire du tirage pour générer une description
+  const spreadInstance = createSpread(spreadType, null, language);
+  
+  // Copier les cartes dans l'instance de tirage
+  spreadInstance.cards = [...reading];
+  
+  // Générer une description détaillée du tirage avec les cartes
+  const spreadDescription = spreadInstance.generateReadingDescription(true);
+  
+  // Construction du prompt de base avec toutes les informations
+  let promptBase = `${spreadDescription}\n\n`;
+  
+  // Enrichir le prompt avec la question et le texte d'emphase
+  return enrichirPromptContextuel(question, promptBase, language);
+}
 ```
 
 ## Enrichissement Contextuel
 
 Le système enrichit les prompts avec des informations contextuelles :
 
-1. **Emphase** : Mise en valeur des éléments importants
-2. **Formatage** : Structuration claire des informations
-3. **Adaptation linguistique** : Ajustement selon la langue
+```javascript
+// Dans prompt.js, méthode enrichirPromptContextuel
+function enrichirPromptContextuel(question, systemPrompt, langue = 'fr') {
+  if (!question || !question.trim()) {
+    return systemPrompt;
+  }
+  
+  // Obtenir la traduction de l'introduction à la question
+  const questionIntro = getTranslation('interpretation.userQuestion', langue);
+  
+  // Sélectionner le texte d'emphase dans la langue appropriée
+  const emphaseTexte = getEmphasisText(langue);
+  
+  // Former le bloc d'emphase avec les délimiteurs et la question
+  const questionBlock = `====================
+${questionIntro}:
+"${question.trim()}"
+====================`;
+
+  return `
+${questionBlock}
+
+${emphaseTexte}
+
+${systemPrompt}`;
+}
+```
 
 ## Exemples de Prompts
 
 ### Prompt Système (Meta)
 
-```
-En tant qu'interprète de tarot, vous devez :
-1. Analyser chaque carte dans son contexte
-2. Considérer les relations entre les cartes
-3. Fournir une interprétation cohérente
-4. Adapter le ton selon le persona choisi
+```javascript
+// Exemple depuis la fonction getMetaPrompt dans prompt.js
+function getMetaPrompt(langue = 'fr') {
+  // Récupérer le prompt de base depuis le système de traductions
+  return getTranslation('metaprompt.base', langue);
+}
 ```
 
 ### Prompt de Persona
 
-```
-Vous êtes un tarologue expérimenté avec :
-- 30 ans de pratique
-- Une approche psychologique
-- Un style bienveillant et professionnel
-```
-
-### Description du Tirage
-
-```
-Tirage en croix avec :
-1. Centre : Le Bateleur (position actuelle)
-2. Nord : La Papesse (influences passées)
-3. Est : L'Impératrice (influences futures)
-...
+```javascript
+// Exemple depuis TarologuePersona.js
+class TarologuePersona extends BasePersona {
+  constructor(language = 'fr') {
+    super('tarologue', language);
+    
+    // Autres propriétés...
+    
+    this.promptTemplate = {
+      'fr': `Vous êtes {{PERSONA_NAME}}, {{PERSONA_DESCRIPTION}}
+      
+Pour cette lecture de tarot en {{SPREAD_TYPE}}, adoptez le ton d'un tarologue expérimenté. 
+Vos interprétations doivent refléter une connaissance approfondie de la symbolique traditionnelle des cartes.
+Vous devez:
+1. Examiner chaque carte individuellement, en expliquant sa signification générale et spécifique à sa position
+2. Considérer l'orientation de chaque carte (à l'endroit ou renversée)
+3. Établir des connections entre les cartes pour former une narration cohérente
+4. Répondre directement à la question posée avec sagesse et clarté
+5. Conclure par un conseil pratique`
+    };
+  }
+}
 ```
 
 ## Bonnes Pratiques
@@ -95,49 +159,67 @@ Tirage en croix avec :
 ### Par Langue
 
 ```javascript
-const metaPrompt = {
-  fr: "En tant qu'interprète de tarot...",
-  en: "As a tarot interpreter...",
-  // autres langues...
-};
+// Dans BasePersona.js, méthode buildSystemPrompt
+buildSystemPrompt(spreadType = 'cross') {
+  const template = this.promptTemplate[this.language] || this.promptTemplate['fr'] || '';
+  
+  // Remplacer les variables dans le template
+  let formattedTemplate = template
+    .replace('{{PERSONA_NAME}}', this.getName())
+    .replace('{{PERSONA_DESCRIPTION}}', this.getDescription())
+    .replace('{{SPREAD_TYPE}}', spreadType);
+    
+  // Ajouter les spécialisations
+  if (this.specializations && this.specializations.length > 0) {
+    if (this.language === 'fr') {
+      formattedTemplate += `\n\nVos domaines d'expertise incluent: ${this.specializations.join(', ')}.`;
+    } else {
+      formattedTemplate += `\n\nYour areas of expertise include: ${this.specializations.join(', ')}.`;
+    }
+  }
+  
+  return formattedTemplate;
+}
 ```
-
-### Par Type de Tirage
-
-```javascript
-const spreadPrompts = {
-  cross: "Tirage en croix traditionnel...",
-  simple: "Tirage simple à trois cartes...",
-  // autres types...
-};
-```
-
-## Optimisation des Prompts
-
-1. **Longueur** : Équilibre entre détail et concision
-2. **Température** : Ajustement selon le besoin de créativité
-3. **Formatage** : Structure claire pour l'IA
-4. **Mots-clés** : Utilisation de termes spécifiques
 
 ## Débogage des Prompts
 
-Pour faciliter le débogage, le mode "prompt" permet de voir le prompt final :
+Le mode "prompt" permet de voir le prompt final sans appel à l'IA :
 
 ```javascript
+// Dans AIService.js, méthode getInterpretation
 if (model === 'prompt') {
-  return `
-    <div class="prompt-display">
-      <h3>Mode Prompt</h3>
-      <div class="system-prompts">
-        <h4>Prompts système :</h4>
-        <pre>${systemPrompts.join('\n\n')}</pre>
-      </div>
-      <div class="user-prompt">
-        <h4>Prompt utilisateur :</h4>
-        <pre>${prompt}</pre>
-      </div>
-    </div>
-  `;
+  console.log('📝 Mode Prompt activé : affichage du prompt sans appel à l\'IA');
+  
+  // Concaténer simplement les prompts système et utilisateur
+  const fullPrompt = `${systemPrompts.join('\n\n')}\n\n${prompt}`;
+  
+  // Affichage minimal sans formatage particulier
+  const response = `<div class="prompt-display">${fullPrompt}</div>`;
+  
+  this.isGenerating = false;
+  return response;
+}
+```
+
+Il existe aussi un mode debug qui affiche les prompts dans la console :
+
+```javascript
+// Dans AIService.js, méthode getInterpretation
+if (this.debugMode) {
+  // Construire le prompt complet comme il sera envoyé à l'IA
+  const fullPrompt = `${systemPrompts.join('\n\n')}\n\n${prompt}`;
+  
+  console.log('📨 PROMPT FINAL ENVOYÉ À L\'IA:');
+  console.log(fullPrompt);
+  
+  // Afficher des informations sur le persona
+  if (PERSONAS[persona]) {
+    const personaInstance = new PERSONAS[persona](language);
+    console.log(`🧙‍♂️ Persona: ${personaInstance.getName()}`);
+    console.log(`📝 Description: ${personaInstance.getDescription()}`);
+    console.log(`🔮 Spécialisations: ${personaInstance.getSpecializations().join(', ')}`);
+  }
 }
 ```
 

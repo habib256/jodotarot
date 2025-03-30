@@ -12,10 +12,17 @@ JodoTarot est construit avec une architecture modulaire en JavaScript ES6, suiva
 jodotarot/
 ├── assets/
 │   ├── js/
-│   │   ├── controllers/
-│   │   ├── models/
-│   │   ├── services/
-│   │   └── utils/
+│   │   ├── controllers/     # Contrôleurs
+│   │   ├── models/          # Modèles
+│   │   ├── services/        # Services métier
+│   │   ├── utils/           # Utilitaires
+│   │   ├── translations/    # Système de traduction
+│   │   ├── main.js          # Point d'entrée
+│   │   ├── api.js           # Appels API IA
+│   │   ├── config.js        # Configuration
+│   │   ├── prompt.js        # Construction de prompts
+│   │   ├── ui.js            # Fonctions UI
+│   │   └── app.js           # Initialisation
 │   ├── css/
 │   └── images/
 ├── docs/
@@ -27,20 +34,24 @@ jodotarot/
 #### Contrôleurs
 - `AppController.js` (222 lignes) : Contrôleur principal
 - `ReadingController.js` (935 lignes) : Gestion des tirages
-- `ConfigController.js` (1193 lignes) : Configuration
+- `ConfigController.js` (1193 lignes) : Configuration et paramètres
 
 #### Services
-- `AIService.js` (764 lignes) : Communication IA
-- `DeckService.js` (194 lignes) : Gestion des cartes
+- `AIService.js` (764 lignes) : Communication avec les modèles d'IA
+- `DeckService.js` (194 lignes) : Gestion des cartes et des tirages
 - `UIService.js` (187 lignes) : Interface utilisateur
+
+#### Utilitaires
+- `StateManager.js` (907 lignes) : Gestionnaire d'état centralisé
 
 #### Modèles
 - `spreads/` : Types de tirages
-  - `BaseSpread.js` : Classe de base
-  - `CrossSpread.js` : Tirage en croix
-  - `HorseshoeSpread.js` : Fer à cheval
-  - `LoveSpread.js` : Tirage amour
-  - `CelticCrossSpread.js` : Croix celtique
+  - `BaseSpread.js` (370 lignes) : Classe de base
+  - `CrossSpread.js` (118 lignes) : Tirage en croix
+  - `HorseshoeSpread.js` (138 lignes) : Fer à cheval
+  - `LoveSpread.js` (136 lignes) : Tirage amour
+  - `CelticCrossSpread.js` (176 lignes) : Croix celtique
+  - `ReadingDescriptionGenerator.js` (81 lignes) : Générateur de descriptions
 
 ## 🎨 Interface Utilisateur
 
@@ -54,41 +65,42 @@ jodotarot/
   - `warnings.css`
 
 ### 🌍 Support Multilingue
-- 6 langues supportées
+- 6 langues supportées (fr, en, es, de, it, zh)
 - Fichiers de traduction par langue
-- Système de changement dynamique
+- Système de changement dynamique via la fonction `getTranslation`
 
 ## 🔄 Gestion de l'État
 
-- `StateManager.js` (utils/) : Gestion centralisée
+- `StateManager.js` (utils/) : Gestion centralisée de l'état
 - Validation des données
-- Persistance des préférences
-- Système d'événements
-- Migrations automatiques
+- Persistance des préférences via localStorage
+- Système d'événements personnalisés
+- Migrations automatiques entre versions
 
 ## 🤖 Intégration IA
 
 ### Modèles Supportés
 - OpenAI (GPT-3.5, GPT-4)
 - Ollama (modèles locaux)
+- Mode "prompt" (sans appel API)
 
 ### Gestion des Prompts
 - Templates personnalisés par persona
 - Adaptation multilingue
-- Optimisation des réponses
+- Construction dynamique des prompts
 
 ## 🔒 Sécurité
 
-- Gestion sécurisée des clés API
+- Gestion des clés API (encodage Base64)
 - Validation des entrées
 - Protection contre les injections
-- Gestion des erreurs
+- Gestion des erreurs et timeouts
 
 ## 📈 Performance
 
-- Chargement asynchrone
-- Cache des réponses IA
-- Optimisation des images
+- Chargement asynchrone des ressources
+- Optimisation des appels API
+- Streaming des réponses
 - Gestion efficace de la mémoire
 
 ## Architecture Globale
@@ -100,43 +112,40 @@ graph TD
     B -->|Services| D[Services]
     D -->|IA| E[AIService]
     E -->|API| F[OpenAI/Ollama]
-    D -->|Données| G[DataService]
+    D -->|Cartes| G[DeckService]
     G -->|Stockage| H[LocalStorage]
     I[Personas] -->|Configuration| E
     J[Spreads] -->|Types de Tirages| B
+    K[Translations] -->|Internationalisation| B
 ```
 
 ## Composants Principaux
 
 ### 1. Interface Utilisateur
 - Interface responsive et moderne
-- Support multilingue
-- Thèmes personnalisables
+- Support multilingue via le système de traduction
 - Animations fluides
 
 ### 2. Gestionnaire d'État (StateManager)
 - État global centralisé
-- Persistance automatique
-- Gestion des changements
-- Synchronisation UI
+- Persistance via localStorage
+- Validation des données
+- Système d'abonnement
 
 ### 3. Services
-- **AIService** : Communication avec les IA
-- **DataService** : Gestion des données
-- **LocalizationService** : Traductions
-- **ThemeService** : Gestion des thèmes
+- **AIService** : Communication avec les modèles d'IA
+- **DeckService** : Gestion des cartes et tirages
+- **UIService** : Interaction avec l'interface utilisateur
 
 ### 4. Contrôleurs
-- **ReadingController** : Gestion des tirages
-- **DeckController** : Gestion des jeux
-- **PersonaController** : Gestion des personas
-- **ConfigController** : Configuration
+- **AppController** : Initialisation et coordination
+- **ReadingController** : Gestion des tirages et interprétations
+- **ConfigController** : Configuration et paramètres système
 
 ### 5. Modèles
-- **Personas** : Styles d'interprétation
-- **Spreads** : Types de tirages
+- **Personas** : Styles d'interprétation (22 personas)
+- **Spreads** : Types de tirages (Croix, Fer à Cheval, Amour, Croix Celtique)
 - **Cards** : Cartes de tarot
-- **Settings** : Paramètres
 
 ## Principes de Conception
 
@@ -152,12 +161,12 @@ graph TD
 
 3. **Maintenabilité**
    - Code documenté
-   - Tests automatisés
    - Standards de codage
+   - Organisation claire
 
 4. **Performance**
    - Chargement optimisé
-   - Mise en cache intelligente
+   - Validation des données
    - Streaming des réponses
 
 ## Flux de Données
@@ -168,34 +177,32 @@ graph TD
    - Questions et paramètres
 
 2. **Traitement**
-   - Validation des données
-   - Construction des prompts
-   - Communication IA
+   - Validation des données via StateManager
+   - Construction des prompts dans AIService
+   - Communication IA via api.js
 
 3. **Sortie**
-   - Interprétation
+   - Interprétation avec effet de machine à écrire
    - Affichage progressif
-   - Sauvegarde locale
+   - Sauvegarde locale via StateManager
 
 ## Technologies Utilisées
 
-- **Frontend** : JavaScript ES6+
-- **UI** : HTML5, CSS3
+- **Frontend** : JavaScript ES6+, HTML5, CSS3
 - **Storage** : LocalStorage
-- **IA** : OpenAI API, Ollama
-- **Build** : Webpack/Vite
+- **IA** : OpenAI API, Ollama (API locale)
 
 ## Sécurité
 
 1. **Protection des Données**
-   - Stockage local sécurisé
-   - Pas de données sensibles
+   - Stockage local des préférences
+   - Mode "prompt" sans envoi de données
    - Validation des entrées
 
 2. **API Security**
-   - Gestion sécurisée des clés
-   - Rate limiting
-   - Validation des réponses
+   - Gestion des clés API avec encodage simple
+   - Timeouts et limites de requêtes
+   - Gestion robuste des erreurs
 
 ## Évolutions Futures
 

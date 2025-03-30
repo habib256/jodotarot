@@ -65,14 +65,14 @@ JodoTarot utilise la méthodologie BEM (Block Element Modifier) pour structurer 
 
 ## Variables CSS
 
-### Nommage des Variables
+### Nommage des Variables Générales
 
 ```css
 :root {
   /* Couleurs */
-  --color-primary: #3498db;
-  --color-secondary: #2ecc71;
-  --color-text: #2c3e50;
+  --color-primary: #6b5b95;
+  --color-secondary: #b5a9d4;
+  --color-text: #333;
   
   /* Espacements */
   --spacing-xs: 0.25rem;
@@ -81,9 +81,9 @@ JodoTarot utilise la méthodologie BEM (Block Element Modifier) pour structurer 
   --spacing-lg: 2rem;
   
   /* Typographie */
-  --font-family-base: 'Arial', sans-serif;
-  --font-size-base: 16px;
-  --line-height-base: 1.5;
+  --font-family-base: 'Segoe UI', sans-serif;
+  --font-size-base: 0.875rem;
+  --line-height-base: 1.3;
   
   /* Breakpoints */
   --breakpoint-sm: 576px;
@@ -96,9 +96,53 @@ JodoTarot utilise la méthodologie BEM (Block Element Modifier) pour structurer 
 }
 ```
 
+### Variables Spécifiques au Tarot
+
+Les variables spécifiques au domaine du tarot suivent une structure hiérarchique à plusieurs niveaux:
+
+```css
+/* Structure des variables de tirage */
+--[spread-type]-[property]-[subproperty]
+
+/* Structure des variables de position */
+--[spread-type]-position-[number]-[x|y|rotation]
+
+/* Structure des variables de carte */
+--[spread-type]-card-[property]
+```
+
+#### Exemples de Variables de Tirage
+
+```css
+/* Variables de base pour le tirage en croix */
+--cross-card-base-width: 95px;       /* Largeur de base des cartes */
+--cross-card-ratio: 1.7;             /* Ratio hauteur/largeur */
+--cross-card-scale-factor: 1;        /* Facteur d'échelle */
+
+/* Variables de position pour le tirage en croix */
+--cross-position-1-x: 50%;           /* Position horizontale (centre) */
+--cross-position-1-y: 50%;           /* Position verticale (centre) */
+--cross-position-2-rotation: 90deg;  /* Rotation (si applicable) */
+
+/* Variables de dimensions calculées */
+--cross-card-width: calc(var(--cross-card-base-width) * var(--cross-card-scale-factor));
+--cross-card-height: calc(var(--cross-card-width) * var(--cross-card-ratio));
+```
+
+#### Préfixes Spécifiques
+
+Les préfixes suivants sont utilisés pour les différents types de tirages:
+
+```css
+--cross-      /* Tirage en croix */
+--horseshoe-  /* Tirage en fer à cheval */
+--love-       /* Tirage de l'amour */
+--celtic-     /* Croix celtique */
+```
+
 ## Media Queries
 
-### Points de Rupture
+### Points de Rupture Standard
 
 ```css
 /* Mobile First */
@@ -106,6 +150,21 @@ JodoTarot utilise la méthodologie BEM (Block Element Modifier) pour structurer 
 @media (min-width: 768px) { /* Medium devices */ }
 @media (min-width: 992px) { /* Large devices */ }
 @media (min-width: 1200px) { /* Extra large devices */ }
+@media (min-width: 1400px) { /* Extra extra large devices */ }
+```
+
+### Media Queries Spécifiques
+
+```css
+/* Orientation */
+@media (orientation: landscape) {
+  /* Styles spécifiques à l'orientation paysage */
+}
+
+/* Hauteur d'écran */
+@media (min-height: 1000px) {
+  /* Styles pour les écrans très hauts */
+}
 ```
 
 ## Animations
@@ -170,22 +229,42 @@ JodoTarot utilise la méthodologie BEM (Block Element Modifier) pour structurer 
 ## Organisation des Fichiers
 
 ```
-styles/
+css/
 ├── base/
-│   ├── _reset.css
-│   ├── _typography.css
-│   └── _variables.css
+│   ├── reset.css
+│   ├── typography.css
+│   └── variables.css       /* Variables globales et spécifiques */
 ├── components/
-│   ├── _buttons.css
-│   ├── _cards.css
-│   └── _spreads.css
+│   ├── buttons.css
+│   ├── cards.css           /* Styles des cartes */
+│   └── spreads.css         /* Styles des tirages */
 ├── layouts/
-│   ├── _grid.css
-│   └── _containers.css
-├── themes/
-│   ├── _light.css
-│   └── _dark.css
-└── main.css
+│   ├── grid.css
+│   └── containers.css
+├── utils/
+│   ├── animations.css
+│   └── helpers.css
+└── main.css                /* Point d'entrée, importe tous les fichiers */
+```
+
+## Conventions pour les Sélecteurs de Position
+
+Les positions de carte utilisent deux systèmes parallèles de sélecteurs:
+
+```css
+/* Sélecteurs numériques (système principal) */
+.card-1 { }
+.card-2 { }
+.card-3 { }
+
+/* Sélecteurs sémantiques (système secondaire, pour compatibilité) */
+.card-present { }
+.card-past { }
+.card-future { }
+
+/* Combinaison avec le type de tirage */
+.card-1.celtic-cross { }
+.card-2.love-spread { }
 ```
 
 ## Bonnes Pratiques
@@ -210,7 +289,12 @@ styles/
    - Éviter les duplications
    - Optimiser les animations
 
-## Exemple Complet
+5. **Variables**
+   - Définir les variables au niveau approprié de spécificité
+   - Utiliser des commentaires explicatifs pour les variables complexes
+   - Préférer les valeurs en pourcentage pour les positions (meilleure responsivité)
+
+## Exemple Complet de Composant Carte
 
 ```css
 /* Composant Card */
@@ -224,48 +308,45 @@ styles/
   flex-direction: column;
   padding: var(--card-padding);
   border-radius: var(--card-radius);
+  position: absolute;
+  transform: translate(-50%, -50%);
   
   /* Thème */
-  background: var(--theme-bg);
-  color: var(--theme-text);
+  background: var(--color-card-background);
   
   /* Animation */
-  transition: transform var(--animation-duration) var(--animation-timing);
+  transition: transform var(--transition-base);
 }
 
 /* Éléments */
 .card__image {
   width: 100%;
   height: auto;
-  border-radius: calc(var(--card-radius) - 2px);
+  object-fit: contain;
 }
 
-.card__title {
-  margin-top: var(--spacing-sm);
-  font-family: var(--font-family-base);
-  font-size: var(--font-size-base);
+/* Modificateurs de position */
+.card-1 {
+  left: var(--cross-position-1-x);
+  top: var(--cross-position-1-y);
 }
 
-/* Modificateurs */
-.card--selected {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+.card-2.celtic-cross {
+  left: var(--celtic-position-2-x);
+  top: var(--celtic-position-2-y);
+  transform: translate(-50%, -50%) rotate(var(--celtic-position-2-rotation));
 }
 
 /* États */
-.card.is-loading {
-  opacity: 0.7;
-  pointer-events: none;
+.card.is-flipped {
+  transform: translate(-50%, -50%) rotateY(180deg);
 }
 
 /* Media Queries */
 @media (min-width: var(--breakpoint-md)) {
   .card {
-    flex-direction: row;
-  }
-  
-  .card__image {
-    width: 30%;
+    width: var(--card-width);
+    height: var(--card-height);
   }
 }
 ``` 

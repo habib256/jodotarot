@@ -6,7 +6,7 @@
 
 JodoTarot est une application web élégante et intuitive qui vous permet de réaliser des tirages de tarot et d'obtenir des interprétations générées par intelligence artificielle. Inspirée par l'univers mystique du tarot, cette application combine l'art divinatoire traditionnel avec les technologies modernes d'IA pour vous offrir une expérience de consultation unique.
 
-[Essayer JodoTarot](https://habib256.github.io/jodotarot/index.html) | [Documentation complète](docs/index.md)
+[Essayer JodoTarot](https://habib256.github.io/jodotarot/index.html) | [Documentation complète](docs/index.md) | [Guide de dépannage](docs/troubleshooting.md)
 
 ## 🚀 Guide rapide
 
@@ -18,9 +18,9 @@ JodoTarot est une application web élégante et intuitive qui vous permet de ré
 
 ## 🌟 Fonctionnalités principales
 
-- 🎴 **4 types de tirages** (Croix, Fer à cheval, Amour, Croix celtique)
+- 🎴 **4 types de tirages** (Croix Celtique, Croix, Fer à cheval, Amour)
 - 🧠 **Interprétation par IA** personnalisée
-- 👤 **21 personas uniques** pour des lectures variées
+- 👤 **[Multiples personas](docs/composants/personas.md)** pour des lectures variées
 - 🎨 **4 jeux de tarot** (Marseille, Thiago Lehmann, Renaissance, Rick & Morty)
 - 🌍 **6 langues** supportées
 - 🤖 **Modèles d'IA** flexibles (OpenAI et Ollama)
@@ -35,19 +35,22 @@ JodoTarot est une application web élégante et intuitive qui vous permet de ré
 |:-------------------------:|:-------------------------:|
 | **Tarot Rick & Morty** | **Tarot Thiago Lehmann** |
 
-## ⚙️ Installation rapide
+## ⚙️ Installation et configuration
 
 1. Clonez ce dépôt
-2. Configurez votre clé API dans `assets/js/config.js`
-3. Ouvrez `index.html` dans votre navigateur
+2. Configurez votre clé API dans `assets/js/config.js` (variable `SETTINGS.API_KEY`)
+3. Pour utiliser Ollama, vérifiez que le service est lancé (`ollama serve`)
+4. Ouvrez `index.html` dans votre navigateur
 
 Pour plus de détails sur l'installation et la configuration, consultez notre [guide technique](docs/index.md).
 
 ## 🔧 Besoin d'aide ?
 
+Si vous rencontrez des problèmes :
 - Consultez notre [guide de dépannage](docs/troubleshooting.md)
 - Explorez la [documentation complète](docs/index.md)
 - Découvrez nos [personas](docs/composants/personas.md)
+- Vérifiez les [paramètres de configuration](docs/troubleshooting.md#vérification-de-la-configuration)
 
 ## 📝 Licence
 

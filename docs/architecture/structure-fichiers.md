@@ -26,25 +26,27 @@ jodotarot/
 │   │   ├── services/        # Services métier
 │   │   │   ├── AIService.js     # Service d'intelligence artificielle (764 lignes)
 │   │   │   ├── UIService.js     # Service d'interface utilisateur (187 lignes)
-│   │   │   └── DeckService.js   # Service de gestion du jeu de cartes (194 lignes)
+│   │   │   ├── DeckService.js   # Service de gestion du jeu de cartes (194 lignes)
+│   │   │   └── StateManager.js  # Simple fichier de liaison vers l'implémentation principale dans utils/
 │   │   ├── controllers/     # Contrôleurs
 │   │   │   ├── AppController.js       # Contrôleur principal (222 lignes)
 │   │   │   ├── ConfigController.js    # Contrôleur de configuration (1193 lignes)
 │   │   │   └── ReadingController.js   # Contrôleur de lecture (935 lignes)
 │   │   ├── utils/           # Utilitaires
-│   │   │   └── StateManager.js   # Gestionnaire d'état (907 lignes)
+│   │   │   └── StateManager.js   # Implémentation principale du gestionnaire d'état global de l'application
 │   │   └── models/          # Modèles de données
-│   │       ├── personas/         # Définitions des personas (23 personas)
+│   │       ├── personas/         # Définitions des personas (22 personas)
 │   │       │   ├── BasePersona.js           # Classe de base (94 lignes)
 │   │       │   ├── TarologuePersona.js      # (75 lignes)
 │   │       │   ├── OraclePersona.js         # (80 lignes)
-│   │       │   └── ... (20 autres personas)
+│   │       │   └── ... (19 autres personas)
 │   │       ├── spreads/          # Types de tirages
-│   │       │   ├── BaseSpread.js         # Classe de base (331 lignes)
-│   │       │   ├── CrossSpread.js        # Tirage en Croix (141 lignes)
-│   │       │   ├── HorseshoeSpread.js    # Tirage en Fer à Cheval (184 lignes)
-│   │       │   ├── LoveSpread.js         # Tirage de l'Amour (216 lignes)
-│   │       │   ├── CelticCrossSpread.js  # Croix Celtique (295 lignes)
+│   │       │   ├── BaseSpread.js         # Classe de base (370 lignes)
+│   │       │   ├── CrossSpread.js        # Tirage en Croix (118 lignes)
+│   │       │   ├── HorseshoeSpread.js    # Tirage en Fer à Cheval (138 lignes)
+│   │       │   ├── LoveSpread.js         # Tirage de l'Amour (136 lignes)
+│   │       │   ├── CelticCrossSpread.js  # Croix Celtique (176 lignes)
+│   │       │   ├── ReadingDescriptionGenerator.js # Générateur de descriptions (81 lignes)
 │   │       │   └── index.js              # (50 lignes)
 │   │       └── cards/            # Définitions des cartes
 │   ├── css/                # Styles CSS
@@ -80,7 +82,7 @@ jodotarot/
 │   │       ├── animations.css           # Animations réutilisables
 │   │       └── helpers.css              # Classes utilitaires
 │   └── images/               # Images et ressources graphiques
-├── spread-editor.html        # Éditeur visuel des positions des cartes (901 lignes)
+├── spread-editor.html        # Éditeur visuel des positions des cartes
 ├── docs/                     # Documentation technique
 │   ├── index.md                  # Point d'entrée de la documentation
 │   ├── README.md                 # Structure de la documentation
@@ -103,15 +105,15 @@ jodotarot/
 │   │   └── spread-editor.md             # Éditeur de positions
 │   └── standards/                # Standards et conventions
 │       ├── bonnes-pratiques.md          # Bonnes pratiques de développement
-│       ├── card-positions.md            # Référence des positions de cartes
+│       ├── card-positions.md            # Référence des positions
 │       ├── css-naming-conventions.md    # Conventions de nommage CSS
 │       ├── tarot-position-standardization.md # Standardisation des positions
 │       └── internationalisation.md      # Standards d'internationalisation
-├── index.html                # Page principale (147 lignes)
-├── favicon.ico               # Icône du site (23 lignes)
-├── screenshot.png            # Capture d'écran de l'application (2165 lignes)
-├── LICENSE                   # Licence du projet (675 lignes)
-└── README.md                 # Documentation du projet (289 lignes)
+├── index.html                # Page principale
+├── favicon.ico               # Icône du site
+├── screenshot.png            # Capture d'écran de l'application
+├── LICENSE                   # Licence du projet
+└── README.md                 # Documentation du projet
 ```
 
 ## Répartition et Rôles des Fichiers
@@ -128,6 +130,7 @@ jodotarot/
   - **AIService.js** : Gestion des interactions avec les modèles d'IA
   - **DeckService.js** : Manipulation des cartes et des tirages
   - **UIService.js** : Interaction avec le DOM et l'interface utilisateur
+  - **StateManager.js** : Simple fichier de liaison vers l'implémentation principale dans utils/
 
 - **controllers/** : Orchestrent les différentes parties de l'application
   - **AppController.js** : Contrôleur principal et initialisation
@@ -135,12 +138,15 @@ jodotarot/
   - **ReadingController.js** : Gestion du processus de tirage et d'interprétation
 
 - **utils/** : Utilitaires et outils transversaux
-  - **StateManager.js** : Gestionnaire d'état global de l'application
+  - **StateManager.js** : Implémentation principale du gestionnaire d'état global de l'application
 
 ### Modèles et Données
 
-- **models/personas/** : Définitions des différents interprètes de tarot
+- **models/personas/** : Définitions des différents interprètes de tarot (22 personas au total)
 - **models/spreads/** : Types de tirages disponibles
+  - **BaseSpread.js** : Classe de base pour tous les types de tirages
+  - **CrossSpread.js**, **HorseshoeSpread.js**, **LoveSpread.js**, **CelticCrossSpread.js** : Types de tirages spécifiques
+  - **ReadingDescriptionGenerator.js** : Générateur de descriptions pour les tirages
 - **models/cards/** : Définitions des cartes de tarot
 
 ### Système de Traduction

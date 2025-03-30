@@ -43,10 +43,10 @@ JodoTarot est une application web modulaire pour les tirages de tarot, construit
 
 ### Fonctionnalités
 - Interface utilisateur complète
-- 4 types de tirages (Croix Celtique, Simple, Fer à Cheval, Amour)
+- 4 types de tirages (Croix Celtique, Croix, Fer à Cheval, Amour)
 - Intégration IA (OpenAI/Ollama)
 - Support multilingue (6 langues)
-- 21 personas
+- Multiples personas d'interprétation
 - Système de cartes avec validation
 - Gestion optimisée des performances
 

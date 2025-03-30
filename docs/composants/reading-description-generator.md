@@ -2,33 +2,41 @@
 
 ## Vue d'ensemble
 
-Le `ReadingDescriptionGenerator` est un composant dédié à la génération des descriptions de tirages de tarot. Il est responsable de la création de descriptions claires et structurées des tirages, en évitant les redondances et en assurant une cohérence dans le format.
+Le `ReadingDescriptionGenerator` est un composant utilitaire pour générer des descriptions structurées de tirages de tarot. Il crée des représentations textuelles complètes des tirages, incluant les détails de chaque carte et leur position.
+
+## Implémentation
+
+La classe `ReadingDescriptionGenerator` est définie dans `assets/js/models/spreads/ReadingDescriptionGenerator.js` et possède deux méthodes principales :
+- `generateCardDescription()` : Génère la description d'une carte individuelle
+- `generateReadingDescription()` : Génère la description complète d'un tirage
 
 ## Fonctionnalités
 
 ### Génération de Descriptions de Cartes
 
 Le générateur crée des descriptions individuelles pour chaque carte d'un tirage, incluant :
-- Le nom de la carte
-- L'orientation (à l'endroit/à l'envers)
-- Le type d'arcane (majeur/mineur)
-- La suite (pour les arcanes mineurs)
-- La signification de la position dans le tirage
+- Le numéro de position et la signification de la position
+- Le nom de la carte (via sa clé de traduction)
+- L'orientation (à l'endroit/renversée)
+- Le type d'arcane (majeur/mineur) si disponible
+- La suite (pour les arcanes mineurs) si disponible
+- La description détaillée de la position (optionnelle)
 
 ### Format des Descriptions
 
-Les descriptions sont générées dans un format cohérent :
+Les descriptions sont générées dans un format structuré, correspondant exactement à l'implémentation dans le code :
+
 ```
-[Nom de la carte] (orientation) - [Type d'arcane]
-[Suite] (si applicable)
+N. PositionName: CardName (orientation) - ArcanaType - Suite
+   PositionDescription (si includeDetailedDescriptions est true)
 ```
 
-### Gestion des Redondances
+### Support Multilingue
 
-Le générateur évite les répétitions d'informations en :
-- Ne répétant pas la position de la carte si elle est déjà mentionnée
-- Organisant les informations de manière logique et concise
-- Supprimant les informations redondantes entre la description principale et les détails
+Le générateur prend en charge au moins le français et l'anglais, avec des traductions pour :
+- L'orientation des cartes ("à l'endroit"/"renversée" ou "upright"/"reversed")
+- Le type d'arcane ("Arcane majeur"/"Arcane mineur" ou "Major Arcana"/"Minor Arcana")
+- Le format du titre ("Tirage" ou "Spread")
 
 ## Utilisation
 
@@ -38,13 +46,53 @@ const description = generator.generateReadingDescription(includeDetailedDescript
 ```
 
 ### Paramètres
-- `spread` : Instance du tirage (BaseSpread ou classe dérivée)
-- `language` : Code de langue pour la localisation
-- `includeDetailedDescriptions` : Booléen indiquant si les descriptions détaillées doivent être incluses
+- `spread` : Instance du tirage contenant les cartes et méthodes d'accès aux positions
+- `language` : Code de langue (par défaut 'fr')
+- `includeDetailedDescriptions` : Booléen pour inclure ou non les descriptions détaillées (par défaut true)
+
+## Méthodes principales
+
+### constructor(spread, language = 'fr')
+Initialise le générateur avec un tirage et une langue.
+
+### generateCardDescription(card, index, includeDetailedDescriptions = true)
+Génère la description d'une carte individuelle.
+- Vérifie d'abord si la carte a une clé de traduction
+- Obtient le nom de la position et l'orientation de la carte
+- Ajoute le type d'arcane et la suite si disponibles
+- Ajoute la description détaillée de la position si demandée
+
+### generateReadingDescription(includeDetailedDescriptions = true)
+Génère une description complète du tirage.
+- Vérifie d'abord si le tirage contient des cartes
+- Ajoute le titre avec le nom du tirage et le nombre de cartes
+- Ajoute la description du tirage si disponible
+- Génère la description pour chaque carte du tirage
+
+## Exemple de Sortie
+
+```
+Tirage Croix Celtique (6 cartes):
+
+Description du tirage si disponible
+
+1. Situation actuelle: L'Empereur (à l'endroit) - Arcane majeur
+   Description détaillée de la position si includeDetailedDescriptions=true
+
+2. Obstacle immédiat: Le Soleil (renversée) - Arcane majeur
+   Description détaillée de la position si includeDetailedDescriptions=true
+
+3. Fondement: As de Coupes (à l'endroit) - Arcane mineur - Coupes
+   Description détaillée de la position si includeDetailedDescriptions=true
+```
 
 ## Intégration
 
-Le générateur est intégré dans le système de tirages via la classe `BaseSpread`, qui l'utilise pour générer les descriptions des tirages. Il peut être étendu pour supporter des formats de description personnalisés ou des langues supplémentaires.
+Le générateur est conçu pour fonctionner avec l'interface `BaseSpread`, qui doit fournir les méthodes suivantes :
+- `getName()` : Retourne le nom du tirage
+- `getDescription()` : Retourne la description du tirage
+- `getPositionMeaning(index)` : Retourne la signification d'une position
+- `getPositionDescription(index, card)` : Retourne la description détaillée d'une position pour une carte spécifique
 
 ## Bonnes Pratiques
 
