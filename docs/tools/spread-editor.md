@@ -2,7 +2,7 @@
 
 ## Aperçu
 
-L'éditeur de positions (`spread-editor.html`) est un outil visuel permettant de définir les positions et les dimensions des cartes pour chaque type de tirage. Il génère les variables CSS nécessaires qui peuvent ensuite être copiées dans le fichier `variables.css`.
+L'éditeur de positions (`spread-editor.html` à la racine du projet) est un outil visuel permettant de définir les positions et les dimensions des cartes pour chaque type de tirage. Il génère les variables CSS nécessaires qui peuvent ensuite être copiées dans le fichier `variables.css`.
 
 ## Rôle dans l'Architecture
 

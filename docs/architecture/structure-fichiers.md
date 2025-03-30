@@ -8,31 +8,31 @@ L'application JodoTarot est organisée selon une structure hiérarchique claire,
 jodotarot/
 ├── assets/                  # Ressources de l'application
 │   ├── js/                  # Code JavaScript
-│   │   ├── main.js           # Point d'entrée et initialisation (203 lignes)
-│   │   ├── api.js            # Communication avec OpenAI et Ollama (864 lignes)
+│   │   ├── main.js           # Point d'entrée et initialisation (322 lignes)
+│   │   ├── api.js            # Communication avec OpenAI et Ollama (857 lignes)
 │   │   ├── ui.js             # Gestion de l'interface utilisateur (255 lignes)
-│   │   ├── config.js         # Configuration globale (143 lignes)
-│   │   ├── app.js            # Gestion des événements et interactions (228 lignes)
+│   │   ├── config.js         # Configuration globale (158 lignes)
+│   │   ├── app.js            # Gestion des événements et interactions (143 lignes)
 │   │   ├── prompt.js         # Gestion des prompts IA (72 lignes)
 │   │   ├── translations/     # Fichiers de traduction
-│   │   │   ├── fr.js        # Français (246 lignes)
-│   │   │   ├── en.js        # Anglais (246 lignes)
-│   │   │   ├── es.js        # Espagnol (166 lignes)
-│   │   │   ├── de.js        # Allemand (166 lignes)
-│   │   │   ├── it.js        # Italien (166 lignes)
-│   │   │   ├── zh.js        # Chinois (167 lignes)
+│   │   │   ├── fr.js        # Français (303 lignes)
+│   │   │   ├── en.js        # Anglais (256 lignes)
+│   │   │   ├── es.js        # Espagnol (236 lignes)
+│   │   │   ├── de.js        # Allemand (236 lignes)
+│   │   │   ├── it.js        # Italien (236 lignes)
+│   │   │   ├── zh.js        # Chinois (237 lignes)
 │   │   │   ├── README.md    # Documentation des traductions (66 lignes)
 │   │   │   └── index.js     # Point d'entrée des traductions (80 lignes)
 │   │   ├── services/        # Services métier
-│   │   │   ├── AIService.js     # Service d'intelligence artificielle (883 lignes)
+│   │   │   ├── AIService.js     # Service d'intelligence artificielle (764 lignes)
 │   │   │   ├── UIService.js     # Service d'interface utilisateur (187 lignes)
-│   │   │   └── DeckService.js   # Service de gestion du jeu de cartes (445 lignes)
+│   │   │   └── DeckService.js   # Service de gestion du jeu de cartes (194 lignes)
 │   │   ├── controllers/     # Contrôleurs
-│   │   │   ├── AppController.js       # Contrôleur principal (217 lignes)
-│   │   │   ├── ConfigController.js    # Contrôleur de configuration (1320 lignes)
-│   │   │   └── ReadingController.js   # Contrôleur de lecture (869 lignes)
+│   │   │   ├── AppController.js       # Contrôleur principal (222 lignes)
+│   │   │   ├── ConfigController.js    # Contrôleur de configuration (1193 lignes)
+│   │   │   └── ReadingController.js   # Contrôleur de lecture (935 lignes)
 │   │   ├── utils/           # Utilitaires
-│   │   │   └── StateManager.js   # Gestionnaire d'état (825 lignes)
+│   │   │   └── StateManager.js   # Gestionnaire d'état (907 lignes)
 │   │   └── models/          # Modèles de données
 │   │       ├── personas/         # Définitions des personas (23 personas)
 │   │       │   ├── BasePersona.js           # Classe de base (94 lignes)
@@ -80,8 +80,7 @@ jodotarot/
 │   │       ├── animations.css           # Animations réutilisables
 │   │       └── helpers.css              # Classes utilitaires
 │   └── images/               # Images et ressources graphiques
-├── tools/                    # Outils de développement
-│   └── spread-editor.html        # Éditeur visuel des positions des cartes (901 lignes)
+├── spread-editor.html        # Éditeur visuel des positions des cartes (901 lignes)
 ├── docs/                     # Documentation technique
 │   ├── index.md                  # Point d'entrée de la documentation
 │   ├── README.md                 # Structure de la documentation
@@ -134,6 +133,9 @@ jodotarot/
   - **AppController.js** : Contrôleur principal et initialisation
   - **ConfigController.js** : Gestion des configurations et préférences
   - **ReadingController.js** : Gestion du processus de tirage et d'interprétation
+
+- **utils/** : Utilitaires et outils transversaux
+  - **StateManager.js** : Gestionnaire d'état global de l'application
 
 ### Modèles et Données
 
@@ -203,7 +205,7 @@ L'ordre d'importation dans main.css est crucial pour maintenir la cascade CSS :
 
 ### Outils de Développement
 
-- **tools/spread-editor.html** : Outil autonome permettant de définir visuellement les positions des cartes pour les différents types de tirages. Cet outil génère les variables CSS correspondantes pour les positions des cartes.
+- **spread-editor.html** : Outil autonome permettant de définir visuellement les positions des cartes pour les différents types de tirages. Cet outil génère les variables CSS correspondantes pour les positions des cartes.
 
 ### Documentation
 

@@ -15,7 +15,7 @@ jodotarot/
 │   │   ├── controllers/
 │   │   ├── models/
 │   │   ├── services/
-│   │   └── views/
+│   │   └── utils/
 │   ├── css/
 │   └── images/
 ├── docs/
@@ -25,13 +25,13 @@ jodotarot/
 ### 🎯 Composants Principaux
 
 #### Contrôleurs
-- `AppController.js` (217 lignes) : Contrôleur principal
-- `ReadingController.js` (869 lignes) : Gestion des tirages
-- `ConfigController.js` (1320 lignes) : Configuration
+- `AppController.js` (222 lignes) : Contrôleur principal
+- `ReadingController.js` (935 lignes) : Gestion des tirages
+- `ConfigController.js` (1193 lignes) : Configuration
 
 #### Services
-- `AIService.js` (883 lignes) : Communication IA
-- `DeckService.js` (445 lignes) : Gestion des cartes
+- `AIService.js` (764 lignes) : Communication IA
+- `DeckService.js` (194 lignes) : Gestion des cartes
 - `UIService.js` (187 lignes) : Interface utilisateur
 
 #### Modèles
@@ -60,7 +60,7 @@ jodotarot/
 
 ## 🔄 Gestion de l'État
 
-- `StateManager.js` : Gestion centralisée
+- `StateManager.js` (utils/) : Gestion centralisée
 - Validation des données
 - Persistance des préférences
 - Système d'événements
