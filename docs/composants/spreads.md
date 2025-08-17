@@ -175,7 +175,7 @@ generateReadingDescription(includeDetailedDescriptions = true) {
 
 ```javascript
 // Création d'un tirage
-const spread = createSpread('celtic', containerElement, 'fr');
+const spread = createSpread('celticCross', containerElement, 'fr');
 
 // Initialisation du tirage (positions vides)
 spread.initializeCardPositions();

@@ -131,8 +131,8 @@ Les cartes sont positionnées à l'aide de sélecteurs basés sur leur position 
   transform: translate(var(--cross-position-2-x), var(--cross-position-2-y)) translate(-50%, -50%);
 }
 
-/* Exemple avec rotation */
-.card-2.celtic-cross {
+/* Exemple avec rotation (Croix Celtique) */
+.celtic-cross-spread .card-2 {
   transform: translate(var(--celtic-position-2-x), var(--celtic-position-2-y)) 
              translate(-50%, -50%) 
              rotate(var(--celtic-position-2-rotation));

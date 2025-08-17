@@ -369,11 +369,9 @@ class AIService {
         // Concaténer simplement les prompts système et utilisateur
         const fullPrompt = `${systemPrompts.join('\n\n')}\n\n${prompt}`;
         
-        // Affichage minimal sans formatage particulier
-        const response = `<div class="prompt-display">${fullPrompt}</div>`;
-        
+        // Retourner du texte brut (aucun HTML) pour un affichage en texte uniquement
         this.isGenerating = false;
-        return response;
+        return fullPrompt;
       }
       
       // Continuer avec le reste de la logique pour les autres modèles...

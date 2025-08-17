@@ -516,18 +516,10 @@ class ReadingController {
       
       // Vérifier si un modèle IA est disponible
       if (!model || model === 'none') {
-        // Aucun modèle disponible, afficher le prompt dans la zone d'interprétation
-        this.elements.responseContent.innerHTML = `
-          <div class="prompt-display">
-            <h3>${getTranslation('interpretation.noModelAvailable', language) || 'Aucun modèle IA disponible'}</h3>
-            <p>${getTranslation('interpretation.promptDisplay', language) || "Voici le prompt qui aurait été envoyé à l'IA :"}</p>
-            <div class="raw-prompt-text">${prompt.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
-          </div>
-        `;
-        
-        // Initialiser les gestionnaires de défilement
+        // Afficher le prompt en texte brut (échappé) dans un conteneur simple
+        const escaped = prompt.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        this.elements.responseContent.textContent = escaped;
         this.initScrollHandlers();
-        
         return prompt;
       }
       
@@ -597,6 +589,7 @@ class ReadingController {
       // nous devons mettre à jour l'affichage manuellement
       if (!firstChunkReceived) {
         this.elements.responseContent.innerHTML = '<div class="typewriter-text"></div>';
+        // Interprétation (réponse modèle) est en HTML; si le modèle est prompt, getInterpretation renvoie du texte
         this.fullText = response;
       }
       

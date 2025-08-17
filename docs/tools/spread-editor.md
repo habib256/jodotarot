@@ -44,7 +44,9 @@ L'éditeur prend en charge quatre types de tirages:
 1. **Tirage en Croix** (cross): 5 cartes disposées en forme de croix
 2. **Fer à Cheval** (horseshoe): 7 cartes disposées en forme de fer à cheval
 3. **Tarot de l'Amour** (love): 7 cartes disposées pour représenter une relation
-4. **Croix Celtique** (celtic): 10 cartes dans la disposition traditionnelle de la croix celtique
+4. **Croix Celtique** (celticCross): 10 cartes dans la disposition traditionnelle de la croix celtique
+
+Note: la clé JavaScript du tirage est `celticCross` tandis que le préfixe des variables CSS associées est `--celtic-` (ex: `--celtic-position-2-x`).
 
 Chaque tirage possède ses propres positions prédéfinies qui peuvent être modifiées via l'interface.
 

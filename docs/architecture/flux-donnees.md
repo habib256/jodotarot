@@ -163,7 +163,7 @@ updateInterpretationSection(interpretation) {
 
 1. **Déclencheur** : Utilisateur clique sur "Effectuer un tirage"
 2. **Controller** : `ReadingController.performReading()`
-3. **Service** : `DeckService.drawCards()`
+3. **Tirage** : `currentSpread.draw(deck)`
 4. **État** : Mise à jour de `cards`, `spreadType`
 5. **UI** : Affichage des cartes selon positions définies
 6. **Persistance** : Sauvegarde du tirage dans localStorage

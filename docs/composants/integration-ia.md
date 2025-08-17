@@ -273,14 +273,12 @@ try {
 Pour générer une interprétation, nous utilisons l'endpoint `/api/generate` (Ollama) ou le format correspondant pour OpenAI :
 
 ```javascript
-// Format pour Ollama (méthode non streaming)
+// Format pour Ollama (méthode non streaming - endpoint /api/generate)
 {
   model: cleanModelName,
-  messages: [
-    { role: 'system', content: systemContent },
-    { role: 'user', content: prompt }
-  ],
-  stream: false
+  prompt: fullPrompt, // systemPrompts + prompt utilisateur concaténés
+  stream: false,
+  options: { temperature: 0.7, num_predict: 1000 }
 }
 
 // Format pour le streaming Ollama
@@ -406,11 +404,9 @@ if (model === 'prompt') {
   // Concaténer simplement les prompts système et utilisateur
   const fullPrompt = `${systemPrompts.join('\n\n')}\n\n${prompt}`;
   
-  // Affichage minimal sans formatage particulier
-  const response = `<div class="prompt-display">${fullPrompt}</div>`;
-  
+  // Retourner du TEXTE BRUT (pas de HTML)
   this.isGenerating = false;
-  return response;
+  return fullPrompt;
 }
 ```
 

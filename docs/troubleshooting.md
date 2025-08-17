@@ -56,10 +56,8 @@ console.log(window.JODOTAROT_SETTINGS);
 
 ### Activation du Débogage
 ```javascript
-// Dans la console du navigateur
-localStorage.setItem('DEBUG', 'true');
-// Ou directement dans config.js
-// Modifier DEBUG_LEVEL à 2 ou 3 pour plus de détails
+// Dans la console du navigateur, le niveau de debug est défini dans config.js
+// Modifiez DEBUG_LEVEL à 2 ou 3 pour plus de détails puis rechargez
 ```
 
 ### Vérification des Modèles Ollama

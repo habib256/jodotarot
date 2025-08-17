@@ -194,11 +194,9 @@ if (model === 'prompt') {
   // Concaténer simplement les prompts système et utilisateur
   const fullPrompt = `${systemPrompts.join('\n\n')}\n\n${prompt}`;
   
-  // Affichage minimal sans formatage particulier
-  const response = `<div class="prompt-display">${fullPrompt}</div>`;
-  
+  // Retourner du TEXTE BRUT (pas de HTML)
   this.isGenerating = false;
-  return response;
+  return fullPrompt;
 }
 ```
 
