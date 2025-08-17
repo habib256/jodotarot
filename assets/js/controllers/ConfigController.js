@@ -640,7 +640,9 @@ class ConfigController {
       // Sauvegarder les options existantes importantes
       const promptOption = Array.from(this.elements.iaModelSelect.options)
         .find(option => option.value === 'prompt');
-      const openaiGroup = this.elements.iaModelSelect.querySelector('optgroup[label="🌐 OpenAI"]');
+      // Rechercher un optgroup OpenAI quel que soit l'emoji dans le label
+      let openaiGroup = Array.from(this.elements.iaModelSelect.querySelectorAll('optgroup'))
+        .find(og => (og.getAttribute('label') || '').toLowerCase().includes('openai'));
 
       // Vider le select
       this.elements.iaModelSelect.innerHTML = '';
@@ -662,7 +664,7 @@ class ConfigController {
       } else {
         // Créer le groupe OpenAI s'il n'existait pas
         const newOpenAIGroup = document.createElement('optgroup');
-        newOpenAIGroup.label = '🌐 OpenAI';
+        newOpenAIGroup.label = '🧠 OpenAI';
         
         // Ajouter les modèles OpenAI
         const openaiModels = [
@@ -681,7 +683,8 @@ class ConfigController {
       }
 
       // Créer ou mettre à jour le groupe Ollama
-      let ollamaGroup = this.elements.iaModelSelect.querySelector('optgroup[label="🤖 Ollama"]');
+      let ollamaGroup = Array.from(this.elements.iaModelSelect.querySelectorAll('optgroup'))
+        .find(og => (og.getAttribute('label') || '').toLowerCase().includes('ollama'));
       if (!ollamaGroup) {
         ollamaGroup = document.createElement('optgroup');
         ollamaGroup.label = '🤖 Ollama';
@@ -758,6 +761,31 @@ class ConfigController {
           });
       } else {
         ollamaGroup.innerHTML = '<option disabled>Aucun modèle Ollama disponible</option>';
+      }
+
+      // Choisir un modèle par défaut: préférer le premier modèle Ollama si disponible
+      const current = this.stateManager.getState().iaModel;
+      const selectEl = this.elements.iaModelSelect;
+      const firstOllamaOption = ollamaGroup.querySelector('option:not([disabled])');
+
+      if (firstOllamaOption) {
+        const hasOpenAIKey = !!(this.aiService && this.aiService.apiKey);
+        const isCurrentOllama = typeof current === 'string' && current.startsWith('ollama:');
+        const isCurrentOpenAI = typeof current === 'string' && current.startsWith('openai/');
+        const isCurrentPrompt = current === 'prompt' || !current;
+
+        // Si l'état actuel est prompt ou un modèle OpenAI, préférer le premier modèle Ollama
+        if (isCurrentPrompt || (isCurrentOpenAI && !hasOpenAIKey)) {
+          selectEl.value = firstOllamaOption.value;
+          this.stateManager.setState({ iaModel: firstOllamaOption.value });
+        } else if (isCurrentOllama && this.isValidOption(selectEl, current)) {
+          // Respecter un modèle Ollama existant si valide
+          selectEl.value = current;
+        } else if (!this.isValidOption(selectEl, current)) {
+          // Si le modèle actuel est invalide, basculer sur le premier Ollama
+          selectEl.value = firstOllamaOption.value;
+          this.stateManager.setState({ iaModel: firstOllamaOption.value });
+        }
       }
 
       return true;
@@ -878,6 +906,18 @@ class ConfigController {
       return;
     }
 
+    // Si modèle OpenAI mais clé absente -> avertir et basculer en prompt
+    if (model && model.startsWith('openai/') && (!this.aiService || !this.aiService.apiKey)) {
+      this.showModelWarning({
+        status: 'error',
+        message: 'Clé API OpenAI manquante'
+      });
+      this.ensurePromptOption();
+      this.elements.iaModelSelect.value = 'prompt';
+      this.stateManager.setState({ iaModel: 'prompt' });
+      return;
+    }
+
     // Vérifier si le modèle est une option valide
     if (this.isValidOption(this.elements.iaModelSelect, model)) {
       this.elements.iaModelSelect.value = model;
@@ -995,7 +1035,8 @@ class ConfigController {
       // Si le modèle n'est pas dans les options, vérifier s'il s'agit d'un modèle Ollama
       if (!modelName.startsWith('openai/')) {
         // Tenter de l'ajouter dynamiquement au groupe Ollama
-        const ollamaOptgroup = this.elements.iaModelSelect.querySelector('optgroup[label="🤖 Ollama"]');
+        const ollamaOptgroup = Array.from(this.elements.iaModelSelect.querySelectorAll('optgroup'))
+          .find(og => (og.getAttribute('label') || '').toLowerCase().includes('ollama'));
         if (ollamaOptgroup) {
           const option = document.createElement('option');
           option.value = modelName;
@@ -1172,7 +1213,8 @@ class ConfigController {
    */
   selectFirstOllamaModel() {
     // Obtenir le premier modèle du groupe Ollama
-    const ollamaOptgroup = this.elements.iaModelSelect.querySelector('optgroup[label="🤖 Ollama"]');
+    const ollamaOptgroup = Array.from(this.elements.iaModelSelect.querySelectorAll('optgroup'))
+      .find(og => (og.getAttribute('label') || '').toLowerCase().includes('ollama'));
     if (ollamaOptgroup && ollamaOptgroup.querySelector('option')) {
       const firstOption = ollamaOptgroup.querySelector('option');
       const ollamaModel = firstOption.value;

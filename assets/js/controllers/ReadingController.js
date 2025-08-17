@@ -5,7 +5,7 @@
 import StateManager from '../utils/StateManager.js';
 import DeckService from '../services/DeckService.js';
 import AIService from '../services/AIService.js';
-import { createSpread } from '../main.js';
+import { createSpread } from '../models/spreads/index.js';
 import { getTranslation } from '../translations/index.js';
 
 class ReadingController {
@@ -292,7 +292,7 @@ class ReadingController {
     const serializedCard = {
       id: cardId,
       name: card.translationKey || card.name,
-      imageUrl: card.image || card.imageUrl,
+      imageUrl: card.imageUrl || card.image,
       position: card.orientation || 'upright',
       type: card.type || 'major',
       suit: card.suit,

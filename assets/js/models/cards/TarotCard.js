@@ -12,13 +12,12 @@ class TarotCard {
 
   // Encode l'URL de l'image pour gérer les espaces et caractères spéciaux
   encodeImageUrl(url) {
-    // Sépare le chemin de base du nom de fichier
-    const lastSlashIndex = url.lastIndexOf('/');
-    const basePath = url.substring(0, lastSlashIndex + 1);
-    const fileName = url.substring(lastSlashIndex + 1);
-    
-    // Encode uniquement le nom du fichier
-    return basePath + encodeURIComponent(fileName);
+    if (!url || typeof url !== 'string') return url;
+    // Encoder chaque segment du chemin, y compris les dossiers contenant des caractères spéciaux
+    return url
+      .split('/')
+      .map(segment => encodeURIComponent(segment))
+      .join('/');
   }
 
   // ... existing code ...

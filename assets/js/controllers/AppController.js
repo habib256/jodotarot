@@ -66,7 +66,7 @@ class AppController {
    * Initialise les services de l'application
    */
   initializeServices() {
-    this.aiService = new AIService();
+    this.aiService = new AIService(this.stateManager);
     this.deckService = new DeckService();
     this.uiService = new UIService();
   }

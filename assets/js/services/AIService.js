@@ -146,6 +146,29 @@ class AIService {
         };
       }
 
+      // Cas OpenAI: vérifier la présence de la clé et la connectivité minimale
+      if (modelName && modelName.startsWith('openai/')) {
+        if (!this.apiKey) {
+          return {
+            available: false,
+            status: 'error',
+            modelName,
+            message: 'Clé API OpenAI manquante',
+            details: {},
+            suggestions: ['Ajouter une clé via le dialogue de configuration']
+          };
+        }
+        const ping = await this.testOpenAIConnectivity();
+        return {
+          available: !!ping.available,
+          status: ping.status,
+          modelName,
+          message: ping.message,
+          details: ping,
+          suggestions: ping.available ? [] : ['Vérifier la clé API', 'Réessayer plus tard']
+        };
+      }
+
       const result = {
         available: true,
         status: 'success',
@@ -363,13 +386,8 @@ class AIService {
         console.log('📨 PROMPT FINAL ENVOYÉ À L\'IA:');
         console.log(fullPrompt);
         
-        // Afficher des informations supplémentaires sur le persona si possible
-        if (PERSONAS[persona]) {
-          const personaInstance = new PERSONAS[persona](language);
-          console.log(`🧙‍♂️ Persona: ${personaInstance.getName()}`);
-          console.log(`📝 Description: ${personaInstance.getDescription()}`);
-          console.log(`🔮 Spécialisations: ${personaInstance.getSpecializations().join(', ')}`);
-        }
+        // Journaliser le persona sélectionné (sans instanciation dynamique)
+        console.log(`🧙‍♂️ Persona sélectionné: ${persona}`);
       }
       
       // Obtenir la réponse selon le type de modèle (OpenAI ou Ollama)
@@ -597,14 +615,20 @@ class AIService {
    */
   async getOllamaResponse(prompt, systemPrompts, model) {
     try {
-      const systemContent = systemPrompts.join('\n');
+      // Construire un prompt complet compatible avec /api/generate
+      const fullPrompt = [
+        ...systemPrompts,
+        prompt
+      ].join('\n\n');
+      
       const payload = {
         model: model.replace('ollama:', ''),
-        messages: [
-          { role: 'system', content: systemContent },
-          { role: 'user', content: prompt }
-        ],
-        stream: false
+        prompt: fullPrompt,
+        stream: false,
+        options: {
+          temperature: 0.7,
+          num_predict: 1000
+        }
       };
       
       this.debugLog("Payload Ollama:", payload);
@@ -627,7 +651,7 @@ class AIService {
       
       const modelNameWithoutPrefix = model.replace('ollama:', '');
       const modelFormat = getOllamaModelFormat(modelNameWithoutPrefix);
-      const responseKey = modelFormat.responseKey || "message.content";
+      const responseKey = modelFormat.responseKey || "response";
       
       this.debugLog(`Format détecté pour ${modelNameWithoutPrefix}: ${modelFormat.description || responseKey}`);
       
@@ -757,7 +781,88 @@ class AIService {
       console.log(`Réponse brute du modèle ${modelName}:`, data);
     }
     
-    // ... existing code ...
+    // Parcourir le chemin de clé (ex: "choices.0.message.content")
+    try {
+      const segments = String(responseKey).split('.');
+      let cursor = data;
+      for (const seg of segments) {
+        if (cursor == null) break;
+        if (/^\d+$/.test(seg)) {
+          const idx = Number(seg);
+          cursor = Array.isArray(cursor) ? cursor[idx] : undefined;
+        } else {
+          cursor = cursor[seg];
+        }
+      }
+      if (typeof cursor === 'string') {
+        return cursor;
+      }
+      // Fallbacks connus
+      if (typeof data.response === 'string') return data.response;
+      if (data.message && typeof data.message.content === 'string') return data.message.content;
+      if (Array.isArray(data.choices) && data.choices[0]?.message?.content) return data.choices[0].message.content;
+    } catch (e) {
+      console.warn('Impossible d\'extraire le contenu de la réponse:', e);
+    }
+    
+    return "";
+  }
+
+  /**
+   * Teste la connectivité avec OpenAI
+   * @returns {Promise<{status: string, available: boolean, message: string}>}
+   */
+  async testOpenAIConnectivity() {
+    try {
+      const state = this.stateManager.getState?.() || {};
+      let model = state.iaModel && state.iaModel.startsWith('openai/')
+        ? state.iaModel.replace('openai/', '')
+        : 'gpt-3.5-turbo';
+      
+      if (!this.apiKey) {
+        return {
+          status: 'error',
+          available: false,
+          message: "Clé API OpenAI manquante"
+        };
+      }
+      
+      const response = await fetch(API_URL_OPENAI, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: 'system', content: 'ping' },
+            { role: 'user', content: 'ping' }
+          ],
+          temperature: 0
+        })
+      });
+      
+      if (!response.ok) {
+        return {
+          status: 'error',
+          available: false,
+          message: `Erreur OpenAI: ${response.status}`
+        };
+      }
+      
+      return {
+        status: 'success',
+        available: true,
+        message: 'Connexion OpenAI valide'
+      };
+    } catch (error) {
+      return {
+        status: 'error',
+        available: false,
+        message: error.message || 'Erreur de connexion OpenAI'
+      };
+    }
   }
 }
 

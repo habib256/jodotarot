@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Créer les services après l'initialisation de l'état
     aiService = new AIService(stateManager);
-    deckService = new DeckService(stateManager);
+    deckService = new DeckService();
     uiService = new UIService();
     
     // Créer et initialiser les contrôleurs
@@ -142,15 +142,8 @@ async function loadInitialResources() {
       console.log("⚠️ Aucun modèle Ollama disponible, vérification des options alternatives");
       
       // Vérifier si OpenAI est configuré
-      if (configController.aiService.apiKey && 
-          configController.aiService.apiKey !== "YOUR API KEY") {
-        console.log("➡️ Utilisation d'OpenAI comme modèle par défaut");
-        document.getElementById('ia-model').value = 'openai/gpt-3.5-turbo';
-      } else {
-        // Ni Ollama ni OpenAI ne sont disponibles, utiliser le mode Prompt
-        console.log("➡️ Ni Ollama ni OpenAI ne sont disponibles, utilisation du mode Prompt");
-        configController.selectPromptMode();
-      }
+      // Ne plus forcer OpenAI par défaut. Laisser ConfigController
+      // choisir le premier modèle Ollama lors du chargement des modèles.
     }
     
     // Cacher l'animation de chargement

@@ -64,14 +64,15 @@ class DeckService {
       console.log(`🔍 Vérification des images pour le jeu ${deckId}...`);
       for (const card of majorCards) {
         try {
-          console.log(`🖼️ Tentative de chargement de l'image: ${card.image}`);
-          const response = await fetch(card.image);
+          const url = card.imageUrl || card.image;
+          console.log(`🖼️ Tentative de chargement de l'image: ${url}`);
+          const response = await fetch(url);
           if (!response.ok) {
-            throw new Error(`Image non trouvée: ${card.image}`);
+            throw new Error(`Image non trouvée: ${url}`);
           }
-          console.log(`✅ Image chargée avec succès: ${card.image}`);
+          console.log(`✅ Image chargée avec succès: ${url}`);
         } catch (error) {
-          console.error(`❌ Erreur lors du chargement de l'image ${card.image}:`, error);
+          console.error(`❌ Erreur lors du chargement de l'image ${card.imageUrl || card.image}:`, error);
           throw new Error(`Impossible de charger l'image de la carte ${card.name}`);
         }
       }
