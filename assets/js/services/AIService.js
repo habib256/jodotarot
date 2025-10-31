@@ -484,8 +484,8 @@ class AIService {
     // Copier les cartes dans l'instance de tirage
     spreadInstance.cards = [...reading];
     
-    // Générer une description détaillée du tirage avec les cartes
-    const spreadDescription = spreadInstance.generateReadingDescription(true);
+    // Générer une description du tirage avec les cartes (sans descriptions détaillées pour réduire la longueur)
+    const spreadDescription = spreadInstance.generateReadingDescription(false);
     
     // Construction du prompt de base avec toutes les informations sur les cartes
     let promptBase = `${spreadDescription}\n\n`;

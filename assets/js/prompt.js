@@ -44,8 +44,10 @@ function enrichirPromptContextuel(question, systemPrompt, langue = 'fr') {
   const emphaseTexte = getEmphasisText(langue);
   
   // Former le bloc d'emphase avec les délimiteurs et la question
+  // Vérifier si questionIntro se termine déjà par ":" ou "："
+  const needsColon = !questionIntro.endsWith(':') && !questionIntro.endsWith('：');
   const questionBlock = `====================
-${questionIntro}:
+${questionIntro}${needsColon ? ':' : ''}
 "${question.trim()}"
 ====================`;
   

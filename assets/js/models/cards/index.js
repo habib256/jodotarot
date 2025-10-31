@@ -90,6 +90,15 @@ export class TarotCard {
     }
   }
 
+  // Obtient le nom traduit de la carte dans la langue spécifiée
+  getTranslatedName(language = 'fr') {
+    if (this.arcana === ARCANE_TYPES.MAJOR) {
+      return getTranslation(`cards.major_arcana.${this.translationKey}`, language);
+    } else {
+      return `${this.rank} of ${this.suit}`;
+    }
+  }
+
   // Vérifie si c'est une carte majeure
   isMajor() {
     return this.arcana === ARCANE_TYPES.MAJOR;

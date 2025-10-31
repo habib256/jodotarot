@@ -185,21 +185,15 @@ const en = {
   
   // Meta prompt for AI
   metaprompt: {
-    base: `Required format (400-450 words):
-1) Concise and complete response in one message
-2) Use relevant tarot-themed emojis to illustrate concepts
-3) HTML formatting only: <h1>/<h2>/<h3> headings, <em>/<strong> importance, <blockquote> quotes, <ul>/<li> lists
-4) Incorporate psychological and symbolic aspects of the cards
-5) Make connections between cards that complement or oppose each other
-6) Avoid overly esoteric jargon to remain accessible
-7) End with practical advice and a suggested action
-8) In English
-9) You must absolutely respond by embodying the chosen persona, with their specific style, vocabulary, and worldview`,
+    base: `Response format (400-450 words, single message):
+- Use emojis and markdown for formatting
+- Integrate psychology and symbolism, make connections between cards
+- Stay accessible, avoid excessive jargon
+- End with practical and actionable advice
+- Fully embody the persona: style, vocabulary, worldview`,
     
-    emphasis: `IMPORTANT: Your answer must be DIRECTLY and SPECIFICALLY related to this question.
-Focus on what the question precisely asks and adapt your interpretation
-based on the elements mentioned in the question. Do not give a generic answer.
-Each aspect of your interpretation must address an aspect of this question.`
+    emphasis: `⚠️ IMPERATIVE: Answer PRECISELY the question asked. 
+Each element of your interpretation must illuminate a specific aspect of this question.`
   },
   
   // Configuration
@@ -250,6 +244,49 @@ Each aspect of your interpretation must address an aspect of this question.`
     noOllamaModels: "No Ollama models available",
     noOllamaModelsDetails: "Ollama is accessible but no models are available",
     selectModel: "Select a model"
+  },
+  
+  // Connectivity messages
+  connectivity: {
+    connecting: "Connecting...",
+    connected: "Connected",
+    disconnected: "Disconnected",
+    error: "Connection error"
+  },
+  
+  // Section titles
+  sections: {
+    reading: "Reading",
+    interpretations: "Interpretation"
+  },
+  
+  // Cards
+  cards: {
+    major_arcana: {
+      fool: "The Fool",
+      magician: "The Magician",
+      high_priestess: "The High Priestess",
+      empress: "The Empress",
+      emperor: "The Emperor",
+      hierophant: "The Hierophant",
+      lovers: "The Lovers",
+      chariot: "The Chariot",
+      justice: "Justice",
+      hermit: "The Hermit",
+      wheel_of_fortune: "Wheel of Fortune",
+      strength: "Strength",
+      hanged_man: "The Hanged Man",
+      death: "Death",
+      temperance: "Temperance",
+      devil: "The Devil",
+      tower: "The Tower",
+      star: "The Star",
+      moon: "The Moon",
+      sun: "The Sun",
+      judgement: "Judgement",
+      world: "The World",
+      back: "Card back"
+    }
   }
 };
 

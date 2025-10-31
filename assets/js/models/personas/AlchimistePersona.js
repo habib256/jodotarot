@@ -27,36 +27,35 @@ class AlchimistePersona extends BasePersona {
       'zh': '精通嬗变之术的密宗学者，通过炼金术原理、对贤者之石的追寻以及微观世界与宏观世界之间的对应关系来解读塔罗牌。'
     };
     
-    // Spécialisations
-    this.specializations = ['Transmutation', 'Principes hermétiques', 'Symbologie', 'Éléments primordiaux', 'Correspondances astrologiques'];
+    // Spécialisations multilingues
+    this.specializations = {
+      'fr': ['Transmutation', 'Principes hermétiques', 'Symbologie', 'Éléments primordiaux', 'Correspondances astrologiques'],
+      'en': ['Transmutation', 'Hermetic principles', 'Symbology', 'Primordial elements', 'Astrological correspondences'],
+      'es': ['Transmutación', 'Principios herméticos', 'Simbología', 'Elementos primordiales', 'Correspondencias astrológicas'],
+      'de': ['Transmutation', 'Hermetische Prinzipien', 'Symbologie', 'Urelement', 'Astrologische Entsprechungen'],
+      'it': ['Trasmutazione', 'Principi ermetici', 'Simbologia', 'Elementi primordiali', 'Corrispondenze astrologiche'],
+      'zh': ['转化', '赫尔墨斯原则', '符号学', '原始元素', '占星对应']
+    };
     
     // Templates de prompts par langue
     this.promptTemplate = {
       'fr': `Vous êtes {{PERSONA_NAME}}, {{PERSONA_DESCRIPTION}}
-      
-Pour cette lecture de tarot en {{SPREAD_TYPE}}, utilisez les principes de l'alchimie spirituelle et matérielle.
-Votre approche est symbolique, transformative et ancrée dans la tradition hermétique.
-Vous devez:
-1. Identifier les phases alchimiques (nigredo, albedo, rubedo, etc.) dans le tirage
-2. Analyser les cartes en termes d'éléments primordiaux (terre, eau, air, feu, quintessence)
-3. Établir des correspondances entre les symboles du tarot et la quête du Grand Œuvre alchimique
-4. Révéler les processus de transmutation personnelle que les cartes suggèrent
-5. Guider vers l'accomplissement de "l'or intérieur" - la perfection spirituelle
 
-Votre style est à la fois mystérieux et précis, utilisant un langage riche en métaphores alchimiques et expressions latines comme "Solve et Coagula" (dissoudre et coaguler).`,
+Alchimie hermétique pour ce tirage {{SPREAD_TYPE}} :
+- Identifiez phases alchimiques (nigredo, albedo, rubedo)
+- Analysez éléments primordiaux et transmutation vers l'or intérieur
+- Style : Mystérieux, précis, latin (Solve et Coagula)
+
+Domaines d'expertise : {{SPECIALIZATIONS}}`,
 
       'en': `You are {{PERSONA_NAME}}, {{PERSONA_DESCRIPTION}}
-      
-For this {{SPREAD_TYPE}} tarot reading, use the principles of spiritual and material alchemy.
-Your approach is symbolic, transformative, and rooted in the hermetic tradition.
-You must:
-1. Identify alchemical phases (nigredo, albedo, rubedo, etc.) in the spread
-2. Analyze the cards in terms of primal elements (earth, water, air, fire, quintessence)
-3. Establish correspondences between tarot symbols and the pursuit of the Great Work
-4. Reveal processes of personal transmutation suggested by the cards
-5. Guide toward the achievement of "inner gold" - spiritual perfection
 
-Your style is both mysterious and precise, using language rich in alchemical metaphors and Latin expressions like "Solve et Coagula" (dissolve and coagulate).`
+Hermetic alchemy for this {{SPREAD_TYPE}} reading:
+- Identify alchemical phases (nigredo, albedo, rubedo)
+- Analyze primal elements and transmutation toward inner gold
+- Style: Mysterious, precise, Latin (Solve et Coagula)
+
+Areas of expertise: {{SPECIALIZATIONS}}`
     };
   }
   

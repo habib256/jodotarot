@@ -124,6 +124,17 @@ const es = {
     celticCross: "Cruz Celta"
   },
   
+  // Divers
+  misc: {
+    loadingModels: "Cargando modelos...",
+    crossSpread: "➕ Tirada en Cruz",
+    horseshoeSpread: "🧲 Tirada en Herradura",
+    loveSpread: "❤️ Tarot del Amor",
+    celticCross: "☘️ Cruz Celta"
+  },
+  
+  tarotPrompt: "{persona}, ¿qué revela esta tirada {spreadType} sobre mi pregunta: \"{question}\"? Analiza las cartas individualmente y en conjunto, considerando sus posiciones e interacciones. Comparte tu visión única.",
+  
   // Messages d'avertissement
   warnings: {
     connectionFailed: "Error de conexión",
@@ -168,21 +179,15 @@ const es = {
   
   // Meta prompt pour l'IA
   metaprompt: {
-    base: `Formato requerido (400-450 palabras):
-1) Respuesta concisa y completa en un solo mensaje
-2) Utiliza emojis relacionados con el tarot para ilustrar conceptos
-3) Formateo HTML únicamente: <h1>/<h2>/<h3> títulos, <em>/<strong> importancia, <blockquote> citas, <ul>/<li> listas
-4) Incorpora aspectos psicológicos y simbólicos de las cartas
-5) Establece conexiones entre cartas que se complementan o se oponen
-6) Evita el lenguaje excesivamente esotérico para ser accesible
-7) Finaliza con un consejo práctico y una sugerencia de acción
-8) En español
-9) Debes responder absolutamente encarnando al personaje elegido, con su estilo, vocabulario y visión del mundo específicos`,
+    base: `Formato de respuesta (400-450 palabras, un solo mensaje):
+- Usa emojis y markdown para el formato
+- Integra psicología y simbolismo, haz conexiones entre cartas
+- Mantente accesible, evita jerga excesiva
+- Termina con consejo práctico y accionable
+- Encarna totalmente al personaje: estilo, vocabulario, visión del mundo`,
     
-    emphasis: `IMPORTANTE: Tu respuesta debe estar DIRECTA y ESPECÍFICAMENTE relacionada con esta pregunta.
-Concéntrate en lo que la pregunta pide precisamente y adapta tu interpretación
-según los elementos mencionados en la pregunta. No des una respuesta genérica.
-Cada aspecto de tu interpretación debe abordar un aspecto de esta pregunta.`
+    emphasis: `⚠️ IMPERATIVO: Responde PRECISAMENTE a la pregunta formulada. 
+Cada elemento de tu interpretación debe iluminar un aspecto específico de esta pregunta.`
   },
   
   personaGroups: {
@@ -230,6 +235,35 @@ Cada aspecto de tu interpretación debe abordar un aspecto de esta pregunta.`
     ollamaConnected: "Ollama conectado con éxito",
     modelAvailable: "Modelo disponible",
     modelUnavailable: "Modelo no disponible"
+  },
+  
+  // Cartas
+  cards: {
+    major_arcana: {
+      fool: "El Loco",
+      magician: "El Mago",
+      high_priestess: "La Sacerdotisa",
+      empress: "La Emperatriz",
+      emperor: "El Emperador",
+      hierophant: "El Hierofante",
+      lovers: "Los Enamorados",
+      chariot: "El Carro",
+      justice: "La Justicia",
+      hermit: "El Ermitaño",
+      wheel_of_fortune: "La Rueda de la Fortuna",
+      strength: "La Fuerza",
+      hanged_man: "El Colgado",
+      death: "La Muerte",
+      temperance: "La Templanza",
+      devil: "El Diablo",
+      tower: "La Torre",
+      star: "La Estrella",
+      moon: "La Luna",
+      sun: "El Sol",
+      judgement: "El Juicio",
+      world: "El Mundo",
+      back: "Reverso de la carta"
+    }
   }
 };
 

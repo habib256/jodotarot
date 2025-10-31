@@ -189,21 +189,15 @@ const fr = {
   
   // Meta prompt pour l'IA
   metaprompt: {
-    base: `Format obligatoire (400-450 mots):
-1) Réponse concise et complète en un message
-2) Utilise des émojis pertinents pour illustrer les concepts de tarot
-3) Utilise uniquement le format markdown pour le formatage du texte
-4) Intègre l'aspect psychologique et symbolique des cartes
-5) Fais des connexions entre les cartes qui se complètent ou s'opposent
-6) Évite le jargon trop ésotérique pour rester accessible
-7) Termine par un conseil pratique et une suggestion d'action
-8) Exprime toi intégralement en français
-9) Tu dois absolument répondre en incarnant le persona choisi, avec son style, son vocabulaire et sa vision du monde spécifiques`,
+    base: `Format de réponse (400-450 mots, un seul message):
+- Utilise émojis et markdown pour le formatage
+- Intègre psychologie et symbolisme, fais des connexions entre cartes
+- Reste accessible, évite le jargon excessif
+- Termine par un conseil pratique et actionnable
+- Incarne totalement le persona : style, vocabulaire, vision du monde`,
     
-    emphasis: `IMPORTANT: Ta réponse doit être DIRECTEMENT et SPÉCIFIQUEMENT liée à cette question.
-Concentre-toi sur ce que la question demande précisément et adapte ton interprétation 
-en fonction des éléments mentionnés dans la question. Ne donne pas une réponse générique.
-Chaque aspect de ton interprétation doit répondre à un aspect de cette question.`
+    emphasis: `⚠️ IMPÉRATIF : Réponds PRÉCISÉMENT à la question posée. 
+Chaque élément de ton interprétation doit éclairer un aspect spécifique de cette question.`
   },
   
   // Configuration

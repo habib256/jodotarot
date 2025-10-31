@@ -183,21 +183,15 @@ const it = {
   
   // Meta prompt per l'IA
   metaprompt: {
-    base: `Formato richiesto (400-450 parole):
-1) Risposta concisa e completa in un unico messaggio
-2) Utilizza emoji a tema tarocchi per illustrare i concetti
-3) Solo formattazione HTML: <h1>/<h2>/<h3> titoli, <em>/<strong> importanza, <blockquote> citazioni, <ul>/<li> liste
-4) Incorpora aspetti psicologici e simbolici delle carte
-5) Crea connessioni tra carte che si completano o si oppongono
-6) Evita un gergo troppo esoterico per rimanere accessibile
-7) Concludi con un consiglio pratico e un suggerimento d'azione
-8) In italiano
-9) Devi assolutamente rispondere incarnando il personaggio scelto, con il suo stile specifico, il suo vocabolario e la sua visione del mondo`,
+    base: `Formato risposta (400-450 parole, un solo messaggio):
+- Usa emoji e markdown per la formattazione
+- Integra psicologia e simbolismo, crea connessioni tra carte
+- Rimani accessibile, evita gergo eccessivo
+- Concludi con consiglio pratico e attuabile
+- Incarna totalmente il personaggio: stile, vocabolario, visione del mondo`,
     
-    emphasis: `IMPORTANTE: La tua risposta deve essere DIRETTAMENTE e SPECIFICAMENTE collegata a questa domanda.
-Concentrati su ciò che la domanda chiede precisamente e adatta la tua interpretazione
-in base agli elementi menzionati nella domanda. Non dare una risposta generica.
-Ogni aspetto della tua interpretazione deve affrontare un aspetto di questa domanda.`
+    emphasis: `⚠️ IMPERATIVO: Rispondi PRECISAMENTE alla domanda posta. 
+Ogni elemento della tua interpretazione deve illuminare un aspetto specifico di questa domanda.`
   },
   
   // Messaggi di connettività
@@ -230,6 +224,49 @@ Ogni aspetto della tua interpretazione deve affrontare un aspetto di questa doma
     ollamaConnected: "Ollama connesso con successo",
     modelAvailable: "Modello disponibile",
     modelUnavailable: "Modello non disponibile"
+  },
+  
+  // Messaggi di connettività
+  connectivity: {
+    connecting: "Connessione in corso...",
+    connected: "Connesso",
+    disconnected: "Disconnesso",
+    error: "Errore di connessione"
+  },
+  
+  // Titoli delle sezioni
+  sections: {
+    reading: "Lettura",
+    interpretations: "Interpretazione"
+  },
+  
+  // Carte
+  cards: {
+    major_arcana: {
+      fool: "Il Matto",
+      magician: "Il Mago",
+      high_priestess: "La Papessa",
+      empress: "L'Imperatrice",
+      emperor: "L'Imperatore",
+      hierophant: "Il Papa",
+      lovers: "Gli Amanti",
+      chariot: "Il Carro",
+      justice: "La Giustizia",
+      hermit: "L'Eremita",
+      wheel_of_fortune: "La Ruota della Fortuna",
+      strength: "La Forza",
+      hanged_man: "L'Appeso",
+      death: "La Morte",
+      temperance: "La Temperanza",
+      devil: "Il Diavolo",
+      tower: "La Torre",
+      star: "La Stella",
+      moon: "La Luna",
+      sun: "Il Sole",
+      judgement: "Il Giudizio",
+      world: "Il Mondo",
+      back: "Retro della carta"
+    }
   }
 };
 

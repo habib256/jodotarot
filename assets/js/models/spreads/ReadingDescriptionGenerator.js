@@ -1,6 +1,8 @@
 /**
  * Classe utilitaire pour générer les descriptions de tirage
  */
+import { getCardMeaning } from '../cards/CardMeanings.js';
+
 class ReadingDescriptionGenerator {
   /**
    * @param {BaseSpread} spread - Instance du tirage
@@ -22,23 +24,21 @@ class ReadingDescriptionGenerator {
     if (!card?.translationKey) return '';
     
     const positionName = this.spread.getPositionMeaning(index);
-    const orientation = card.orientation === 'upright' ? 
-      (this.language === 'fr' ? 'à l\'endroit' : 'upright') : 
-      (this.language === 'fr' ? 'renversée' : 'reversed');
+    const symbol = card.orientation === 'upright' ? '↑' : '↓';
     
-    let description = `${index+1}. ${positionName}: ${card.translationKey} (${orientation})`;
+    // Obtenir le nom traduit de la carte
+    const cardName = card.getTranslatedName ? card.getTranslatedName(this.language) : card.translationKey;
     
-    if (card.arcana) {
-      const arcanaText = this.language === 'fr' 
-        ? (card.arcana === 'major' ? 'Arcane majeur' : 'Arcane mineur') 
-        : (card.arcana === 'major' ? 'Major Arcana' : 'Minor Arcana');
-      description += ` - ${arcanaText}`;
+    // Format compact : une seule ligne par carte
+    let description = `${index+1}. ${positionName} : ${cardName} (${symbol})`;
+    
+    // Ajouter la signification courte de la carte si disponible
+    const cardMeaning = getCardMeaning(card.translationKey, card.orientation, this.language);
+    if (cardMeaning) {
+      description += ` - ${cardMeaning}`;
     }
     
-    if (card.suit) {
-      description += ` - ${card.suit}`;
-    }
-    
+    // Ajouter les descriptions détaillées uniquement si demandé
     if (includeDetailedDescriptions) {
       const positionDescription = this.spread.getPositionDescription(index, card);
       if (positionDescription) {
@@ -46,7 +46,7 @@ class ReadingDescriptionGenerator {
       }
     }
     
-    return description + '\n\n';
+    return description + '\n';
   }
 
   /**
@@ -60,9 +60,21 @@ class ReadingDescriptionGenerator {
     const spreadName = this.spread.getName();
     const spreadDesc = this.spread.getDescription();
     
-    let description = this.language === 'fr' 
-      ? `Tirage ${spreadName} (${this.spread.cards.length} cartes):\n\n`
-      : `${spreadName} Spread (${this.spread.cards.length} cards):\n\n`;
+    // Traduire "Spread" et "cards" selon la langue
+    const spreadLabels = {
+      'fr': { spread: 'Tirage', cards: 'cartes' },
+      'en': { spread: 'Spread', cards: 'cards' },
+      'es': { spread: 'Tirada', cards: 'cartas' },
+      'de': { spread: 'Legung', cards: 'Karten' },
+      'it': { spread: 'Lettura', cards: 'carte' },
+      'zh': { spread: '', cards: '张牌' }
+    };
+    
+    const labels = spreadLabels[this.language] || spreadLabels['en'];
+    
+    let description = labels.spread 
+      ? `${labels.spread} ${spreadName} (${this.spread.cards.length} ${labels.cards}):\n\n`
+      : `${spreadName} (${this.spread.cards.length}${labels.cards}):\n\n`;
     
     if (spreadDesc) {
       description += `${spreadDesc}\n\n`;
