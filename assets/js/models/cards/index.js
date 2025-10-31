@@ -44,6 +44,7 @@ export class TarotCard {
   constructor(id, translationKey, image, arcana = ARCANE_TYPES.MAJOR, suit = null, rank = null) {
     this.id = id;
     this.translationKey = translationKey;
+    this.name = translationKey; // Alias pour faciliter l'accès au nom de la carte
     this.image = image;
     this.arcana = arcana;
     this.suit = suit;

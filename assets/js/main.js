@@ -9,6 +9,7 @@ import ConfigController from './controllers/ConfigController.js';
 import AIService from './services/AIService.js';
 import DeckService from './services/DeckService.js';
 import UIService from './services/UIService.js';
+import CardEnlarger from './utils/CardEnlarger.js';
 
 // Import dynamique des personas au lieu d'imports individuels
 import { getAllPersonas } from './models/personas/index.js';
@@ -27,6 +28,7 @@ let uiService;
 let appController;
 let readingController;
 let configController;
+let cardEnlarger;
 
 // Initialisation des registres
 window.registries = {
@@ -78,6 +80,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     aiService = new AIService(stateManager);
     deckService = new DeckService();
     uiService = new UIService();
+    
+    // Initialiser le gestionnaire d'agrandissement des cartes
+    cardEnlarger = new CardEnlarger();
     
     // Créer et initialiser les contrôleurs
     configController = new ConfigController(stateManager, aiService, uiService);

@@ -233,18 +233,35 @@ css/
 ├── base/
 │   ├── reset.css
 │   ├── typography.css
-│   └── variables.css       /* Variables globales et spécifiques */
+│   └── variables.css           /* Variables globales et spécifiques */
 ├── components/
 │   ├── buttons.css
-│   ├── cards.css           /* Styles des cartes */
-│   └── spreads.css         /* Styles des tirages */
+│   ├── cards.css               /* Styles des cartes */
+│   ├── copy-button.css         /* Bouton de copie */
+│   ├── forms.css
+│   ├── information-zone.css
+│   ├── interpretation.css      /* Panneau d'interprétation */
+│   ├── loading.css
+│   ├── modal.css
+│   ├── select.css
+│   └── warnings.css            /* Messages et avertissements */
 ├── layouts/
-│   ├── grid.css
-│   └── containers.css
+│   ├── container.css
+│   ├── header.css
+│   └── panels.css
+├── modules/
+│   ├── celtic-cross-spread.css /* Tirage croix celtique */
+│   ├── cross-spread.css        /* Tirage en croix */
+│   ├── horseshoe-spread.css    /* Tirage fer à cheval */
+│   ├── interpretations.css     /* Styles des interprétations */
+│   ├── love-spread.css         /* Tirage de l'amour */
+│   ├── persona.css             /* Styles des personas */
+│   └── select.css              /* Menus de sélection spécifiques */
 ├── utils/
 │   ├── animations.css
-│   └── helpers.css
-└── main.css                /* Point d'entrée, importe tous les fichiers */
+│   ├── helpers.css
+│   └── scrolling.css
+└── main.css                    /* Point d'entrée, importe tous les fichiers */
 ```
 
 ## Conventions pour les Sélecteurs de Position
