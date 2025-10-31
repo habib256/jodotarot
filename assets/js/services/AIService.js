@@ -38,7 +38,7 @@ class AIService {
     
     this.defaultModel = 'openai/gpt-3.5-turbo';
     this.baseUrl = {
-      ollama: API_URL_OLLAMA.replace('/api/chat', ''),
+      ollama: API_URL_OLLAMA.replace('/api/generate', ''),
       openai: API_URL_OPENAI.replace('/chat/completions', '')
     };
     

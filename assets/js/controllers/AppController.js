@@ -1,91 +1,27 @@
 /**
  * Contrôleur principal de l'application JodoTarot
- * Responsable de l'initialisation et de la coordination des composants
+ * Responsable de la coordination des composants et de la gestion de l'état global
  */
 import StateManager from '../utils/StateManager.js';
 import ReadingController from './ReadingController.js';
 import ConfigController from './ConfigController.js';
-import AIService from '../services/AIService.js';
-import DeckService from '../services/DeckService.js';
-import UIService from '../services/UIService.js';
 
 class AppController {
   /**
    * @param {StateManager} stateManager - Instance du gestionnaire d'état
+   * @param {ConfigController} configController - Instance du contrôleur de configuration
+   * @param {ReadingController} readingController - Instance du contrôleur de lecture
    */
-  constructor(stateManager) {
+  constructor(stateManager, configController, readingController) {
     this.stateManager = stateManager;
-    
-    // Services
-    this.aiService = null;
-    this.deckService = null;
-    this.uiService = null;
-    
-    // Contrôleurs
-    this.readingController = null;
-    this.configController = null;
+    this.configController = configController;
+    this.readingController = readingController;
     
     // Écouter les changements d'état pour mettre à jour l'UI
     this.stateManager.subscribe(this.handleStateChange.bind(this));
     
     // Synchroniser l'UI avec l'état restauré
     this.syncUIWithState();
-  }
-  
-  /**
-   * Initialise l'application avec tous ses services et contrôleurs
-   */
-  async initialize() {
-    try {
-      // Initialiser les services
-      this.initializeServices();
-      
-      // Initialiser les contrôleurs
-      this.initializeControllers();
-      
-      // Charger le jeu de cartes
-      const state = this.stateManager.getState();
-      const deckToLoad = state.cardSet || 'set01';
-      await this.readingController.changeDeck(deckToLoad);
-      
-      // Charger les ressources initiales
-      await this.loadInitialResources();
-      
-      // Configurer les écouteurs d'événements
-      this.setupEventListeners();
-      
-      return true;
-    } catch (error) {
-      console.error('Erreur lors de l\'initialisation de l\'application:', error);
-      this.showError('Une erreur est survenue lors de l\'initialisation de l\'application.');
-      return false;
-    }
-  }
-  
-  /**
-   * Initialise les services de l'application
-   */
-  initializeServices() {
-    this.aiService = new AIService(this.stateManager);
-    this.deckService = new DeckService();
-    this.uiService = new UIService();
-  }
-  
-  /**
-   * Initialise les contrôleurs de l'application
-   */
-  initializeControllers() {
-    this.readingController = new ReadingController(
-      this.stateManager,
-      this.deckService,
-      this.aiService
-    );
-    
-    this.configController = new ConfigController(
-      this.stateManager,
-      this.aiService,
-      this.uiService
-    );
   }
   
   /**
@@ -150,48 +86,6 @@ class AppController {
     
     // Afficher/masquer le spinner de chargement
     this.updateLoadingState(state.isLoading);
-  }
-  
-  /**
-   * Charge les ressources initiales nécessaires
-   */
-  async loadInitialResources() {
-    try {
-      // Charger le jeu de cartes par défaut si aucun n'est défini dans l'état
-      const state = this.stateManager.getState();
-      const deckToLoad = state.cardSet || 'set01';
-      
-      const deckLoaded = await this.deckService.loadDeck(deckToLoad);
-      if (!deckLoaded) {
-        throw new Error('Impossible de charger le jeu de cartes.');
-      }
-      
-      // Synchroniser l'UI avec l'état actuel
-      this.syncUIWithState();
-      
-      return true;
-    } catch (error) {
-      console.error('Erreur lors du chargement des ressources:', error);
-      throw error;
-    }
-  }
-  
-  /**
-   * Configure les écouteurs d'événements globaux
-   */
-  setupEventListeners() {
-    // Écouteur pour le redimensionnement de la fenêtre
-    window.addEventListener('resize', () => {
-      // Recalculer les positions des cartes si nécessaire
-      this.readingController.updateCardDisplay();
-    });
-    
-    // Écouteur pour les événements personnalisés
-    document.addEventListener('error', (event) => {
-      if (event.detail && event.detail.message) {
-        this.showError(event.detail.message);
-      }
-    });
   }
   
   /**

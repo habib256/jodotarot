@@ -53,38 +53,20 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
         if (connectivityTest.status === 'testing') {
           const testingText = getTranslation('ollama.testing', langue) || `Vérification de la connexion à Ollama...`;
           
-          // Mise à jour pour respecter la nouvelle structure HTML
-          const infoContent = responsePrompt.querySelector('.information-zone__content');
-          if (infoContent) {
-            infoContent.innerHTML = `<p>${testingText}</p>`;
-          } else {
-            responsePrompt.innerHTML = `
-              <div class="information-zone__content">
-                <p>${testingText}</p>
-              </div>
-            `;
+          // Afficher le message de test dans responseContent
+          if (responseContent) {
+            responseContent.innerHTML = `<p>${testingText}</p>`;
           }
           
-          responsePrompt.style.display = 'none';
-          responseResponse.style.display = 'none';
           return testingText;
         } else if (connectivityTest.status === 'error') {
           const errorMessage = `${getTranslation('interpretation.connectionError', langue) || 'Erreur de connexion à Ollama:'} ${connectivityTest.message}`;
           
-          // Mise à jour pour respecter la nouvelle structure HTML
-          const infoContent = responsePrompt.querySelector('.information-zone__content');
-          if (infoContent) {
-            infoContent.innerHTML = `<p class="error">${errorMessage}</p>`;
-          } else {
-            responsePrompt.innerHTML = `
-              <div class="information-zone__content">
-                <p class="error">${errorMessage}</p>
-              </div>
-            `;
+          // Afficher le message d'erreur dans responseContent
+          if (responseContent) {
+            responseContent.innerHTML = `<p class="error">${errorMessage}</p>`;
           }
           
-          responsePrompt.style.display = 'none';
-          responseResponse.style.display = 'none';
           throw new Error(`Erreur Ollama: ${connectivityTest.message}`);
         }
       } catch (err) {
@@ -152,21 +134,19 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
     
     console.log("🔍 DEBUG - Envoi de la requête API à:", API_URL);
     
-    // Faire la requête à l'API avec streaming
-    const progressContainer = document.createElement('div');
-    progressContainer.className = 'ollama-progress';
-    progressContainer.innerHTML = `
-      <p>${getTranslation('interpretation.streamingResponse', langue)}</p>
-      <div class="progress-container">
-        <div class="progress-bar"></div>
-      </div>
-    `;
-    responsePrompt.innerHTML = '';
-    responsePrompt.appendChild(progressContainer);
-    
-    const partialResponse = document.createElement('div');
-    partialResponse.className = 'partial-response';
-    responseResponse.appendChild(partialResponse);
+    // Afficher un indicateur de chargement si le streaming est activé
+    if (SETTINGS.ENABLE_STREAMING && responseContent) {
+      const progressContainer = document.createElement('div');
+      progressContainer.className = 'ollama-progress';
+      progressContainer.innerHTML = `
+        <p>${getTranslation('interpretation.streamingResponse', langue)}</p>
+        <div class="progress-container">
+          <div class="progress-bar"></div>
+        </div>
+      `;
+      responseContent.innerHTML = '';
+      responseContent.appendChild(progressContainer);
+    }
     
     try {
       console.log("🔍 DEBUG - Début fetch API");
