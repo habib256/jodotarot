@@ -17,12 +17,11 @@ jodotarot/
 │   │   ├── services/        # Services métier
 │   │   ├── utils/           # Utilitaires
 │   │   ├── translations/    # Système de traduction
-│   │   ├── main.js          # Point d'entrée
+│   │   ├── main.js          # Point d'entrée et initialisation
 │   │   ├── api.js           # Appels API IA
 │   │   ├── config.js        # Configuration
 │   │   ├── prompt.js        # Construction de prompts
-│   │   ├── ui.js            # Fonctions UI
-│   │   └── app.js           # Initialisation
+│   │   └── ui.js            # Fonctions UI
 │   ├── css/
 │   └── images/
 ├── docs/
@@ -143,7 +142,7 @@ graph TD
 - **ConfigController** : Configuration et paramètres système
 
 ### 5. Modèles
-- **Personas** : Styles d'interprétation (22 personas)
+- **Personas** : Styles d'interprétation (21 personas)
 - **Spreads** : Types de tirages (Croix, Fer à Cheval, Amour, Croix Celtique)
 - **Cards** : Cartes de tarot
 

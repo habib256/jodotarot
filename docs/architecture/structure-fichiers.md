@@ -8,12 +8,11 @@ L'application JodoTarot est organisée selon une structure hiérarchique claire,
 jodotarot/
 ├── assets/                  # Ressources de l'application
 │   ├── js/                  # Code JavaScript
-│   │   ├── main.js           # Point d'entrée et initialisation (322 lignes)
-│   │   ├── api.js            # Communication avec OpenAI et Ollama (857 lignes)
-│   │   ├── ui.js             # Gestion de l'interface utilisateur (255 lignes)
+│   │   ├── main.js           # Point d'entrée et initialisation (320 lignes)
+│   │   ├── api.js            # Communication avec OpenAI et Ollama
+│   │   ├── ui.js             # Gestion de l'interface utilisateur
 │   │   ├── config.js         # Configuration globale (158 lignes)
-│   │   ├── app.js            # Gestion des événements et interactions (143 lignes)
-│   │   ├── prompt.js         # Gestion des prompts IA (72 lignes)
+│   │   ├── prompt.js         # Gestion des prompts IA
 │   │   ├── translations/     # Fichiers de traduction
 │   │   │   ├── fr.js        # Français (303 lignes)
 │   │   │   ├── en.js        # Anglais (256 lignes)
@@ -24,18 +23,18 @@ jodotarot/
 │   │   │   ├── README.md    # Documentation des traductions (66 lignes)
 │   │   │   └── index.js     # Point d'entrée des traductions (80 lignes)
 │   │   ├── services/        # Services métier
-│   │   │   ├── AIService.js     # Service d'intelligence artificielle (764 lignes)
-│   │   │   ├── UIService.js     # Service d'interface utilisateur (187 lignes)
-│   │   │   ├── DeckService.js   # Service de gestion du jeu de cartes (194 lignes)
-│   │   │   └── StateManager.js  # Simple fichier de liaison vers l'implémentation principale dans utils/
+│   │   │   ├── AIService.js     # Service d'intelligence artificielle
+│   │   │   ├── UIService.js     # Service d'interface utilisateur
+│   │   │   └── DeckService.js   # Service de gestion du jeu de cartes
 │   │   ├── controllers/     # Contrôleurs
 │   │   │   ├── AppController.js       # Contrôleur principal (222 lignes)
 │   │   │   ├── ConfigController.js    # Contrôleur de configuration (1193 lignes)
 │   │   │   └── ReadingController.js   # Contrôleur de lecture (935 lignes)
 │   │   ├── utils/           # Utilitaires
-│   │   │   └── StateManager.js   # Implémentation principale du gestionnaire d'état global de l'application
+│   │   │   ├── StateManager.js   # Implémentation principale du gestionnaire d'état global de l'application
+│   │   │   └── CardEnlarger.js   # Gestionnaire d'agrandissement interactif des cartes
 │   │   └── models/          # Modèles de données
-│   │       ├── personas/         # Définitions des personas (22 personas)
+│   │       ├── personas/         # Définitions des personas (21 personas)
 │   │       │   ├── BasePersona.js           # Classe de base (94 lignes)
 │   │       │   ├── TarologuePersona.js      # (75 lignes)
 │   │       │   ├── OraclePersona.js         # (80 lignes)
@@ -65,14 +64,17 @@ jodotarot/
 │   │   │   ├── persona.css              # Styles des personas (1372 lignes)
 │   │   │   └── select.css               # Styles des select (60 lignes)
 │   │   ├── components/           # Composants CSS
-│   │   │   ├── buttons.css              # Styles des boutons (119 lignes)
-│   │   │   ├── cards.css                # Styles des cartes (170 lignes)
-│   │   │   ├── forms.css                # Styles des formulaires (170 lignes)
-│   │   │   ├── information-zone.css     # Zone d'information (118 lignes)
-│   │   │   ├── loading.css              # Indicateurs de chargement (120 lignes)
-│   │   │   ├── modal.css                # Fenêtres modales (168 lignes)
-│   │   │   ├── select.css               # Sélecteurs (134 lignes)
-│   │   │   └── warnings.css             # Messages d'avertissement (167 lignes)
+│   │   │   ├── buttons.css              # Styles des boutons
+│   │   │   ├── cards.css                # Styles des cartes
+│   │   │   ├── card-enlarger.css        # Styles pour l'agrandissement des cartes
+│   │   │   ├── copy-button.css          # Styles du bouton de copie
+│   │   │   ├── forms.css                # Styles des formulaires
+│   │   │   ├── information-zone.css     # Zone d'information
+│   │   │   ├── interpretation.css       # Styles de l'interprétation (dans components)
+│   │   │   ├── loading.css              # Indicateurs de chargement
+│   │   │   ├── modal.css                # Fenêtres modales
+│   │   │   ├── select.css               # Sélecteurs
+│   │   │   └── warnings.css             # Messages d'avertissement
 │   │   ├── layouts/              # Mises en page
 │   │   │   ├── container.css            # Conteneurs principaux
 │   │   │   ├── header.css               # En-tête de l'application  
@@ -127,10 +129,9 @@ jodotarot/
 ### Services et Contrôleurs
 
 - **services/** : Implémentent la logique métier spécifique
-  - **AIService.js** : Gestion des interactions avec les modèles d'IA
+  - **AIService.js** : Gestion des interactions avec les modèles d'IA (OpenAI et Ollama)
   - **DeckService.js** : Manipulation des cartes et des tirages
   - **UIService.js** : Interaction avec le DOM et l'interface utilisateur
-  - **StateManager.js** : Simple fichier de liaison vers l'implémentation principale dans utils/
 
 - **controllers/** : Orchestrent les différentes parties de l'application
   - **AppController.js** : Contrôleur principal et initialisation
@@ -138,11 +139,12 @@ jodotarot/
   - **ReadingController.js** : Gestion du processus de tirage et d'interprétation
 
 - **utils/** : Utilitaires et outils transversaux
-  - **StateManager.js** : Implémentation principale du gestionnaire d'état global de l'application
+  - **StateManager.js** : Gestionnaire d'état global de l'application avec persistance localStorage
+  - **CardEnlarger.js** : Gestionnaire d'agrandissement interactif des cartes au clic
 
 ### Modèles et Données
 
-- **models/personas/** : Définitions des différents interprètes de tarot (22 personas au total)
+- **models/personas/** : Définitions des différents interprètes de tarot (21 personas au total)
 - **models/spreads/** : Types de tirages disponibles
   - **BaseSpread.js** : Classe de base pour tous les types de tirages
   - **CrossSpread.js**, **HorseshoeSpread.js**, **LoveSpread.js**, **CelticCrossSpread.js** : Types de tirages spécifiques
@@ -191,10 +193,14 @@ L'architecture CSS suit une organisation modulaire inspirée de la méthodologie
 4. **components/** : Composants d'interface réutilisables
    - **buttons.css** : Styles des boutons
    - **cards.css** : Styles des cartes de tarot
+   - **card-enlarger.css** : Styles pour l'agrandissement interactif des cartes
+   - **copy-button.css** : Styles du bouton de copie
    - **forms.css** : Styles des formulaires et contrôles
+   - **information-zone.css** : Zone d'information des cartes
+   - **interpretation.css** : Styles de l'interprétation
+   - **loading.css** : Indicateurs de chargement
    - **modal.css** : Fenêtres modales
    - **select.css** : Sélecteurs personnalisés
-   - **loading.css** : Indicateurs de chargement
    - **warnings.css** : Affichage des messages d'erreur
 
 5. **modules/** : Styles spécifiques aux fonctionnalités

@@ -18,13 +18,17 @@ jodotarot/
 │       ├── controllers/      # Contrôleurs de l'application
 │       ├── models/           # Modèles de données
 │       │   └── spreads/      # Modèles des différents tirages
-│       ├── services/         # Services (API, IA, etc.)
-│       ├── translations/     # Fichiers de traduction
+│       ├── services/         # Services métier (API, IA, etc.)
+│       │   ├── AIService.js     # Service d'intelligence artificielle
+│       │   ├── DeckService.js   # Service de gestion du jeu de cartes
+│       │   └── UIService.js     # Service d'interface utilisateur
 │       ├── utils/            # Utilitaires
+│       │   ├── CardEnlarger.js  # Gestionnaire d'agrandissement des cartes
+│       │   └── StateManager.js  # Gestionnaire d'état global
+│       ├── translations/     # Fichiers de traduction
 │       ├── api.js            # Gestion des API externes
-│       ├── app.js            # Point d'entrée de l'application
+│       ├── main.js           # Point d'entrée principal de l'application
 │       ├── config.js         # Configuration globale
-│       ├── main.js           # Module principal
 │       ├── prompt.js         # Gestion des prompts
 │       └── ui.js             # Interface utilisateur
 ├── docs/                      # Documentation technique
