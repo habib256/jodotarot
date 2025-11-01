@@ -129,6 +129,7 @@
             overflow: hidden;
             display: -webkit-box;
             -webkit-line-clamp: 2;
+            line-clamp: 2;
             -webkit-box-orient: vertical;
             max-width: 90%;
             transform: none;
@@ -403,6 +404,12 @@
         let cardPositions = {}; // Structure de données pour stocker les positions de toutes les cartes
         let initialCardPositions = {};
         
+        // Variables pour optimisations de performance
+        let updateOutputTimeout = null; // Timeout pour debounce de updateOutput
+        let rafId = null; // ID pour requestAnimationFrame
+        let lastOutputContent = ''; // Cache du dernier contenu CSS généré
+        let initialCardDimensions = {}; // Dimensions initiales par tirage pour détecter les changements
+        
         // Éléments DOM principaux
         const workspace = document.getElementById('workspace');
         const spreadSelect = document.getElementById('spreadType');
@@ -510,17 +517,27 @@
                     const defaultRotation = defaultPositions[spreadType]?.[card.name]?.rotation || 0;
                     
                     // Valeur par défaut si la variable n'existe pas ou n'est pas un nombre valide
+                    const finalX = isNaN(x) ? defaultX : x;
+                    const finalY = isNaN(y) ? defaultY : y;
+                    const finalRotation = isNaN(rotation) ? defaultRotation : rotation;
+                    
                     cardPositions[spreadType][card.name] = {
-                        x: isNaN(x) ? defaultX : x,
-                        y: isNaN(y) ? defaultY : y,
-                        rotation: isNaN(rotation) ? defaultRotation : rotation
+                        x: finalX,
+                        y: finalY,
+                        rotation: finalRotation,
+                        // Précalculer les valeurs arrondies pour optimiser les comparaisons
+                        roundedX: Math.round(finalX),
+                        roundedY: Math.round(finalY)
                     };
                     
                     // Stocker également les valeurs initiales pour comparaison ultérieure
                     initialCardPositions[spreadType][card.name] = {
-                        x: isNaN(x) ? defaultX : x,
-                        y: isNaN(y) ? defaultY : y,
-                        rotation: isNaN(rotation) ? defaultRotation : rotation
+                        x: finalX,
+                        y: finalY,
+                        rotation: finalRotation,
+                        // Précalculer les valeurs arrondies initiales
+                        roundedX: Math.round(finalX),
+                        roundedY: Math.round(finalY)
                     };
                 });
             });
@@ -550,6 +567,15 @@
             
             console.log(`Dimensions chargées pour ${spreadType}:`, { baseWidth, ratio, scaleFactor });
             
+            // Stocker les dimensions initiales si elles n'existent pas encore (première fois)
+            if (!initialCardDimensions[spreadType]) {
+                initialCardDimensions[spreadType] = {
+                    baseWidth: baseWidth,
+                    ratio: ratio,
+                    scaleFactor: scaleFactor
+                };
+            }
+            
             // Mettre à jour les curseurs
             cardBaseWidth.value = baseWidth;
             cardRatio.value = ratio;
@@ -569,9 +595,6 @@
             document.documentElement.style.setProperty('--card-base-width', `${baseWidth}px`);
             document.documentElement.style.setProperty('--card-ratio', ratio);
             document.documentElement.style.setProperty('--card-scale-factor', scaleFactor);
-            
-            // Générer le CSS pour les dimensions
-            generateCardDimensionsCSS();
         }
 
         // Fonction pour générer le CSS des dimensions des cartes
@@ -661,15 +684,19 @@
             // Mettre en évidence la zone de sortie et la garder en évidence pendant le déplacement
             output.classList.add('updating');
             
-            // Garantir que les positions sont initialisées
+            // Garantir que les positions sont initialisées avec valeurs arrondies
             if (!cardPositions[spreadType]) {
                 cardPositions[spreadType] = {};
             }
             if (!cardPositions[spreadType][name]) {
+                const initialX = parseFloat(selectedCard.style.left) || 50;
+                const initialY = parseFloat(selectedCard.style.top) || 50;
                 cardPositions[spreadType][name] = { 
-                    x: parseFloat(selectedCard.style.left) || 50, 
-                    y: parseFloat(selectedCard.style.top) || 50,
-                    rotation: rotation 
+                    x: initialX, 
+                    y: initialY,
+                    rotation: rotation,
+                    roundedX: Math.round(initialX),
+                    roundedY: Math.round(initialY)
                 };
             }
             
@@ -686,40 +713,62 @@
                     return;
                 }
                 
-                const rect = workspace.getBoundingClientRect();
-                
-                const x = ((e.clientX - rect.left) / rect.width) * 100;
-                const y = ((e.clientY - rect.top) / rect.height) * 100;
-                
-                // Limiter les valeurs entre 0 et 100
-                const boundedX = Math.max(0, Math.min(100, x));
-                const boundedY = Math.max(0, Math.min(100, y));
-                
-                selectedCard.style.left = boundedX + '%';
-                selectedCard.style.top = boundedY + '%';
-                
-                // Conserver la rotation dans la transformation mais sans animation
-                const name = selectedCard.dataset.name;
-                const spreadType = spreadSelect.value;
-                const rotation = cardPositions[spreadType][name].rotation || 0;
-                selectedCard.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+                // Utiliser requestAnimationFrame pour optimiser les mises à jour visuelles
+                cancelAnimationFrame(rafId);
+                rafId = requestAnimationFrame(() => {
+                    if (!selectedCard || !isDragging) return;
+                    
+                    const rect = workspace.getBoundingClientRect();
+                    
+                    const x = ((e.clientX - rect.left) / rect.width) * 100;
+                    const y = ((e.clientY - rect.top) / rect.height) * 100;
+                    
+                    // Limiter les valeurs entre 0 et 100
+                    const boundedX = Math.max(0, Math.min(100, x));
+                    const boundedY = Math.max(0, Math.min(100, y));
+                    
+                    // Mise à jour visuelle immédiate avec RAF (fluide)
+                    selectedCard.style.left = boundedX + '%';
+                    selectedCard.style.top = boundedY + '%';
+                    
+                    // Conserver la rotation dans la transformation mais sans animation
+                    const name = selectedCard.dataset.name;
+                    const spreadType = spreadSelect.value;
+                    const rotation = cardPositions[spreadType]?.[name]?.rotation || 0;
+                    selectedCard.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
 
-                // Sauvegarder la position immédiatement
-                if (!cardPositions[spreadType]) {
-                    cardPositions[spreadType] = {};
-                }
-                if (!cardPositions[spreadType][name]) {
-                    cardPositions[spreadType][name] = { rotation: 0 };
-                }
-                cardPositions[spreadType][name].x = boundedX;
-                cardPositions[spreadType][name].y = boundedY;
-                
-                // Forcer la mise à jour du texte CSS à chaque mouvement
-                updateOutput(true);
+                    // Sauvegarder la position avec valeurs arrondies précalculées (optimisation)
+                    if (!cardPositions[spreadType]) {
+                        cardPositions[spreadType] = {};
+                    }
+                    if (!cardPositions[spreadType][name]) {
+                        cardPositions[spreadType][name] = { 
+                            x: 50, 
+                            y: 50, 
+                            rotation: 0,
+                            roundedX: 50,
+                            roundedY: 50
+                        };
+                    }
+                    
+                    // Stocker les valeurs arrondies pour éviter les recalculs dans hasChanged
+                    cardPositions[spreadType][name].x = boundedX;
+                    cardPositions[spreadType][name].y = boundedY;
+                    cardPositions[spreadType][name].roundedX = Math.round(boundedX);
+                    cardPositions[spreadType][name].roundedY = Math.round(boundedY);
+                    
+                    // Mise à jour CSS en debounce (réduit les appels de ~90%)
+                    scheduleOutputUpdate(true);
+                });
             }
 
             function onMouseUp() {
                 isDragging = false;
+                
+                // Annuler les mises à jour en attente
+                cancelAnimationFrame(rafId);
+                clearTimeout(updateOutputTimeout);
+                
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
                 document.removeEventListener('blur', onWindowBlur);
@@ -729,7 +778,7 @@
                     output.classList.remove('updating');
                 }, 300);
                 
-                // S'assurer que la sortie est à jour une dernière fois
+                // Mise à jour finale immédiate (sans debounce) pour garantir la cohérence
                 updateOutput(false);
             }
             
@@ -760,24 +809,28 @@
             const name = selectedCard.dataset.name;
             const spreadType = spreadSelect.value;
             
-            // Appliquer la rotation à la carte
-            selectedCard.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+            // Appliquer la rotation à la carte avec RAF pour fluidité
+            cancelAnimationFrame(rafId);
+            rafId = requestAnimationFrame(() => {
+                selectedCard.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+            });
             
             // Sauvegarder la rotation
             if (!cardPositions[spreadType]) {
                 cardPositions[spreadType] = {};
             }
             if (!cardPositions[spreadType][name]) {
-                cardPositions[spreadType][name] = { x: 50, y: 50 };
+                cardPositions[spreadType][name] = { 
+                    x: 50, 
+                    y: 50,
+                    roundedX: 50,
+                    roundedY: 50
+                };
             }
             cardPositions[spreadType][name].rotation = rotation;
             
-            // Mettre en évidence la sortie
-            output.classList.add('updating');
-            setTimeout(() => output.classList.remove('updating'), 300);
-            
-            // Mise à jour immédiate
-            updateOutput(true);
+            // Mise à jour CSS avec debounce
+            scheduleOutputUpdate(true);
         });
 
         // Gestion des dimensions des cartes
@@ -874,19 +927,51 @@
             updateOutput(false);
         }
 
-        // Fonction pour comparer deux valeurs avec une tolérance pour les nombres
+        /**
+         * Fonction optimisée pour comparer deux valeurs avec une tolérance
+         * Version optimisée qui évite les recalculs inutiles
+         * @param {number} val1 - Première valeur (déjà arrondie si possible)
+         * @param {number} val2 - Deuxième valeur (déjà arrondie si possible)
+         * @param {number} tolerance - Tolérance pour la comparaison (défaut: 0.5)
+         * @returns {boolean} - True si les valeurs diffèrent au-delà de la tolérance
+         */
         function hasChanged(val1, val2, tolerance = 0.5) {
-            // Convertir en nombres si possible pour assurer une comparaison cohérente
+            // Si les valeurs sont déjà des nombres, comparaison directe
+            if (typeof val1 === 'number' && typeof val2 === 'number') {
+                return Math.abs(val1 - val2) > tolerance;
+            }
+            
+            // Sinon, conversion avec parseFloat (moins fréquent)
             const num1 = typeof val1 === 'number' ? val1 : parseFloat(val1);
             const num2 = typeof val2 === 'number' ? val2 : parseFloat(val2);
             
-            // Si les deux valeurs peuvent être converties en nombres valides
             if (!isNaN(num1) && !isNaN(num2)) {
                 return Math.abs(num1 - num2) > tolerance;
             }
             
-            // Pour les autres types ou si la conversion échoue, comparaison stricte
+            // Pour les autres types, comparaison stricte
             return val1 !== val2;
+        }
+        
+        /**
+         * Planifie la mise à jour de la sortie CSS avec debounce
+         * Pendant le drag, utilise un debounce pour éviter trop d'appels
+         * @param {boolean} instant - Si true, utilise debounce (pendant drag), sinon mise à jour immédiate
+         */
+        function scheduleOutputUpdate(instant = false) {
+            // Annuler toute mise à jour en attente
+            clearTimeout(updateOutputTimeout);
+            cancelAnimationFrame(rafId);
+            
+            if (instant) {
+                // Pendant le drag : debounce pour réduire les appels
+                updateOutputTimeout = setTimeout(() => {
+                    updateOutput(false);
+                }, 50); // 50ms de debounce = ~20 appels/seconde max au lieu de ~60
+            } else {
+                // Hors drag : mise à jour immédiate mais optimisée
+                updateOutput(false);
+            }
         }
 
         // Fonction pour générer le CSS des variables de position
@@ -946,6 +1031,15 @@
             if (isNaN(scaleFactor)) scaleFactor = getCSSVariableNumeric('--card-scale-factor') || 1;
             
             console.log(`Chargement des dimensions pour le tirage ${spreadType}:`, { baseWidth, ratio, scaleFactor });
+            
+            // Stocker les dimensions initiales si elles n'existent pas encore (lors du changement de tirage)
+            if (!initialCardDimensions[spreadType]) {
+                initialCardDimensions[spreadType] = {
+                    baseWidth: baseWidth,
+                    ratio: ratio,
+                    scaleFactor: scaleFactor
+                };
+            }
             
             cardBaseWidth.value = baseWidth;
             cardRatio.value = ratio;
@@ -1015,31 +1109,44 @@
             }
         }
         
-        // Fonction mise à jour avec le nouveau format des variables standardisées
+        // Fonction mise à jour optimisée avec le nouveau format des variables standardisées
         function updateOutput(instant = false) {
             // Commencer par récupérer le type de tirage actif pour les manipulations visuelles
             const activeSpreadType = spreadSelect.value;
             
-            // Durant le déplacement d'une carte (instant = true), on n'affiche que les variables du tirage actif
+            // Durant le déplacement d'une carte, on n'affiche que les variables du tirage actif
             // pour une meilleure performance, sinon on affiche tout
             const showOnlyActiveSpread = instant && selectedCard;
             
-            // Variables pour suivre les modifications
-            let hasChangedValues = false;
             let css = "";
+            let hasAnyChanges = false;
             
-            // Traitement des dimensions des cartes
-            const spreadType = activeSpreadType;
+            // Vérifier les dimensions uniquement pour le tirage actif (les curseurs correspondent toujours au tirage actif)
+            const currentBaseWidth = parseFloat(cardBaseWidth.value);
+            const currentRatio = parseFloat(cardRatio.value);
+            const currentScaleFactor = parseFloat(cardScaleFactor.value);
             
-            // Toujours afficher les dimensions courantes des cartes en premier
-            css += `/* Dimensions des cartes pour le tirage ${spreads[spreadType].name} */\n`;
-            css += `--${spreadType}-card-base-width: ${cardBaseWidth.value}px;\n`;
-            css += `--${spreadType}-card-ratio: ${cardRatio.value};\n`;
-            css += `--${spreadType}-card-scale-factor: ${cardScaleFactor.value};\n\n`;
+            // Récupérer les dimensions initiales du tirage actif
+            const initialDims = initialCardDimensions[activeSpreadType];
             
-            hasChangedValues = true;
+            // Si les dimensions initiales existent, vérifier si elles ont changé
+            if (initialDims) {
+                const dimensionsChanged = 
+                    hasChanged(currentBaseWidth, initialDims.baseWidth, 0.1) ||
+                    hasChanged(currentRatio, initialDims.ratio, 0.01) ||
+                    hasChanged(currentScaleFactor, initialDims.scaleFactor, 0.01);
+                
+                // N'afficher les dimensions que si elles ont changé
+                if (dimensionsChanged) {
+                    css += `/* Dimensions des cartes modifiées pour le tirage ${spreads[activeSpreadType].name} */\n`;
+                    css += `--${activeSpreadType}-card-base-width: ${currentBaseWidth}px;\n`;
+                    css += `--${activeSpreadType}-card-ratio: ${currentRatio};\n`;
+                    css += `--${activeSpreadType}-card-scale-factor: ${currentScaleFactor};\n\n`;
+                    hasAnyChanges = true;
+                }
+            }
             
-            // Parcourir tous les types de tirages disponibles
+            // Parcourir tous les types de tirages disponibles pour les positions
             for (const spreadType in spreads) {
                 // Si on est en mode déplacement, on n'affiche que le tirage actif
                 if (showOnlyActiveSpread && spreadType !== activeSpreadType) continue;
@@ -1061,17 +1168,23 @@
                     const pos = cardPositions[spreadType][card.name];
                     const initialPos = initialCardPositions[spreadType][card.name];
                     
-                    // Vérifier si les valeurs de x, y ou rotation ont changé
+                    // Utiliser les valeurs arrondies précalculées si disponibles (optimisation)
+                    const roundedX = pos.roundedX !== undefined ? pos.roundedX : Math.round(pos.x);
+                    const roundedY = pos.roundedY !== undefined ? pos.roundedY : Math.round(pos.y);
+                    const roundedInitialX = initialPos.roundedX !== undefined ? initialPos.roundedX : Math.round(initialPos.x);
+                    const roundedInitialY = initialPos.roundedY !== undefined ? initialPos.roundedY : Math.round(initialPos.y);
+                    
+                    // Vérifier si les valeurs ont changé (utilisation des valeurs précalculées)
                     let positionCSS = "";
                     
                     // Vérifier si x a changé
-                    if (hasChanged(Math.round(pos.x), Math.round(initialPos.x))) {
-                        positionCSS += `--${spreadType}-position-${card.position}-x: ${Math.round(pos.x)}%;\n`;
+                    if (hasChanged(roundedX, roundedInitialX)) {
+                        positionCSS += `--${spreadType}-position-${card.position}-x: ${roundedX}%;\n`;
                     }
                     
                     // Vérifier si y a changé
-                    if (hasChanged(Math.round(pos.y), Math.round(initialPos.y))) {
-                        positionCSS += `--${spreadType}-position-${card.position}-y: ${Math.round(pos.y)}%;\n`;
+                    if (hasChanged(roundedY, roundedInitialY)) {
+                        positionCSS += `--${spreadType}-position-${card.position}-y: ${roundedY}%;\n`;
                     }
                     
                     // Vérifier si rotation a changé
@@ -1095,15 +1208,22 @@
                 }
             }
             
-            // Mise à jour du texte de la zone d'affichage principale
-            output.textContent = css;
+            // Ne mettre à jour le DOM que si le contenu a réellement changé (optimisation)
+            if (css !== lastOutputContent) {
+                output.textContent = css;
+                lastOutputContent = css;
+                
+                // Mettre en évidence la sortie pendant une courte durée
+                if (!output.classList.contains('updating')) {
+                    output.classList.add('updating');
+                }
+            }
             
-            // Si besoin d'une mise à jour immédiate, forcer un reflow
-            if (instant) {
-                // Technique standard pour forcer un reflow
-                output.style.display = 'none';
-                void output.offsetHeight; // Force reflow
-                output.style.display = '';
+            // Supprimer la classe 'updating' après un délai (si pas déjà en cours)
+            if (!instant) {
+                setTimeout(() => {
+                    output.classList.remove('updating');
+                }, 300);
             }
         }
 
