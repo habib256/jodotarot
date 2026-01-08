@@ -184,21 +184,15 @@ const zh = {
   
   // Meta prompt pour l'IA
   metaprompt: {
-    base: `必需格式（400-450字）：
-1) 在一条消息中提供简洁完整的回答
-2) 使用相关的塔罗主题表情符号来说明概念
-3) 仅使用HTML格式：<h2>/<h3>标题，<em>/<strong>强调，<blockquote>引用，<ul>/<li>列表
-4) 融入牌的心理和象征方面
-5) 建立互补或对立的牌之间的联系
-6) 避免过于深奥的术语，保持易懂
-7) 以实用建议和行动建议结束
-8) 使用中文
-9) 您必须完全体现所选角色的特点，使用其特定的风格、词汇和世界观`,
+    base: `回答格式（400-450字，单条消息）：
+- 使用表情符号和markdown格式化
+- 融入心理学和象征意义，建立牌之间的联系
+- 保持易懂，避免过度术语
+- 以实用可行的建议结束
+- 完全体现角色：风格、词汇、世界观`,
     
-    emphasis: `重要提示：您的回答必须与这个问题直接且具体相关。
-请专注于问题所精确询问的内容，并根据问题中提到的元素调整您的解读。
-请勿提供泛泛而论的回答。
-您解读的每个方面都应该回应问题的某个方面。`
+    emphasis: `⚠️ 必须：精确回答所提问题。
+您解读的每个元素都必须阐明此问题的具体方面。`
   },
   
   // 连接消息
@@ -231,6 +225,49 @@ const zh = {
     ollamaConnected: "Ollama连接成功",
     modelAvailable: "模型可用",
     modelUnavailable: "模型不可用"
+  },
+  
+  // 连接状态
+  connectivity: {
+    connecting: "连接中...",
+    connected: "已连接",
+    disconnected: "已断开",
+    error: "连接错误"
+  },
+  
+  // 部分标题
+  sections: {
+    reading: "解读",
+    interpretations: "解释"
+  },
+  
+  // 卡牌
+  cards: {
+    major_arcana: {
+      fool: "愚者",
+      magician: "魔术师",
+      high_priestess: "女祭司",
+      empress: "皇后",
+      emperor: "皇帝",
+      hierophant: "教皇",
+      lovers: "恋人",
+      chariot: "战车",
+      justice: "正义",
+      hermit: "隐士",
+      wheel_of_fortune: "命运之轮",
+      strength: "力量",
+      hanged_man: "倒吊者",
+      death: "死神",
+      temperance: "节制",
+      devil: "恶魔",
+      tower: "高塔",
+      star: "星星",
+      moon: "月亮",
+      sun: "太阳",
+      judgement: "审判",
+      world: "世界",
+      back: "卡牌背面"
+    }
   }
 };
 

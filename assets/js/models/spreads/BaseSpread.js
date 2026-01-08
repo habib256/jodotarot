@@ -228,10 +228,10 @@ class BaseSpread {
     deck.shuffle();
     console.log(`Jeu mélangé - ${deck.getRemainingCount()} cartes disponibles`);
     
-    // Tirer le nombre de cartes nécessaires
+    // Tirer le nombre de cartes nécessaires avec orientation aléatoire
     for (let i = 0; i < this.getCardCount(); i++) {
       console.log(`Tirage de la carte ${i+1}/${this.getCardCount()}`);
-      const card = deck.drawCard();
+      const card = deck.drawCard(true); // true pour activer l'orientation aléatoire
       if (!card) {
         console.error(`Tirage échoué: carte nulle à l'indice ${i}`);
         throw new Error(`Tirage échoué: carte nulle à l'indice ${i}`);
@@ -331,6 +331,16 @@ class BaseSpread {
    * @return {string|null} Description détaillée ou null
    */
   getPositionDescription(positionIndex, card = null) {
+    // Si on a des descriptions de positions définies, les utiliser
+    if (this.positionDescriptions && this.positionDescriptions[this.language]) {
+      const descriptions = this.positionDescriptions[this.language];
+      const description = descriptions[positionIndex + 1];
+      if (description) {
+        return description;
+      }
+    }
+    
+    // Sinon, retourner une description basique si une carte est fournie
     if (!card) return '';
     
     // Description de base de la carte

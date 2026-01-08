@@ -124,6 +124,17 @@ const de = {
     celticCross: "Keltisches Kreuz"
   },
   
+  // Diverses
+  misc: {
+    loadingModels: "Modelle werden geladen...",
+    crossSpread: "➕ Kreuzlegung",
+    horseshoeSpread: "🧲 Hufeisenlegung",
+    loveSpread: "❤️ Liebes-Tarot",
+    celticCross: "☘️ Keltisches Kreuz"
+  },
+  
+  tarotPrompt: "{persona}, was offenbart dieses {spreadType} über meine Frage: \"{question}\"? Analysiere die Karten einzeln und als Ganzes, unter Berücksichtigung ihrer Positionen und Interaktionen. Teile deine einzigartige Sicht.",
+  
   // Messages d'avertissement
   warnings: {
     connectionFailed: "Verbindungsfehler",
@@ -168,21 +179,15 @@ const de = {
   
   // Meta prompt pour l'IA
   metaprompt: {
-    base: `Erforderliches Format (400-450 Wörter):
-1) Präzise und vollständige Antwort in einer Nachricht
-2) Verwende relevante Tarot-Emojis zur Veranschaulichung von Konzepten
-3) Nur HTML-Formatierung: <h1>/<h2>/<h3> Überschriften, <em>/<strong> Betonung, <blockquote> Zitate, <ul>/<li> Listen
-4) Integriere psychologische und symbolische Aspekte der Karten
-5) Stelle Verbindungen zwischen Karten her, die sich ergänzen oder entgegenstehen
-6) Vermeide übermäßig esoterischen Fachjargon, um verständlich zu bleiben
-7) Schließe mit praktischen Ratschlägen und einem Handlungsvorschlag ab
-8) Auf Deutsch
-9) Du musst unbedingt in der Rolle der gewählten Persona antworten, mit ihrem spezifischen Stil, Vokabular und ihrer Weltanschauung`,
+    base: `Antwortformat (400-450 Wörter, eine Nachricht):
+- Verwende Emojis und Markdown zur Formatierung
+- Integriere Psychologie und Symbolik, stelle Verbindungen zwischen Karten her
+- Bleibe verständlich, vermeide übermäßigen Fachjargon
+- Schließe mit praktischem und umsetzbarem Rat ab
+- Verkörpere die Persona vollständig: Stil, Vokabular, Weltanschauung`,
     
-    emphasis: `WICHTIG: Deine Antwort muss DIREKT und SPEZIFISCH mit dieser Frage verbunden sein.
-Konzentriere dich darauf, was die Frage genau fragt, und passe deine Interpretation
-an die in der Frage genannten Elemente an. Gib keine allgemeine Antwort.
-Jeder Aspekt deiner Interpretation muss einen Aspekt dieser Frage ansprechen.`
+    emphasis: `⚠️ IMPERATIV: Antworte PRÄZISE auf die gestellte Frage. 
+Jedes Element deiner Interpretation muss einen spezifischen Aspekt dieser Frage beleuchten.`
   },
   
   personaGroups: {
@@ -230,6 +235,35 @@ Jeder Aspekt deiner Interpretation muss einen Aspekt dieser Frage ansprechen.`
     ollamaConnected: "Ollama erfolgreich verbunden",
     modelAvailable: "Modell verfügbar",
     modelUnavailable: "Modell nicht verfügbar"
+  },
+  
+  // Karten
+  cards: {
+    major_arcana: {
+      fool: "Der Narr",
+      magician: "Der Magier",
+      high_priestess: "Die Hohepriesterin",
+      empress: "Die Herrscherin",
+      emperor: "Der Herrscher",
+      hierophant: "Der Hierophant",
+      lovers: "Die Liebenden",
+      chariot: "Der Wagen",
+      justice: "Die Gerechtigkeit",
+      hermit: "Der Eremit",
+      wheel_of_fortune: "Rad des Schicksals",
+      strength: "Die Kraft",
+      hanged_man: "Der Gehängte",
+      death: "Der Tod",
+      temperance: "Die Mäßigkeit",
+      devil: "Der Teufel",
+      tower: "Der Turm",
+      star: "Der Stern",
+      moon: "Der Mond",
+      sun: "Die Sonne",
+      judgement: "Das Gericht",
+      world: "Die Welt",
+      back: "Kartenrückseite"
+    }
   }
 };
 

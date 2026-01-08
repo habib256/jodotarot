@@ -1,0 +1,186 @@
+/**
+ * Styles pour l'agrandissement des cartes
+ */
+
+/* Overlay sombre pour le fond */
+.card-enlarge-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0);
+  z-index: 10000;
+  cursor: pointer;
+  transition: background-color 0.4s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-enlarge-overlay.active {
+  background-color: rgba(0, 0, 0, 0.85);
+}
+
+/* Message d'aide pour fermer */
+.card-enlarge-overlay::after {
+  content: '✕ Cliquez pour fermer';
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  color: white;
+  font-size: 1rem;
+  padding: 10px 20px;
+  background-color: rgba(107, 91, 149, 0.8);
+  border-radius: 20px;
+  opacity: 0;
+  transition: opacity 0.3s ease 0.5s;
+  pointer-events: none;
+  z-index: 10002;
+}
+
+.card-enlarge-overlay.active::after {
+  opacity: 1;
+}
+
+/* Carte agrandie */
+.card-enlarged {
+  cursor: default;
+  border-radius: 8px;
+  transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+  overflow: visible; /* Permet à l'image de ne pas être coupée */
+  position: relative;
+}
+
+/* S'assurer que la rotation de l'image est préservée pour les cartes renversées */
+.card-enlarged.reversed img {
+  transform: rotate(180deg);
+}
+
+/* Pour les images dans les cartes agrandies */
+.card-enlarged img {
+  max-width: none; /* Permet à l'image d'être plus grande que le conteneur si nécessaire */
+  max-height: none;
+}
+
+/* Informations de la carte agrandie */
+.card-enlarged-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 70%, transparent 100%);
+  padding: 20px;
+  color: white;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  opacity: 0;
+  animation: fadeInInfo 0.5s ease 0.3s forwards;
+}
+
+@keyframes fadeInInfo {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card-enlarged-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.card-enlarged-position {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-primary-light, #b8a4d9);
+  margin-bottom: 6px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Description détaillée retirée */
+
+/* Effet de survol sur les cartes pour indiquer qu'elles sont cliquables */
+.card {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  z-index: calc(var(--z-index-base, 10) + 1);
+}
+
+/* Animation du curseur au survol */
+.card:hover {
+  cursor: zoom-in;
+}
+
+.card-enlarged {
+  cursor: default !important;
+}
+
+/* Responsive - Ajustements pour mobile */
+@media (max-width: 768px) {
+  .card-enlarged-name {
+    font-size: 1.2rem;
+  }
+  
+  .card-enlarged-position {
+    font-size: 0.9rem;
+  }
+  
+  .card-enlarged-info {
+    padding: 15px;
+  }
+  
+  .card-enlarge-overlay::after {
+    font-size: 0.85rem;
+    padding: 8px 15px;
+    top: 10px;
+    right: 10px;
+  }
+}
+
+/* Ajustements pour les très petits écrans */
+@media (max-width: 480px) {
+  .card-enlarge-overlay::after {
+    content: '✕';
+    font-size: 1.5rem;
+    padding: 10px;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Empêcher le défilement du body quand une carte est agrandie */
+body.card-enlarged-active {
+  overflow: hidden;
+}
+
+/* S'assurer que la carte agrandie reste au-dessus de tout */
+.card-enlarge-overlay,
+.card-enlarged {
+  pointer-events: auto;
+}
+
+/* Animation douce pour les transitions */
+.card-enlarged * {
+  transition: none !important;
+}
+
+.card-enlarged img {
+  transition: none !important;
+}
+

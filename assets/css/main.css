@@ -23,8 +23,11 @@
 /* Composants */
 @import 'components/buttons.css';
 @import 'components/cards.css';
+@import 'components/card-enlarger.css';
 @import 'components/forms.css';
 @import 'components/information-zone.css';
+@import 'components/interpretation.css';
+@import 'components/copy-button.css';
 @import 'components/loading.css';
 @import 'components/modal.css';
 @import 'components/select.css';
@@ -42,6 +45,7 @@
 @import 'modules/celtic-cross-spread.css';
 @import 'modules/interpretations.css';
 @import 'modules/persona.css';
+@import 'modules/select.css';
 
 /**
  * Ce fichier central permet d'organiser les importations CSS
@@ -71,16 +75,4 @@ html, body {
 }
 
 /* Suppression des styles redondants de défilement qui sont maintenant dans scrolling.css */
-
-/* Styles pour le bouton désactivé pendant la génération */
-.primary-button.disabled {
-  background-color: #999;
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-.primary-button:disabled {
-  background-color: #999;
-  cursor: not-allowed;
-  opacity: 0.7;
-} 
+/* Styles pour les boutons désactivés définis dans components/buttons.css */ 

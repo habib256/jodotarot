@@ -39,6 +39,8 @@ JodoTarot est une application web élégante et intuitive qui vous permet de ré
 
 1. Clonez ce dépôt
 2. Configurez votre clé API dans `assets/js/config.js` (variable `SETTINGS.API_KEY`)
+   - Laissez `"YOUR API KEY"` si vous souhaitez utiliser uniquement Ollama
+   - Pour utiliser OpenAI, remplacez par votre clé API OpenAI
 3. Pour utiliser Ollama, vérifiez que le service est lancé (`ollama serve`)
 4. Ouvrez `index.html` dans votre navigateur
 

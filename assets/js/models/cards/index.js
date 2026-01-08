@@ -44,6 +44,7 @@ export class TarotCard {
   constructor(id, translationKey, image, arcana = ARCANE_TYPES.MAJOR, suit = null, rank = null) {
     this.id = id;
     this.translationKey = translationKey;
+    this.name = translationKey; // Alias pour faciliter l'accès au nom de la carte
     this.image = image;
     this.arcana = arcana;
     this.suit = suit;
@@ -84,6 +85,15 @@ export class TarotCard {
   getFullName() {
     if (this.arcana === ARCANE_TYPES.MAJOR) {
       return getTranslation(`cards.major_arcana.${this.translationKey}`);
+    } else {
+      return `${this.rank} of ${this.suit}`;
+    }
+  }
+
+  // Obtient le nom traduit de la carte dans la langue spécifiée
+  getTranslatedName(language = 'fr') {
+    if (this.arcana === ARCANE_TYPES.MAJOR) {
+      return getTranslation(`cards.major_arcana.${this.translationKey}`, language);
     } else {
       return `${this.rank} of ${this.suit}`;
     }

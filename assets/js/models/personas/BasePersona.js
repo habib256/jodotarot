@@ -52,6 +52,20 @@ class BasePersona {
   }
   
   /**
+   * Obtient les spécialisations traduites si disponibles
+   * @param {string} language - Code de langue
+   * @return {Array<string>} Liste des spécialisations traduites
+   */
+  getTranslatedSpecializations(language = 'fr') {
+    // Si les spécialisations sont un objet multilingue
+    if (this.specializations && typeof this.specializations === 'object' && !Array.isArray(this.specializations)) {
+      return this.specializations[language] || this.specializations['fr'] || [];
+    }
+    // Sinon retourner le tableau français par défaut
+    return this.specializations || [];
+  }
+
+  /**
    * Construit et retourne le prompt système pour ce persona
    * @param {string} spreadType - Type de tirage (cross, horseshoe, love)
    * @return {string} Prompt système formaté
@@ -65,15 +79,23 @@ class BasePersona {
       .replace('{{PERSONA_DESCRIPTION}}', this.getDescription())
       .replace('{{SPREAD_TYPE}}', spreadType);
       
+    // Obtenir les spécialisations traduites
+    const specializations = this.getTranslatedSpecializations(this.language);
+    
     // Ajouter les spécialisations si elles ne sont pas déjà mentionnées dans le template
-    if (this.specializations && this.specializations.length > 0 && !template.includes('{{SPECIALIZATIONS}}')) {
-      if (this.language === 'fr') {
-        formattedTemplate += `\n\nVos domaines d'expertise incluent: ${this.specializations.join(', ')}.`;
-      } else {
-        formattedTemplate += `\n\nYour areas of expertise include: ${this.specializations.join(', ')}.`;
-      }
+    if (specializations && specializations.length > 0 && !template.includes('{{SPECIALIZATIONS}}')) {
+      const expertiseLabels = {
+        'fr': 'Vos domaines d\'expertise incluent',
+        'en': 'Your areas of expertise include',
+        'es': 'Tus áreas de experiencia incluyen',
+        'de': 'Ihre Fachgebiete umfassen',
+        'it': 'Le tue aree di competenza includono',
+        'zh': '专业领域包括'
+      };
+      const label = expertiseLabels[this.language] || expertiseLabels['en'];
+      formattedTemplate += `\n\n${label}: ${specializations.join(', ')}.`;
     } else if (template.includes('{{SPECIALIZATIONS}}')) {
-      formattedTemplate = formattedTemplate.replace('{{SPECIALIZATIONS}}', this.specializations.join(', '));
+      formattedTemplate = formattedTemplate.replace('{{SPECIALIZATIONS}}', specializations.join(', '));
     }
     
     return formattedTemplate;

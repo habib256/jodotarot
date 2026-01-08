@@ -138,51 +138,9 @@
   padding: var(--spacing-xs);
   white-space: pre-wrap;
   word-wrap: break-word;
-  top: 40%;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
-.card-position.empty::after,
-.card-position:empty::after {
-  content: attr(data-position-meaning);
-  position: absolute;
-  font-size: var(--font-size-xs);
-  color: var(--color-text-light);
-  opacity: 0;
-  text-align: center;
-  width: 90%;
-  max-width: 90%;
-  padding: var(--spacing-xs);
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  top: 70%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  transition: opacity 0.3s ease;
-}
-
-.card-position.empty:hover::after,
-.card-position:empty:hover::after {
-  opacity: 0.8;
-}
-
-/* Styles pour les significations des positions */
-.card-position.empty[data-position-meaning]::after,
-.card-position:empty[data-position-meaning]::after {
-  content: attr(data-position-meaning);
-  position: absolute;
-  font-size: var(--font-size-xs);
-  color: var(--color-text-lightest);
-  opacity: 0.9;
-  text-align: center;
-  width: 90%;
-  max-width: 90%;
-  padding: var(--spacing-xs);
-  top: 65%;
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  line-height: 1.2;
-} 
+/* Descriptions détaillées des positions retirées - affichage simplifié */ 

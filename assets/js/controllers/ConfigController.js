@@ -340,7 +340,9 @@ class ConfigController {
       case 'celticCross':
         spreadTitle = getTranslation('spreadTypes.celticCross', language, 'Croix Celtique');
         break;
-      // Suppression du cas par défaut redondant
+      default:
+        spreadTitle = getTranslation('spreadTypes.cross', language, 'Tirage');
+        console.warn(`Type de tirage inconnu: ${spreadType}, utilisation du titre par défaut`);
     }
     
     this.elements.appTitle.textContent = `JodoTarot ${spreadTitle}`;
