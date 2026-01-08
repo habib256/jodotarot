@@ -6,7 +6,7 @@
 
 JodoTarot est une application web élégante et intuitive qui vous permet de réaliser des tirages de tarot et d'obtenir des interprétations générées par intelligence artificielle. Inspirée par l'univers mystique du tarot, cette application combine l'art divinatoire traditionnel avec les technologies modernes d'IA pour vous offrir une expérience de consultation unique.
 
-[Essayer JodoTarot](https://habib256.github.io/jodotarot/index.html) | [Documentation complète](docs/index.md) | [Guide de dépannage](docs/troubleshooting.md)
+[Essayer JodoTarot](https://habib256.github.io/jodotarot/index.html) | [Documentation technique](CLAUDE.md)
 
 ## 🚀 Guide rapide
 
@@ -20,7 +20,7 @@ JodoTarot est une application web élégante et intuitive qui vous permet de ré
 
 - 🎴 **4 types de tirages** (Croix Celtique, Croix, Fer à cheval, Amour)
 - 🧠 **Interprétation par IA** personnalisée
-- 👤 **[Multiples personas](docs/composants/personas.md)** pour des lectures variées
+- 👤 **Multiples personas** pour des lectures variées (22 personas disponibles)
 - 🎨 **4 jeux de tarot** (Marseille, Thiago Lehmann, Renaissance, Rick & Morty)
 - 🌍 **6 langues** supportées
 - 🤖 **Modèles d'IA** flexibles (OpenAI et Ollama)
@@ -42,15 +42,15 @@ JodoTarot est une application web élégante et intuitive qui vous permet de ré
 3. Pour utiliser Ollama, vérifiez que le service est lancé (`ollama serve`)
 4. Ouvrez `index.html` dans votre navigateur
 
-Pour plus de détails sur l'installation et la configuration, consultez notre [guide technique](docs/index.md).
+Pour plus de détails sur l'architecture et le développement, consultez [CLAUDE.md](CLAUDE.md).
 
-## 🔧 Besoin d'aide ?
+## 🔧 Configuration et Développement
 
-Si vous rencontrez des problèmes :
-- Consultez notre [guide de dépannage](docs/troubleshooting.md)
-- Explorez la [documentation complète](docs/index.md)
-- Découvrez nos [personas](docs/composants/personas.md)
-- Vérifiez les [paramètres de configuration](docs/troubleshooting.md#vérification-de-la-configuration)
+Pour configurer l'application ou contribuer au développement :
+- Consultez la [documentation technique](CLAUDE.md)
+- Vérifiez les paramètres dans `assets/js/config.js`
+- Explorez les 22 personas disponibles dans `assets/js/models/personas/`
+- Utilisez `spread-editor.html` pour configurer les positions de cartes
 
 ## 📝 Licence
 
