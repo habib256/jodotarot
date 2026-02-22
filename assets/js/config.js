@@ -24,7 +24,9 @@ const SETTINGS = {
   DEFAULT_LANGUAGE: "fr",        // Langue par défaut
   DEFAULT_DECK: "set01",         // Jeu de cartes par défaut
   DEFAULT_SPREAD: "cross",       // Type de tirage par défaut
-  DEFAULT_MODEL: "prompt",       // Modèle par défaut changé à "prompt" pour plus de sécurité
+  // Modèle par défaut : "prompt" = 100% offline, aucune clé API requise (idéal itch.io)
+  // 3 modes disponibles : prompt (gratuit, affiche le prompt), openai/* (clé API), ollama:* (Ollama local)
+  DEFAULT_MODEL: "prompt",
   
   // Paramètres d'interface
   HIDE_PROMPT: false,      // Masquer le prompt envoyé à l'IA
