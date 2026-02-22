@@ -42,9 +42,20 @@ JodoTarot est une application web élégante et intuitive qui vous permet de ré
    - Laissez `"YOUR API KEY"` si vous souhaitez utiliser uniquement Ollama
    - Pour utiliser OpenAI, remplacez par votre clé API OpenAI
 3. Pour utiliser Ollama, vérifiez que le service est lancé (`ollama serve`)
-4. Ouvrez `index.html` dans votre navigateur
+4. Ouvrez `index.html` dans votre navigateur (nécessite un serveur HTTP)
 
 Pour plus de détails sur l'architecture et le développement, consultez [CLAUDE.md](CLAUDE.md).
+
+## 📦 Version standalone (hors-ligne)
+
+Une version autonome peut être générée pour une utilisation sans serveur HTTP, directement en `file://` :
+
+```bash
+npm install        # Installe les dépendances (esbuild)
+npm run build      # Génère index-standalone.html
+```
+
+Ouvrez ensuite `index-standalone.html` directement dans votre navigateur. Tout le JavaScript et le CSS sont intégrés dans le fichier. Les images restent dans `assets/images/` (le fichier doit rester au même niveau que le dossier `assets/`).
 
 ## 🔧 Configuration et Développement
 

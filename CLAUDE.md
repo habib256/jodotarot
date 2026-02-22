@@ -8,17 +8,21 @@ JodoTarot is a modular web application for tarot readings with AI-powered interp
 
 **Key Tech**: HTML5, CSS3, JavaScript ES6+ modules, LocalStorage
 **AI Integration**: OpenAI API, Ollama (local models)
-**No build tools**: Direct browser execution via `index.html`
+**Dev mode**: Direct browser execution via `index.html` (requires HTTP server)
+**Standalone mode**: `npm run build` generates `index-standalone.html` (works via `file://`)
 
 ## Development Commands
 
 ### Running the Application
 ```bash
-# No build needed - open directly in browser
-open index.html
-# Or use a simple HTTP server for proper module loading
+# Development: use an HTTP server (ES modules require it)
 python -m http.server 8000
 # Then navigate to http://localhost:8000
+
+# Standalone: build and open directly in browser (no server needed)
+npm install          # Install esbuild (one-time)
+npm run build        # Generates index-standalone.html
+open index-standalone.html   # Works via file://
 ```
 
 ### Testing AI Connectivity
@@ -69,19 +73,24 @@ UI Components (rendering)
 ### File Organization
 
 ```
-assets/js/
-├── controllers/     # App coordination (AppController, ReadingController, ConfigController)
-├── services/        # Business logic (AIService, DeckService, UIService)
-├── models/
-│   ├── personas/    # 21 AI interpretation personas (inherit from BasePersona)
-│   └── spreads/     # 4 spread types (inherit from BaseSpread)
-├── utils/           # StateManager (centralized state management)
-├── translations/    # 6 language files (fr, en, es, de, it, zh)
-├── main.js          # Entry point
-├── api.js           # Low-level AI API calls
-├── config.js        # Configuration constants
-├── prompt.js        # Prompt construction utilities
-└── ui.js            # Legacy UI functions (being migrated to UIService)
+./
+├── index.html               # Main entry point (requires HTTP server)
+├── build.js                 # Standalone build script (esbuild)
+├── package.json             # Dev dependencies (esbuild)
+├── index-standalone.html    # Generated standalone version (gitignored)
+└── assets/js/
+    ├── controllers/     # App coordination (AppController, ReadingController, ConfigController)
+    ├── services/        # Business logic (AIService, DeckService, UIService)
+    ├── models/
+    │   ├── personas/    # 21 AI interpretation personas (inherit from BasePersona)
+    │   └── spreads/     # 4 spread types (inherit from BaseSpread)
+    ├── utils/           # StateManager (centralized state management)
+    ├── translations/    # 6 language files (fr, en, es, de, it, zh)
+    ├── main.js          # Entry point
+    ├── api.js           # Low-level AI API calls
+    ├── config.js        # Configuration constants
+    ├── prompt.js        # Prompt construction utilities
+    └── ui.js            # Legacy UI functions (being migrated to UIService)
 ```
 
 ## Critical Implementation Details
@@ -353,6 +362,36 @@ const msg = getTranslation('interpretation.loadingWithModel', 'fr', {
 - "Prompt" mode: No external API calls, data stays local
 - Input validation prevents injection attacks
 - AI responses returned as plain text, not HTML (XSS prevention)
+
+## Standalone Build System
+
+The project includes a build system (`build.js`) using esbuild to generate a self-contained `index-standalone.html` that works via `file://` without any HTTP server.
+
+### How It Works
+
+1. **esbuild bundles JS** — `assets/js/main.js` is bundled as IIFE (no `type="module"` needed)
+2. **esbuild bundles CSS** — `assets/css/main.css` with all `@import` resolved
+3. **HTML generation** — `index.html` is used as template, CSS and JS inlined via `<style>` and `<script>` tags
+4. **Images stay external** — `assets/images/` remains as-is (relative paths work in `file://`)
+
+### Build Plugins
+
+Two esbuild plugins handle `file://` compatibility:
+
+- **`personaStaticImportPlugin`** — Converts dynamic `await import()` calls in `personas/index.js` to static imports (esbuild cannot bundle dynamic imports with variable paths)
+- **`deckServicePatchPlugin`** — Removes the `fetch()`-based image validation in `DeckService.loadDeck()` (fetch fails on `file://`, but `<img>` tags load fine)
+
+### Key Files
+
+| File | Description |
+|------|-------------|
+| `package.json` | Dev dependency: esbuild |
+| `build.js` | Build script with plugins |
+| `index-standalone.html` | Generated output (gitignored) |
+
+### Rebuilding After Changes
+
+After modifying any source JS/CSS, run `npm run build` to regenerate the standalone file.
 
 ## Additional Resources
 
