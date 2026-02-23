@@ -83,14 +83,8 @@ class StateManager {
           for (const card of value) {
             if (!card || typeof card !== 'object') return false;
             
-            // Si la carte n'a pas d'ID, essayer de le générer à partir du nom
             if (!card.id) {
-              const cardNumber = this.getCardNumberFromName(card.name);
-              if (cardNumber !== null) {
-                card.id = `M${cardNumber.toString().padStart(2, '0')}`;
-              } else {
-                return false;
-              }
+              return false;
             }
             
             if (!card.name || typeof card.name !== 'string') return false;

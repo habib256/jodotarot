@@ -61,10 +61,14 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
           return testingText;
         } else if (connectivityTest.status === 'error') {
           const errorMessage = `${getTranslation('interpretation.connectionError', langue) || 'Erreur de connexion à Ollama:'} ${connectivityTest.message}`;
-          
+
           // Afficher le message d'erreur dans responseContent
           if (responseContent) {
-            responseContent.innerHTML = `<p class="error">${errorMessage}</p>`;
+            const p = document.createElement('p');
+            p.className = 'error';
+            p.textContent = errorMessage;
+            responseContent.innerHTML = '';
+            responseContent.appendChild(p);
           }
           
           throw new Error(`Erreur Ollama: ${connectivityTest.message}`);
@@ -362,9 +366,6 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
           // Ne pas lever d'erreur mais enregistrer l'avertissement
         }
         
-        // Ajouter un marqueur pour indiquer que le streaming s'est terminé correctement
-        fullResponse += "\n\n<!-- streaming-completed -->";
-        
         // Mettre en cache la réponse
         responseCache.set(JSON.stringify({
           persona,
@@ -382,14 +383,22 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
     } catch (fetchError) {
       console.error("🔍 DEBUG - Erreur critique fetch:", fetchError);
       if (responseContent) {
-        responseContent.innerHTML = `<p class="error">${getTranslation('interpretation.apiError', langue) || 'Erreur API:'} ${fetchError.message}</p>`;
+        const p1 = document.createElement('p');
+        p1.className = 'error';
+        p1.textContent = `${getTranslation('interpretation.apiError', langue) || 'Erreur API:'} ${fetchError.message}`;
+        responseContent.innerHTML = '';
+        responseContent.appendChild(p1);
       }
       throw fetchError;
     }
   } catch (error) {
     console.error("🔍 DEBUG - Erreur globale:", error);
     if (responseContent) {
-      responseContent.innerHTML = `<p class="error">${getTranslation('interpretation.error', langue) || 'Erreur:'} ${error.message}</p>`;
+      const p2 = document.createElement('p');
+      p2.className = 'error';
+      p2.textContent = `${getTranslation('interpretation.error', langue) || 'Erreur:'} ${error.message}`;
+      responseContent.innerHTML = '';
+      responseContent.appendChild(p2);
     }
     throw error;
   }

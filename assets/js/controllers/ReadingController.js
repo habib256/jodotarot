@@ -445,11 +445,14 @@ class ReadingController {
         state.spreadType
       );
       
+      // Marquer le chargement comme terminé
+      this.stateManager.setState({ isLoading: false });
+
       // Réactiver le bouton et restaurer son texte original avec le texte traduit
       this.elements.tirerButton.disabled = false;
       this.elements.tirerButton.textContent = getTranslation('header.drawButton', currentLanguage);
       this.elements.tirerButton.classList.remove('disabled');
-      
+
     } catch (error) {
       console.error("Erreur lors du tirage:", error);
       
@@ -473,7 +476,11 @@ class ReadingController {
       }
       
       // Afficher l'erreur à l'utilisateur
-      this.elements.responseContent.innerHTML = `<p class="error">${error.message}</p>`;
+      const errorP = document.createElement('p');
+      errorP.className = 'error';
+      errorP.textContent = error.message;
+      this.elements.responseContent.innerHTML = '';
+      this.elements.responseContent.appendChild(errorP);
     }
   }
   
@@ -593,9 +600,10 @@ class ReadingController {
         this.fullText = response;
       }
       
-      // Extraire le nom du modèle sans préfixe
-      const modelName = model.replace('ollama:', '').replace('openai/', '');
-      
+      // Extraire le nom du modèle sans préfixe et échapper pour HTML
+      const modelName = model.replace('ollama:', '').replace('openai/', '')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
       // Ajouter le nom du modèle à la fin du texte avec le formatage HTML approprié et aligné à droite
       this.fullText += `\n\n<div style="text-align: right;"><em>Généré par: ${modelName}</em></div>`;
       this.startTypewriterEffect();
@@ -622,21 +630,17 @@ class ReadingController {
       }
       
       // Afficher un message d'erreur approprié à l'utilisateur
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'error-message';
+      const errorMsg = document.createElement('p');
       if (error.message && error.message.includes('aborted')) {
-        // Si l'erreur est due à une annulation, afficher un message spécifique
-        this.elements.responseContent.innerHTML = `
-          <div class="error-message">
-            <p>${getTranslation('interpretation.error.generationStopped', language)}</p>
-          </div>
-        `;
+        errorMsg.textContent = getTranslation('interpretation.error.generationStopped', language);
       } else {
-        // Sinon, afficher le message d'erreur général
-        this.elements.responseContent.innerHTML = `
-          <div class="error-message">
-            <p>${getTranslation('interpretation.error.interpretationError', language)}: ${error.message}</p>
-          </div>
-        `;
+        errorMsg.textContent = `${getTranslation('interpretation.error.interpretationError', language)}: ${error.message}`;
       }
+      errorDiv.appendChild(errorMsg);
+      this.elements.responseContent.innerHTML = '';
+      this.elements.responseContent.appendChild(errorDiv);
       
       throw error;
     }

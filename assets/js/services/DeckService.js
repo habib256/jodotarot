@@ -60,23 +60,6 @@ class DeckService {
       this.decks[deckId] = deck;
       this.currentDeckId = deckId;
 
-      // Vérifier que toutes les images sont accessibles
-      console.log(`🔍 Vérification des images pour le jeu ${deckId}...`);
-      for (const card of majorCards) {
-        try {
-          const url = card.imageUrl || card.image;
-          console.log(`🖼️ Tentative de chargement de l'image: ${url}`);
-          const response = await fetch(url);
-          if (!response.ok) {
-            throw new Error(`Image non trouvée: ${url}`);
-          }
-          console.log(`✅ Image chargée avec succès: ${url}`);
-        } catch (error) {
-          console.error(`❌ Erreur lors du chargement de l'image ${card.imageUrl || card.image}:`, error);
-          throw new Error(`Impossible de charger l'image de la carte ${card.name}`);
-        }
-      }
-
       console.log(`✅ Jeu ${deckId} chargé avec succès`);
       return deck;
     } catch (error) {
@@ -97,7 +80,7 @@ class DeckService {
     }
 
     const cards = [];
-    for (let i = 0; i <= config.majorCount; i++) {
+    for (let i = 0; i < config.majorCount; i++) {
       const cardName = config.cardNames[i];
       const fileName = `${String(i).padStart(2, '0')}_${cardName}.${config.extension}`;
       const imagePath = `${config.path}/${fileName}`;

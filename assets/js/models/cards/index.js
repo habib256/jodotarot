@@ -287,7 +287,7 @@ function generateCards(setId) {
   }
 
   const cards = [];
-  for (let i = 0; i <= config.majorCount; i++) {
+  for (let i = 0; i < config.majorCount; i++) {
     const cardName = config.cardNames[i];
     const fileName = `${String(i).padStart(2, '0')}_${cardName}.${config.extension}`;
     const imagePath = `${config.path}/${fileName}`;
@@ -440,8 +440,9 @@ export function getMajorCardMeaning(cardId, orientation = 'upright') {
  * @return {string} URL de l'image de dos
  */
 export function getBackCardImage(setId) {
-  if (!cardSets[setId]) return "";
-  
-  const backCardIndex = cardSets[setId].backCardIndex;
-  return cardSets[setId].cards[backCardIndex].image;
+  const config = cardSetConfigs[setId];
+  if (!config) return "";
+
+  const fileName = `${String(config.majorCount).padStart(2, '0')}_${config.cardNames[config.majorCount]}.${config.extension}`;
+  return `${config.path}/${fileName}`;
 } 

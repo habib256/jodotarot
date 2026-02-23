@@ -87,9 +87,9 @@ function updateUILanguage(langue) {
   updateAppTitle(langue);
   
   // Mettre à jour les étiquettes des sélecteurs
-  document.querySelector('.select-group:nth-child(1) .select-label').textContent = getTranslation('header.deck', langue);
-  document.querySelector('.select-group:nth-child(2) .select-label').textContent = getTranslation('header.language', langue);
-  document.querySelector('.select-group:nth-child(3) .select-label').textContent = getTranslation('header.persona', langue);
+  document.querySelector('.select-group:nth-child(1) .select-label').textContent = getTranslation('header.language', langue);
+  document.querySelector('.select-group:nth-child(2) .select-label').textContent = getTranslation('header.persona', langue);
+  document.querySelector('.select-group:nth-child(3) .select-label').textContent = getTranslation('header.deck', langue);
   document.querySelector('.select-group:nth-child(4) .select-label').textContent = getTranslation('header.spreadType', langue);
   document.querySelector('.select-group:nth-child(5) .select-label').textContent = getTranslation('header.model', langue);
   

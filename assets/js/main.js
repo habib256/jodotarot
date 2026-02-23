@@ -72,9 +72,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     await stateManager.initialize();
     console.log('✅ État chargé avec succès');
     
-    // Définir le jeu de cartes par défaut si non défini
-    // Utilisez cardSet au lieu de deckId pour être cohérent avec le schéma d'état mis à jour
-    stateManager.setState({ cardSet: 'set01' });
+    // Définir le jeu de cartes par défaut uniquement si non défini dans l'état restauré
+    const restoredState = stateManager.getState();
+    if (!restoredState.cardSet) {
+      stateManager.setState({ cardSet: 'set01' });
+    }
     
     // Créer les services après l'initialisation de l'état
     aiService = new AIService(stateManager);
@@ -107,12 +109,16 @@ document.addEventListener('DOMContentLoaded', async () => {
  */
 async function loadInitialResources() {
   try {
-    // Définir la langue française par défaut
-    stateManager.setState({ language: 'fr' });
-    
-    // Forcer la sélection du tirage en croix au démarrage
-    document.getElementById('spread-type').value = 'cross';
-    stateManager.setState({ spreadType: 'cross' });
+    // Définir la langue et le tirage par défaut uniquement si non restaurés
+    const currentState = stateManager.getState();
+    if (!currentState.language) {
+      stateManager.setState({ language: 'fr' });
+    }
+
+    if (!currentState.spreadType) {
+      stateManager.setState({ spreadType: 'cross' });
+    }
+    document.getElementById('spread-type').value = currentState.spreadType || 'cross';
     
     // Afficher l'animation de chargement
     const loadingAnimations = document.getElementById('loading-animations');
@@ -232,8 +238,19 @@ async function handleCopyButtonClick() {
       textToCopy = responseContent.textContent;
     }
     
-    // Copier dans le presse-papier
-    await navigator.clipboard.writeText(textToCopy);
+    // Copier dans le presse-papier (avec fallback pour file://)
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(textToCopy);
+    } else {
+      const textarea = document.createElement('textarea');
+      textarea.value = textToCopy;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+    }
     
     // Afficher un retour visuel de succès
     const originalText = copyButton.querySelector('span').textContent;
