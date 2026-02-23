@@ -697,23 +697,9 @@ function formatStreamingResponse(text) {
   
   // Réduire les logs de débogage
   if (DEBUG_LEVEL > 2) console.log("🔍 DEBUG - formatStreamingResponse:", text.substring(0, 30) + "...");
-  
-  // Cache statique pour optimiser les appels répétés
-  if (!formatStreamingResponse.containsHtmlCache) {
-    formatStreamingResponse.containsHtmlCache = new Map();
-  }
-  
-  // Vérifier si on a déjà analysé ce texte (optimisation)
-  const cacheKey = text.substring(0, 100); // Utiliser début du texte comme clé
-  
-  let containsHtml;
-  if (formatStreamingResponse.containsHtmlCache.has(cacheKey)) {
-    containsHtml = formatStreamingResponse.containsHtmlCache.get(cacheKey);
-  } else {
-    // Vérifie si le texte contient déjà des balises HTML
-    containsHtml = /<\/?[a-z][\s\S]*>/i.test(text);
-    formatStreamingResponse.containsHtmlCache.set(cacheKey, containsHtml);
-  }
+
+  // Vérifie si le texte contient déjà des balises HTML
+  const containsHtml = /<\/?[a-z][\s\S]*>/i.test(text);
   
   if (containsHtml) {
     // Si le texte contient déjà du HTML, vérifier seulement qu'il est enveloppé dans un conteneur

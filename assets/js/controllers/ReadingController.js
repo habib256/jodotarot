@@ -492,8 +492,6 @@ class ReadingController {
     if (this.elements.responseContent) {
       this.elements.responseContent.innerHTML = '';
     }
-
-    this.stateManager.setState({ lastInterpretation: null });
   }
   
   /**
@@ -885,8 +883,11 @@ class ReadingController {
    * Initialise les gestionnaires d'événements pour le défilement
    */
   initScrollHandlers() {
+    if (this.scrollHandlersInitialized) return;
+    this.scrollHandlersInitialized = true;
+
     this.elements.responseContent.setAttribute('tabindex', '0');
-    
+
     // Permettre le focus au clic
     this.elements.responseContent.addEventListener('click', () => {
       this.elements.responseContent.focus();
