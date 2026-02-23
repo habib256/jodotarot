@@ -307,6 +307,10 @@ class ReadingController {
    * Effectue un tirage de cartes
    */
   async performReading() {
+    // Protection contre les double-clics / appels concurrents
+    if (this.isPerformingReading) return;
+    this.isPerformingReading = true;
+
     try {
       const state = this.stateManager.getState();
       const currentLanguage = state.language || 'fr';
@@ -448,39 +452,33 @@ class ReadingController {
       // Marquer le chargement comme terminé
       this.stateManager.setState({ isLoading: false });
 
-      // Réactiver le bouton et restaurer son texte original avec le texte traduit
-      this.elements.tirerButton.disabled = false;
-      this.elements.tirerButton.textContent = getTranslation('header.drawButton', currentLanguage);
-      this.elements.tirerButton.classList.remove('disabled');
-
     } catch (error) {
       console.error("Erreur lors du tirage:", error);
-      
+
       // Mettre à jour l'état avec l'erreur
       this.stateManager.setState({
         isLoading: false
       });
-      
-      const state = this.stateManager.getState();
-      const currentLanguage = state.language || 'fr';
-      
-      // Réactiver le bouton et restaurer son texte en cas d'erreur
-      this.elements.tirerButton.disabled = false;
-      this.elements.tirerButton.textContent = getTranslation('header.drawButton', currentLanguage);
-      this.elements.tirerButton.classList.remove('disabled');
-      
+
       // Masquer le message de statut en cas d'erreur
       const statusMessage = document.getElementById('status-message');
       if (statusMessage) {
         statusMessage.style.display = 'none';
       }
-      
+
       // Afficher l'erreur à l'utilisateur
       const errorP = document.createElement('p');
       errorP.className = 'error';
       errorP.textContent = error.message;
       this.elements.responseContent.innerHTML = '';
       this.elements.responseContent.appendChild(errorP);
+    } finally {
+      // Toujours réactiver le bouton et réinitialiser le guard
+      const currentLang = this.stateManager.getState().language || 'fr';
+      this.elements.tirerButton.disabled = false;
+      this.elements.tirerButton.textContent = getTranslation('header.drawButton', currentLang);
+      this.elements.tirerButton.classList.remove('disabled');
+      this.isPerformingReading = false;
     }
   }
   
@@ -530,25 +528,27 @@ class ReadingController {
       
       // Afficher l'indicateur de génération en cours
       const generationIndicator = document.getElementById('generation-indicator');
-      const modelNameSpan = generationIndicator.querySelector('.model-name');
-      if (generationIndicator && modelNameSpan) {
-        // Extraire et afficher le nom du modèle
-        const modelDisplayName = model.replace('ollama:', '').replace('openai/', '');
-        modelNameSpan.textContent = modelDisplayName;
-        
+      if (generationIndicator) {
+        const modelNameSpan = generationIndicator.querySelector('.model-name');
+        if (modelNameSpan) {
+          // Extraire et afficher le nom du modèle
+          const modelDisplayName = model.replace('ollama:', '').replace('openai/', '');
+          modelNameSpan.textContent = modelDisplayName;
+        }
+
         // Mettre à jour le texte du bouton d'arrêt avec la traduction
         const stopGenerationText = generationIndicator.querySelector('#stop-generation-text');
         if (stopGenerationText) {
           stopGenerationText.textContent = getTranslation('header.stopGeneration', language);
         }
-        
+
         generationIndicator.style.display = 'block';
       }
       
       // Préparer l'affichage des animations de chargement
       this.elements.responseContent.innerHTML = `
         <div class="loading-message">
-          <p>Génération de l'interprétation en cours...</p>
+          <p>${getTranslation('interpretation.loading', language)}</p>
           <div class="loading-spinner"></div>
         </div>
       `;
@@ -556,19 +556,26 @@ class ReadingController {
       // Variable pour suivre si nous avons reçu le premier chunk
       let firstChunkReceived = false;
       
+      // Fonction d'échappement HTML pour prévenir les injections XSS
+      const escapeHtml = (text) => text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+
       // Obtenir une interprétation avec streaming et effet de machine à écrire
       const handleChunk = (chunk) => {
         // Supprimer les timestamps qui pourraient apparaître à la fin (comme "2025-03-11T17:58:05.280771997Z")
         const cleanedChunk = chunk.replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z$/g, '');
-        
+
         // Si c'est le premier chunk, remplacer le message de chargement par la div de machine à écrire
         if (!firstChunkReceived) {
           this.elements.responseContent.innerHTML = '<div class="typewriter-text"></div>';
           firstChunkReceived = true;
         }
-        
-        // Ajouter le nouveau chunk au texte complet
-        this.fullText += cleanedChunk;
+
+        // Ajouter le nouveau chunk au texte complet (échappé pour prévenir XSS)
+        this.fullText += escapeHtml(cleanedChunk);
         
         // Si une animation de frappe est déjà en cours, l'arrêter
         if (this.typewriterTimeout) {
@@ -594,8 +601,8 @@ class ReadingController {
       // nous devons mettre à jour l'affichage manuellement
       if (!firstChunkReceived) {
         this.elements.responseContent.innerHTML = '<div class="typewriter-text"></div>';
-        // Interprétation (réponse modèle) est en HTML; si le modèle est prompt, getInterpretation renvoie du texte
-        this.fullText = response;
+        // Échapper la réponse pour prévenir XSS
+        this.fullText = escapeHtml(response);
       }
       
       // Extraire le nom du modèle sans préfixe et échapper pour HTML
@@ -620,7 +627,13 @@ class ReadingController {
       return response;
     } catch (error) {
       console.error("Erreur lors de l'interprétation:", error);
-      
+
+      // Arrêter toute animation de machine à écrire en cours
+      if (this.typewriterTimeout) {
+        clearTimeout(this.typewriterTimeout);
+        this.typewriterTimeout = null;
+      }
+
       // Masquer l'indicateur de génération en cas d'erreur
       const generationIndicator = document.getElementById('generation-indicator');
       if (generationIndicator) {
@@ -884,6 +897,7 @@ class ReadingController {
    */
   initScrollHandlers() {
     if (this.scrollHandlersInitialized) return;
+    if (!this.elements.responseContent) return;
     this.scrollHandlersInitialized = true;
 
     this.elements.responseContent.setAttribute('tabindex', '0');

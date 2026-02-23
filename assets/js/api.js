@@ -204,6 +204,9 @@ async function obtenirReponseGPT4O(message, systemPrompts = [], modele = 'openai
       
       // Traiter le stream de la réponse
       console.log("🔍 DEBUG - Début traitement du stream");
+      if (!response.body) {
+        throw new Error('La réponse du serveur est vide (pas de corps de réponse)');
+      }
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let fullResponse = '';
