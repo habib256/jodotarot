@@ -226,20 +226,6 @@ Ogni elemento della tua interpretazione deve illuminare un aspetto specifico di 
     modelUnavailable: "Modello non disponibile"
   },
   
-  // Messaggi di connettività
-  connectivity: {
-    connecting: "Connessione in corso...",
-    connected: "Connesso",
-    disconnected: "Disconnesso",
-    error: "Errore di connessione"
-  },
-  
-  // Titoli delle sezioni
-  sections: {
-    reading: "Lettura",
-    interpretations: "Interpretazione"
-  },
-  
   // Carte
   cards: {
     major_arcana: {

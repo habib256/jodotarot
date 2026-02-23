@@ -227,20 +227,6 @@ const zh = {
     modelUnavailable: "模型不可用"
   },
   
-  // 连接状态
-  connectivity: {
-    connecting: "连接中...",
-    connected: "已连接",
-    disconnected: "已断开",
-    error: "连接错误"
-  },
-  
-  // 部分标题
-  sections: {
-    reading: "解读",
-    interpretations: "解释"
-  },
-  
   // 卡牌
   cards: {
     major_arcana: {
