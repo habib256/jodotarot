@@ -53,20 +53,6 @@ class AIService {
   }
   
   /**
-   * Gère une erreur d'annulation
-   * @param {Error} error - L'erreur à gérer
-   * @returns {boolean} True si c'était une erreur d'annulation
-   */
-  handleAbortError(error) {
-    if (error.name === 'AbortError') {
-      console.log('Interprétation annulée par l\'utilisateur');
-      this.isGenerating = false;
-      return true;
-    }
-    return false;
-  }
-  
-  /**
    * Annule l'interprétation en cours si elle existe
    * @returns {boolean} Indique si une interprétation a été annulée
    */
@@ -185,18 +171,17 @@ class AIService {
    */
   loadApiKey() {
     try {
-      if (window.localStorage) {
-        const encodedKey = localStorage.getItem('jodotarot_api_key');
-        if (encodedKey) {
-          // Décoder la clé
-          const apiKey = atob(encodedKey);
-          this.apiKey = apiKey;
-          console.log('Clé API OpenAI chargée depuis le localStorage');
-          return apiKey;
-        }
+      const encodedKey = localStorage.getItem('jodotarot_api_key');
+      if (encodedKey) {
+        return atob(encodedKey);
       }
     } catch (error) {
-      console.error('Erreur lors du chargement de la clé API:', error);
+      console.warn('Clé API illisible, suppression de l\'entrée corrompue:', error.message);
+      try {
+        localStorage.removeItem('jodotarot_api_key');
+      } catch {
+        // localStorage indisponible: rien de plus à faire
+      }
     }
     
     return null;
@@ -350,23 +335,28 @@ class AIService {
       return response;
     } catch (error) {
       this.isGenerating = false;
-      console.error("Erreur lors de l'obtention de l'interprétation:", error);
-      
-      if (this.handleAbortError(error)) {
-        return "";
+
+      // Annulation demandée par l'utilisateur: ce n'est pas une erreur,
+      // l'appelant conserve le texte déjà reçu et le signale à sa façon.
+      if (error.name === 'AbortError') {
+        console.log('Interprétation annulée par l\'utilisateur');
+        throw error;
       }
-      
+
+      console.error("Erreur lors de l'obtention de l'interprétation:", error);
+
       // Gestion plus détaillée des erreurs
       let errorMessage = "Une erreur est survenue lors de l'interprétation.";
-      
+      const details = error?.message || '';
+
       if (!this.apiKey && model.startsWith('openai/')) {
         errorMessage = "La clé API OpenAI n'est pas configurée.";
-      } else if (error.message.includes('timeout')) {
+      } else if (details.includes('timeout')) {
         errorMessage = "Le temps de réponse a dépassé la limite.";
-      } else if (error.message.includes('connect')) {
+      } else if (details.includes('connect')) {
         errorMessage = "Impossible de se connecter au service d'IA.";
       }
-      
+
       throw new Error(errorMessage);
     }
   }

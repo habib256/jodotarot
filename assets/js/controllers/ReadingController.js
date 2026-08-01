@@ -78,15 +78,29 @@ class ReadingController {
       }
     });
 
-    // Changement de type de tirage
+    // Changement de type de tirage: le tirage précédent n'a plus de sens dans
+    // une disposition qui n'a ni le même nombre ni les mêmes positions.
     document.addEventListener('spreadType:changed', (event) => {
+      this.clearReading();
       this.updateSpreadDisplay(event.detail.spreadType);
+      this.currentSpread.reset();
     });
 
     // Changement de langue: réinitialiser les tirages pour traduire les positions
     document.addEventListener('language:changed', () => {
       this.initializeAllSpreads();
     });
+  }
+
+  /**
+   * Efface le tirage courant, en mémoire comme dans l'état persisté
+   */
+  clearReading() {
+    this.currentReading = [];
+    if (this.currentSpread) {
+      this.currentSpread.cards = [];
+    }
+    this.stateManager.setState({ cards: [], interpretation: null });
   }
 
   /**
@@ -406,21 +420,57 @@ class ReadingController {
 
       return this.fullText;
     } catch (error) {
-      console.error("Erreur lors de l'interprétation:", error);
-
       this.stopTypewriterEffect();
 
       if (generationIndicator) {
         generationIndicator.style.display = 'none';
       }
 
-      // Afficher un message d'erreur approprié à l'utilisateur
-      const message = error.message?.includes('aborted')
-        ? getTranslation('interpretation.error.generationStopped', language)
-        : `${getTranslation('interpretation.error.interpretationError', language)}: ${error.message}`;
-      this.showResponseError(message);
+      // La langue a pu changer pendant la génération (c'est même une des
+      // façons de l'annuler): utiliser celle affichée actuellement.
+      const currentLanguage = this.stateManager.getState().language;
+
+      // Annulation volontaire: conserver le texte déjà reçu et l'indiquer,
+      // sans la traiter comme un échec du tirage.
+      if (error.name === 'AbortError') {
+        this.showGenerationStoppedNotice(currentLanguage);
+        return this.fullText;
+      }
+
+      console.error("Erreur lors de l'interprétation:", error);
+
+      this.showResponseError(
+        `${getTranslation('interpretation.error.interpretationError', currentLanguage)}: ${error.message}`
+      );
 
       throw error;
+    }
+  }
+
+  /**
+   * Signale que la génération a été interrompue, en conservant le texte déjà
+   * affiché. Le message n'est pas ajouté à `fullText`: il ne doit pas être
+   * persisté comme faisant partie de l'interprétation.
+   * @param {string} language - Code de langue
+   */
+  showGenerationStoppedNotice(language) {
+    if (!this.elements.responseContent) return;
+
+    // S'assurer que le texte partiel déjà reçu est intégralement affiché
+    const typewriterElement = this.elements.responseContent.querySelector('.typewriter-text');
+    if (typewriterElement) {
+      typewriterElement.textContent = this.fullText;
+      this.typedLength = this.fullText.length;
+    }
+
+    const notice = document.createElement('p');
+    notice.className = 'generation-stopped-notice';
+    notice.textContent = getTranslation('interpretation.error.generationStopped', language);
+
+    if (typewriterElement) {
+      this.elements.responseContent.appendChild(notice);
+    } else {
+      this.elements.responseContent.replaceChildren(notice);
     }
   }
 
@@ -534,8 +584,8 @@ class ReadingController {
       const newDeck = await this.deckService.loadDeck(deckId);
 
       // Réinitialiser le tirage: les cartes du jeu précédent ne sont plus valides
-      this.currentReading = [];
-      this.stateManager.setState({ cards: [], error: null });
+      this.clearReading();
+      this.stateManager.setState({ error: null });
 
       // Réafficher le tirage courant, désormais vide
       this.currentSpread?.reset();

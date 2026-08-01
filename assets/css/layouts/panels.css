@@ -49,7 +49,6 @@
   min-height: var(--spread-height);
   height: auto;
   padding: var(--spacing-md);
-  background-color: white;
   border-radius: var(--border-radius-md);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   position: relative;

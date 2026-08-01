@@ -129,6 +129,10 @@ class ConfigController {
       return;
     }
     
+    // Annuler toute génération en cours: elle porte sur des cartes qui vont
+    // être remplacées par celles du nouveau jeu.
+    this.aiService?.cancelCurrentInterpretation();
+
     // Mettre à jour l'état: ReadingController réagit à `cardSet:changed`
     // pour charger le nouveau jeu et rafraîchir l'affichage.
     this.stateManager.setState({ cardSet });
