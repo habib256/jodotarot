@@ -2,115 +2,72 @@
  * Contrôleur principal de l'application JodoTarot
  * Responsable de la coordination des composants et de la gestion de l'état global
  */
-import StateManager from '../utils/StateManager.js';
-import ReadingController from './ReadingController.js';
-import ConfigController from './ConfigController.js';
+import { getTranslation } from '../translations/index.js';
 
 class AppController {
   /**
    * @param {StateManager} stateManager - Instance du gestionnaire d'état
    * @param {ConfigController} configController - Instance du contrôleur de configuration
    * @param {ReadingController} readingController - Instance du contrôleur de lecture
+   * @param {UIService} uiService - Service UI pour l'affichage des messages
    */
-  constructor(stateManager, configController, readingController) {
+  constructor(stateManager, configController, readingController, uiService) {
     this.stateManager = stateManager;
     this.configController = configController;
     this.readingController = readingController;
-    
+    this.uiService = uiService;
+
+    // Restaurer la question saisie précédemment
+    const questionInput = document.getElementById('question');
+    if (questionInput) {
+      questionInput.value = this.stateManager.getState().question;
+    }
+
+    // Appliquer les traductions et le titre correspondant à l'état restauré
+    this.configController.updateUILanguage(this.stateManager.getState().language);
+    this.updateDocumentTitle();
+
     // Écouter les changements d'état pour mettre à jour l'UI
     this.stateManager.subscribe(this.handleStateChange.bind(this));
-    
-    // Synchroniser l'UI avec l'état restauré
-    this.syncUIWithState();
   }
-  
+
   /**
-   * Synchronise l'interface utilisateur avec l'état restauré
+   * Restaure le tirage sauvegardé.
+   * À appeler une fois le jeu de cartes chargé, sinon les images des cartes
+   * ne peuvent pas être résolues.
    */
-  syncUIWithState() {
+  restoreSavedReading() {
     const state = this.stateManager.getState();
-    
-    // Mettre à jour les sélecteurs
-    const elements = {
-      languageSelect: document.getElementById('language'),
-      personaSelect: document.getElementById('persona'),
-      cardSetSelect: document.getElementById('card-set'),
-      spreadTypeSelect: document.getElementById('spread-type'),
-      iaModelSelect: document.getElementById('ia-model'),
-      questionInput: document.getElementById('question')
-    };
-    
-    // Synchroniser les sélecteurs avec l'état
-    if (elements.languageSelect) elements.languageSelect.value = state.language;
-    if (elements.personaSelect) elements.personaSelect.value = state.persona;
-    if (elements.cardSetSelect) elements.cardSetSelect.value = state.cardSet;
-    if (elements.spreadTypeSelect) elements.spreadTypeSelect.value = state.spreadType;
-    if (elements.iaModelSelect) elements.iaModelSelect.value = state.iaModel;
-    if (elements.questionInput) elements.questionInput.value = state.question;
-    
-    // Si un tirage existe, le restaurer
-    if (state.cards && state.cards.length > 0 && this.readingController) {
+
+    if (state.cards?.length > 0) {
       this.readingController.restoreReading(state.cards, state.interpretation);
     }
   }
-  
+
   /**
    * Gère les changements d'état et met à jour l'interface utilisateur
    * @param {Object} state - Le nouvel état de l'application
+   * @param {Object} changes - Les clés effectivement modifiées
    */
-  handleStateChange(state) {
-    // Mettre à jour le titre du document en fonction du type de tirage
-    let title = 'JodoTarot';
-    
-    switch (state.spreadType) {
-      case 'cross':
-        title += ' - Tirage en Croix';
-        break;
-      case 'horseshoe':
-        title += ' - Tirage en Fer à Cheval';
-        break;
-      case 'love':
-        title += ' - Tarot de l\'Amour';
-        break;
-      case 'celticCross':
-        title += ' - Croix Celtique';
-        break;
+  handleStateChange(state, changes = {}) {
+    if ('spreadType' in changes || 'language' in changes) {
+      this.updateDocumentTitle();
     }
-    
-    document.title = title;
-    
-    // Mettre à jour la visibilité des messages d'erreur
-    if (state.error) {
-      this.showError(state.error);
-    }
-    
-    // Afficher/masquer le spinner de chargement
-    this.updateLoadingState(state.isLoading);
-  }
-  
-  /**
-   * Met à jour l'état de chargement dans l'interface
-   * @param {boolean} isLoading - Si l'application est en cours de chargement
-   */
-  updateLoadingState(isLoading) {
-    const loadingOverlay = document.querySelector('.loading-overlay');
-    if (loadingOverlay) {
-      loadingOverlay.remove();
+
+    // N'afficher une erreur qu'au moment où elle apparaît, et non à chaque
+    // changement d'état tant qu'elle reste présente dans l'état.
+    if (changes.error) {
+      this.uiService?.showError(changes.error);
     }
   }
-  
+
   /**
-   * Affiche un message d'erreur
-   * @param {string} message - Message d'erreur à afficher
+   * Met à jour le titre du document en fonction du type de tirage et de la langue
    */
-  showError(message) {
-    if (this.uiService) {
-      this.uiService.showError(message);
-    } else {
-      console.error(message);
-      alert(message);
-    }
+  updateDocumentTitle() {
+    const { spreadType, language } = this.stateManager.getState();
+    document.title = `JodoTarot - ${getTranslation(`spreadTypes.${spreadType}`, language)}`;
   }
 }
 
-export default AppController; 
+export default AppController;

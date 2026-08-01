@@ -12,10 +12,10 @@
  * @property {AbortController} currentController - Contrôleur pour annuler les requêtes
  * @property {boolean} isGenerating - État de génération en cours
  */
-import PERSONAS, { getPersonaPrompt } from '../models/personas/index.js';
+import { getPersonaPrompt } from '../models/personas/index.js';
 import { createSpread } from '../models/spreads/index.js';
 import { API_KEY, API_URL_OPENAI, API_URL_OLLAMA, API_URL_OLLAMA_TAGS, getOllamaModelFormat, DEBUG_LEVEL, TIMEOUTS } from '../config.js';
-import { getMetaPrompt, getEmphasisText, enrichirPromptContextuel } from '../prompt.js';
+import { getMetaPrompt, enrichirPromptContextuel } from '../prompt.js';
 
 class AIService {
   /**
@@ -53,31 +53,13 @@ class AIService {
   }
   
   /**
-   * Gère une erreur d'annulation
-   * @param {Error} error - L'erreur à gérer
-   * @returns {boolean} True si c'était une erreur d'annulation
-   */
-  handleAbortError(error) {
-    if (error.name === 'AbortError') {
-      console.log('Interprétation annulée par l\'utilisateur');
-      this.isGenerating = false;
-      return true;
-    }
-    return false;
-  }
-  
-  /**
    * Annule l'interprétation en cours si elle existe
    * @returns {boolean} Indique si une interprétation a été annulée
    */
   cancelCurrentInterpretation() {
     if (this.currentController && this.isGenerating) {
       console.log('Annulation de l\'interprétation en cours...');
-      
-      // Créer une erreur d'annulation
-      const abortError = new Error('Generation aborted by user');
-      abortError.name = 'AbortError';
-      
+
       // Annuler la requête en cours
       this.currentController.abort();
       this.currentController = null;
@@ -86,41 +68,6 @@ class AIService {
       return true;
     }
     return false;
-  }
-  
-  /**
-   * Récupère la liste des modèles Ollama disponibles
-   * @returns {Promise<Array>} Liste des modèles disponibles
-   */
-  async getOllamaModels() {
-    try {
-      console.log('Tentative de récupération des modèles Ollama...');
-      const response = await fetch(API_URL_OLLAMA_TAGS);
-      
-      if (!response.ok) {
-        console.error(`Erreur HTTP lors de la récupération des modèles Ollama: ${response.status}`);
-        return [];
-      }
-      
-      const data = await response.json();
-      
-      if (!data.models || !Array.isArray(data.models)) {
-        console.error('Format de réponse Ollama invalide:', data);
-        return [];
-      }
-      
-      // Filtrer les modèles pour ne garder que ceux qui sont complets
-      const validModels = data.models.filter(model => {
-        // Exclure les modèles partiels ou en cours de téléchargement
-        return !model.name.includes('partial') && !model.name.includes('downloading');
-      });
-      
-      console.log('Modèles Ollama récupérés:', validModels);
-      return validModels;
-    } catch (error) {
-      console.error('Erreur lors de la récupération des modèles Ollama:', error);
-      return [];
-    }
   }
   
   /**
@@ -169,7 +116,9 @@ class AIService {
         };
       }
 
-      const result = {
+      // Cas Ollama: la liste des modèles provient déjà du serveur Ollama,
+      // un modèle proposé dans le sélecteur est donc considéré disponible.
+      return {
         available: true,
         status: 'success',
         modelName,
@@ -177,26 +126,6 @@ class AIService {
         details: {},
         suggestions: []
       };
-
-      // Détection des modèles Ollama
-      const isOllamaModel = 
-        modelName.startsWith('ollama:') || 
-        modelName.includes(':') ||
-        !modelName.startsWith('openai/');
-      
-      if (isOllamaModel) {
-        // Nettoyer le nom du modèle - supprimer les préfixes
-        let ollamaModelName = modelName;
-        if (ollamaModelName.startsWith('ollama:')) {
-          ollamaModelName = ollamaModelName.replace('ollama:', '');
-        }
-        
-        if (this.debugMode) {
-          console.log(`Modèle Ollama détecté: ${ollamaModelName}`);
-        }
-      }
-      
-      return result;
     } catch (error) {
       console.error('Erreur lors du test de disponibilité du modèle:', error);
       return {
@@ -242,18 +171,17 @@ class AIService {
    */
   loadApiKey() {
     try {
-      if (window.localStorage) {
-        const encodedKey = localStorage.getItem('jodotarot_api_key');
-        if (encodedKey) {
-          // Décoder la clé
-          const apiKey = atob(encodedKey);
-          this.apiKey = apiKey;
-          console.log('Clé API OpenAI chargée depuis le localStorage');
-          return apiKey;
-        }
+      const encodedKey = localStorage.getItem('jodotarot_api_key');
+      if (encodedKey) {
+        return atob(encodedKey);
       }
     } catch (error) {
-      console.error('Erreur lors du chargement de la clé API:', error);
+      console.warn('Clé API illisible, suppression de l\'entrée corrompue:', error.message);
+      try {
+        localStorage.removeItem('jodotarot_api_key');
+      } catch {
+        // localStorage indisponible: rien de plus à faire
+      }
     }
     
     return null;
@@ -269,14 +197,15 @@ class AIService {
     console.error(`Erreur lors de l'appel à ${service}:`, error);
     
     let errorMessage = `Erreur lors de la communication avec ${service}`;
-    
-    if (error.message.includes('timeout')) {
+    const details = error?.message || '';
+
+    if (details.includes('timeout')) {
       errorMessage = `Le temps de réponse de ${service} a dépassé la limite`;
-    } else if (error.message.includes('connect')) {
+    } else if (details.includes('connect')) {
       errorMessage = `Impossible de se connecter à ${service}`;
-    } else if (error.message.includes('401') || error.message.includes('403')) {
+    } else if (details.includes('401') || details.includes('403')) {
       errorMessage = `Erreur d'authentification avec ${service}`;
-    } else if (error.message.includes('429')) {
+    } else if (details.includes('429')) {
       errorMessage = `Limite de requêtes atteinte pour ${service}`;
     }
     
@@ -348,13 +277,12 @@ class AIService {
       this.currentController = new AbortController();
       this.isGenerating = true;
       
-      // Vérifier les paramètres essentiels
-      if (!reading || !reading.length || !question.trim()) {
-        throw new Error('Les cartes et la question sont requises pour l\'interprétation');
-      }
-      
-      const systemPrompts = await this.buildSystemPrompts(persona, language, spreadType);
-      const prompt = this.buildPrompt(reading, question, language, spreadType);
+      // Une seule instance de tirage sert au nom localisé et à la description
+      const spread = createSpread(spreadType, null, language);
+      spread.cards = [...reading];
+
+      const systemPrompts = await this.buildSystemPrompts(persona, language, spread.getName());
+      const prompt = this.buildPrompt(spread, question, language);
       
       // Mode spécial "prompt" (Sans IA)
       // Ce mode est une fonctionnalité de sécurité et de débogage qui :
@@ -391,22 +319,15 @@ class AIService {
       // Obtenir la réponse selon le type de modèle (OpenAI ou Ollama)
       let response;
       
+      const signal = this.currentController.signal;
+
       if (model.startsWith('openai/')) {
-        response = await this.getOpenAIResponse(prompt, systemPrompts, model.replace('openai/', ''));
+        response = await this.getOpenAIResponse(prompt, systemPrompts, model.replace('openai/', ''), signal);
+      } else if (typeof onChunk === 'function') {
+        // Streaming Ollama pour un affichage progressif
+        response = await this.getOllamaStreamingResponse(prompt, systemPrompts, model, onChunk, signal);
       } else {
-        // Si un callback de streaming est fourni, utiliser le streaming pour Ollama
-        if (onChunk && typeof onChunk === 'function') {
-          try {
-            response = await this.getOllamaStreamingResponse(prompt, systemPrompts, model, onChunk, this.currentController.signal);
-          } catch (error) {
-            if (this.handleAbortError(error)) {
-              return "";
-            }
-            throw error;
-          }
-        } else {
-          response = await this.getOllamaResponse(prompt, systemPrompts, model);
-        }
+        response = await this.getOllamaResponse(prompt, systemPrompts, model, signal);
       }
       
       // Marquer la génération comme terminée
@@ -414,23 +335,28 @@ class AIService {
       return response;
     } catch (error) {
       this.isGenerating = false;
-      console.error("Erreur lors de l'obtention de l'interprétation:", error);
-      
-      if (this.handleAbortError(error)) {
-        return "";
+
+      // Annulation demandée par l'utilisateur: ce n'est pas une erreur,
+      // l'appelant conserve le texte déjà reçu et le signale à sa façon.
+      if (error.name === 'AbortError') {
+        console.log('Interprétation annulée par l\'utilisateur');
+        throw error;
       }
-      
+
+      console.error("Erreur lors de l'obtention de l'interprétation:", error);
+
       // Gestion plus détaillée des erreurs
       let errorMessage = "Une erreur est survenue lors de l'interprétation.";
-      
+      const details = error?.message || '';
+
       if (!this.apiKey && model.startsWith('openai/')) {
         errorMessage = "La clé API OpenAI n'est pas configurée.";
-      } else if (error.message.includes('timeout')) {
+      } else if (details.includes('timeout')) {
         errorMessage = "Le temps de réponse a dépassé la limite.";
-      } else if (error.message.includes('connect')) {
+      } else if (details.includes('connect')) {
         errorMessage = "Impossible de se connecter au service d'IA.";
       }
-      
+
       throw new Error(errorMessage);
     }
   }
@@ -439,14 +365,14 @@ class AIService {
    * Construit les prompts système pour le modèle d'IA
    * @param {string} persona - Persona choisi
    * @param {string} language - Langue
-   * @param {string} spreadType - Type de tirage
+   * @param {string} spreadName - Nom localisé du tirage
    * @return {Promise<Array>} Liste des prompts système
    */
-  async buildSystemPrompts(persona, language, spreadType) {
-    this.debugLog(`Chargement du prompt pour le persona: ${persona}, langue: ${language}, tirage: ${spreadType}`);
-    
+  async buildSystemPrompts(persona, language, spreadName) {
+    this.debugLog(`Chargement du prompt pour le persona: ${persona}, langue: ${language}, tirage: ${spreadName}`);
+
     try {
-      const personaPrompt = await getPersonaPrompt(persona, language, spreadType);
+      const personaPrompt = await getPersonaPrompt(persona, language, spreadName);
       this.debugLog('Contenu du prompt persona:', personaPrompt);
       
       const metaPrompt = getMetaPrompt(language);
@@ -465,33 +391,17 @@ class AIService {
   
   /**
    * Construit le prompt principal pour l'interprétation
-   * @param {Array} reading - Tableau des cartes tirées
+   * @param {BaseSpread} spread - Instance de tirage contenant les cartes tirées
    * @param {string} question - Question posée
-   * @param {string} language - Code de langue 
-   * @param {string} spreadType - Type de tirage
+   * @param {string} language - Code de langue
    * @return {string} Prompt formaté
    */
-  buildPrompt(reading, question, language, spreadType = 'cross') {
-    // S'assurer que reading est un tableau
-    if (!Array.isArray(reading)) {
-      console.error('Le paramètre reading doit être un tableau de cartes');
-      return `Question: ${question}\n\nErreur: Format de tirage invalide`;
-    }
-    
-    // Créer une instance temporaire du tirage pour générer une description riche
-    const spreadInstance = createSpread(spreadType, null, language);
-    
-    // Copier les cartes dans l'instance de tirage
-    spreadInstance.cards = [...reading];
-    
-    // Générer une description du tirage avec les cartes (sans descriptions détaillées pour réduire la longueur)
-    const spreadDescription = spreadInstance.generateReadingDescription(false);
-    
-    // Construction du prompt de base avec toutes les informations sur les cartes
-    let promptBase = `${spreadDescription}\n\n`;
-    
+  buildPrompt(spread, question, language) {
+    // Description du tirage sans les descriptions détaillées, pour limiter la longueur
+    const spreadDescription = spread.generateReadingDescription(false);
+
     // Enrichir le prompt avec la question et le texte d'emphase
-    return enrichirPromptContextuel(question, promptBase, language);
+    return enrichirPromptContextuel(question, `${spreadDescription}\n\n`, language);
   }
   
   /**
@@ -499,9 +409,10 @@ class AIService {
    * @param {string} prompt - Le prompt principal
    * @param {Array} systemPrompts - Les prompts système
    * @param {string} model - Le modèle OpenAI à utiliser
+   * @param {AbortSignal} [signal] - Signal permettant d'annuler la requête
    * @return {Promise<string>} La réponse générée
    */
-  async getOpenAIResponse(prompt, systemPrompts, model) {
+  async getOpenAIResponse(prompt, systemPrompts, model, signal) {
     if (!this.apiKey) {
       throw new Error('Clé API OpenAI non configurée');
     }
@@ -524,7 +435,8 @@ class AIService {
           model: model,
           messages: messages,
           temperature: 0.7
-        })
+        }),
+        signal
       });
       
       if (!response.ok) {
@@ -534,84 +446,86 @@ class AIService {
       const data = await response.json();
       return data.choices[0]?.message?.content || '';
     } catch (error) {
+      if (error.name === 'AbortError') throw error;
       throw this.handleApiError(error, 'OpenAI');
     }
   }
   
   /**
-   * Utilitaire pour les requêtes fetch avec timeout et réessai
+   * Utilitaire pour les requêtes fetch avec timeout et réessai.
+   * Une annulation demandée par l'utilisateur (via `signal`) interrompt
+   * immédiatement les tentatives, contrairement à une erreur réseau.
    * @param {string} url - URL de la requête
    * @param {Object} options - Options de fetch
-   * @param {number} maxRetries - Nombre maximum de tentatives
-   * @param {number} timeoutMs - Délai d'expiration en millisecondes
+   * @param {AbortSignal} [userSignal] - Signal d'annulation utilisateur
+   * @param {number} [maxRetries] - Nombre maximum de tentatives supplémentaires
+   * @param {number} [timeoutMs] - Délai d'expiration par tentative
    * @return {Promise<Response>} - Promesse de réponse
    */
-  async fetchWithRetry(url, options, maxRetries = TIMEOUTS.MAX_RETRIES, timeoutMs = TIMEOUTS.OLLAMA_CONNECT) {
-    let retries = 0;
-    let lastError = null;
-    
-    while (retries <= maxRetries) {
+  async fetchWithRetry(url, options, userSignal = null, maxRetries = TIMEOUTS.MAX_RETRIES, timeoutMs = TIMEOUTS.OLLAMA_RESPONSE) {
+    // Erreur d'annulation à propager sans nouvelle tentative
+    const userAbortError = () => {
+      const error = new Error('Generation aborted by user');
+      error.name = 'AbortError';
+      return error;
+    };
+
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      // L'utilisateur a pu annuler pendant le délai d'attente précédent
+      if (userSignal?.aborted) {
+        throw userAbortError();
+      }
+
+      // Contrôleur combinant le timeout et l'annulation utilisateur
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+      const abortFromUser = () => controller.abort();
+      userSignal?.addEventListener('abort', abortFromUser);
+
       try {
-        // Créer un contrôleur d'abandon pour le timeout
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-        
-        // Ajouter le signal au options
-        const optionsWithSignal = {
-          ...options,
-          signal: controller.signal
-        };
-        
-        try {
-          // Tenter la requête
-          const response = await fetch(url, optionsWithSignal);
-          clearTimeout(timeoutId);
-          
-          // Si la réponse est OK, la retourner
-          if (response.ok) {
-            return response;
-          }
-          
-          // Sinon, lire le texte d'erreur et le lancer
-          const errorText = await response.text();
-          throw new Error(`Erreur API (${response.status}): ${errorText.slice(0, 100)}`);
-        } catch (fetchError) {
-          clearTimeout(timeoutId);
-          throw fetchError;
+        const response = await fetch(url, { ...options, signal: controller.signal });
+
+        if (response.ok) {
+          return response;
         }
+
+        const errorText = await response.text();
+        throw new Error(`Erreur API (${response.status}): ${errorText.slice(0, 100)}`);
       } catch (error) {
-        lastError = error;
-        retries++;
-        
-        const isTimeout = error.name === 'AbortError';
-        const retriesLeft = maxRetries - retries + 1;
-        
-        if (retriesLeft > 0) {
-          // Délai exponentiel avec un peu d'aléatoire pour éviter les collisions
-          const delay = Math.pow(2, retries) * 1000 + Math.random() * 500;
-          console.warn(`Tentative ${retries}/${maxRetries} échouée${isTimeout ? ' (timeout)' : ''}: ${error.message}. Nouvelle tentative dans ${delay/1000} secondes...`);
-          
-          // Attendre avant de réessayer
-          await new Promise(resolve => setTimeout(resolve, delay));
-        } else {
-          console.error(`Toutes les tentatives ont échoué (${retries}/${maxRetries}):`, error);
+        // Annulation explicite de l'utilisateur: ne pas réessayer
+        if (userSignal?.aborted) {
+          throw userAbortError();
+        }
+
+        if (attempt === maxRetries) {
+          console.error(`Toutes les tentatives ont échoué (${attempt + 1}/${maxRetries + 1}):`, error);
           throw error;
         }
+
+        // Délai exponentiel avec un peu d'aléatoire pour éviter les collisions
+        const delay = Math.pow(2, attempt + 1) * 1000 + Math.random() * 500;
+        const isTimeout = error.name === 'AbortError';
+        console.warn(`Tentative ${attempt + 1}/${maxRetries + 1} échouée${isTimeout ? ' (timeout)' : ''}: ${error.message}. Nouvelle tentative dans ${(delay / 1000).toFixed(1)}s...`);
+
+        clearTimeout(timeoutId);
+        userSignal?.removeEventListener('abort', abortFromUser);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      } finally {
+        clearTimeout(timeoutId);
+        userSignal?.removeEventListener('abort', abortFromUser);
       }
     }
-    
-    // Ce code ne devrait jamais être atteint, mais par précaution
-    throw lastError || new Error("Erreur inconnue pendant les tentatives de connexion");
   }
-  
+
   /**
    * Obtient une réponse d'Ollama
    * @param {string} prompt - Le prompt principal
    * @param {Array} systemPrompts - Les prompts système
    * @param {string} model - Le modèle Ollama à utiliser
+   * @param {AbortSignal} [signal] - Signal permettant d'annuler la requête
    * @return {Promise<string>} La réponse générée
    */
-  async getOllamaResponse(prompt, systemPrompts, model) {
+  async getOllamaResponse(prompt, systemPrompts, model, signal) {
     try {
       // Construire un prompt complet compatible avec /api/generate
       const fullPrompt = [
@@ -638,8 +552,8 @@ class AIService {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         },
-        2,
-        20000
+        signal,
+        2
       );
       
       this.debugLog("Statut réponse Ollama:", response.status);
@@ -655,6 +569,7 @@ class AIService {
       
       return this.extractResponseContent(data, responseKey, modelNameWithoutPrefix);
     } catch (error) {
+      if (error.name === 'AbortError') throw error;
       throw this.handleApiError(error, 'Ollama');
     }
   }

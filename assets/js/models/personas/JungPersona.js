@@ -95,23 +95,6 @@ Aree di competenza: {{SPECIALIZATIONS}}`,
     };
   }
   
-  /**
-   * Surcharge pour formater l'interprétation selon le style de Jung
-   * @param {string} interpretation - Texte d'interprétation brut
-   * @return {string} Interprétation formatée avec le style spécifique à Jung
-   */
-  formatInterpretation(interpretation) {
-    // Formatter le texte avec un style académique et des citations
-    let formattedText = `<div class="interpretation-jung">
-      <p class="jung-quote">"Celui qui regarde à l'extérieur rêve, celui qui regarde à l'intérieur s'éveille."</p>
-      <div class="jung-content">
-        ${interpretation}
-      </div>
-      <p class="jung-closing">Dans le processus d'individuation, ces symboles peuvent constituer des guides précieux pour votre développement psychique.</p>
-    </div>`;
-    
-    return formattedText;
-  }
 }
 
 export default JungPersona; 

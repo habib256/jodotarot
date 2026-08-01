@@ -95,23 +95,6 @@ Aree di competenza: {{SPECIALIZATIONS}}`,
     };
   }
   
-  /**
-   * Surcharge pour formater l'interprétation selon le style du Rabbin
-   * @param {string} interpretation - Texte d'interprétation brut
-   * @return {string} Interprétation formatée avec le style spécifique au Rabbin
-   */
-  formatInterpretation(interpretation) {
-    // Formatter le texte avec un style inspiré de la Kabbale
-    let formattedText = `<div class="interpretation-rabbin">
-      <p class="rabbin-intro">✡️ <em>"Shalom aleichem. Que la lumière du Ein Sof illumine votre chemin."</em> ✡️</p>
-      <div class="rabbin-content">
-        ${interpretation}
-      </div>
-      <p class="rabbin-closing">"Comme l'enseigne le Zohar : tout ce qui est en haut est comme ce qui est en bas. <em>Kol tuv</em> (tout le meilleur)."</p>
-    </div>`;
-    
-    return formattedText;
-  }
 }
 
 export default RabbinPersona; 

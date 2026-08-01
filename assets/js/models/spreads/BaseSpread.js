@@ -113,15 +113,19 @@ class BaseSpread {
    */
   _createCardElement(card, index) {
     const cardElement = document.createElement('div');
-    cardElement.className = `card ${card.orientation}`;
+    // `orientation` pour une carte fraîchement tirée, `position` pour une carte
+    // restaurée depuis l'état persisté
+    cardElement.className = `card ${card.orientation || card.position || 'upright'}`;
+    const cardName = this.getCardDisplayName(card);
+
     cardElement.setAttribute('data-card-id', card.id);
-    cardElement.setAttribute('data-card-name', card.name);
+    cardElement.setAttribute('data-card-name', cardName);
     cardElement.setAttribute('data-position', index);
-    
+
     // Image de la carte
     const cardImage = document.createElement('img');
     cardImage.src = card.imageUrl;
-    cardImage.alt = card.name;
+    cardImage.alt = cardName;
     
     cardElement.appendChild(cardImage);
     return cardElement;
@@ -161,6 +165,18 @@ class BaseSpread {
   }
 
   /**
+   * Retourne le nom affichable d'une carte dans la langue du tirage
+   * @param {Object} card - La carte
+   * @return {string} Nom traduit, ou nom brut pour une carte restaurée
+   * @private
+   */
+  getCardDisplayName(card) {
+    return card.getTranslatedName
+      ? card.getTranslatedName(this.language)
+      : card.name;
+  }
+
+  /**
    * Met à jour les attributs de description d'une position
    * @param {HTMLElement} positionElement - L'élément de position
    * @param {Object} card - La carte à cette position
@@ -171,7 +187,7 @@ class BaseSpread {
     if (!positionElement || !card) return;
     
     // Mettre à jour le nom de la carte
-    positionElement.setAttribute('data-card-name', card.name);
+    positionElement.setAttribute('data-card-name', this.getCardDisplayName(card));
     
     // Mettre à jour la description détaillée
     positionElement.setAttribute('data-card-description', this.getPositionDescription(index, card));
@@ -217,29 +233,22 @@ class BaseSpread {
     if (!deck) {
       throw new Error('Aucun jeu de cartes fourni pour le tirage');
     }
-    
-    console.log(`Début du tirage avec le jeu "${deck.deckId}" - ${this.getCardCount()} cartes nécessaires`);
-    console.log(`Nombre de cartes disponibles: ${deck.getRemainingCount()}`);
-    
+
     // Réinitialiser les cartes
     this.cards = [];
-    
+
     // Mélanger le jeu
     deck.shuffle();
-    console.log(`Jeu mélangé - ${deck.getRemainingCount()} cartes disponibles`);
-    
+
     // Tirer le nombre de cartes nécessaires avec orientation aléatoire
     for (let i = 0; i < this.getCardCount(); i++) {
-      console.log(`Tirage de la carte ${i+1}/${this.getCardCount()}`);
       const card = deck.drawCard(true); // true pour activer l'orientation aléatoire
       if (!card) {
-        console.error(`Tirage échoué: carte nulle à l'indice ${i}`);
         throw new Error(`Tirage échoué: carte nulle à l'indice ${i}`);
       }
       this.cards.push(card);
     }
-    
-    console.log(`Tirage terminé avec succès: ${this.cards.length} cartes tirées`);
+
     return this.cards;
   }
   
@@ -360,20 +369,13 @@ class BaseSpread {
    * @return {string} Description formatée du tirage
    */
   generateReadingDescription(includeDetailedDescriptions = true) {
-    console.log('BaseSpread.generateReadingDescription appelé');
-    console.log('Cartes disponibles:', this.cards);
-    console.log('Langue:', this.language);
-    
     if (!this.cards || this.cards.length === 0) {
       console.warn('Aucune carte disponible pour la description');
       return '';
     }
-    
+
     const generator = new ReadingDescriptionGenerator(this, this.language);
-    const description = generator.generateReadingDescription(includeDetailedDescriptions);
-    
-    console.log('Description générée:', description);
-    return description;
+    return generator.generateReadingDescription(includeDetailedDescriptions);
   }
 }
 

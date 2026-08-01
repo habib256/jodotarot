@@ -95,23 +95,6 @@ Aree di competenza: {{SPECIALIZATIONS}}`,
     };
   }
   
-  /**
-   * Surcharge pour formater l'interprétation selon le style de Socrate
-   * @param {string} interpretation - Texte d'interprétation brut
-   * @return {string} Interprétation formatée avec le style spécifique à Socrate
-   */
-  formatInterpretation(interpretation) {
-    // Formatter le texte avec un style philosophique
-    let formattedText = `<div class="interpretation-socrate">
-      <p class="socrate-intro">"Je ne sais qu'une chose, c'est que je ne sais rien. Examinons ensemble ce que les cartes nous enseignent..."</p>
-      <div class="socrate-content">
-        ${interpretation}
-      </div>
-      <p class="socrate-closing">γνῶθι σεαυτόν - Connais-toi toi-même, et tu connaîtras l'univers et les dieux.</p>
-    </div>`;
-    
-    return formattedText;
-  }
 }
 
 export default SocratePersona; 

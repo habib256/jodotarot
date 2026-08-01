@@ -39,20 +39,14 @@
 
 /* Positionnement spécifique pour chaque carte */
 /* Position 1: Situation actuelle */
-.celtic-cross-spread .card-1,
-.celtic-cross-spread .present,
-.celtic-cross-spread .position-1,
-.celtic-cross-spread .card-position-1 {
+.celtic-cross-spread .card-1 {
   left: var(--celtic-position-1-x);
   top: var(--celtic-position-1-y);
   transform: translate(-50%, -50%);
 }
 
 /* Position 2: Défi/Obstacle */
-.celtic-cross-spread .card-2,
-.celtic-cross-spread .challenge,
-.celtic-cross-spread .position-2,
-.celtic-cross-spread .card-position-2 {
+.celtic-cross-spread .card-2 {
   left: var(--celtic-position-2-x);
   top: var(--celtic-position-2-y);
   transform: translate(-50%, -50%) rotate(var(--celtic-position-2-rotation));
@@ -62,80 +56,56 @@
 }
 
 /* Position 3: Base/Fondation */
-.celtic-cross-spread .card-3,
-.celtic-cross-spread .foundation,
-.celtic-cross-spread .position-3,
-.celtic-cross-spread .card-position-3 {
+.celtic-cross-spread .card-3 {
   left: var(--celtic-position-3-x);
   top: var(--celtic-position-3-y);
   transform: translate(-50%, -50%);
 }
 
 /* Position 4: Passé récent */
-.celtic-cross-spread .card-4,
-.celtic-cross-spread .past,
-.celtic-cross-spread .position-4,
-.celtic-cross-spread .card-position-4 {
+.celtic-cross-spread .card-4 {
   left: var(--celtic-position-4-x);
   top: var(--celtic-position-4-y);
   transform: translate(-50%, -50%);
 }
 
 /* Position 5: Couronne/Objectif */
-.celtic-cross-spread .card-5,
-.celtic-cross-spread .crown,
-.celtic-cross-spread .position-5,
-.celtic-cross-spread .card-position-5 {
+.celtic-cross-spread .card-5 {
   left: var(--celtic-position-5-x);
   top: var(--celtic-position-5-y);
   transform: translate(-50%, -50%);
 }
 
 /* Position 6: Futur immédiat */
-.celtic-cross-spread .card-6,
-.celtic-cross-spread .future,
-.celtic-cross-spread .position-6,
-.celtic-cross-spread .card-position-6 {
+.celtic-cross-spread .card-6 {
   left: var(--celtic-position-6-x);
   top: var(--celtic-position-6-y);
   transform: translate(-50%, -50%);
 }
 
 /* Position 7: Vous-même */
-.celtic-cross-spread .card-7,
-.celtic-cross-spread .self,
-.celtic-cross-spread .position-7,
-.celtic-cross-spread .card-position-7 {
+.celtic-cross-spread .card-7 {
   left: var(--celtic-position-7-x);
   top: var(--celtic-position-7-y);
   transform: translate(-50%, -50%);
 }
 
 /* Position 8: Environnement/Influences */
-.celtic-cross-spread .card-8,
-.celtic-cross-spread .environment,
-.celtic-cross-spread .position-8,
-.celtic-cross-spread .card-position-8 {
+.celtic-cross-spread .card-8 {
   left: var(--celtic-position-8-x);
   top: var(--celtic-position-8-y);
   transform: translate(-50%, -50%);
 }
 
 /* Position 9: Espoirs/Craintes */
-.celtic-cross-spread .card-9,
-.celtic-cross-spread .hopes,
-.celtic-cross-spread .position-9,
-.celtic-cross-spread .card-position-9 {
+.celtic-cross-spread .card-9 {
   left: var(--celtic-position-9-x);
   top: var(--celtic-position-9-y);
   transform: translate(-50%, -50%);
 }
 
 /* Position 10: Résultat final */
-.celtic-cross-spread .card-10,
-.celtic-cross-spread .outcome,
-.celtic-cross-spread .position-10,
-.celtic-cross-spread .card-position-10 {
+.celtic-cross-spread .card-10 {
   left: var(--celtic-position-10-x);
   top: var(--celtic-position-10-y);
   transform: translate(-50%, -50%);
@@ -156,10 +126,7 @@
 }
 
 /* Pour la carte avec rotation */
-.celtic-cross-spread .card-2:hover,
-.celtic-cross-spread .challenge:hover,
-.celtic-cross-spread .position-2:hover,
-.celtic-cross-spread .card-position-2:hover {
+.celtic-cross-spread .card-2:hover {
   z-index: 10;
   filter: brightness(1.08);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
@@ -168,37 +135,10 @@
 }
 
 /* Éléments visuels de la croix celtique */
-.celtic-cross-vertical,
-.celtic-cross-horizontal {
+.celtic-cross-vertical {
   position: absolute;
   background-color: rgba(107, 91, 149, 0.1);
   border: 1px solid rgba(107, 91, 149, 0.2);
-  pointer-events: none;
-  z-index: -1;
-}
-
-.celtic-cross-vertical {
-  width: 10px;
-  height: 200px;
-  left: 40%;
-  top: 20%;
-}
-
-.celtic-cross-horizontal {
-  width: 200px;
-  height: 10px;
-  left: 20%;
-  top: 45%;
-}
-
-.celtic-cross-circle {
-  position: absolute;
-  width: 100px;
-  height: 100px;
-  border: 1px solid rgba(107, 91, 149, 0.2);
-  border-radius: 50%;
-  left: 35%;
-  top: 35%;
   pointer-events: none;
   z-index: -1;
 }

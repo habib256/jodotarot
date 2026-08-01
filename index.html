@@ -32,36 +32,36 @@
       <div class="select-group">
         <span class="select-label">Personnage :</span>
         <select id="persona" class="select-dropdown">
-          <optgroup label="Arts Divinatoires">
+          <optgroup label="Arts Divinatoires" data-optgroup-key="personaGroups.divinationArts">
             <option value="tarologue">🔮 Tarologue</option>
             <option value="oracle">✨ Oracle Mystique</option>
             <option value="voyante">🎯 Voyante Gitane</option>
           </optgroup>
-          <optgroup label="Traditions Spirituelles">
+          <optgroup label="Traditions Spirituelles" data-optgroup-key="personaGroups.spiritualTraditions">
             <option value="pretre">✝️ Prêtre Exégète</option>
             <option value="rabbin">✡️ Rabbin Kabbaliste</option>
             <option value="imam">☪️ Imam Soufis</option>
             <option value="dalailama">☸️ Dalaï-Lama</option>
           </optgroup>
-          <optgroup label="Traditions Ésotériques">
+          <optgroup label="Traditions Ésotériques" data-optgroup-key="personaGroups.esotericTraditions">
             <option value="sorciere">🌙 Sorcière Ancestrale</option>
             <option value="alchimiste">⚗️ Alchimiste Ésotérique</option>
             <option value="mage">🌟 Mage Élémentaliste</option>
             <option value="francmacon">🏛️ Maître Franc-Maçon</option>
           </optgroup>
-          <optgroup label="Psychanalystes">
+          <optgroup label="Psychanalystes" data-optgroup-key="personaGroups.psychoanalysts">
             <option value="freud">🛋️ Sigmund Freud</option>
             <option value="jung">☯️ Carl Gustav Jung</option>
             <option value="lacan">🔄 Jacques Lacan</option>
             <option value="dolto">👶 Françoise Dolto</option>
           </optgroup>
-          <optgroup label="Philosophes et Sages">
+          <optgroup label="Philosophes et Sages" data-optgroup-key="personaGroups.philosophersSages">
             <option value="socrate">🧠 Socrate</option>
             <option value="salomon">👑 Roi Salomon</option>
             <option value="montaigne">📚 Michel de Montaigne</option>
             <option value="quichotte">🛡️ Don Quichotte</option>
           </optgroup>
-          <optgroup label="Entités Surnaturelles">
+          <optgroup label="Entités Surnaturelles" data-optgroup-key="personaGroups.supernaturalEntities">
             <option value="demon">💀 Mortrarion</option>
             <option value="noegoman">☯️ No EGO man</option>
           </optgroup>
@@ -93,12 +93,12 @@
         <div class="model-select-container">
           <select id="ia-model" class="select-dropdown">
             <option value="prompt">📝 Prompt (Sans IA)</option>
-            <optgroup label="🧠 OpenAI">
+            <optgroup label="🧠 OpenAI" data-optgroup-key="iaGroups.openai">
               <option value="openai/gpt-4o">GPT-4o</option>
               <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
               <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo</option>
             </optgroup>
-            <optgroup label="🤖 Ollama">
+            <optgroup label="🤖 Ollama" data-optgroup-key="iaGroups.ollama">
               <option disabled>Chargement des modèles...</option>
             </optgroup>
           </select>
@@ -121,7 +121,6 @@
       </div>
       <div class="controls-container">
         <button id="tirer" class="primary-button">Tirer les cartes</button>
-        <div id="status-message" style="display: none; margin-top: 5px; padding: 5px; border-radius: 4px; font-size: 0.9em;"></div>
       </div>
       <!-- Nouvel indicateur de génération en cours -->
       <div id="generation-indicator" class="generation-indicator" style="display: none;">
@@ -129,12 +128,6 @@
         <span class="model-name"></span>
       </div>
     </div>
-  </div>
-  
-  <!-- Conteneur invisible pour les éléments fonctionnels -->
-  <div style="display: none;">
-    <p id="ollama-promo" class="promo-text"></p>
-    <div id="loading-animations" class="loading-container"></div>
   </div>
   
   <!-- Ligne de séparation entre le haut et le bas de la page -->

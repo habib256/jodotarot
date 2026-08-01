@@ -19,7 +19,10 @@ const zh = {
     drawButton: "抽牌",
     drawButtonGenerating: "生成中...请稍候",
     streamingOption: "实时回应:",
-    stopGeneration: "停止生成"
+    stopGeneration: "停止生成",
+    copyButton: "复制",
+    copyButtonCopied: "已复制！",
+    copyButtonError: "错误！"
   },
   
   // Messages d'interprétation
@@ -36,6 +39,8 @@ const zh = {
     error: {
       general: "解读过程中发生错误。请重试。",
       noQuestion: "请在抽牌前输入问题",
+      generationStopped: "生成已被用户停止",
+      interpretationError: "解读过程中出错",
       api: "API错误: {0}"
     },
     apiWarning: "解读意外终止。以下是部分结果：",
@@ -229,6 +234,8 @@ const zh = {
   
   // 卡牌
   cards: {
+    reversed: "逆位",
+    closeHint: "✕ 点击关闭",
     major_arcana: {
       fool: "愚者",
       magician: "魔术师",

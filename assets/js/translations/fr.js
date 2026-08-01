@@ -19,7 +19,10 @@ const fr = {
     drawButton: "Tirer les cartes",
     drawButtonGenerating: "Génération en cours... Patientez",
     streamingOption: "Réponse en direct :",
-    stopGeneration: "Stopper la génération"
+    stopGeneration: "Stopper la génération",
+    copyButton: "Copier",
+    copyButtonCopied: "Copié !",
+    copyButtonError: "Erreur !"
   },
   
   // Messages d'interprétation
@@ -266,6 +269,8 @@ Chaque élément de ton interprétation doit éclairer un aspect spécifique de 
   },
   
   cards: {
+    reversed: "Renversée",
+    closeHint: "✕ Cliquez pour fermer",
     major_arcana: {
       fool: "Le Fou",
       magician: "Le Bateleur",

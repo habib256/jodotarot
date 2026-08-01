@@ -59,23 +59,6 @@ Areas of expertise: {{SPECIALIZATIONS}}`
     };
   }
   
-  /**
-   * Surcharge pour formater l'interprétation selon le style de l'Alchimiste
-   * @param {string} interpretation - Texte d'interprétation brut
-   * @return {string} Interprétation formatée avec le style spécifique à l'Alchimiste
-   */
-  formatInterpretation(interpretation) {
-    // Formatter le texte avec un style inspiré des anciens traités alchimiques
-    let formattedText = `<div class="interpretation-alchimiste">
-      <p class="alchimiste-intro">⚗️ <em>"As Above, So Below. Comme dans le ciel, ainsi sur la terre. Observons les transmutations révélées par les arcanes..."</em> 🔮</p>
-      <div class="alchimiste-content">
-        ${interpretation}
-      </div>
-      <p class="alchimiste-closing">Puisse votre quête du Grand Œuvre vous mener à l'or philosophal. <em>Visita Interiora Terrae Rectificando Invenies Occultum Lapidem</em>.</p>
-    </div>`;
-    
-    return formattedText;
-  }
 }
 
 export default AlchimistePersona; 

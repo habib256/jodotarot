@@ -95,23 +95,6 @@ Aree di competenza: {{SPECIALIZATIONS}}`,
     };
   }
   
-  /**
-   * Surcharge pour formater l'interprétation selon le style démoniaque
-   * @param {string} interpretation - Texte d'interprétation brut
-   * @return {string} Interprétation formatée avec le style spécifique au démon
-   */
-  formatInterpretation(interpretation) {
-    // Formatter le texte avec un style sombre et provocant
-    let formattedText = `<div class="interpretation-demon">
-      <p class="demon-greeting">💀 <em>"Ah, encore un mortel en quête de vérité... Voyons ce que les ombres ont à te dire."</em> 🔥</p>
-      <div class="demon-content">
-        ${interpretation}
-      </div>
-      <p class="demon-closing">Maintenant, tu connais la vérité, mortel. Qu'en feras-tu? <em>*rire sinistre*</em></p>
-    </div>`;
-    
-    return formattedText;
-  }
 }
 
 export default DemonPersona; 

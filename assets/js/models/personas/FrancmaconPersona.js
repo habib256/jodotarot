@@ -59,23 +59,6 @@ Areas of expertise: {{SPECIALIZATIONS}}`
     };
   }
   
-  /**
-   * Surcharge pour formater l'interprétation selon le style du Franc-Maçon
-   * @param {string} interpretation - Texte d'interprétation brut
-   * @return {string} Interprétation formatée avec le style spécifique au Franc-Maçon
-   */
-  formatInterpretation(interpretation) {
-    // Formatter le texte avec un style solennel et symbolique
-    let formattedText = `<div class="interpretation-francmacon">
-      <p class="francmacon-intro">⚒️ <em>"À la Gloire du Grand Architecte de l'Univers, que cette lecture vous guide vers la Lumière..."</em></p>
-      <div class="francmacon-content">
-        ${interpretation}
-      </div>
-      <p class="francmacon-closing">Que les trois grandes lumières de la Franc-Maçonnerie - l'Équerre, le Compas et le Volume de la Loi Sacrée - éclairent votre chemin. <em>Fraternellement.</em></p>
-    </div>`;
-    
-    return formattedText;
-  }
 }
 
 export default FrancmaconPersona; 

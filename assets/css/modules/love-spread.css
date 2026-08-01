@@ -34,10 +34,7 @@
 
 /* Positionnement spécifique pour chaque carte */
 /* Position 1: Vous (Votre cœur) */
-.love-spread .card-1,
-.love-spread .self,
-.love-spread .position-1,
-.love-spread .card-position-1 {
+.love-spread .card-1 {
   left: var(--love-position-1-x);
   top: var(--love-position-1-y);
   transform: translate(-50%, -50%);
@@ -45,10 +42,7 @@
 }
 
 /* Position 2: Partenaire (Son cœur) */
-.love-spread .card-2,
-.love-spread .partner,
-.love-spread .position-2,
-.love-spread .card-position-2 {
+.love-spread .card-2 {
   left: var(--love-position-2-x);
   top: var(--love-position-2-y);
   transform: translate(-50%, -50%);
@@ -56,10 +50,7 @@
 }
 
 /* Position 3: Relation (Relation actuelle) */
-.love-spread .card-3,
-.love-spread .relationship,
-.love-spread .position-3,
-.love-spread .card-position-3 {
+.love-spread .card-3 {
   left: var(--love-position-3-x);
   top: var(--love-position-3-y);
   transform: translate(-50%, -50%);
@@ -67,10 +58,7 @@
 }
 
 /* Position 4: Obstacles (Obstacles à surmonter) */
-.love-spread .card-4,
-.love-spread .obstacles,
-.love-spread .position-4,
-.love-spread .card-position-4 {
+.love-spread .card-4 {
   left: var(--love-position-4-x);
   top: var(--love-position-4-y);
   transform: translate(-50%, -50%);
@@ -78,10 +66,7 @@
 }
 
 /* Position 5: Désirs (Désirs secrets) */
-.love-spread .card-5,
-.love-spread .desires,
-.love-spread .position-5,
-.love-spread .card-position-5 {
+.love-spread .card-5 {
   left: var(--love-position-5-x);
   top: var(--love-position-5-y);
   transform: translate(-50%, -50%);
@@ -89,10 +74,7 @@
 }
 
 /* Position 6: Résultat (Résultat probable) */
-.love-spread .card-6,
-.love-spread .outcome,
-.love-spread .position-6,
-.love-spread .card-position-6 {
+.love-spread .card-6 {
   left: var(--love-position-6-x);
   top: var(--love-position-6-y);
   transform: translate(-50%, -50%);
@@ -100,10 +82,7 @@
 }
 
 /* Position 7: Conseil (Conseil final) */
-.love-spread .card-7,
-.love-spread .advice,
-.love-spread .position-7,
-.love-spread .card-position-7 {
+.love-spread .card-7 {
   left: var(--love-position-7-x);
   top: var(--love-position-7-y);
   transform: translate(-50%, -50%);

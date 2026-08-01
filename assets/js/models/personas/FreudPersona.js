@@ -103,23 +103,6 @@ Aree di competenza: {{SPECIALIZATIONS}}`,
     // Ajouter d'autres langues au besoin
   }
   
-  /**
-   * Surcharge pour formater l'interprétation selon le style de Freud
-   * @param {string} interpretation - Texte d'interprétation brut
-   * @return {string} Interprétation formatée avec le style spécifique à Freud
-   */
-  formatInterpretation(interpretation) {
-    // Formatter le texte avec un style académique
-    let formattedText = `<div class="interpretation-freud">
-      <p class="freud-intro"><em>"Parfois un symbole n'est qu'un symbole, mais le plus souvent il révèle nos désirs les plus profonds."</em></p>
-      <div class="freud-content">
-        ${interpretation}
-      </div>
-      <p class="freud-closing">Cette analyse n'est qu'un début. Une véritable psychanalyse demanderait bien plus de séances pour explorer ces contenus refoulés...</p>
-    </div>`;
-    
-    return formattedText;
-  }
 }
 
 export default FreudPersona; 

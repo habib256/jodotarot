@@ -20,8 +20,7 @@
 }
 
 /* Positions des cartes */
-.card-position.top, .card-position.left, .card-position.center, .card-position.right, .card-position.bottom,
-.top, .left, .center, .right, .bottom {
+.card-position.top {
   position: absolute;
   width: var(--cross-card-width);
   height: var(--cross-card-height);
@@ -42,48 +41,16 @@
 }
 
 /* Positions spécifiques pour chaque carte */
-.card-position.center, .center {
+.card-position.center {
   left: var(--cross-position-1-x);
   top: var(--cross-position-1-y);
   transform: translate(-50%, -50%);
   z-index: 3;
   transform-origin: center center;
-}
-
-.card-position.top, .top {
-  left: var(--cross-position-2-x);
-  top: var(--cross-position-2-y);
-  transform: translate(-50%, 0);
-  z-index: 2;
-  transform-origin: center top;
-}
-
-.card-position.left, .left {
-  left: var(--cross-position-3-x);
-  top: var(--cross-position-3-y);
-  transform: translate(0, -50%);
-  z-index: 2;
-  transform-origin: left center;
-}
-
-.card-position.right, .right {
-  left: var(--cross-position-4-x);
-  top: var(--cross-position-4-y);
-  transform: translate(-100%, -50%);
-  z-index: 2;
-  transform-origin: right center;
-}
-
-.card-position.bottom, .bottom {
-  left: var(--cross-position-5-x);
-  top: var(--cross-position-5-y);
-  transform: translate(-50%, -100%);
-  z-index: 2;
-  transform-origin: center bottom;
 }
 
 /* Positions numériques (nouvelles classes pour compatibilité) */
-.card-position-1, .position-1 {
+.card-position-1 {
   left: var(--cross-position-1-x);
   top: var(--cross-position-1-y);
   transform: translate(-50%, -50%);
@@ -91,43 +58,8 @@
   transform-origin: center center;
 }
 
-.card-position-2, .position-2 {
-  left: var(--cross-position-2-x);
-  top: var(--cross-position-2-y);
-  transform: translate(-50%, 0);
-  z-index: 2;
-  transform-origin: center top;
-}
-
-.card-position-3, .position-3 {
-  left: var(--cross-position-3-x);
-  top: var(--cross-position-3-y);
-  transform: translate(0, -50%);
-  z-index: 2;
-  transform-origin: left center;
-}
-
-.card-position-4, .position-4 {
-  left: var(--cross-position-4-x);
-  top: var(--cross-position-4-y);
-  transform: translate(-100%, -50%);
-  z-index: 2;
-  transform-origin: right center;
-}
-
-.card-position-5, .position-5 {
-  left: var(--cross-position-5-x);
-  top: var(--cross-position-5-y);
-  transform: translate(-50%, -100%);
-  z-index: 2;
-  transform-origin: center bottom;
-}
-
 /* Effets au survol uniformisés */
-.center:hover, .top:hover, .left:hover, .right:hover, .bottom:hover,
-.position-1:hover, .position-2:hover, .position-3:hover, .position-4:hover, .position-5:hover,
-.card-position.center:hover, .card-position.top:hover, .card-position.left:hover, .card-position.right:hover, .card-position.bottom:hover,
-.card-position-1:hover, .card-position-2:hover, .card-position-3:hover, .card-position-4:hover, .card-position-5:hover,
+.center:hover,
 .spread .card-position:hover {
   z-index: 10;
   filter: brightness(1.08);
@@ -135,24 +67,8 @@
 }
 
 /* Maintien des transformations originales */
-.center:hover, .card-position.center:hover {
+.center:hover {
   transform: translate(-50%, -50%) scale(1.02);
-}
-
-.top:hover, .card-position.top:hover {
-  transform: translate(-50%, 0) scale(1.02);
-}
-
-.left:hover, .card-position.left:hover {
-  transform: translate(0, -50%) scale(1.02);
-}
-
-.right:hover, .card-position.right:hover {
-  transform: translate(-100%, -50%) scale(1.02);
-}
-
-.bottom:hover, .card-position.bottom:hover {
-  transform: translate(-50%, -100%) scale(1.02);
 }
 
 /* Styles responsifs */

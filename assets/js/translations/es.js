@@ -19,7 +19,10 @@ const es = {
     drawButton: "Tirar las cartas",
     drawButtonGenerating: "Generando... Por favor espera",
     streamingOption: "Respuesta en vivo:",
-    stopGeneration: "Detener generación"
+    stopGeneration: "Detener generación",
+    copyButton: "Copiar",
+    copyButtonCopied: "¡Copiado!",
+    copyButtonError: "¡Error!"
   },
   
   // Messages d'interprétation
@@ -36,6 +39,8 @@ const es = {
     error: {
       general: "Ha ocurrido un error durante la interpretación. Por favor, inténtalo de nuevo.",
       noQuestion: "Por favor, introduce una pregunta antes de tirar las cartas",
+      generationStopped: "Generación detenida por el usuario",
+      interpretationError: "Error durante la interpretación",
       api: "Error de API: {0}"
     },
     apiWarning: "La interpretación se ha terminado de forma inesperada. Aquí está el resultado parcial:",
@@ -239,6 +244,8 @@ Cada elemento de tu interpretación debe iluminar un aspecto específico de esta
   
   // Cartas
   cards: {
+    reversed: "Invertida",
+    closeHint: "✕ Haz clic para cerrar",
     major_arcana: {
       fool: "El Loco",
       magician: "El Mago",

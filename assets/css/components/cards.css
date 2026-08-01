@@ -42,47 +42,6 @@
   transform: rotate(180deg);
 }
 
-/* Carte agrandie */
-.card.enlarged {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: var(--card-width-large);
-  height: var(--card-height-large);
-  z-index: var(--z-index-modal);
-  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
-}
-
-/* Conteneur pour les cartes agrandies */
-#enlarge-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: var(--z-index-modal);
-  background-color: rgba(0, 0, 0, 0.7);
-}
-
-/* Informations de la carte */
-.card-info {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  padding: var(--spacing-sm);
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  font-size: var(--font-size-sm);
-}
-
-.card:hover .card-info {
-}
-
 .card-drawn {
 }
 

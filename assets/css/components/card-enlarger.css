@@ -22,9 +22,8 @@
   background-color: rgba(0, 0, 0, 0.85);
 }
 
-/* Message d'aide pour fermer */
-.card-enlarge-overlay::after {
-  content: '✕ Cliquez pour fermer';
+/* Message d'aide pour fermer (texte injecté par CardEnlarger, traduit) */
+.card-enlarge-hint {
   position: fixed;
   top: 20px;
   right: 20px;
@@ -39,7 +38,7 @@
   z-index: 10002;
 }
 
-.card-enlarge-overlay.active::after {
+.card-enlarge-overlay.active + .card-enlarge-hint {
   opacity: 1;
 }
 

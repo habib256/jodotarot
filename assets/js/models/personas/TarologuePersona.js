@@ -95,16 +95,6 @@ Aree di competenza: {{SPECIALIZATIONS}}`,
     };
   }
   
-  /**
-   * Surcharge pour formater l'interprétation selon le style du tarologue
-   * @param {string} interpretation - Texte d'interprétation brut
-   * @return {string} Interprétation formatée avec le style spécifique au tarologue
-   */
-  formatInterpretation(interpretation) {
-    // On pourrait ajouter ici un formatage spécifique pour le tarologue
-    // Par exemple, mise en forme avec des emojis symboliques, etc.
-    return interpretation;
-  }
 }
 
 export default TarologuePersona; 

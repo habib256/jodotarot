@@ -57,7 +57,7 @@ UI Components (rendering)
 
 ### Key Architectural Principles
 
-1. **StateManager is Central**: ALL shared state goes through `StateManager` (907 lines in `assets/js/utils/StateManager.js`)
+1. **StateManager is Central**: ALL shared state goes through `StateManager` (`assets/js/utils/StateManager.js`)
    - Automatic validation via schema
    - Observer pattern for reactivity
    - LocalStorage persistence
@@ -87,10 +87,8 @@ UI Components (rendering)
     ├── utils/           # StateManager (centralized state management)
     ├── translations/    # 6 language files (fr, en, es, de, it, zh)
     ├── main.js          # Entry point
-    ├── api.js           # Low-level AI API calls
     ├── config.js        # Configuration constants
-    ├── prompt.js        # Prompt construction utilities
-    └── ui.js            # Legacy UI functions (being migrated to UIService)
+    └── prompt.js        # Prompt construction utilities
 ```
 
 ## Critical Implementation Details
@@ -134,9 +132,10 @@ unsubscribe();
 - `cardSet`: 'set01'|'set02'|'set03'|'set04' (Marseille, Lehmann, Renaissance, Rick&Morty)
 - `spreadType`: 'cross'|'horseshoe'|'love'|'celticCross'
 - `iaModel`: 'prompt'|'openai/*'|'ollama:*'
+- `question`: User question (max 1000 chars)
 - `cards`: Array of drawn cards with validation
-- `interpretation`: Generated AI response (plain text, not HTML)
-- `isLoading`, `error`, `isCardEnlarged`, `enlargedCardId`: UI state
+- `interpretation`: Generated AI response (plain text, not HTML), nullable
+- `isLoading`, `error`: transient UI state (never persisted)
 
 ### AI Service Architecture
 
@@ -153,13 +152,14 @@ Different Ollama models return different JSON structures. The system auto-detect
 - `llama3`: `message.content`
 - `llama2`: `response`
 
-**Retry Logic** (`api.js` ~200-300):
+**Retry Logic** (`AIService.fetchWithRetry`):
 - Exponential backoff with jitter
-- Configurable timeouts per operation (connect, model load, response)
-- Automatic fallback to "prompt" mode on connectivity errors
+- Configurable timeouts per operation (see `TIMEOUTS` in `config.js`)
+- A user-initiated cancellation (AbortSignal) stops retries immediately
+- Automatic fallback to "prompt" mode when no model is available
 
-**Streaming Implementation** (`AIService.js` ~400-500):
-Uses `response.body.getReader()` with `TextDecoder` for chunk-by-chunk processing. Calls `onChunk` callback for progressive UI updates.
+**Streaming Implementation** (`AIService.getOllamaStreamingResponse`):
+Uses `response.body.getReader()` with `TextDecoder` for chunk-by-chunk processing. Calls `onChunk` callback for progressive UI updates. `ReadingController` renders chunks via `textContent` only — the model response is never inserted as HTML.
 
 ### Persona System
 
@@ -186,9 +186,11 @@ class CustomPersona extends BasePersona {
 }
 ```
 
-**Prompt Construction** (`AIService.js` ~150-200):
+**Prompt Construction** (`AIService.buildSystemPrompts` / `buildPrompt`):
 1. Meta prompt (system instructions) from translations
-2. Persona prompt (style/approach) via `persona.buildSystemPrompt()`
+2. Persona prompt (style/approach) via `persona.buildSystemPrompt(spreadName)` —
+   `spreadName` must already be localized (`spread.getName()`); passing the raw
+   key produces prompts like "this celticCross spread"
 3. Reading description (cards + positions) via `spread.generateReadingDescription()`
 4. User question with contextual enrichment
 
@@ -197,10 +199,10 @@ class CustomPersona extends BasePersona {
 **4 Spread Types** in `assets/js/models/spreads/`:
 - `CrossSpread.js`: 5 cards (past, present, future, advice, outcome)
 - `HorseshoeSpread.js`: 7 cards (horseshoe layout)
-- `LoveSpread.js`: 5 cards (love/relationship focus)
+- `LoveSpread.js`: 7 cards (love/relationship focus)
 - `CelticCrossSpread.js`: 10 cards (comprehensive reading)
 
-**All inherit from `BaseSpread`** (370 lines):
+**All inherit from `BaseSpread`**:
 - Card position definitions with semantic names
 - `draw()`: Shuffle and draw cards
 - `generateReadingDescription()`: Creates detailed prompt text
@@ -231,12 +233,15 @@ const msg = getTranslation('interpretation.loadingWithModel', 'fr', {
 
 **Modular Structure** (`assets/css/`):
 - `main.css`: Entry point, imports all modules
-- `buttons.css`, `cards.css`, `forms.css`, `modal.css`, `warnings.css`: Component styles
+- `components/`, `layouts/`, `modules/`, `utils/`: styles by scope
 - Uses CSS variables for theming
 - BEM naming convention for classes
 
 **Card Positioning**:
-- Dual identification: semantic names + numeric IDs
+- Positions are applied as inline styles by `BaseSpread._configurePositionStyle()`,
+  which reads the `--<key>-position-<n>-{x,y,rotation}` CSS variables from
+  `base/variables.css`. The `modules/*-spread.css` files only style the
+  containers; editing a position means editing the variable.
 - Position data defined in spread classes (e.g., `CrossSpread.js`)
 - Z-index management for overlapping cards
 - Visual editor available in `spread-editor.html`
@@ -274,7 +279,7 @@ const msg = getTranslation('interpretation.loadingWithModel', 'fr', {
 
 ### Debugging State Issues
 
-1. Check browser console for StateManager logs (🔄 for updates, ✅ for changes)
+1. Set `DEBUG_LEVEL >= 2` in `config.js` to see StateManager persistence/restore logs
 2. Listen to custom events: `document.addEventListener('state:changed', e => console.log(e.detail))`
 3. Use browser DevTools → Application → LocalStorage → `jodotarot_state`
 4. Inspect `stateManager.getState()` in console
@@ -282,15 +287,20 @@ const msg = getTranslation('interpretation.loadingWithModel', 'fr', {
 
 ### Working with Cards
 
-**Card Structure**:
+**Card Structure** (as persisted in state):
 ```javascript
 {
-  id: 'M01',           // Major Arcana format
-  name: 'Le Bateleur', // Card name
-  imageUrl: 'assets/images/cards/marseille/01_Le_bateleur.png',
+  id: 'M01',           // Major Arcana format (M00..M21)
+  name: 'Bateleur',    // File/meaning key, NOT the display name
+  imageUrl: 'assets/images/cards/marseille/01_Bateleur.png',
   position: 'upright' | 'reversed'
 }
 ```
+
+**Card names**: `name` is the image/meaning key. The user-facing name comes from
+`TarotCard.getTranslatedName(language)`, which maps the card number through
+`MAJOR_ARCANA_TRANSLATION_KEYS` to `cards.major_arcana.*` translations.
+Never display `card.name` directly.
 
 **Card Sets** (`assets/images/cards/`):
 - `set01`: marseille (Tarot de Marseille)
@@ -298,19 +308,18 @@ const msg = getTranslation('interpretation.loadingWithModel', 'fr', {
 - `set03`: renaissance
 - `set04`: rick&morty
 
-**Validation**: StateManager validates card structure on every update (`StateManager.js` ~600-650)
+**Validation**: StateManager validates card structure on every update (`cards` entry in the schema)
 
 ## Important Constraints
 
 ### NEVER Do This
 
-1. **Direct DOM manipulation** - Always use `UIService`
-2. **Bypass StateManager** - All shared state must go through it
-3. **Hardcode text** - Use translation system
-4. **Modify state directly** - Use `setState()`, never `state.property = value`
-5. **Create circular service dependencies**
-6. **Use `pointer-events: none` on scrollable containers** - Breaks scrolling
-7. **Return HTML from AI services** - Always return plain text for security
+1. **Bypass StateManager** - All shared state must go through it
+2. **Hardcode text** - Use translation system
+3. **Modify state directly** - Use `setState()`, never `state.property = value`
+4. **Create circular service dependencies** - controllers must not import from `main.js`
+5. **Use `pointer-events: none` on scrollable containers** - Breaks scrolling
+6. **Render AI output as HTML** - Always insert model responses via `textContent`
 
 ### Always Do This
 
@@ -351,8 +360,7 @@ const msg = getTranslation('interpretation.loadingWithModel', 'fr', {
 
 - **Selective Updates**: StateManager only notifies on actual value changes (`isEqual` check)
 - **Debouncing**: Use for frequent events (resize, scroll)
-- **Response Cache**: AIService includes Map-based response cache (see `api.js` ~100)
-- **Lazy Loading**: Personas loaded on-demand via dynamic imports
+- **Lazy Loading**: Personas loaded on-demand via dynamic imports (`getPersonaPrompt`)
 - **Stream Processing**: Chunks processed immediately without buffering entire response
 
 ## Security Notes
@@ -376,10 +384,9 @@ The project includes a build system (`build.js`) using esbuild to generate a sel
 
 ### Build Plugins
 
-Two esbuild plugins handle `file://` compatibility:
+One esbuild plugin handles `file://` compatibility:
 
-- **`personaStaticImportPlugin`** — Converts dynamic `await import()` calls in `personas/index.js` to static imports (esbuild cannot bundle dynamic imports with variable paths)
-- **`deckServicePatchPlugin`** — Removes the `fetch()`-based image validation in `DeckService.loadDeck()` (fetch fails on `file://`, but `<img>` tags load fine)
+- **`personaStaticImportPlugin`** — Converts dynamic `await import()` calls in `personas/index.js` to static imports (esbuild cannot bundle dynamic imports with variable paths). Its generated module must mirror the real `personas/index.js` exports.
 
 ### Key Files
 
@@ -396,7 +403,7 @@ After modifying any source JS/CSS, run `npm run build` to regenerate the standal
 ## Additional Resources
 
 - `spread-editor.html`: Visual editor for configuring card positions in spreads
-- `assets/js/models/personas/`: All 22 persona implementations
+- `assets/js/models/personas/`: All 21 persona implementations
 - `assets/js/models/spreads/`: All 4 spread type implementations
 - `assets/js/translations/`: Translation files for 6 supported languages
 - `assets/css/`: Modular CSS architecture with BEM naming

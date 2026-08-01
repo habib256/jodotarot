@@ -95,23 +95,6 @@ Aree di competenza: {{SPECIALIZATIONS}}`,
     };
   }
   
-  /**
-   * Surcharge pour formater l'interprétation selon le style de Lacan
-   * @param {string} interpretation - Texte d'interprétation brut
-   * @return {string} Interprétation formatée avec le style spécifique à Lacan
-   */
-  formatInterpretation(interpretation) {
-    // Formatter le texte avec un style intellectuel et énigmatique
-    let formattedText = `<div class="interpretation-lacan">
-      <p class="lacan-intro"><em>"Ce qui est rejeté dans l'ordre symbolique resurgit dans le réel. Examinons donc ce qui se manifeste dans ces cartes..."</em></p>
-      <div class="lacan-content">
-        ${interpretation}
-      </div>
-      <p class="lacan-closing">Le sujet barré ($) se trouve toujours dans cette relation au désir de l'Autre. <em>Voilà.</em></p>
-    </div>`;
-    
-    return formattedText;
-  }
 }
 
 export default LacanPersona; 
