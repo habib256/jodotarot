@@ -19,6 +19,18 @@ export const MINOR_SUITS = {
   PENTACLES: 'pentacles'
 };
 
+/**
+ * Clés de traduction des arcanes majeurs, indexées par leur numéro (0 à 21).
+ * Les noms de fichiers (`La_lune`, ...) servent d'identifiants d'image et de
+ * clés de signification, alors que l'affichage passe par ces clés traduites.
+ */
+export const MAJOR_ARCANA_TRANSLATION_KEYS = [
+  'fool', 'magician', 'high_priestess', 'empress', 'emperor', 'hierophant',
+  'lovers', 'chariot', 'justice', 'hermit', 'wheel_of_fortune', 'strength',
+  'hanged_man', 'death', 'temperance', 'devil', 'tower', 'star',
+  'moon', 'sun', 'judgement', 'world'
+];
+
 // Constantes pour les rangs des arcanes mineurs
 export const MINOR_RANKS = {
   ACE: 'ace',
@@ -63,40 +75,15 @@ export class TarotCard {
       .join('/');
   }
 
-  // Générateur d'ID unique pour les cartes
-  static generateId(arcana, suit, rank) {
-    if (arcana === ARCANE_TYPES.MAJOR) {
-      return `M${rank.padStart(2, '0')}`; // M00 pour Le Fou, M21 pour Le Monde
-    } else {
-      return `${suit[0].toUpperCase()}${rank[0].toUpperCase()}`; // WK pour Roi de Bâtons
-    }
-  }
-
-  // Générateur de nom de fichier standardisé
-  static generateFileName(arcana, suit, rank, name) {
-    if (arcana === ARCANE_TYPES.MAJOR) {
-      return `${rank.padStart(2, '0')} ${name}`;
-    } else {
-      return `${rank} of ${suit}`;
-    }
-  }
-
-  // Obtient le nom complet de la carte
-  getFullName() {
-    if (this.arcana === ARCANE_TYPES.MAJOR) {
-      return getTranslation(`cards.major_arcana.${this.translationKey}`);
-    } else {
-      return `${this.rank} of ${this.suit}`;
-    }
-  }
-
   // Obtient le nom traduit de la carte dans la langue spécifiée
   getTranslatedName(language = 'fr') {
-    if (this.arcana === ARCANE_TYPES.MAJOR) {
-      return getTranslation(`cards.major_arcana.${this.translationKey}`, language);
-    } else {
+    if (this.arcana !== ARCANE_TYPES.MAJOR) {
       return `${this.rank} of ${this.suit}`;
     }
+
+    // L'identifiant est de la forme M00..M21: en déduire la clé de traduction
+    const key = MAJOR_ARCANA_TRANSLATION_KEYS[Number(this.id.slice(1))];
+    return key ? getTranslation(`cards.major_arcana.${key}`, language) : this.translationKey;
   }
 
   // Vérifie si c'est une carte majeure
@@ -276,11 +263,11 @@ export const cardSetConfigs = {
 };
 
 /**
- * Génère les cartes pour un jeu spécifique
+ * Génère les cartes majeures d'un jeu de cartes
  * @param {string} setId - Identifiant du jeu
- * @returns {Array} Liste des cartes
+ * @returns {TarotCard[]} Liste des cartes majeures
  */
-function generateCards(setId) {
+export function generateCards(setId) {
   const config = cardSetConfigs[setId];
   if (!config) {
     throw new Error(`Jeu non trouvé: ${setId}`);
@@ -290,159 +277,13 @@ function generateCards(setId) {
   for (let i = 0; i < config.majorCount; i++) {
     const cardName = config.cardNames[i];
     const fileName = `${String(i).padStart(2, '0')}_${cardName}.${config.extension}`;
-    const imagePath = `${config.path}/${fileName}`;
-    
+
     cards.push(new TarotCard(
       `M${String(i).padStart(2, '0')}`,
       cardName,
-      imagePath
+      `${config.path}/${fileName}`
     ));
   }
 
   return cards;
 }
-
-/**
- * Informations sur les cartes du jeu Marseille
- */
-export const marseilleCards = generateCards('set01');
-
-/**
- * Informations sur les cartes du jeu Thiago Lehmann
- */
-export const lehmannCards = generateCards('set02');
-
-/**
- * Informations sur les cartes du jeu Renaissance
- */
-export const renaissanceCards = generateCards('set03');
-
-/**
- * Informations sur les cartes du jeu Rick&Morty
- */
-export const rickAndMortyCards = generateCards('set04');
-
-/**
- * Significations des arcanes majeurs à l'endroit
- */
-export const majorUprightMeanings = {
-  "00": "Liberté, spiritualité, potentiel inexploité",
-  "01": "Habileté, dextérité, action, créativité",
-  "02": "Intuition, sagesse intérieure, connaissance secrète",
-  "03": "Abondance, féminité, créativité, nature",
-  "04": "Autorité, structure, contrôle, leadership",
-  "05": "Spiritualité, croyance, tradition, conformité",
-  "06": "Amour, choix, attraction, équilibre",
-  "07": "Détermination, contrôle, succès, action",
-  "08": "Équité, vérité, loi, équilibre",
-  "09": "Introspection, recherche, solitude, guidance",
-  "10": "Chance, karma, destin, tournants de vie",
-  "11": "Courage, persuasion, influence, énergie",
-  "12": "Sacrifice, perspective, suspension, lâcher-prise",
-  "13": "Transformation, transition, changement, libération",
-  "14": "Modération, équilibre, patience, harmonie",
-  "15": "Ombres, matérialisme, attachements, illusions",
-  "16": "Bouleversement soudain, chaos, révélation, éveil",
-  "17": "Espoir, inspiration, renouveau, spiritualité",
-  "18": "Illusion, peurs, anxiété, confusion",
-  "19": "Succès, joie, vitalité, confiance",
-  "20": "Éveil, rénovation, jugement, absolution",
-  "21": "Accomplissement, intégration, voyage, complétude"
-};
-
-/**
- * Significations des arcanes majeurs renversés
- */
-export const majorReversedMeanings = {
-  "00": "Errance, imprudence, risques insensés",
-  "01": "Manque de confiance, talents inexploités, tromperie",
-  "02": "Secrets cachés, savoir caché, besoin d'écouter son intuition",
-  "03": "Dépendance, blocage créatif, problèmes domestiques",
-  "04": "Domination, rigidité, inflexibilité, contrôle excessif",
-  "05": "Rébellion, subversion, nouvelles méthodes, non-conventionalité",
-  "06": "Déséquilibre, discorde, disharmonie, mauvais choix",
-  "07": "Manque de direction, agression, échec, défaite",
-  "08": "Injustice, malhonnêteté, manque d'objectivité",
-  "09": "Isolement, repli sur soi, paranoïa, solitude excessive",
-  "10": "Revers de fortune, bouleversements, résistance au changement",
-  "11": "Doute de soi, faiblesse, manque de détermination",
-  "12": "Résistance, stagnation, indécision, retard",
-  "13": "Résistance au changement, stagnation, inévitabilité",
-  "14": "Déséquilibre, excès, auto-restriction, désalignement",
-  "15": "Libération, indépendance, affronter ses peurs",
-  "16": "Éviter le désastre, retarder l'inévitable, résistance au changement",
-  "17": "Désespoir, pessimisme, manque de foi, découragement",
-  "18": "Confusion, peur, malentendus, méconnaissance",
-  "19": "Blocage, dépression, malentendus, égocentrisme",
-  "20": "Doute de soi, auto-critique, peur du changement",
-  "21": "Incomplet, stagnation, manque d'accomplissement, voyage déséquilibré"
-};
-
-/**
- * Définition complète des jeux de cartes disponibles
- */
-export const cardSets = {
-  set01: {
-    id: 'set01',
-    name: 'Tarot Marseille',
-    cards: marseilleCards,
-    backCardIndex: 22
-  },
-  set02: {
-    id: 'set02',
-    name: 'Tarot Thiago Lehmann',
-    cards: lehmannCards,
-    backCardIndex: 22
-  },
-  set03: {
-    id: 'set03',
-    name: 'Tarot Renaissance',
-    cards: renaissanceCards,
-    backCardIndex: 22
-  },
-  set04: {
-    id: 'set04',
-    name: 'Tarot Rick & Morty',
-    cards: rickAndMortyCards,
-    backCardIndex: 22
-  }
-};
-
-/**
- * Obtient une carte par son ID dans un jeu spécifié
- * @param {string} setId - Identifiant du jeu de cartes
- * @param {string} cardId - Identifiant de la carte
- * @return {Object|null} La carte trouvée ou null
- */
-export function getCardById(setId, cardId) {
-  if (!cardSets[setId]) return null;
-  
-  return cardSets[setId].cards.find(card => card.id === cardId) || null;
-}
-
-/**
- * Obtient la signification d'une carte majeure selon son orientation
- * @param {string} cardId - Identifiant de la carte
- * @param {string} orientation - Orientation de la carte (upright ou reversed)
- * @return {string} La signification de la carte
- */
-export function getMajorCardMeaning(cardId, orientation = 'upright') {
-  if (orientation === 'upright') {
-    return majorUprightMeanings[cardId] || "Signification inconnue";
-  } else {
-    return majorReversedMeanings[cardId] || "Signification inconnue";
-  }
-}
-
-/**
- * Obtient l'image de dos pour un jeu de cartes
- * @param {string} setId - Identifiant du jeu de cartes
- * @return {string} URL de l'image de dos
- */
-export function getBackCardImage(setId) {
-  const config = cardSetConfigs[setId];
-  if (!config) return "";
-
-  const fileName = `${String(config.majorCount).padStart(2, '0')}_${config.cardNames[config.majorCount]}.${config.extension}`;
-  return `${config.path}/${fileName}`;
-} 

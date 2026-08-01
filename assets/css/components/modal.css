@@ -166,3 +166,43 @@
 .error-modal .modal-title {
   color: white;
 } 
+/* Dialogue de configuration (saisie de la clé API OpenAI) */
+.config-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: var(--z-index-modal);
+}
+
+.config-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  max-width: 90%;
+  padding: var(--spacing-lg);
+  background-color: white;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: calc(var(--z-index-modal) + 1);
+}
+
+.config-dialog h3 {
+  margin-top: 0;
+  color: var(--color-primary);
+}
+
+.config-dialog input {
+  width: 100%;
+  padding: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: var(--border-radius-sm);
+}
+
+.config-dialog-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+}

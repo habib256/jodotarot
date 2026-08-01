@@ -19,7 +19,10 @@ const zh = {
     drawButton: "抽牌",
     drawButtonGenerating: "生成中...请稍候",
     streamingOption: "实时回应:",
-    stopGeneration: "停止生成"
+    stopGeneration: "停止生成",
+    copyButton: "复制",
+    copyButtonCopied: "已复制！",
+    copyButtonError: "错误！"
   },
   
   // Messages d'interprétation
@@ -229,6 +232,7 @@ const zh = {
   
   // 卡牌
   cards: {
+    reversed: "逆位",
     major_arcana: {
       fool: "愚者",
       magician: "魔术师",

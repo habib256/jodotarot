@@ -63,9 +63,13 @@ ${mapEntries}
 };
 
 export async function getPersonaPrompt(personaKey, language = 'fr', spreadType = 'cross') {
+  const PersonaClass = PERSONA_MAP[personaKey];
+  if (!PersonaClass) {
+    console.error('Persona inconnu: ' + personaKey);
+    return '';
+  }
+
   try {
-    const PersonaClass = PERSONA_MAP[personaKey];
-    if (!PersonaClass) return '';
     const persona = new PersonaClass(language);
     return persona.buildSystemPrompt(spreadType);
   } catch (error) {
@@ -73,13 +77,6 @@ export async function getPersonaPrompt(personaKey, language = 'fr', spreadType =
     return '';
   }
 }
-
-export async function getAllPersonas() {
-  return { ...PERSONA_MAP };
-}
-
-const PERSONAS = Object.keys(PERSONA_MAP).reduce((o, k) => ({ ...o, [k]: k }), {});
-export default PERSONAS;
 `;
 
           return { contents, loader: 'js', resolveDir: path.dirname(args.path) };
@@ -90,37 +87,7 @@ export default PERSONAS;
 }
 
 // ---------------------------------------------------------------------------
-// 2. DeckService patch plugin
-// ---------------------------------------------------------------------------
-// DeckService.loadDeck() uses fetch() to validate card images before loading.
-// fetch() fails on file:// protocol. Since <img> tags load fine from file://,
-// we simply remove the fetch-based validation loop in the standalone build.
-
-function deckServicePatchPlugin() {
-  return {
-    name: 'deckservice-patch',
-    setup(build) {
-      build.onLoad(
-        { filter: /services[/\\]DeckService\.js$/ },
-        async (args) => {
-          let contents = fs.readFileSync(args.path, 'utf8');
-
-          // Remove the fetch-based image validation block (lines 63-78 in original)
-          // Replace the whole "Vérifier que toutes les images sont accessibles" block
-          contents = contents.replace(
-            /\/\/ Vérifier que toutes les images sont accessibles[\s\S]*?for \(const card of majorCards\) \{[\s\S]*?\}\s*\}/,
-            '// Image validation skipped in standalone build (fetch fails on file://)'
-          );
-
-          return { contents, loader: 'js', resolveDir: path.dirname(args.path) };
-        }
-      );
-    },
-  };
-}
-
-// ---------------------------------------------------------------------------
-// 3. Build
+// 2. Build
 // ---------------------------------------------------------------------------
 
 async function build() {
@@ -134,7 +101,7 @@ async function build() {
     write: false,
     minify: false,
     target: ['es2020'],
-    plugins: [personaStaticImportPlugin(), deckServicePatchPlugin()],
+    plugins: [personaStaticImportPlugin()],
   });
 
   const bundledJS = jsResult.outputFiles[0].text;

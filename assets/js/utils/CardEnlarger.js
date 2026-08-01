@@ -1,8 +1,14 @@
 /**
  * Gère l'agrandissement des cartes avec animation
  */
+import { getTranslation } from '../translations/index.js';
+
 class CardEnlarger {
-  constructor() {
+  /**
+   * @param {StateManager} stateManager - Gestionnaire d'état (pour la langue)
+   */
+  constructor(stateManager) {
+    this.stateManager = stateManager;
     this.overlay = null;
     this.isEnlarged = false;
     this.currentCard = null;
@@ -35,14 +41,11 @@ class CardEnlarger {
    * @returns {number} L'angle en degrés
    */
   getRotationAngle(transform) {
-    if (!transform || transform === 'none') return 0;
-    
-    const values = transform.split('(')[1].split(')')[0].split(',');
-    const a = values[0];
-    const b = values[1];
-    const angle = Math.round(Math.atan2(b, a) * (180 / Math.PI));
-    
-    return angle;
+    const matrix = /^matrix\(([^)]+)\)/.exec(transform || '');
+    if (!matrix) return 0;
+
+    const [a, b] = matrix[1].split(',').map(Number);
+    return Math.round(Math.atan2(b, a) * (180 / Math.PI));
   }
 
   /**
@@ -212,24 +215,32 @@ class CardEnlarger {
     const positionName = positionElement.getAttribute('data-position-name');
     const isReversed = cardElement.classList.contains('reversed');
 
+    const language = this.stateManager?.getState().language;
+
     const infoDiv = document.createElement('div');
     infoDiv.className = 'card-enlarged-info';
-    
-    // Ajouter le nom de la carte avec indication de renversement
-    let cardNameWithOrientation = cardName;
+
+    const nameDiv = document.createElement('div');
+    nameDiv.className = 'card-enlarged-name';
+    nameDiv.textContent = cardName;
+
+    // Indiquer l'orientation renversée
     if (isReversed) {
-      cardNameWithOrientation += ' <span style="color: #ffc107; font-weight: bold;">(Renversée)</span>';
+      const reversedTag = document.createElement('span');
+      reversedTag.className = 'card-enlarged-reversed';
+      reversedTag.textContent = ` (${getTranslation('cards.reversed', language)})`;
+      nameDiv.appendChild(reversedTag);
     }
-    let infoHTML = `<div class="card-enlarged-name">${cardNameWithOrientation}</div>`;
-    
+
+    infoDiv.appendChild(nameDiv);
+
     if (positionName) {
-      infoHTML += `<div class="card-enlarged-position">${positionName}</div>`;
+      const positionDiv = document.createElement('div');
+      positionDiv.className = 'card-enlarged-position';
+      positionDiv.textContent = positionName;
+      infoDiv.appendChild(positionDiv);
     }
-    
-    // Description détaillée retirée
-    
-    infoDiv.innerHTML = infoHTML;
-    
+
     return infoDiv;
   }
 

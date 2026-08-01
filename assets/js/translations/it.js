@@ -19,7 +19,10 @@ const it = {
     drawButton: "Pesca le carte",
     drawButtonGenerating: "Generazione in corso... Attendere prego",
     streamingOption: "Risposta in diretta:",
-    stopGeneration: "Ferma generazione"
+    stopGeneration: "Ferma generazione",
+    copyButton: "Copia",
+    copyButtonCopied: "Copiato!",
+    copyButtonError: "Errore!"
   },
   
   // Messages d'interprétation
@@ -228,6 +231,7 @@ Ogni elemento della tua interpretazione deve illuminare un aspetto specifico di 
   
   // Carte
   cards: {
+    reversed: "Rovesciata",
     major_arcana: {
       fool: "Il Matto",
       magician: "Il Mago",

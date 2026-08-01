@@ -19,7 +19,10 @@ const es = {
     drawButton: "Tirar las cartas",
     drawButtonGenerating: "Generando... Por favor espera",
     streamingOption: "Respuesta en vivo:",
-    stopGeneration: "Detener generación"
+    stopGeneration: "Detener generación",
+    copyButton: "Copiar",
+    copyButtonCopied: "¡Copiado!",
+    copyButtonError: "¡Error!"
   },
   
   // Messages d'interprétation
@@ -239,6 +242,7 @@ Cada elemento de tu interpretación debe iluminar un aspecto específico de esta
   
   // Cartas
   cards: {
+    reversed: "Invertida",
     major_arcana: {
       fool: "El Loco",
       magician: "El Mago",

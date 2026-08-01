@@ -2,8 +2,6 @@
  * Classe représentant un jeu de cartes de tarot
  * Gère le mélange et le tirage des cartes
  */
-import { ARCANE_TYPES } from './index.js';
-
 class Deck {
   /**
    * @param {string} deckId - Identifiant du jeu de cartes
@@ -14,15 +12,6 @@ class Deck {
     this.originalCards = [...cards]; // Sauvegarde des cartes originales
     this.cards = [...cards]; // Copie des cartes pour manipulation
     this.drawnCards = []; // Cartes déjà tirées
-  }
-  
-  /**
-   * Charge les cartes pour ce jeu
-   * @param {Array} cards - Liste des cartes à charger
-   */
-  loadCards(cards) {
-    this.originalCards = [...cards];
-    this.reset();
   }
   
   /**
@@ -78,23 +67,6 @@ class Deck {
   }
   
   /**
-   * Tire plusieurs cartes du jeu
-   * @param {number} count - Nombre de cartes à tirer
-   * @param {boolean} [randomOrientation=false] - Si true, les cartes peuvent être renversées
-   * @returns {Array} Les cartes tirées
-   */
-  drawCards(count, randomOrientation = false) {
-    const drawn = [];
-    for (let i = 0; i < count && this.cards.length > 0; i++) {
-      const card = this.drawCard(randomOrientation);
-      if (card) {
-        drawn.push(card);
-      }
-    }
-    return drawn;
-  }
-  
-  /**
    * Retourne le nombre de cartes restantes dans le jeu
    * @return {number} Nombre de cartes restantes
    */
@@ -108,14 +80,6 @@ class Deck {
    */
   getAllCards() {
     return [...this.originalCards];
-  }
-  
-  /**
-   * Retourne les cartes déjà tirées
-   * @return {Array} Cartes tirées
-   */
-  getDrawnCards() {
-    return [...this.drawnCards];
   }
   
   /**
@@ -136,57 +100,6 @@ class Deck {
     return this.findCardById(cardId);
   }
   
-  /**
-   * Recherche une carte par son nom
-   * @param {string} cardName - Nom de la carte à rechercher
-   * @return {Object|null} La carte trouvée ou null
-   */
-  findCardByName(cardName) {
-    return this.originalCards.find(card => 
-      card.name.toLowerCase() === cardName.toLowerCase()
-    ) || null;
-  }
-  
-  /**
-   * Obtient le nombre total de cartes dans le jeu
-   * @returns {number} Nombre total de cartes
-   */
-  getTotalCount() {
-    return this.originalCards.length;
-  }
-  
-  /**
-   * Filtre les cartes par type d'arcane
-   * @param {string} arcanaType - Type d'arcane (major ou minor)
-   * @returns {Array} Cartes filtrées
-   */
-  filterByArcana(arcanaType) {
-    return this.cards.filter(card => card.arcana === arcanaType);
-  }
-  
-  /**
-   * Obtient les cartes majeures
-   * @returns {Array} Cartes majeures
-   */
-  getMajorCards() {
-    return this.filterByArcana(ARCANE_TYPES.MAJOR);
-  }
-  
-  /**
-   * Obtient les cartes mineures
-   * @returns {Array} Cartes mineures
-   */
-  getMinorCards() {
-    return this.filterByArcana(ARCANE_TYPES.MINOR);
-  }
-  
-  /**
-   * Vérifie si le jeu contient des arcanes mineurs
-   * @returns {boolean} True si le jeu contient des arcanes mineurs
-   */
-  hasMinorArcana() {
-    return this.getMinorCards().length > 0;
-  }
 }
 
-export default Deck; 
+export default Deck;

@@ -6,47 +6,8 @@ class UIService {
   constructor() {
     // Initialiser les gestionnaires d'événements globaux
     this.initGlobalEvents();
-    
-    // Écouter l'événement de disponibilité de l'état
-    document.addEventListener('stateManager:ready', this.handleStateReady.bind(this));
-    
-    // Écouter les changements globaux d'état
-    document.addEventListener('state:changed', this.handleStateChanged.bind(this));
   }
-  
-  /**
-   * Gère l'événement indiquant que l'état est prêt
-   * @param {CustomEvent} event - Événement avec les détails de l'état
-   */
-  handleStateReady(event) {
-    console.log('🔄 UIService: État disponible, synchronisation de l\'interface');
-    this.synchronizeUIWithState(event.detail.state);
-  }
-  
-  /**
-   * Gère les changements d'état
-   * @param {CustomEvent} event - Événement avec les détails des changements
-   */
-  handleStateChanged(event) {
-    const { changes, state } = event.detail;
-    this.synchronizeUIWithState(state, changes);
-  }
-  
-  /**
-   * Synchronise tous les éléments d'interface avec l'état actuel
-   * @param {Object} state - État actuel
-   * @param {Object} changes - Changements spécifiques (optionnel)
-   */
-  synchronizeUIWithState(state, changes = null) {
-    // Vérifier les propriétés critiques et les synchroniser avec l'UI
-    this.ensureInterpretationPanelVisibility();
-    
-    // Synchroniser d'autres éléments d'interface selon les besoins
-    this.updateStatusIndicators(state);
-    
-    console.log('✅ UIService: Synchronisation UI/État terminée');
-  }
-  
+
   /**
    * S'assure que le panneau d'interprétation est toujours visible
    */
@@ -60,22 +21,6 @@ class UIService {
         const minHeight = Math.max(250, window.innerHeight * 0.3);
         interpretationPanel.style.minHeight = `${minHeight}px`;
       }
-    }
-  }
-  
-  /**
-   * Met à jour les indicateurs de statut dans l'interface
-   * @param {Object} state - État actuel
-   */
-  updateStatusIndicators(state) {
-    // Nous ne voulons plus afficher l'indicateur de modèle actif
-    // Le message "status-message" a été supprimé de la vue
-    
-    // Nous conservons uniquement la référence au message pour d'autres usages potentiels
-    let statusMessage = document.getElementById('status-message');
-    if (statusMessage) {
-      // Masquer complètement le message de statut
-      statusMessage.style.display = 'none';
     }
   }
   
@@ -143,45 +88,6 @@ class UIService {
     return errorElement;
   }
   
-  /**
-   * Affiche un message de notification
-   * @param {string} message - Message à afficher
-   * @param {string} type - Type de notification (info, success, warning)
-   * @param {number} duration - Durée d'affichage en ms
-   */
-  showNotification(message, type = 'info', duration = 3000) {
-    let container = document.getElementById('toast-container');
-    if (!container) {
-      container = document.createElement('div');
-      container.id = 'toast-container';
-      container.style.position = 'fixed';
-      container.style.top = '20px';
-      container.style.right = '20px';
-      container.style.zIndex = '10000';
-      container.style.display = 'flex';
-      container.style.flexDirection = 'column';
-      container.style.gap = '10px';
-      document.body.appendChild(container);
-    }
-    
-    const toast = document.createElement('div');
-    toast.className = 'toast notification-' + type;
-    toast.innerText = message;
-    toast.style.opacity = '0';
-    toast.style.transition = 'opacity 0.5s ease';
-    container.appendChild(toast);
-    
-    // Forcer un reflow pour déclencher la transition
-    void toast.offsetWidth;
-    toast.style.opacity = '1';
-
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      setTimeout(() => {
-        toast.remove();
-      }, 500);
-    }, duration);
-  }
 }
 
-export default UIService; 
+export default UIService;

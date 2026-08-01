@@ -33,18 +33,6 @@ function createSpread(spreadType, container = null, langue = 'fr') {
   return new SPREADS[spreadType](container, langue);
 }
 
-/**
- * Obtient une description détaillée du type de tirage (sans cartes)
- * @param {string} spreadType - Clé du type de tirage
- * @param {string} langue - Code de langue (fr, en, etc.)
- * @returns {string} - Description du type de tirage
- */
-function getSpreadDescription(spreadType, langue = 'fr') {
-  // Créer une instance temporaire pour accéder aux descriptions
-  const spread = createSpread(spreadType, null, langue);
-  return spread.getDescription();
-}
-
 // Exporter les types de tirages et les fonctions utilitaires
 export default SPREADS;
-export { createSpread, getSpreadDescription }; 
+export { createSpread }; 

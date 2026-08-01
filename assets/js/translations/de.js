@@ -19,7 +19,10 @@ const de = {
     drawButton: "Karten ziehen",
     drawButtonGenerating: "Generierung läuft... Bitte warten",
     streamingOption: "Live-Antwort:",
-    stopGeneration: "Generierung stoppen"
+    stopGeneration: "Generierung stoppen",
+    copyButton: "Kopieren",
+    copyButtonCopied: "Kopiert!",
+    copyButtonError: "Fehler!"
   },
   
   // Messages d'interprétation
@@ -239,6 +242,7 @@ Jedes Element deiner Interpretation muss einen spezifischen Aspekt dieser Frage 
   
   // Karten
   cards: {
+    reversed: "Umgekehrt",
     major_arcana: {
       fool: "Der Narr",
       magician: "Der Magier",

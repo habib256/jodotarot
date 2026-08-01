@@ -69,6 +69,5 @@ ${systemPrompt}`;
 
 export {
   getMetaPrompt,
-  getEmphasisText,
   enrichirPromptContextuel
 }; 

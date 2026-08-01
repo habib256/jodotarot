@@ -19,7 +19,10 @@ const en = {
     drawButton: "Draw Cards",
     drawButtonGenerating: "Generation in progress... Please wait",
     streamingOption: "Live Response:",
-    stopGeneration: "Stop Generation"
+    stopGeneration: "Stop Generation",
+    copyButton: "Copy",
+    copyButtonCopied: "Copied!",
+    copyButtonError: "Error!"
   },
   
   // Interpretation messages
@@ -262,6 +265,7 @@ Each element of your interpretation must illuminate a specific aspect of this qu
   
   // Cards
   cards: {
+    reversed: "Reversed",
     major_arcana: {
       fool: "The Fool",
       magician: "The Magician",
