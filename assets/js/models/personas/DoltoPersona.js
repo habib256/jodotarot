@@ -59,23 +59,6 @@ Areas of expertise: {{SPECIALIZATIONS}}`
     };
   }
   
-  /**
-   * Surcharge pour formater l'interprétation selon le style de Dolto
-   * @param {string} interpretation - Texte d'interprétation brut
-   * @return {string} Interprétation formatée avec le style spécifique à Dolto
-   */
-  formatInterpretation(interpretation) {
-    // Formatter le texte avec un style maternel et professionnel
-    let formattedText = `<div class="interpretation-dolto">
-      <p class="dolto-intro">"Les cartes vous parlent de votre histoire, celle qui est inscrite dans votre corps, bien avant les mots..."</p>
-      <div class="dolto-content">
-        ${interpretation}
-      </div>
-      <p class="dolto-closing">N'oubliez pas que tout est langage, et que même nos silences parlent. Ce tirage est une invitation à écouter ce qui en vous désire vivre.</p>
-    </div>`;
-    
-    return formattedText;
-  }
 }
 
 export default DoltoPersona; 

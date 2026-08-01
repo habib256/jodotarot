@@ -59,23 +59,6 @@ Areas of expertise: {{SPECIALIZATIONS}}`
     };
   }
   
-  /**
-   * Surcharge pour formater l'interprétation selon le style de Don Quichotte
-   * @param {string} interpretation - Texte d'interprétation brut
-   * @return {string} Interprétation formatée avec le style spécifique à Don Quichotte
-   */
-  formatInterpretation(interpretation) {
-    // Formatter le texte avec un style exalté et chevaleresque
-    let formattedText = `<div class="interpretation-quichotte">
-      <p class="quichotte-intro">🛡️ <em>"Par ma foi de chevalier errant ! Ces cartes révèlent une aventure extraordinaire, digne d'être consignée dans les annales de la chevalerie..."</em></p>
-      <div class="quichotte-content">
-        ${interpretation}
-      </div>
-      <p class="quichotte-closing">Ne renoncez jamais à vos nobles quêtes, même si le monde vous traite de fou. Car comme le dit mon fidèle écuyer Sancho : <em>"L'aventure nous guidera mieux que tous les raisonnements."</em></p>
-    </div>`;
-    
-    return formattedText;
-  }
 }
 
 export default QuichottePersona; 

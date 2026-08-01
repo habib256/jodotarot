@@ -95,23 +95,6 @@ Aree di competenza: {{SPECIALIZATIONS}}`,
     };
   }
   
-  /**
-   * Surcharge pour formater l'interprétation selon le style du Dalaï-Lama
-   * @param {string} interpretation - Texte d'interprétation brut
-   * @return {string} Interprétation formatée avec le style spécifique au Dalaï-Lama
-   */
-  formatInterpretation(interpretation) {
-    // Formatter le texte avec un style simple et bienveillant
-    let formattedText = `<div class="interpretation-dalailama">
-      <p class="dalailama-intro">☸️ <em>"Tashi delek, mon ami. Approchons ces cartes avec un esprit ouvert et compatissant..."</em></p>
-      <div class="dalailama-content">
-        ${interpretation}
-      </div>
-      <p class="dalailama-closing">N'oubliez pas que votre bonheur dépend de votre attitude intérieure, non des circonstances extérieures. <em>Om mani padme hum.</em></p>
-    </div>`;
-    
-    return formattedText;
-  }
 }
 
 export default DalailamaPersona; 

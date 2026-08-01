@@ -67,17 +67,19 @@ class BasePersona {
 
   /**
    * Construit et retourne le prompt système pour ce persona
-   * @param {string} spreadType - Type de tirage (cross, horseshoe, love)
+   * @param {string} spreadName - Nom localisé du tirage (ex: « Croix Celtique »).
+   *   Doit être traduit par l'appelant: injecter la clé technique produirait
+   *   des tournures comme « ce tirage celticCross » dans le prompt envoyé à l'IA.
    * @return {string} Prompt système formaté
    */
-  buildSystemPrompt(spreadType = 'cross') {
+  buildSystemPrompt(spreadName = '') {
     const template = this.promptTemplate[this.language] || this.promptTemplate['fr'] || '';
-    
+
     // Remplacer les variables dans le template
     let formattedTemplate = template
-      .replace('{{PERSONA_NAME}}', this.getName())
-      .replace('{{PERSONA_DESCRIPTION}}', this.getDescription())
-      .replace('{{SPREAD_TYPE}}', spreadType);
+      .replaceAll('{{PERSONA_NAME}}', this.getName())
+      .replaceAll('{{PERSONA_DESCRIPTION}}', this.getDescription())
+      .replaceAll('{{SPREAD_TYPE}}', spreadName);
       
     // Obtenir les spécialisations traduites
     const specializations = this.getTranslatedSpecializations(this.language);
@@ -95,22 +97,12 @@ class BasePersona {
       const label = expertiseLabels[this.language] || expertiseLabels['en'];
       formattedTemplate += `\n\n${label}: ${specializations.join(', ')}.`;
     } else if (template.includes('{{SPECIALIZATIONS}}')) {
-      formattedTemplate = formattedTemplate.replace('{{SPECIALIZATIONS}}', specializations.join(', '));
+      formattedTemplate = formattedTemplate.replaceAll('{{SPECIALIZATIONS}}', specializations.join(', '));
     }
     
     return formattedTemplate;
   }
   
-  /**
-   * Méthode utilitaire pour formater l'interprétation selon le style du persona
-   * @param {string} interpretation - Texte d'interprétation brut
-   * @return {string} Interprétation formatée
-   */
-  formatInterpretation(interpretation) {
-    // Par défaut, retourne l'interprétation telle quelle
-    // Les personas spécifiques peuvent surcharger cette méthode
-    return interpretation;
-  }
 }
 
-export default BasePersona; 
+export default BasePersona;

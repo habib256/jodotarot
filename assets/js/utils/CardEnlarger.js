@@ -10,6 +10,7 @@ class CardEnlarger {
   constructor(stateManager) {
     this.stateManager = stateManager;
     this.overlay = null;
+    this.hint = null;
     this.isEnlarged = false;
     this.currentCard = null;
     this.init();
@@ -70,6 +71,12 @@ class CardEnlarger {
     this.overlay = document.createElement('div');
     this.overlay.className = 'card-enlarge-overlay';
     document.body.appendChild(this.overlay);
+
+    // Message d'aide pour fermer (doit suivre l'overlay: cf. sélecteur CSS `+`)
+    this.hint = document.createElement('div');
+    this.hint.className = 'card-enlarge-hint';
+    this.hint.textContent = getTranslation('cards.closeHint', this.stateManager?.getState().language);
+    document.body.appendChild(this.hint);
 
     // Créer le clone de la carte
     const cardClone = cardElement.cloneNode(true);
@@ -273,13 +280,13 @@ class CardEnlarger {
       if (cardClone && cardClone.parentNode) {
         cardClone.remove();
       }
-      if (this.overlay && this.overlay.parentNode) {
-        this.overlay.remove();
-      }
+      this.overlay?.remove();
+      this.hint?.remove();
       // Réactiver le défilement du body
       document.body.classList.remove('card-enlarged-active');
       
       this.overlay = null;
+      this.hint = null;
       this.currentCard = null;
       this.isEnlarged = false;
     }, 300);

@@ -59,23 +59,6 @@ Areas of expertise: {{SPECIALIZATIONS}}`
     };
   }
   
-  /**
-   * Surcharge pour formater l'interprétation selon le style de No EGO man
-   * @param {string} interpretation - Texte d'interprétation brut
-   * @return {string} Interprétation formatée avec le style spécifique à No EGO man
-   */
-  formatInterpretation(interpretation) {
-    // Formatter le texte avec un style minimaliste et transcendant
-    let formattedText = `<div class="interpretation-noego">
-      <p class="noego-intro">☯️ <em>Silence...</em> ☯️</p>
-      <div class="noego-content">
-        ${interpretation}
-      </div>
-      <p class="noego-closing">Ce qui voit à travers vos yeux est ce que vous cherchez. <em>Tat tvam asi.</em> (Tu es Cela.)</p>
-    </div>`;
-    
-    return formattedText;
-  }
 }
 
 export default NoEgoPersona; 

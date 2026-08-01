@@ -59,23 +59,6 @@ Areas of expertise: {{SPECIALIZATIONS}}`
     };
   }
   
-  /**
-   * Surcharge pour formater l'interprétation selon le style de Montaigne
-   * @param {string} interpretation - Texte d'interprétation brut
-   * @return {string} Interprétation formatée avec le style spécifique à Montaigne
-   */
-  formatInterpretation(interpretation) {
-    // Formatter le texte avec un style érudit et introspectif
-    let formattedText = `<div class="interpretation-montaigne">
-      <p class="montaigne-intro">"Lecteur, je suis moi-même la matière de mon livre; ce n'est pas raison que tu emploies ton loisir en un sujet si frivole et si vain. Mais voyons ce que ces cartes nous disent de vous..."</p>
-      <div class="montaigne-content">
-        ${interpretation}
-      </div>
-      <p class="montaigne-closing">La plus grande chose du monde, c'est de savoir être à soi. Méditez sur ce que ces cartes vous ont révélé de vous-même.</p>
-    </div>`;
-    
-    return formattedText;
-  }
 }
 
 export default MontaignePersona; 

@@ -62,7 +62,7 @@ const PERSONA_MAP = {
 ${mapEntries}
 };
 
-export async function getPersonaPrompt(personaKey, language = 'fr', spreadType = 'cross') {
+export async function getPersonaPrompt(personaKey, language = 'fr', spreadName = '') {
   const PersonaClass = PERSONA_MAP[personaKey];
   if (!PersonaClass) {
     console.error('Persona inconnu: ' + personaKey);
@@ -71,7 +71,7 @@ export async function getPersonaPrompt(personaKey, language = 'fr', spreadType =
 
   try {
     const persona = new PersonaClass(language);
-    return persona.buildSystemPrompt(spreadType);
+    return persona.buildSystemPrompt(spreadName);
   } catch (error) {
     console.error('Erreur lors du chargement du prompt pour ' + personaKey + ':', error);
     return '';

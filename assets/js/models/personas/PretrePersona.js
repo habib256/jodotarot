@@ -95,23 +95,6 @@ Aree di competenza: {{SPECIALIZATIONS}}`,
     };
   }
   
-  /**
-   * Surcharge pour formater l'interprétation selon le style du Prêtre
-   * @param {string} interpretation - Texte d'interprétation brut
-   * @return {string} Interprétation formatée avec le style spécifique au Prêtre
-   */
-  formatInterpretation(interpretation) {
-    // Formatter le texte avec un style inspiré des textes religieux
-    let formattedText = `<div class="interpretation-pretre">
-      <p class="pretre-intro">✝️ <em>"In nomine Patris, et Filii, et Spiritus Sancti. Amen."</em> ✝️</p>
-      <div class="pretre-content">
-        ${interpretation}
-      </div>
-      <p class="pretre-closing">"Que la lumière divine éclaire votre chemin. <em>Pax et bonum</em>."</p>
-    </div>`;
-    
-    return formattedText;
-  }
 }
 
 export default PretrePersona; 

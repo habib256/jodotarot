@@ -39,6 +39,8 @@ const zh = {
     error: {
       general: "解读过程中发生错误。请重试。",
       noQuestion: "请在抽牌前输入问题",
+      generationStopped: "生成已被用户停止",
+      interpretationError: "解读过程中出错",
       api: "API错误: {0}"
     },
     apiWarning: "解读意外终止。以下是部分结果：",
@@ -233,6 +235,7 @@ const zh = {
   // 卡牌
   cards: {
     reversed: "逆位",
+    closeHint: "✕ 点击关闭",
     major_arcana: {
       fool: "愚者",
       magician: "魔术师",

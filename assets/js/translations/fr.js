@@ -270,6 +270,7 @@ Chaque élément de ton interprétation doit éclairer un aspect spécifique de 
   
   cards: {
     reversed: "Renversée",
+    closeHint: "✕ Cliquez pour fermer",
     major_arcana: {
       fool: "Le Fou",
       magician: "Le Bateleur",

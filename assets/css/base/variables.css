@@ -49,13 +49,11 @@
   --line-height-loose: 1.4;    /* Pour les interprétations - était 1.5 */
   
   /* Espacements minimaux */
-  --spacing-xxs: 0.125rem;     /* 2px - était 3.2px */
   --spacing-xs: 0.25rem;       /* 4px - était 4.8px */
   --spacing-sm: 0.375rem;      /* 6px - était 8px */
   --spacing-md: 0.5rem;        /* 8px - était 11.2px */
   --spacing-lg: 0.75rem;       /* 12px - était 16px */
   --spacing-xl: 1rem;          /* 16px - était 24px */
-  --spacing-xxl: 1.5rem;       /* 24px - était 32px */
   
   /* Bordures et ombres */
   --border-radius-sm: 0.25rem;  /* 4px - Arrondis subtils */
@@ -63,32 +61,21 @@
   --border-radius-lg: 1rem;     /* 16px - Grands arrondis */
   
   --border-width-thin: 1px;     /* Bordures fines pour séparateurs */
-  --border-width-medium: 2px;   /* Bordures standard */
   --border-width-thick: 4px;    /* Bordures épaisses pour accent */
   
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);  /* Ombre légère */
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);   /* Ombre moyenne */
   --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1);  /* Ombre prononcée */
-  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.06);  /* Ombre intérieure */
   
   /* Transitions */
   --transition-fast: 0.15s ease;  /* Transitions rapides pour feedback immédiat */
   --transition-base: 0.3s ease;   /* Transitions standard */
-  --transition-slow: 0.5s ease;   /* Transitions lentes pour effets dramatiques */
   
   /* Z-index */
-  --z-index-below: -1;     /* Éléments sous le flux normal */
   --z-index-base: 1;       /* Niveau de base */
-  --z-index-above: 10;     /* Au-dessus du flux normal */
   --z-index-modal: 100;    /* Fenêtres modales */
-  --z-index-toast: 1000;   /* Notifications */
   
   /* Breakpoints pour le responsive */
-  --breakpoint-sm: 576px;
-  --breakpoint-md: 768px;
-  --breakpoint-lg: 992px;
-  --breakpoint-xl: 1200px;
-  --breakpoint-xxl: 1400px;
 
   /* Dimensions des cartes - Mobile first */
   --card-base-width: 95px;          /* Taille de base pour mobile */
@@ -99,9 +86,6 @@
   /* Dimensions calculées */
   --card-width: calc(var(--card-base-width) * var(--card-scale-factor));
   --card-height: calc(var(--card-width) * var(--card-ratio));
-  --card-width-large: calc(var(--card-width) * var(--card-scale-large));
-  --card-height-large: calc(var(--card-width-large) * var(--card-ratio));
-
 
   /* Variables pour les positions des cartes */
 
@@ -128,18 +112,6 @@
   /* Position 5: Basse - Résultat (précédemment 'bottom') */
   --cross-position-5-x: 50%;
   --cross-position-5-y: 82%;
-
-  /* Conserver les anciennes variables temporairement pour compatibilité */
-  --cross-center-x: var(--cross-position-1-x);
-  --cross-center-y: var(--cross-position-1-y);
-  --cross-top-x: var(--cross-position-2-x);
-  --cross-top-y: var(--cross-position-2-y);
-  --cross-left-x: var(--cross-position-3-x);
-  --cross-left-y: var(--cross-position-3-y);
-  --cross-right-x: var(--cross-position-4-x);
-  --cross-right-y: var(--cross-position-4-y);
-  --cross-bottom-x: var(--cross-position-5-x);
-  --cross-bottom-y: var(--cross-position-5-y);
 
   /* Positions en fer à cheval */
   /* Dimensions spécifiques au tirage en fer à cheval */
@@ -249,42 +221,30 @@
 @media (min-width: 576px) {
   :root {
     --card-base-width: 80px;
-    --card-scale-large: 3.5;
   }
 }
 
 @media (min-width: 768px) {
   :root {
     --card-base-width: 90px;
-    --card-scale-large: 4;
   }
 }
 
 @media (min-width: 992px) {
   :root {
     --card-base-width: 100px;
-    --card-scale-large: 4.5;
   }
 }
 
 @media (min-width: 1200px) {
   :root {
     --card-base-width: 110px;
-    --card-scale-large: 5;
   }
 }
 
 @media (min-width: 1400px) {
   :root {
     --card-base-width: 120px;
-    --card-scale-large: 5.5;
-  }
-}
-
-/* Media Queries pour l'orientation */
-@media (orientation: landscape) {
-  :root {
-    --card-scale-large: calc(var(--card-scale-large) * 0.8); /* Réduire la taille en mode paysage */
   }
 }
 

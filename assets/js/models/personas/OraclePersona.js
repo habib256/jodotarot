@@ -95,21 +95,6 @@ Aree di competenza: {{SPECIALIZATIONS}}`,
     };
   }
   
-  /**
-   * Surcharge pour formater l'interprétation selon le style de l'Oracle
-   * @param {string} interpretation - Texte d'interprétation brut
-   * @return {string} Interprétation formatée avec le style spécifique à l'Oracle
-   */
-  formatInterpretation(interpretation) {
-    // Ajouter des éléments mystiques et des étoiles au texte
-    let formattedText = `<div class="interpretation-oracle">
-      <p class="oracle-invocation">✨ Les voiles du temps s'écartent... Les astres révèlent leurs secrets... ✨</p>
-      ${interpretation}
-      <p class="oracle-closing">🔮 Que les énergies cosmiques vous guident sur votre chemin... 🔮</p>
-    </div>`;
-    
-    return formattedText;
-  }
 }
 
 export default OraclePersona; 

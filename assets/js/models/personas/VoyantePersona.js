@@ -61,23 +61,6 @@ Areas of expertise: {{SPECIALIZATIONS}}`
     // Ajouter d'autres langues au besoin
   }
   
-  /**
-   * Surcharge pour formater l'interprétation selon le style de la Voyante
-   * @param {string} interpretation - Texte d'interprétation brut
-   * @return {string} Interprétation formatée avec le style spécifique à la Voyante
-   */
-  formatInterpretation(interpretation) {
-    // Formatter le texte avec un style mystérieux et des éléments visuels gitans
-    let formattedText = `<div class="interpretation-voyante">
-      <p class="voyante-greeting">✋ <em>La voyante prend vos mains et regarde intensément les cartes...</em> ✋</p>
-      <div class="voyante-content">
-        ${interpretation}
-      </div>
-      <p class="voyante-closing">Que les étoiles veillent sur votre chemin, <em>querido</em>. 🌟 Les cartes ont parlé ! 🌟</p>
-    </div>`;
-    
-    return formattedText;
-  }
 }
 
 export default VoyantePersona; 

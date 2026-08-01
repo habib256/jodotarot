@@ -32,10 +32,10 @@ const PERSONA_PATHS = {
  * Récupère le prompt spécifique à un persona
  * @param {string} personaKey - Clé identifiant le persona
  * @param {string} language - Code de langue
- * @param {string} spreadType - Type de tirage (cross, horseshoe, love, celticCross)
+ * @param {string} spreadName - Nom localisé du tirage (ex: « Croix Celtique »)
  * @returns {string} Le prompt spécifique au persona
  */
-export async function getPersonaPrompt(personaKey, language = 'fr', spreadType = 'cross') {
+export async function getPersonaPrompt(personaKey, language = 'fr', spreadName = '') {
   const path = PERSONA_PATHS[personaKey];
   if (!path) {
     console.error(`Persona inconnu: ${personaKey}`);
@@ -46,7 +46,7 @@ export async function getPersonaPrompt(personaKey, language = 'fr', spreadType =
     // Import dynamique du persona
     const module = await import(path);
     const persona = new module.default(language);
-    return persona.buildSystemPrompt(spreadType);
+    return persona.buildSystemPrompt(spreadName);
   } catch (error) {
     console.error(`Erreur lors du chargement du prompt pour ${personaKey}:`, error);
     return '';

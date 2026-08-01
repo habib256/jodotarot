@@ -39,6 +39,8 @@ const de = {
     error: {
       general: "Bei der Interpretation ist ein Fehler aufgetreten. Bitte versuche es erneut.",
       noQuestion: "Bitte gib eine Frage ein, bevor du die Karten ziehst",
+      generationStopped: "Generierung vom Benutzer gestoppt",
+      interpretationError: "Fehler bei der Interpretation",
       api: "API-Fehler: {0}"
     },
     apiWarning: "Die Interpretation wurde unerwartet beendet. Hier ist das teilweise Ergebnis:",
@@ -243,6 +245,7 @@ Jedes Element deiner Interpretation muss einen spezifischen Aspekt dieser Frage 
   // Karten
   cards: {
     reversed: "Umgekehrt",
+    closeHint: "✕ Zum Schließen klicken",
     major_arcana: {
       fool: "Der Narr",
       magician: "Der Magier",

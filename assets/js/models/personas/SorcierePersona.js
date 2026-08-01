@@ -101,23 +101,6 @@ Aree di competenza: {{SPECIALIZATIONS}}`,
     };
   }
   
-  /**
-   * Surcharge pour formater l'interprétation selon le style de la Sorcière
-   * @param {string} interpretation - Texte d'interprétation brut
-   * @return {string} Interprétation formatée avec le style spécifique à la Sorcière
-   */
-  formatInterpretation(interpretation) {
-    // Formatter le texte avec un style mystique et naturel
-    let formattedText = `<div class="interpretation-sorciere">
-      <p class="sorciere-invocation">🌙 <em>"Par la lumière de la lune et la sagesse des anciens, les cartes révèlent leur vérité..."</em> 🌿</p>
-      <div class="sorciere-content">
-        ${interpretation}
-      </div>
-      <p class="sorciere-closing">Que les énergies soient en équilibre dans votre vie. <em>Blessed be.</em> ✨</p>
-    </div>`;
-    
-    return formattedText;
-  }
 }
 
 export default SorcierePersona; 

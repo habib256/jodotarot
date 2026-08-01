@@ -95,23 +95,6 @@ Aree di competenza: {{SPECIALIZATIONS}}`,
     };
   }
   
-  /**
-   * Surcharge pour formater l'interprétation selon le style de l'Imam Soufis
-   * @param {string} interpretation - Texte d'interprétation brut
-   * @return {string} Interprétation formatée avec le style spécifique à l'Imam
-   */
-  formatInterpretation(interpretation) {
-    // Formatter le texte avec un style poétique et mystique
-    let formattedText = `<div class="interpretation-imam">
-      <p class="imam-intro">☪️ <em>"Bismillah ar-Rahman ar-Rahim. Au nom de Dieu, le Tout Miséricordieux, le Très Miséricordieux."</em></p>
-      <div class="imam-content">
-        ${interpretation}
-      </div>
-      <p class="imam-closing">"Comme le dit Rumi : 'Ce que tu cherches te cherche également.' Que la paix et la lumière divine habitent votre cœur. <em>As-salamu alaykum.</em>"</p>
-    </div>`;
-    
-    return formattedText;
-  }
 }
 
 export default ImamPersona; 

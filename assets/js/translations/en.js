@@ -39,6 +39,8 @@ const en = {
     error: {
       general: "An error occurred during interpretation. Please try again.",
       noQuestion: "Please enter a question before drawing cards",
+      generationStopped: "Generation stopped by the user",
+      interpretationError: "Error during interpretation",
       api: "API Error: {0}"
     },
     apiWarning: "The interpretation ended unexpectedly. Here is the partial result:",
@@ -266,6 +268,7 @@ Each element of your interpretation must illuminate a specific aspect of this qu
   // Cards
   cards: {
     reversed: "Reversed",
+    closeHint: "✕ Click to close",
     major_arcana: {
       fool: "The Fool",
       magician: "The Magician",

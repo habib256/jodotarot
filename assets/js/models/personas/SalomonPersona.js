@@ -59,23 +59,6 @@ Areas of expertise: {{SPECIALIZATIONS}}`
     };
   }
   
-  /**
-   * Surcharge pour formater l'interprétation selon le style de Salomon
-   * @param {string} interpretation - Texte d'interprétation brut
-   * @return {string} Interprétation formatée avec le style spécifique à Salomon
-   */
-  formatInterpretation(interpretation) {
-    // Formatter le texte avec un style royal et biblique
-    let formattedText = `<div class="interpretation-salomon">
-      <p class="salomon-intro">👑 <em>"Que celui qui cherche la sagesse vienne et écoute, car les cartes révèlent ce qui est caché aux yeux des hommes ordinaires..."</em></p>
-      <div class="salomon-content">
-        ${interpretation}
-      </div>
-      <p class="salomon-closing">Rappelez-vous que le commencement de la sagesse est la crainte de l'Éternel, et la connaissance du Saint est l'intelligence. <em>Shalom.</em></p>
-    </div>`;
-    
-    return formattedText;
-  }
 }
 
 export default SalomonPersona; 

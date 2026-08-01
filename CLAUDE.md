@@ -188,7 +188,9 @@ class CustomPersona extends BasePersona {
 
 **Prompt Construction** (`AIService.buildSystemPrompts` / `buildPrompt`):
 1. Meta prompt (system instructions) from translations
-2. Persona prompt (style/approach) via `persona.buildSystemPrompt()`
+2. Persona prompt (style/approach) via `persona.buildSystemPrompt(spreadName)` —
+   `spreadName` must already be localized (`spread.getName()`); passing the raw
+   key produces prompts like "this celticCross spread"
 3. Reading description (cards + positions) via `spread.generateReadingDescription()`
 4. User question with contextual enrichment
 
@@ -197,10 +199,10 @@ class CustomPersona extends BasePersona {
 **4 Spread Types** in `assets/js/models/spreads/`:
 - `CrossSpread.js`: 5 cards (past, present, future, advice, outcome)
 - `HorseshoeSpread.js`: 7 cards (horseshoe layout)
-- `LoveSpread.js`: 5 cards (love/relationship focus)
+- `LoveSpread.js`: 7 cards (love/relationship focus)
 - `CelticCrossSpread.js`: 10 cards (comprehensive reading)
 
-**All inherit from `BaseSpread`** (370 lines):
+**All inherit from `BaseSpread`**:
 - Card position definitions with semantic names
 - `draw()`: Shuffle and draw cards
 - `generateReadingDescription()`: Creates detailed prompt text

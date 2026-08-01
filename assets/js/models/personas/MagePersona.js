@@ -59,23 +59,6 @@ Areas of expertise: {{SPECIALIZATIONS}}`
     };
   }
   
-  /**
-   * Surcharge pour formater l'interprétation selon le style du Mage
-   * @param {string} interpretation - Texte d'interprétation brut
-   * @return {string} Interprétation formatée avec le style spécifique au Mage
-   */
-  formatInterpretation(interpretation) {
-    // Formatter le texte avec un style mystérieux et dramatique
-    let formattedText = `<div class="interpretation-mage">
-      <p class="mage-invocation">🔥 💧 🌪️ 🌍 <em>"Par les forces élémentaires, je convoque la vérité cachée dans ces arcanes..."</em> ✨</p>
-      <div class="mage-content">
-        ${interpretation}
-      </div>
-      <p class="mage-closing">Que les éléments vous guident sur votre chemin. <em>Lux in tenebris lucet.</em> (La lumière brille dans les ténèbres.)</p>
-    </div>`;
-    
-    return formattedText;
-  }
 }
 
 export default MagePersona; 

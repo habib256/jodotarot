@@ -292,8 +292,12 @@ class AIService {
       this.currentController = new AbortController();
       this.isGenerating = true;
       
-      const systemPrompts = await this.buildSystemPrompts(persona, language, spreadType);
-      const prompt = this.buildPrompt(reading, question, language, spreadType);
+      // Une seule instance de tirage sert au nom localisé et à la description
+      const spread = createSpread(spreadType, null, language);
+      spread.cards = [...reading];
+
+      const systemPrompts = await this.buildSystemPrompts(persona, language, spread.getName());
+      const prompt = this.buildPrompt(spread, question, language);
       
       // Mode spécial "prompt" (Sans IA)
       // Ce mode est une fonctionnalité de sécurité et de débogage qui :
@@ -371,14 +375,14 @@ class AIService {
    * Construit les prompts système pour le modèle d'IA
    * @param {string} persona - Persona choisi
    * @param {string} language - Langue
-   * @param {string} spreadType - Type de tirage
+   * @param {string} spreadName - Nom localisé du tirage
    * @return {Promise<Array>} Liste des prompts système
    */
-  async buildSystemPrompts(persona, language, spreadType) {
-    this.debugLog(`Chargement du prompt pour le persona: ${persona}, langue: ${language}, tirage: ${spreadType}`);
-    
+  async buildSystemPrompts(persona, language, spreadName) {
+    this.debugLog(`Chargement du prompt pour le persona: ${persona}, langue: ${language}, tirage: ${spreadName}`);
+
     try {
-      const personaPrompt = await getPersonaPrompt(persona, language, spreadType);
+      const personaPrompt = await getPersonaPrompt(persona, language, spreadName);
       this.debugLog('Contenu du prompt persona:', personaPrompt);
       
       const metaPrompt = getMetaPrompt(language);
@@ -397,33 +401,17 @@ class AIService {
   
   /**
    * Construit le prompt principal pour l'interprétation
-   * @param {Array} reading - Tableau des cartes tirées
+   * @param {BaseSpread} spread - Instance de tirage contenant les cartes tirées
    * @param {string} question - Question posée
-   * @param {string} language - Code de langue 
-   * @param {string} spreadType - Type de tirage
+   * @param {string} language - Code de langue
    * @return {string} Prompt formaté
    */
-  buildPrompt(reading, question, language, spreadType = 'cross') {
-    // S'assurer que reading est un tableau
-    if (!Array.isArray(reading)) {
-      console.error('Le paramètre reading doit être un tableau de cartes');
-      return `Question: ${question}\n\nErreur: Format de tirage invalide`;
-    }
-    
-    // Créer une instance temporaire du tirage pour générer une description riche
-    const spreadInstance = createSpread(spreadType, null, language);
-    
-    // Copier les cartes dans l'instance de tirage
-    spreadInstance.cards = [...reading];
-    
-    // Générer une description du tirage avec les cartes (sans descriptions détaillées pour réduire la longueur)
-    const spreadDescription = spreadInstance.generateReadingDescription(false);
-    
-    // Construction du prompt de base avec toutes les informations sur les cartes
-    let promptBase = `${spreadDescription}\n\n`;
-    
+  buildPrompt(spread, question, language) {
+    // Description du tirage sans les descriptions détaillées, pour limiter la longueur
+    const spreadDescription = spread.generateReadingDescription(false);
+
     // Enrichir le prompt avec la question et le texte d'emphase
-    return enrichirPromptContextuel(question, promptBase, language);
+    return enrichirPromptContextuel(question, `${spreadDescription}\n\n`, language);
   }
   
   /**
@@ -485,7 +473,19 @@ class AIService {
    * @return {Promise<Response>} - Promesse de réponse
    */
   async fetchWithRetry(url, options, userSignal = null, maxRetries = TIMEOUTS.MAX_RETRIES, timeoutMs = TIMEOUTS.OLLAMA_RESPONSE) {
+    // Erreur d'annulation à propager sans nouvelle tentative
+    const userAbortError = () => {
+      const error = new Error('Generation aborted by user');
+      error.name = 'AbortError';
+      return error;
+    };
+
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      // L'utilisateur a pu annuler pendant le délai d'attente précédent
+      if (userSignal?.aborted) {
+        throw userAbortError();
+      }
+
       // Contrôleur combinant le timeout et l'annulation utilisateur
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
@@ -504,9 +504,7 @@ class AIService {
       } catch (error) {
         // Annulation explicite de l'utilisateur: ne pas réessayer
         if (userSignal?.aborted) {
-          const abortError = new Error('Generation aborted by user');
-          abortError.name = 'AbortError';
-          throw abortError;
+          throw userAbortError();
         }
 
         if (attempt === maxRetries) {
@@ -519,6 +517,8 @@ class AIService {
         const isTimeout = error.name === 'AbortError';
         console.warn(`Tentative ${attempt + 1}/${maxRetries + 1} échouée${isTimeout ? ' (timeout)' : ''}: ${error.message}. Nouvelle tentative dans ${(delay / 1000).toFixed(1)}s...`);
 
+        clearTimeout(timeoutId);
+        userSignal?.removeEventListener('abort', abortFromUser);
         await new Promise(resolve => setTimeout(resolve, delay));
       } finally {
         clearTimeout(timeoutId);

@@ -39,6 +39,8 @@ const it = {
     error: {
       general: "Si è verificato un errore durante l'interpretazione. Si prega di riprovare.",
       noQuestion: "Inserisci una domanda prima di pescare le carte",
+      generationStopped: "Generazione interrotta dall'utente",
+      interpretationError: "Errore durante l'interpretazione",
       api: "Errore API: {0}"
     },
     apiWarning: "L'interpretazione è terminata in modo inaspettato. Ecco il risultato parziale:",
@@ -232,6 +234,7 @@ Ogni elemento della tua interpretazione deve illuminare un aspetto specifico di 
   // Carte
   cards: {
     reversed: "Rovesciata",
+    closeHint: "✕ Clicca per chiudere",
     major_arcana: {
       fool: "Il Matto",
       magician: "Il Mago",
