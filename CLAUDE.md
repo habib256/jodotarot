@@ -233,12 +233,15 @@ const msg = getTranslation('interpretation.loadingWithModel', 'fr', {
 
 **Modular Structure** (`assets/css/`):
 - `main.css`: Entry point, imports all modules
-- `buttons.css`, `cards.css`, `forms.css`, `modal.css`, `warnings.css`: Component styles
+- `components/`, `layouts/`, `modules/`, `utils/`: styles by scope
 - Uses CSS variables for theming
 - BEM naming convention for classes
 
 **Card Positioning**:
-- Dual identification: semantic names + numeric IDs
+- Positions are applied as inline styles by `BaseSpread._configurePositionStyle()`,
+  which reads the `--<key>-position-<n>-{x,y,rotation}` CSS variables from
+  `base/variables.css`. The `modules/*-spread.css` files only style the
+  containers; editing a position means editing the variable.
 - Position data defined in spread classes (e.g., `CrossSpread.js`)
 - Z-index management for overlapping cards
 - Visual editor available in `spread-editor.html`

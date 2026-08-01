@@ -17,7 +17,6 @@
 
 /* Utilitaires (déplacé en haut pour être disponible partout) */
 @import 'utils/scrolling.css';
-@import 'utils/animations.css';
 @import 'utils/helpers.css';
 
 /* Composants */
@@ -27,7 +26,6 @@
 @import 'components/forms.css';
 @import 'components/interpretation.css';
 @import 'components/copy-button.css';
-@import 'components/loading.css';
 @import 'components/modal.css';
 @import 'components/select.css';
 @import 'components/warnings.css';

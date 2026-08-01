@@ -67,14 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
  * Charge les ressources initiales
  */
 async function loadInitialResources() {
-  const loadingAnimations = document.getElementById('loading-animations');
-
   try {
-    // Afficher l'animation de chargement
-    if (loadingAnimations) {
-      loadingAnimations.style.display = 'block';
-    }
-
     // Charger le jeu de cartes sélectionné dans l'état
     const selectedCardSet = stateManager.getState().cardSet;
     try {
@@ -98,11 +91,6 @@ async function loadInitialResources() {
     console.error('Erreur lors du chargement des ressources:', error);
     showErrorMessage(`Erreur d'initialisation: ${error.message}`);
     throw error;
-  } finally {
-    // Cacher l'animation de chargement dans tous les cas
-    if (loadingAnimations) {
-      loadingAnimations.style.display = 'none';
-    }
   }
 }
 

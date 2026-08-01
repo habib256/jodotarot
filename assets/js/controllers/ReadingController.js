@@ -32,7 +32,6 @@ class ReadingController {
       spreadZone: document.querySelector('.spread-panel'),
       interpretationPanel: document.querySelector('.interpretation-panel'),
       responseContent: document.querySelector('.response-content'),
-      loadingAnimations: document.getElementById('loading-animations'),
       tirerButton: document.getElementById('tirer'),
       questionInput: document.getElementById('question')
     };
@@ -496,10 +495,7 @@ class ReadingController {
     const text = document.createElement('p');
     text.textContent = getTranslation('interpretation.loading', language);
 
-    const spinner = document.createElement('div');
-    spinner.className = 'loading-spinner';
-
-    container.append(text, spinner);
+    container.appendChild(text);
     this.elements.responseContent.replaceChildren(container);
   }
 
@@ -575,11 +571,6 @@ class ReadingController {
     try {
       if (!deckId) throw new Error('Identifiant de jeu non spécifié');
 
-      // Mettre à jour l'interface pour indiquer le chargement
-      if (this.elements.loadingAnimations) {
-        this.elements.loadingAnimations.style.display = 'block';
-      }
-
       // Charger le nouveau jeu
       const newDeck = await this.deckService.loadDeck(deckId);
 
@@ -595,10 +586,6 @@ class ReadingController {
       console.error(`❌ Erreur lors du chargement du jeu ${deckId}:`, error);
       this.stateManager.setState({ error: error.message });
       throw error;
-    } finally {
-      if (this.elements.loadingAnimations) {
-        this.elements.loadingAnimations.style.display = 'none';
-      }
     }
   }
 
