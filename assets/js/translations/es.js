@@ -48,6 +48,7 @@ const es = {
     userMessage: "Me gustaría una interpretación detallada y personalizada de mi tirada de tarot en cruz. Analiza el simbolismo de cada carta según su posición y establece las conexiones entre las cartas para ofrecer una lectura coherente que responda con precisión a mi pregunta.",
     ollamaPromo: "Descarga <a href='https://ollama.com' target='_blank'>ollama</a> con <a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a> para empezar. Recarga la página y haz tu tirada",
     streamingResponse: "Generando respuesta",
+    thinking: "Reflexionando...",
     // Messages pour les cartes spécifiques
     loveCardsMeaning: {
       moon_bottomLeft: "\"La Luna\" en la posición de sentimientos revela emociones profundas, a veces confusas o ambivalentes. Explora tu mundo interior para entender mejor tus verdaderos deseos.",

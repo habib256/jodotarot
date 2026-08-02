@@ -48,6 +48,7 @@ const zh = {
     userMessage: "我想要一个详细且个性化的十字塔罗牌阅读。请根据每张牌的位置分析其象征意义，并建立牌与牌之间的联系，提供一个连贯的解读，准确回应我的问题。",
     ollamaPromo: "下载 <a href='https://ollama.com' target='_blank'>ollama</a> 和 <a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a> 开始使用。刷新页面并进行您的牌阵",
     streamingResponse: "生成回应中",
+    thinking: "思考中...",
     // Messages pour les cartes spécifiques
     loveCardsMeaning: {
       moon_bottomLeft: "「月亮」在感情位置揭示了深层的、有时混乱或矛盾的情感。探索你的内心世界，以更好地理解你真正的渴望。",

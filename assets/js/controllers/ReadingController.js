@@ -377,16 +377,34 @@ class ReadingController {
       // Afficher le message de chargement
       this.showLoadingMessage(language);
 
-      // Variable pour suivre si nous avons reçu le premier chunk
+      // Variables pour suivre l'état du flux. La réflexion des modèles à
+      // raisonnement précède la réponse et n'est affichée que pendant la
+      // génération: elle ne fait pas partie de l'interprétation.
       let firstChunkReceived = false;
+      let thinkingElement = null;
 
-      const handleChunk = (chunk) => {
+      const handleChunk = (chunk, isThinking = false) => {
         // Supprimer les timestamps parfois renvoyés en fin de flux
         const cleanedChunk = chunk.replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z$/g, '');
 
-        // Au premier chunk, remplacer le message de chargement par la zone de texte
+        if (isThinking) {
+          // Au premier chunk de réflexion, remplacer le message de chargement
+          if (!thinkingElement) {
+            thinkingElement = this.prepareThinkingContainer(language);
+          }
+
+          if (thinkingElement) {
+            thinkingElement.textContent += cleanedChunk;
+            thinkingElement.scrollTop = thinkingElement.scrollHeight;
+          }
+          return;
+        }
+
+        // Au premier chunk de réponse, remplacer le message de chargement (ou la
+        // zone de réflexion) par la zone de texte
         if (!firstChunkReceived) {
           this.prepareTypewriterContainer();
+          thinkingElement = null;
           firstChunkReceived = true;
         }
 
@@ -500,6 +518,48 @@ class ReadingController {
   }
 
   /**
+   * Prépare le conteneur affichant la réflexion des modèles à raisonnement.
+   * Le texte est inséré via textContent, comme celui de l'interprétation.
+   * @param {string} language - Code de langue
+   * @return {HTMLElement|null} L'élément recevant le texte de réflexion
+   */
+  prepareThinkingContainer(language) {
+    if (!this.elements.responseContent) return null;
+
+    const section = document.createElement('div');
+    section.className = 'thinking-section';
+
+    const header = document.createElement('div');
+    header.className = 'thinking-header';
+    header.textContent = getTranslation('interpretation.thinking', language);
+
+    const content = document.createElement('div');
+    content.className = 'thinking-content';
+
+    section.append(header, content);
+    this.elements.responseContent.replaceChildren(section);
+
+    return content;
+  }
+
+  /**
+   * Fait disparaître la zone de réflexion en fondu, puis la retire du DOM.
+   * @param {HTMLElement} section - La section de réflexion à retirer
+   */
+  dismissThinkingSection(section) {
+    // Doit correspondre à la durée de transition de `.thinking-section`
+    const FADE_OUT_MS = 600;
+
+    section.classList.add('fade-out');
+
+    clearTimeout(this.thinkingFadeTimeout);
+    this.thinkingFadeTimeout = setTimeout(() => {
+      this.thinkingFadeTimeout = null;
+      section.remove();
+    }, FADE_OUT_MS);
+  }
+
+  /**
    * Prépare le conteneur qui reçoit le texte de l'interprétation
    * @return {HTMLElement|null} L'élément de texte créé
    */
@@ -508,7 +568,16 @@ class ReadingController {
 
     const typewriterElement = document.createElement('div');
     typewriterElement.className = 'typewriter-text';
-    this.elements.responseContent.replaceChildren(typewriterElement);
+
+    // Une zone de réflexion en cours disparaît en fondu plutôt que d'être
+    // retirée brutalement à l'arrivée du premier mot de la réponse.
+    const thinkingSection = this.elements.responseContent.querySelector('.thinking-section');
+    if (thinkingSection) {
+      this.elements.responseContent.replaceChildren(thinkingSection, typewriterElement);
+      this.dismissThinkingSection(thinkingSection);
+    } else {
+      this.elements.responseContent.replaceChildren(typewriterElement);
+    }
 
     this.typedLength = 0;
     return typewriterElement;
@@ -560,6 +629,8 @@ class ReadingController {
   stopTypewriterEffect() {
     clearTimeout(this.typewriterTimeout);
     this.typewriterTimeout = null;
+    clearTimeout(this.thinkingFadeTimeout);
+    this.thinkingFadeTimeout = null;
     this.typedLength = 0;
   }
 

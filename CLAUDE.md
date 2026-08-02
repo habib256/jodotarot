@@ -159,7 +159,14 @@ Different Ollama models return different JSON structures. The system auto-detect
 - Automatic fallback to "prompt" mode when no model is available
 
 **Streaming Implementation** (`AIService.getOllamaStreamingResponse`):
-Uses `response.body.getReader()` with `TextDecoder` for chunk-by-chunk processing. Calls `onChunk` callback for progressive UI updates. `ReadingController` renders chunks via `textContent` only — the model response is never inserted as HTML.
+Uses `response.body.getReader()` with `TextDecoder` for chunk-by-chunk processing. Calls `onChunk(text, isThinking)` for progressive UI updates. `ReadingController` renders chunks via `textContent` only — the model response is never inserted as HTML.
+
+**Reasoning models** (qwen3, deepseek-r1…): Ollama streams their reasoning in a
+separate `thinking` field. It is forwarded with `isThinking: true`, shown live in
+a `.thinking-section` that fades out when the answer starts, and excluded from
+both the returned response and the persisted interpretation. `num_predict` is
+`-1` (unlimited) because a token cap was being spent on reasoning, truncating
+the actual reading.
 
 ### Persona System
 

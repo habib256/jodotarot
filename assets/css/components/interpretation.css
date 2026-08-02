@@ -89,6 +89,41 @@
   background-color: transparent;
 }
 
+/* Réflexion des modèles à raisonnement (qwen3, deepseek-r1...), affichée le
+   temps de la génération puis retirée en fondu à l'arrivée de la réponse. */
+.thinking-section {
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  background-color: rgba(255, 255, 255, 0.75);
+  border-left: 3px solid var(--color-primary-light);
+  border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0;
+  opacity: 1;
+  transition: opacity 0.6s ease-out;
+}
+
+.thinking-section.fade-out {
+  opacity: 0;
+}
+
+.thinking-header {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.thinking-content {
+  max-height: 250px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  font-style: italic;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-base);
+  color: var(--color-text-light);
+}
+
 /* Fond lisible derrière le texte de l'interprétation */
 .typewriter-text {
   pointer-events: auto;
