@@ -48,6 +48,7 @@ const en = {
     userMessage: "I would like a detailed and personalized interpretation of my tarot cross spread. Analyze the symbolism of each card based on its position and establish connections between the cards to offer a coherent reading that precisely answers my question.",
     ollamaPromo: "Download <a href='https://ollama.com' target='_blank'>ollama</a> with <a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a> to get started. Reload the page and create your card reading",
     streamingResponse: "Generating response",
+    thinking: "Thinking...",
     // Messages for specific cards
     loveCardsMeaning: {
       moon_bottomLeft: "\"The Moon\" in the feelings position reveals deep emotions, sometimes confusing or ambivalent. Explore your inner world to better understand your true desires.",

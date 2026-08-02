@@ -539,7 +539,9 @@ class AIService {
         stream: false,
         options: {
           temperature: 0.7,
-          num_predict: 1000
+          // -1: pas de limite. Les modèles à raisonnement ("thinking") consomment
+          // une partie du quota en réflexion et voyaient l'interprétation tronquée.
+          num_predict: -1
         }
       };
       
@@ -579,9 +581,11 @@ class AIService {
    * @param {string} prompt - Le prompt utilisateur
    * @param {Array} systemPrompts - Les prompts système
    * @param {string} modelName - Nom du modèle Ollama
-   * @param {Function} onChunk - Callback pour chaque morceau de réponse
+   * @param {Function} onChunk - Callback `(texte, isThinking)` appelé pour chaque
+   *   morceau. `isThinking` vaut `true` pour la réflexion des modèles à
+   *   raisonnement, qui ne fait pas partie de la réponse retournée.
    * @param {AbortSignal} signal - Signal pour annuler la requête
-   * @return {Promise<string>} La réponse complète
+   * @return {Promise<string>} La réponse complète (hors réflexion)
    */
   async getOllamaStreamingResponse(prompt, systemPrompts, modelName, onChunk, signal) {
     // Nettoyer le nom du modèle (enlever le préfixe ollama: si présent)
@@ -600,7 +604,9 @@ class AIService {
       stream: true,
       options: {
         temperature: 0.7,
-        num_predict: 1000
+        // Voir getOllamaResponse: pas de limite, sinon la réflexion des modèles
+        // "thinking" épuise le quota avant la réponse.
+        num_predict: -1
       }
     };
     
@@ -655,10 +661,16 @@ class AIService {
             // Analyser chaque ligne comme un objet JSON
             const data = JSON.parse(line);
             
+            // Réflexion des modèles à raisonnement (qwen3, deepseek-r1...):
+            // affichée en direct mais exclue de l'interprétation finale.
+            if (data.thinking) {
+              onChunk(data.thinking, true);
+            }
+
             // Extraire le contenu de la réponse
             if (data.response) {
               completeResponse += data.response;
-              onChunk(data.response);
+              onChunk(data.response, false);
             }
           } catch (error) {
             console.error("Erreur lors de l'analyse du chunk JSON:", error);

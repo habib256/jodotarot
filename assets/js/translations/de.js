@@ -48,6 +48,7 @@ const de = {
     userMessage: "Ich hätte gerne eine detaillierte und personalisierte Interpretation meiner Tarot-Kreuzlegung. Analysiere die Symbolik jeder Karte entsprechend ihrer Position und stelle Verbindungen zwischen den Karten her, um eine kohärente Lesung zu bieten, die genau auf meine Frage eingeht.",
     ollamaPromo: "Lade <a href='https://ollama.com' target='_blank'>ollama</a> mit <a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a> herunter, um zu beginnen. Lade die Seite neu und ziehe deine Karten",
     streamingResponse: "Generiere Antwort",
+    thinking: "Nachdenken...",
     // Messages pour les cartes spécifiques
     loveCardsMeaning: {
       moon_bottomLeft: "\"Der Mond\" in der Position der Gefühle offenbart tiefe, manchmal verwirrende oder ambivalente Emotionen. Erforsche deine innere Welt, um deine wahren Wünsche besser zu verstehen.",

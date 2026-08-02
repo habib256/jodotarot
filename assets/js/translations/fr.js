@@ -49,6 +49,7 @@ const fr = {
     userMessage: "J'aimerais une interprétation détaillée et personnalisée de mon tirage de tarot en croix. Analysez la symbolique de chaque carte en fonction de sa position et établissez les connexions entre les cartes pour offrir une lecture cohérente qui réponde précisément à ma question.",
     ollamaPromo: "Télécharge <a href='https://ollama.com' target='_blank'>ollama</a> avec <a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a> pour commencer. Recharge la page et réalise ton tirage de cartes",
     streamingResponse: "Génération de la réponse",
+    thinking: "Réflexion en cours...",
     // Messages pour les cartes spécifiques
     loveCardsMeaning: {
       moon_bottomLeft: "\"La lune\" en position des sentiments révèle des émotions profondes, parfois confuses ou ambivalentes. Explorez votre monde intérieur pour mieux comprendre vos désirs véritables.",

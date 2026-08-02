@@ -48,6 +48,7 @@ const it = {
     userMessage: "Vorrei un'interpretazione dettagliata e personalizzata della mia stesa di tarocchi a croce. Analizza il simbolismo di ogni carta in base alla sua posizione e stabilisci le connessioni tra le carte per offrire una lettura coerente che risponda con precisione alla mia domanda.",
     ollamaPromo: "Scarica <a href='https://ollama.com' target='_blank'>ollama</a> con <a href='https://ollama.com/library/llama3.2' target='_blank'>llama3.2:3b</a> per iniziare. Ricarica la pagina e fai la tua pescata",
     streamingResponse: "Generazione della risposta",
+    thinking: "Riflessione in corso...",
     // Messages pour les cartes spécifiques
     loveCardsMeaning: {
       moon_bottomLeft: "\"La Luna\" nella posizione dei sentimenti rivela emozioni profonde, talvolta confuse o ambivalenti. Esplora il tuo mondo interiore per comprendere meglio i tuoi veri desideri.",
